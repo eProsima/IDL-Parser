@@ -32,17 +32,17 @@ public class Context
         m_file = file;
 
         // Remove absolute directory where the application was executed
-        if(startsWith(file, m_userdir))
+        if(startsWith(m_file, m_userdir))
         {
-        	file = file.substring(m_userdir.length());
+        	m_file = m_file.substring(m_userdir.length());
         	
         	// Remove possible separator    
-            if(startsWith(file, java.io.File.separator))
-                file = file.substring(1);
+            if(startsWith(m_file, java.io.File.separator))
+                m_file = m_file.substring(1);
         }
         // Remove relative directory if is equal that where the processed IDL is.
-        if(getDirectoryFile() != null && startsWith(file, getDirectoryFile()))
-        	file = file.substring(getDirectoryFile().length());
+        if(m_directoryFile != null && startsWith(m_file, m_directoryFile))
+        	m_file = m_file.substring(m_directoryFile.length());
 
         m_definitions = new ArrayList<Definition>();
         m_interfaces = new HashMap<String, Interface>();
@@ -56,7 +56,7 @@ public class Context
 
         // The scope file has to be initialized because could occur the preprocessor
         // is not called (using -ppDisable).
-        m_scopeFile = file;
+        m_scopeFile = m_file;
 
         m_includePaths = new ArrayList<String>();
         m_dependencies = new HashSet<String>();
@@ -72,11 +72,11 @@ public class Context
             	include = include.substring(m_userdir.length());
             	
             	// Remove possible separator    
-                if(startsWith(file, java.io.File.separator))
-                    file = file.substring(1);
+                if(startsWith(include, java.io.File.separator))
+                    include = include.substring(1);
             }
-            if(getDirectoryFile() != null && startsWith(include, getDirectoryFile()))
-            	include = include.substring(getDirectoryFile().length());
+            if(m_directoryFile != null && startsWith(include, m_directoryFile))
+            	include = include.substring(m_directoryFile.length());
             // Add last separator.
             if(include.charAt(include.length() - 1) != java.io.File.separatorChar)
                 include += java.io.File.separator;
@@ -120,11 +120,6 @@ public class Context
     public String getTrimfilename()
     {
         return Util.stringTrimAll(m_filename);
-    }
-
-    public String getDirectoryFile()
-    {
-        return m_directoryFile;
     }
 
     public String getScope()
