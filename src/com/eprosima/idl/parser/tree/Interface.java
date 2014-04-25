@@ -242,6 +242,16 @@ public class Interface extends ExportContainer implements Definition, Notebook
 
         return retValue;
     }
+
+    ////////// Auth block ////////////
+    // TODO Pensar en que la Annotación no solo tenga un string, sino más valores.
+    
+    public String getAuth()
+    {
+        return getAnnotations().get("AUTH_INTERFACE");
+    }
+
+    ///////// End Auth Block /////////
     
     ////////// RESTful block //////////
     

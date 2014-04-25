@@ -63,7 +63,7 @@ definition returns [Pair<Definition, TemplateGroup> dtg = null]
 	    |   (("abstract" | "custom")? "eventtype") => event SEMI!
 	    |   component SEMI!
 	    |   home_dcl SEMI!
-        |   annotation_type
+        |   annotation_type SEMI!
         |   annotation_application
 	    )
 	;
