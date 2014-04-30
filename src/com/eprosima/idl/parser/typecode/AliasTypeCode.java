@@ -21,6 +21,11 @@ public class AliasTypeCode extends ContainerTypeCode
             AliasTypeCode alias = (AliasTypeCode)super.getContentTypeCode();
             return alias.getContentTypeCode();
         }
+        else if(super.getContentTypeCode() instanceof ContainerTypeCode)
+        {
+            ContainerTypeCode container = (ContainerTypeCode)super.getContentTypeCode();
+            return container.getContentTypeCode();
+        }
 
         return super.getContentTypeCode();
     }
