@@ -7,6 +7,7 @@ public class Solution
 	public Solution()
 	{
 		m_projects = new ArrayList<Project>();
+		m_libraryPaths = new ArrayList<String>();
 		m_libraries = new ArrayList<String>();
 		m_includes = new ArrayList<String>();
 		
@@ -111,6 +112,16 @@ public class Solution
 		
 		return dep.equals(file);
 	}
+
+	public void addLibraryPath(String libraryPath)
+	{
+	    m_libraryPaths.add(libraryPath);
+	}
+	
+	public ArrayList<String> getLibraryPaths()
+	{
+	    return m_libraryPaths;
+	}
 	
 	public void addLibrary(String library)
 	{
@@ -134,6 +145,7 @@ public class Solution
 	
 	private ArrayList<Project> m_projects = null;
 	private ArrayList<Project> m_cacheprojects = null;
+	private ArrayList<String> m_libraryPaths = null;
 	private ArrayList<String> m_libraries = null;
 	private ArrayList<String> m_includes = null;
 	
