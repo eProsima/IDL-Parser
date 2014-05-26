@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
+import com.eprosima.log.Log;
+
 public class TemplateGroup
 {
     private Map<String, StringTemplate> m_templates;
@@ -40,6 +42,7 @@ public class TemplateGroup
 	            Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
 	            
 	            // Call setAttribute
+                Log.printDebug("setting attribute (TemplateGroup) to template group " + m.getKey() + " from " + tg.getTemplate(m.getKey()).getName() + " to " + m.getValue().getName());
 	            m.getValue().setAttribute(attribute, tg.getTemplate(m.getKey()).toString());
 	        }
     	}
@@ -55,6 +58,7 @@ public class TemplateGroup
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
             
             // Call setAttribute
+            Log.printDebug("setting attribute (obj1) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1);
         }
     }
@@ -69,6 +73,7 @@ public class TemplateGroup
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
             
             // Call setAttribute
+            Log.printDebug("setting attribute (obj1,obj2) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2);
         }
     }
@@ -83,6 +88,7 @@ public class TemplateGroup
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
             
             // Call setAttribute
+            Log.printDebug("setting attribute (obj1,obj2,obj3) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2, obj3);
         }
     }
@@ -97,6 +103,7 @@ public class TemplateGroup
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
             
             // Call setAttribute
+            Log.printDebug("setting attribute (obj1,obj2,obj3,obj4) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2, obj3, obj4);
         }
     }
@@ -111,6 +118,7 @@ public class TemplateGroup
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
             
             // Call setAttribute
+            Log.printDebug("setting attribute (obj1,obj2,obj3,obj4,obj5) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2, obj3, obj4, obj5);
         }
     }

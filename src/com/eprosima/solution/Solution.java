@@ -7,8 +7,10 @@ public class Solution
 	public Solution()
 	{
 		m_projects = new ArrayList<Project>();
+		m_libraryPaths = new ArrayList<String>();
 		m_libraries = new ArrayList<String>();
 		m_includes = new ArrayList<String>();
+		m_defines = new ArrayList<String>();
 		
 		// Detect OS
         m_os = System.getProperty("os.name");
@@ -111,6 +113,16 @@ public class Solution
 		
 		return dep.equals(file);
 	}
+
+	public void addLibraryPath(String libraryPath)
+	{
+	    m_libraryPaths.add(libraryPath);
+	}
+	
+	public ArrayList<String> getLibraryPaths()
+	{
+	    return m_libraryPaths;
+	}
 	
 	public void addLibrary(String library)
 	{
@@ -131,11 +143,23 @@ public class Solution
 	{
 	    return m_includes;
 	}
+
+	public void addDefine(String define)
+	{
+	    m_defines.add(define);
+	}
+	
+	public ArrayList<String> getDefines()
+	{
+	    return m_defines;
+	}
 	
 	private ArrayList<Project> m_projects = null;
 	private ArrayList<Project> m_cacheprojects = null;
+	private ArrayList<String> m_libraryPaths = null;
 	private ArrayList<String> m_libraries = null;
 	private ArrayList<String> m_includes = null;
+	private ArrayList<String> m_defines = null;
 	
 	// OS
     String m_os = null;
