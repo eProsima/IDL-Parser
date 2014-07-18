@@ -601,7 +601,7 @@ public class Context
     //! Map that contains all global exceptions that were found processing the IDL file (after preprocessing).
     private HashMap<String, com.eprosima.idl.parser.tree.Exception> m_exceptions = null;
     //! Map that contains all types that were found processing the IDL file (after preprocessing).
-    private HashMap<String, TypeCode> m_types = null;
+    protected HashMap<String, TypeCode> m_types = null;
   //! Map that contains all annotations that where found processing the IDL file.
     private HashMap<String, Annotation> m_annotations = null;
     //! Map that contains temporarily the annotations before to be linked with an element.
