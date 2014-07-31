@@ -63,11 +63,11 @@ public class StringTypeCode extends TypeCode
         
         if(m_maxsize == null)
         {
-            return new Pair<Integer, Integer>(lcurrentSize + 255, 1);
+            return new Pair<Integer, Integer>(lcurrentSize + 255 + 1, 1);
         }
         else
         {
-            return new Pair<Integer, Integer>(lcurrentSize + Integer.parseInt(m_maxsize), 1);
+            return new Pair<Integer, Integer>(lcurrentSize + Integer.parseInt(m_maxsize) + 1, 1);
         }
     }
     
@@ -75,11 +75,11 @@ public class StringTypeCode extends TypeCode
     {
         if(m_maxsize == null)
         {
-            return currentSize + 4 + 255;
+            return currentSize + 4 + 255 + 1;
         }
         else
         {
-            return currentSize + 4 + Integer.parseInt(m_maxsize);
+            return currentSize + 4 + Integer.parseInt(m_maxsize) + 1;
         }
     }
     
