@@ -244,7 +244,7 @@ public class Interface extends ExportContainer implements Definition, Notebook
     }
 
     ////////// Auth block ////////////
-    // TODO Pensar en que la Annotación no solo tenga un string, sino más valores.
+    // TODO Pensar en que la Annotacion no solo tenga un string, sino mas valores.
     
     public String getAuth()
     {
