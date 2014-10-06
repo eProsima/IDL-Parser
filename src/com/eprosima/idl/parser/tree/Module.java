@@ -5,15 +5,11 @@ import java.util.HashMap;
 
 public class Module extends DefinitionContainer implements Definition, Notebook
 {   
-    public Module(String name)
+    public Module(String scopeFile, boolean isInScope, String scope, String name)
     {
-        m_name = name;
+        super(scopeFile, isInScope, scope, name);
+
         m_annotations = new HashMap<String, String>();
-    }
-    
-    public String getName()
-    {
-        return m_name;
     }
     
     public void setParent(Object obj)
@@ -26,31 +22,6 @@ public class Module extends DefinitionContainer implements Definition, Notebook
         return m_parent;
     }
     
-    @Override
-    public Interface getFirstInterface(String idlFile)
-    {
-        Interface returnedValue = null;
-        
-        for(int count = 0; returnedValue == null && count < getDefinitions().size(); ++count)
-        {
-            returnedValue = getDefinitions().get(count).getFirstInterface(idlFile);
-        }
-        
-        return returnedValue;
-    }
-    
-    @Override
-    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
-    {
-    	com.eprosima.idl.parser.tree.Exception returnedValue = null;
-        
-        for(int count = 0; returnedValue == null && count < getDefinitions().size(); ++count)
-        {
-            returnedValue = getDefinitions().get(count).getFirstException(idlFile);
-        }
-        
-        return returnedValue;
-    }
     
     /*!
      * @brief This function is used in stringtemplates to not generate module in some cases (Right now in RequestReply.idl).
@@ -226,7 +197,6 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     
     ////////// End RESTful block //////////
 
-    private String m_name = null;
     private Object m_parent = null;
   //! Map that stores the annotations of the interface.
     HashMap<String, String> m_annotations = null;

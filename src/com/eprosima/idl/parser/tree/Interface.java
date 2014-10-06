@@ -5,46 +5,13 @@ import java.util.HashMap;
 
 public class Interface extends ExportContainer implements Definition, Notebook
 {
-    public Interface(String scope, String name)
+    public Interface(String scopeFile, boolean isInScope, String scope, String name)
     {
-        m_name = name;
-        m_scope = scope;
+        super(scopeFile, isInScope, scope, name);
+
         m_annotations = new HashMap<String, String>();
     }
     
-    public String getName()
-    {
-        return m_name;
-    }
-    
-    public String getScopedname()
-    {
-        if(m_scope.isEmpty())
-            return m_name;
-
-        return m_scope + "::" + m_name;
-    }
-
-    public String getScope()
-    {
-        return m_scope;
-    }
-    
-    /*
-     * @brief This function returns the scoped name of the interface but
-     * changing "::" by "_".
-     */
-    public String getFormatedScopedname()
-    {
-        String ret = null;
-        
-        if(m_scope.isEmpty())
-            ret = m_name;
-        else
-            ret = m_scope + "::" + m_name;
-        
-        return ret.replaceAll("::", "_");
-    }
 
     public void setParent(Object obj)
     {
@@ -54,25 +21,6 @@ public class Interface extends ExportContainer implements Definition, Notebook
     public Object getParent()
     {
         return m_parent;
-    }
-    
-    @Override
-    public Interface getFirstInterface(String idlFile)
-    {
-        if(getScopeFile().equals(idlFile) && getFirstOperation() != null)
-            return this;
-        
-        return null;
-    }
-    
-    @Override
-    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
-    {
-    	
-    	if(getScopeFile().equals(idlFile))
-            return getFirstException();
-        
-        return null;
     }
     
     @Override
@@ -103,32 +51,6 @@ public class Interface extends ExportContainer implements Definition, Notebook
     public boolean isIsConstDeclaration()
     {
         return false;
-    }
-    
-    /*!
-     * @brief This function returns the first exception of the interface.
-     */
-    public com.eprosima.idl.parser.tree.Exception getFirstException()
-    {
-    	for(int count = 0; m_firstexception == null && count < getExports().size(); ++count)
-        {
-            if(getExports().get(count).isIsException())
-            	m_firstexception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
-        }
-        return m_firstexception;
-    }
-    
-    /*!
-     * @brief This function returns the first operation of the interface.
-     */
-    public Operation getFirstOperation()
-    {
-        for(int count = 0; m_firstoperation == null && count < getExports().size(); ++count)
-        {
-            if(getExports().get(count).isIsOperation())
-                m_firstoperation = (Operation)getExports().get(count);
-        }
-        return m_firstoperation;
     }
     
     /*!
@@ -243,90 +165,10 @@ public class Interface extends ExportContainer implements Definition, Notebook
         return retValue;
     }
 
-    ////////// Auth block ////////////
-    // TODO Pensar en que la Annotacion no solo tenga un string, sino mas valores.
-    
-    public String getAuth()
-    {
-        return getAnnotations().get("AUTH_INTERFACE");
-    }
-
-    ///////// End Auth Block /////////
-    
-    ////////// RESTful block //////////
-    
-    public String getPath() {
-    	return getAnnotations().get("PATH");
-    }
-    
-    public String getPathWithoutFirstBackslace()
-    {
-        String path = getPath();
-        
-        if(path != null)
-        {
-            if(!path.isEmpty() && path.charAt(0) ==  '/')
-                path = path.substring(1);
-            
-            return path;
-        }
-        
-        return null;
-    }
-    
-    public boolean getPathHasBrackets() {
-    	if(getPath().contains("{") && getPath().contains("}"))
-    		return true;
-    	
-    	return false;
-    }
-    
-    public ArrayList<Integer> getTemplateParameterPositions()
-    {
-        ArrayList<Integer> ret = new ArrayList<Integer>();
-        int fpos = -1, numTag = 0;
-        
-        String uri = getPath();
-        
-        if(uri.length() > 2)
-        {
-            if(uri.charAt(0) == '/')
-                ++fpos;
-            
-            int lpos = fpos;
-            
-            do
-            {
-                if(uri.length() > lpos + 1)
-                {
-                    if(uri.charAt(lpos + 1) == '{')
-                        ret.add(numTag);
-                    
-                    fpos = lpos + 1;
-                }
-                else
-                    break;
-                
-                ++numTag;
-            }
-            while((lpos = uri.indexOf('/', fpos)) != -1);
-        }
-        
-        return ret;
-    }
-    
-    /////// End of RESTful block //////
-
-    private String m_name = null;
-    private String m_scope = null;
     private Object m_parent = null;
     
     //! Contains all operations.
     private ArrayList<Operation> m_operations = null;
-    //! Cache the first operation.
-    private Operation m_firstoperation = null;
-    //! Cache the first exception.
-    private com.eprosima.idl.parser.tree.Exception m_firstexception = null;
     //! Map that stores the annotations of the interface.
     HashMap<String, String> m_annotations = null;
 }

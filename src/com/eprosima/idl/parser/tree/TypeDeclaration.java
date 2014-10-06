@@ -3,10 +3,12 @@ package com.eprosima.idl.parser.tree;
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
-public class TypeDeclaration implements Definition, Export
+public class TypeDeclaration extends TreeNode implements Definition, Export
 {
-    public TypeDeclaration(TypeCode typecode)
+    public TypeDeclaration(String scopeFile, boolean isInScope, String scope, String name, TypeCode typecode)
     {
+        super(scopeFile, isInScope, scope, name);
+
         m_typecode = typecode;
         // Set as parent to the Typecode.
         m_typecode.setParent(this);
@@ -43,18 +45,6 @@ public class TypeDeclaration implements Definition, Export
     public boolean isIsException()
     {
         return false;
-    }
-    
-    @Override
-    public Interface getFirstInterface(String idlFile)
-    {
-        return null;
-    }
-    
-    @Override
-    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
-    {
-        return null;
     }
     
     @Override

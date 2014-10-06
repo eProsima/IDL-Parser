@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.NoSuchElementException;
 
-import com.eprosima.idl.parser.tree.ScopedObject;
+import com.eprosima.idl.parser.tree.TreeNode;
 import com.eprosima.idl.parser.tree.Notebook;
 import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Module;
@@ -45,6 +45,7 @@ public class Context
         	m_file = m_file.substring(m_directoryFile.length());
 
         m_definitions = new ArrayList<Definition>();
+        m_modules = new HashMap<String, Module>();
         m_interfaces = new HashMap<String, Interface>();
         m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
         m_types = new HashMap<String, TypeCode>();
@@ -155,16 +156,6 @@ public class Context
     	m_scopeLimitToAll = scopeLimitToAll;
     }
 
-    
-    /*!
-     * @return True if the object belongs to the processed file.
-     */
-    public boolean setScopedFileToObject(ScopedObject object)
-    {
-    	object.setScopeFile(m_scopeFile, m_scopeFile.equals(m_file));
-    	return m_scopeFile.equals(m_file);
-    }
-
     public int getCurrentIncludeLine()
     {
     	return m_currentincludeline;
@@ -184,16 +175,36 @@ public class Context
     }
 
     /*!
-     * @brief This function adds a interface to the context.
+     * @brief This function adds a module to the context.
      * This function is used in the parser.
      */
-    public void addInterface(String name, Interface interf)
+    public void addModule(Module module)
     { 
-        Interface prev = m_interfaces.put(name, interf);
+        Module prev = m_modules.put(module.getScopedname(), module);
         
         // TODO: Excepcion
         if(prev != null)
-            System.out.println("Warning: Redefined interface " + name);
+            System.out.println("Warning: Redefined module " + prev.getScopedname());
+    }
+
+    public Interface createInterface(String name)
+    {
+        Interface interfaceObject = new Interface(m_scopeFile, isInScopedFile(), m_scope, name);
+        addInterface(interfaceObject);
+        return interfaceObject;
+    }
+
+    /*!
+     * @brief This function adds a interface to the context.
+     * This function is used in the parser.
+     */
+    protected void addInterface(Interface interf)
+    { 
+        Interface prev = m_interfaces.put(interf.getScopedname(), interf);
+        
+        // TODO: Excepcion
+        if(prev != null)
+            System.out.println("Warning: Redefined interface " + prev.getScopedname());
     }
 
     /*!
@@ -204,17 +215,37 @@ public class Context
     {
         return new ArrayList<Interface>(m_interfaces.values());
     }
+
+    public ArrayList<Interface> getScopedInterfaces()
+    {
+        ArrayList<Interface> ret = new ArrayList<Interface>();
+
+        for(Interface interf : m_interfaces.values())
+        {
+            if(interf.isInScope())
+                ret.add(interf);
+        }
+
+        return ret;
+    }
+
+    public com.eprosima.idl.parser.tree.Exception createException(String name)
+    {
+        com.eprosima.idl.parser.tree.Exception exceptionObject = new com.eprosima.idl.parser.tree.Exception(m_scopeFile, isInScopedFile(), m_scope, name);
+        addException(exceptionObject);
+        return exceptionObject;
+    }
     
     /*!
      * @brief This function adds a global exception to the context.
      */
-    public void addException(String name, com.eprosima.idl.parser.tree.Exception exception)
+    protected void addException(com.eprosima.idl.parser.tree.Exception exception)
     {
-    	com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(name, exception);
+    	com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(exception.getScopedname(), exception);
         
         // TODO: Exception.
         if(prev != null)
-        	System.out.println("Warning: Redefined exception " + name);
+        	System.out.println("Warning: Redefined exception " + prev.getScopedname());
     }
 
     /*!
@@ -249,16 +280,22 @@ public class Context
         return returnedValue;
     }
 
+    public Operation createOperation(String name)
+    {
+        Operation operationObject = new Operation(m_scopeFile, isInScopedFile(), null, name);
+        return operationObject;
+    }
+
     /*!
      * @brief This function adds a global typecode to the context.
      */
-    public void addTypeCode(String name, TypeCode typecode)
+    public void addTypeCode(String scopedname, TypeCode typecode)
     {
-        TypeCode prev = m_types.put(name, typecode);
+        TypeCode prev = m_types.put(scopedname, typecode);
         
         // TODO: Exception.
         if(prev != null)
-        	System.out.println("Warning: Redefined type " + name);
+        	System.out.println("Warning: Redefined type " + scopedname);
     }
 
     /*!
@@ -296,13 +333,13 @@ public class Context
     /*!
      * @brief This function adds an annotation to the context.
      */
-    public void addAnnotation(String name, Annotation annotation)
+    public void addAnnotation(Annotation annotation)
     {
-        Annotation prev = m_annotations.put(name, annotation);
+        Annotation prev = m_annotations.put(annotation.getScopedname(), annotation);
         
         // TODO: Exception.
         if(prev != null)
-            System.out.println("Warning: Redefined annotation " + name);
+            System.out.println("Warning: Redefined annotation " + prev.getScopedname());
     }
 
     public Annotation getAnnotation(String name)
@@ -432,22 +469,6 @@ public class Context
     public ArrayList<String> getIncludeDependencies()
     {
     	return new ArrayList<String>(m_includedependency);
-    }
-
-    /*!
-     * @brief This function sets the current module that is been processed.
-     */
-    public void setCurrentModule(Module module)
-    {
-        m_currentmodule = module;
-    }
-    
-    /*!
-     * @brief This function gets the current module that is been processed.
-     */
-    public Module getCurrentModule()
-    {
-        return m_currentmodule;
     }
     
     /*!
@@ -596,6 +617,8 @@ public class Context
 
     //! Store all global definitions.
     private ArrayList<Definition> m_definitions;
+    //! Map that contains all modules that were found processing the IDL file (after preprocessing):
+    private HashMap<String, Module> m_modules = null;
     //! Map that contains all interfaces that were found processing the IDL file (after preprocessing):
     private HashMap<String, Interface> m_interfaces = null;
     //! Map that contains all global exceptions that were found processing the IDL file (after preprocessing).
@@ -606,8 +629,6 @@ public class Context
     private HashMap<String, Annotation> m_annotations = null;
     //! Map that contains temporarily the annotations before to be linked with an element.
     private HashMap<String, String> m_tmpAnnotations = null;
-    //! Current Module that is been processing.
-    private Module m_currentmodule = null;
 
     private ArrayList<String> m_includePaths = null;
     //! Set that contains the library dependencies that were found because there was a line of the preprocessor.

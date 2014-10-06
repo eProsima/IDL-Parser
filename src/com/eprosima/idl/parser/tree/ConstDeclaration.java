@@ -3,12 +3,13 @@ package com.eprosima.idl.parser.tree;
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
-public class ConstDeclaration implements Definition, Export
+public class ConstDeclaration extends TreeNode implements Definition, Export
 {
-    public ConstDeclaration(TypeCode typecode, String name, String value)
+    public ConstDeclaration(String scopeFile, boolean isInScope, String scope, String name, TypeCode typecode, String value)
     {
+        super(scopeFile, isInScope, scope, name);
+
         m_typecode = typecode;
-        m_name = name;
         m_value = value;
         // Set as parent to the Typecode.
         m_typecode.setParent(this);
@@ -24,11 +25,6 @@ public class ConstDeclaration implements Definition, Export
         return m_value;
     }
 
-    public String getName()
-    {
-        return m_name;
-    }
-    
     public void setParent(Object obj)
     {
         m_parent = obj;
@@ -58,18 +54,6 @@ public class ConstDeclaration implements Definition, Export
     }
     
     @Override
-    public Interface getFirstInterface(String idlFile)
-    {
-        return null;
-    }
-    
-    @Override
-    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
-    {
-        return null;
-    }
-    
-    @Override
     public boolean isIsInterface()
     {
     	return false;
@@ -94,7 +78,6 @@ public class ConstDeclaration implements Definition, Export
     }
     
     private TypeCode m_typecode = null;
-    private String m_name = null;
     private String m_value = null;
     private Object m_parent = null;
 }

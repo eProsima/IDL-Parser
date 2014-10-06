@@ -2,10 +2,12 @@ package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
 
-public class ExportContainer extends ScopedObject
+public class ExportContainer extends TreeNode
 {
-    protected ExportContainer()
+    protected ExportContainer(String scopeFile, boolean isInScope, String scope, String name)
     {
+        super(scopeFile, isInScope, scope, name);
+
         m_exports = new ArrayList<Export>();
     }
     

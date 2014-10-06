@@ -6,20 +6,16 @@ import java.util.HashMap;
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
-public class Operation implements Export, Notebook
+public class Operation extends TreeNode implements Export, Notebook
 {
-    public Operation(String name)
+    public Operation(String scopeFile, boolean isInScope, String scope, String name)
     {
-        m_name = name;
+        super(scopeFile, isInScope, scope, name);
+
         m_params = new ArrayList<Param>();
         m_exceptions = new ArrayList<com.eprosima.idl.parser.tree.Exception>();
         m_unresolvedExceptions = new ArrayList<String>();
         m_annotations = new HashMap<String, String>();
-    }
-    
-    public String getName()
-    {
-        return m_name;
     }
     
     public void setParent(Object obj)
@@ -109,12 +105,13 @@ public class Operation implements Export, Notebook
         return inoutput;
     }
     
+    // TODO Eliminar cuando añadamos los cambios de estandard.
     public void setRettype(TypeCode rettype)
     {
         if(rettype != null)
         {
             m_rettype = rettype;
-            m_rettypeparam = new OutputParam(m_name + "_ret", m_rettype);
+            m_rettypeparam = new OutputParam(getName() + "_ret", m_rettype);
         }
     }
     
@@ -218,20 +215,7 @@ public class Operation implements Export, Notebook
             throw new RuntimeException("ERROR<Operation::getCardinal>: Parent is not an interface.");
         }
     }
-    
-    ////////// RESTful block //////////
-    
-    public String getMethod() {
-    	return getAnnotations().get("METHOD");
-    }
-    
-    public String getBody() {
-    	return getAnnotations().get("BODY");
-    }
-        
-    /////// End of RESTful block //////
 
-    private String m_name = null;
     private Object m_parent = null;
     private boolean m_isOneway = false;
     private ArrayList<Param> m_params;

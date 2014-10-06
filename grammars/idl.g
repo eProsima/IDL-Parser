@@ -85,23 +85,25 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 	     name=identifier
 	     {
 	       // Create the Module object.
-	       moduleObject = new Module(name);
+	       moduleObject = new Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name);
 	       // Set temporarily annotations.
            ctx.setTmpAnnotations(moduleObject);
            
 	       if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
            {
                moduleTemplates = tmanager.createTemplateGroup("module");
+	           moduleTemplates.setAttribute("ctx", ctx);
 	           // Set the module object to the TemplateGroup of the module.
 	           moduleTemplates.setAttribute("module", moduleObject);
-	           moduleTemplates.setAttribute("ctx", ctx);
-	           ctx.setCurrentModule(moduleObject);
 	       }
 	       // Update to a new namespace.
            if(old_scope.isEmpty())
 	           ctx.setScope(name);
            else
 	           ctx.setScope(old_scope + "::" + name);
+
+           // Add the module to the context.
+           ctx.addModule(moduleObject);
 	     }
 	     // Each definition is stored in the Module and each TemplateGroup is set as attribute in the TemplateGroup of the module.
 	     LCURLY! tg=d:definition_list[moduleObject]{if(moduleTemplates!=null && tg!=null)moduleTemplates.setAttribute("definition_list", tg);} RCURLY!
@@ -153,16 +155,15 @@ interface_dcl returns [Pair<Interface, TemplateGroup> returnPair = null]
  	    name=identifier
  	    {
            // Create the Interface object.
-           interfaceObject = new Interface(ctx.getScope(), name);
+           interfaceObject = ctx.createInterface(name);
            // Set temporarily annotations.
            ctx.setTmpAnnotations(interfaceObject);
-           if(ctx.setScopedFileToObject(interfaceObject) || ctx.isScopeLimitToAll())
+           if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
            {
                interfaceTemplates = tmanager.createTemplateGroup("interface");
                interfaceTemplates.setAttribute("ctx", ctx);
                // Set the the interface object to the TemplateGroup of the module.
                interfaceTemplates.setAttribute("interface", interfaceObject);
-               ctx.addInterface(interfaceObject.getScopedname(), interfaceObject);
            }
 
 	       // Update to a new namespace.
@@ -375,7 +376,7 @@ const_dcl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
     {
 	   if(typecode != null)
 	   {
-           constDecl = new ConstDeclaration(typecode, name, value);
+           constDecl = new ConstDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, typecode, value);
            constTemplates.setAttribute("ctx", ctx);
            constTemplates.setAttribute("const", constDecl);
 	       
@@ -615,8 +616,9 @@ type_dcl returns [Pair<TypeDeclaration, TemplateGroup> returnPair = null]
     |   constr_forward_decl
 	)
 	{
+        // TODO Añadir nombre al typedeclaration.
 	    if(ttg!=null)
-	        returnPair = new Pair<TypeDeclaration, TemplateGroup>(new TypeDeclaration(ttg.first()), ttg.second());
+	        returnPair = new Pair<TypeDeclaration, TemplateGroup>(new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), null, ttg.first()), ttg.second());
 	}
 	;
 
@@ -836,7 +838,7 @@ annotation_type
         LCURLY! annotation_member_list[annotation] RCURLY!
         {
            // Add anotation typecode to the map with all typecodes.
-           ctx.addAnnotation(annotation.getScopedname(), annotation);
+           ctx.addAnnotation(annotation);
         }
     ;
     
@@ -1142,8 +1144,9 @@ except_dcl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup> 
 	    name=identifier
 	    {
             // Create the Exception object.
-            exceptionObject = new com.eprosima.idl.parser.tree.Exception(ctx.getScope(), name);
-            if(ctx.setScopedFileToObject(exceptionObject) || ctx.isScopeLimitToAll())
+            exceptionObject = ctx.createException(name);
+
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
                 exTemplates = tmanager.createTemplateGroup("exception");
                 exTemplates.setAttribute("ctx", ctx);
@@ -1158,7 +1161,6 @@ except_dcl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup> 
 	    }
 	    LCURLY! opt_member_list[exceptionObject] RCURLY!
 	    {
-            ctx.addException(exceptionObject.getScopedname(), exceptionObject);
             // Create the returned data.
             returnPair = new Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>(exceptionObject, exTemplates);
         }
@@ -1197,12 +1199,12 @@ op_dcl returns [Pair<Operation, TemplateGroup> returnPair = null]
 	    {name += LT(1).getText();}IDENT^				// identifier
 	    {
            // Create the Operation object.
-           operationObject = new Operation(name);
+           operationObject = ctx.createOperation(name);
            // Set temporarily annotations.
            ctx.setTmpAnnotations(operationObject);
+           operationTemplates.setAttribute("ctx", ctx);
            // Set the the interface object to the TemplateGroup of the module.
            operationTemplates.setAttribute("operation", operationObject);
-           operationTemplates.setAttribute("ctx", ctx);
            
            // Set return type
            operationObject.setRettype(retType);

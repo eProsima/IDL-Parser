@@ -2,10 +2,12 @@ package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
 
-public class DefinitionContainer
+public class DefinitionContainer extends TreeNode
 {
-    protected DefinitionContainer()
+    protected DefinitionContainer(String scopeFile, boolean isInScope, String scope, String name)
     {
+        super(scopeFile, isInScope, scope, name);
+
         m_definitions = new ArrayList<Definition>();
     }
     
