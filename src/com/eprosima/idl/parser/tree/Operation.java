@@ -111,7 +111,7 @@ public class Operation extends TreeNode implements Export, Notebook
         if(rettype != null)
         {
             m_rettype = rettype;
-            m_rettypeparam = new OutputParam(getName() + "_ret", m_rettype);
+            m_rettypeparam = new OutputParam("return_", m_rettype);
         }
     }
     
@@ -200,20 +200,6 @@ public class Operation extends TreeNode implements Export, Notebook
     public HashMap<String, String> getAnnotations()
     {
         return m_annotations;
-    }
-
-    // Function used in string templates
-    public int getCardinal()
-    {
-        if(m_parent instanceof Interface)
-        {
-            Interface ifc = (Interface)m_parent;
-            return ifc.getOperationCardinal(this);
-        }
-        else
-        {
-            throw new RuntimeException("ERROR<Operation::getCardinal>: Parent is not an interface.");
-        }
     }
 
     private Object m_parent = null;

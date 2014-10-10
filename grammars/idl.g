@@ -860,7 +860,7 @@ struct_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 {
     String name = null;
     StructTypeCode structTP = null;
-    TemplateGroup structTemplates = tmanager.createTemplateGroup("struct_type");
+    TemplateGroup structTemplates = null;
 }
 	:   "struct"^
 	    name=identifier
@@ -869,8 +869,12 @@ struct_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 	    }
 	    LCURLY! member_list[structTP] RCURLY!
 	    {
-	       structTemplates.setAttribute("ctx", ctx);
-           structTemplates.setAttribute("struct", structTP);
+           if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+           {
+               structTemplates = tmanager.createTemplateGroup("struct_type");
+               structTemplates.setAttribute("ctx", ctx);
+               structTemplates.setAttribute("struct", structTP);
+           }
            // Add struct typecode to the map with all typecodes.
            ctx.addTypeCode(structTP.getScopedname(), structTP);
            // Return the returned data.
