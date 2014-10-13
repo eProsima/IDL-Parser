@@ -14,6 +14,7 @@ import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Module;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
+import com.eprosima.idl.parser.tree.Param;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
@@ -284,6 +285,12 @@ public class Context
     {
         Operation operationObject = new Operation(m_scopeFile, isInScopedFile(), null, name);
         return operationObject;
+    }
+
+    public Param createParam(String name, TypeCode typecode, Param.Kind kind)
+    {
+        Param paramObject = new Param(name, typecode, kind);
+        return paramObject;
     }
 
     /*!

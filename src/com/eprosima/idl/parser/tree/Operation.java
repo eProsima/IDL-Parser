@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.parser.tree.Param;
 
 public class Operation extends TreeNode implements Export, Notebook
 {
@@ -111,7 +112,7 @@ public class Operation extends TreeNode implements Export, Notebook
         if(rettype != null)
         {
             m_rettype = rettype;
-            m_rettypeparam = new OutputParam("return_", m_rettype);
+            m_rettypeparam = new Param("return_", m_rettype, Param.Kind.OUT_PARAM);
         }
     }
     

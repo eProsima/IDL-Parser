@@ -1277,11 +1277,11 @@ param_dcl returns [Pair<Param, TemplateGroup> returnPair = null]
 	        {
 		        Param param = null;
 		        if(literal.equals("in"))
-		            param = new InputParam(pair.first(), typecode);
+		            param = ctx.createParam(pair.first(), typecode, Param.Kind.IN_PARAM);
 		        else if(literal.equals("out"))
-		            param = new OutputParam(pair.first(), typecode);
+		            param = ctx.createParam(pair.first(), typecode, Param.Kind.OUT_PARAM);
 		        else if(literal.equals("inout"))
-		            param = new InoutParam(pair.first(), typecode);
+		            param = ctx.createParam(pair.first(), typecode, Param.Kind.INOUT_PARAM);
 		            
 		        paramTemplate.setAttribute("parameter", param);
 		        returnPair = new Pair<Param, TemplateGroup>(param, paramTemplate);

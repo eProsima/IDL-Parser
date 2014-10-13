@@ -2,23 +2,62 @@ package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.parser.typecode.TypeCode;
 
-public abstract class Param
+public class Param
 {
-    public abstract boolean isInput();
+    public enum Kind
+    {
+        IN_PARAM,
+        OUT_PARAM,
+        INOUT_PARAM
+    };
+
+    public boolean isInput()
+    {
+        if(m_kind == Kind.IN_PARAM || m_kind == Kind.INOUT_PARAM)
+        {
+            return true;
+        }
+
+        return false;
+    }
     
-    public abstract boolean isOutput();
+    public boolean isOutput()
+    {
+        if(m_kind == Kind.OUT_PARAM || m_kind == Kind.INOUT_PARAM)
+        {
+            return true;
+        }
+
+        return false;
+    }
     
     public boolean isOnlyOutput()
     {        
-        return !isInput() && isOutput();
+        if(m_kind == Kind.OUT_PARAM)
+        {
+            return true;
+        }
+
+        return false;
     }
     
-    public abstract String getComment();
+    public String getComment()
+    {
+        if(m_kind == Kind.IN_PARAM)
+            return "in";
+        else if(m_kind == Kind.OUT_PARAM)
+            return "out";
+        else if(m_kind == Kind. INOUT_PARAM)
+            return "inout";
+
+        return "error";
+    }
     
-    public Param(String name, TypeCode typecode)
+    public Param(String name, TypeCode typecode, Kind kind)
     {
         m_name = name;
         m_typecode = typecode;
+        m_kind = kind;
     }
     
     public String getName()
@@ -41,32 +80,7 @@ public abstract class Param
         return m_parent;
     }
     
-    ////////// RESTful block //////////
-    
-    /*
-     * @brief Get the annotation with the real name of the query parameter.
-     * Also substitute the spaces by %20.
-     */
-    public String getRealname()
-    {
-        String realname;
-        
-        if((realname = ((Operation)getParent()).getAnnotations().get(m_name)) != null)
-        {
-            return realname.replace(" ", "%20");
-        }
-        
-        return m_name;
-    }
-    
-    public boolean getBodyParam ()
-    {
-    	String bodyParam = ((Operation)getParent()).getBody();   	
-        return getName().equals(bodyParam);
-    }
-    
-    /////// End of RESTful block //////
-    
+    private Kind m_kind = Kind.IN_PARAM;
     private String m_name = null;
     private TypeCode m_typecode = null;
     private Object m_parent = null;
