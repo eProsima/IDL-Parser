@@ -172,7 +172,7 @@ interface_dcl returns [Pair<Interface, TemplateGroup> returnPair = null]
            else
 	           ctx.setScope(old_scope + "::" + name);
         }
-	    ( interface_inheritance_spec )?	   
+	    ( interface_inheritance_spec[interfaceObject] )?	   
 	    LCURLY tg=interface_body[interfaceObject]{if(interfaceTemplates!=null && tg!=null)interfaceTemplates.setAttribute("export_list", tg);} RCURLY)
 	    {
 	       // Set the old namespace.
@@ -225,8 +225,27 @@ export returns [Pair<Export, TemplateGroup> etg = null]
 	;
 
 
-interface_inheritance_spec
-	:   COLON^ scoped_name_list
+interface_inheritance_spec [Interface interfaceObject]
+    {
+        Vector<String> iflist = null;
+    }
+	:   COLON^ iflist=scoped_name_list
+    {
+        for(String str : iflist)
+        {
+            Interface base = ctx.getInterface(str);
+
+            if(base != null)
+            {
+                if(!interfaceObject.addBase(base))
+                    throw new ParseException(ctx.getScopeFile(), LT(0) != null ? LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " is duplicated.");
+            }
+            else
+            {
+	           throw new ParseException(ctx.getScopeFile(), LT(0) != null ? LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " was not defined.");
+            }
+        }
+    }
 	;
 
 interface_name

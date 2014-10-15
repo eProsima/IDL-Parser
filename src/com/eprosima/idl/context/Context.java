@@ -208,6 +208,34 @@ public class Context
             System.out.println("Warning: Redefined interface " + prev.getScopedname());
     }
 
+    public Interface getInterface(String name)
+    {
+        int lastIndex = -1;
+        Interface returnedValue = m_interfaces.get(name);
+
+        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        {
+            String scope = m_scope;
+
+            while(returnedValue == null && !scope.isEmpty())
+            {
+                returnedValue = m_interfaces.get(scope + "::" + name);
+                lastIndex = scope.lastIndexOf("::");
+
+                if(lastIndex != -1)
+                {
+                    scope = scope.substring(0, lastIndex);
+                }
+                else
+                {
+                    scope = "";
+                }
+            }
+        }
+
+        return returnedValue;
+    }
+
     /*!
      * @brief This function returns all interfaces.
      * This function is used in string templates.
@@ -605,6 +633,19 @@ public class Context
     	return st.startsWith(prefix);
     }
 
+    /*** Function to generate random loop variables in string templates ***/
+    public String getNewLoopVarName()
+    {
+        m_loopVarName = 'a';
+        return Character.toString(m_loopVarName);
+    }
+
+    public String getNextLoopVarName()
+    {
+        return Character.toString(++m_loopVarName);
+    }
+    /*** End ***/
+
     // OS
     String m_os = null;
     String m_userdir = null;
@@ -648,4 +689,7 @@ public class Context
     // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
     //! Set that contains the include dependencies that force to include our type generated file (right now only with exceptions in RTI DDS types).
     private HashSet<String> m_includedependency = null;
+
+    // TODO Lleva la cuenta del nombre de variables para bucles anidados.
+    private char m_loopVarName = 'a';
 }

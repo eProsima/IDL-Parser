@@ -9,6 +9,7 @@ public class Interface extends ExportContainer implements Definition, Notebook
     {
         super(scopeFile, isInScope, scope, name);
 
+        m_bases = new HashMap<String, Interface>();
         m_annotations = new HashMap<String, String>();
     }
     
@@ -52,6 +53,21 @@ public class Interface extends ExportContainer implements Definition, Notebook
     {
         return false;
     }
+
+    public boolean addBase(Interface interf)
+    {
+        Interface prev = m_bases.put(interf.getName(), interf);
+
+        if(prev != null)
+            return false;
+
+        return true;
+    }
+
+    public ArrayList<Interface> getBases()
+    {
+        return new ArrayList<Interface>(m_bases.values());
+    }
     
     /*!
      * @brief This function returns the exception defined inside the interface.
@@ -86,7 +102,7 @@ public class Interface extends ExportContainer implements Definition, Notebook
     	
     	return exception;
     }
-    
+
     /*!
      * @brief This function returns all operations of the interface.
      * This function is used in the string templates.
@@ -145,6 +161,8 @@ public class Interface extends ExportContainer implements Definition, Notebook
 
     private Object m_parent = null;
     
+    //! Contains all interfaces it inherits from.
+    private HashMap<String, Interface> m_bases = null;
     //! Contains all operations.
     private ArrayList<Operation> m_operations = null;
     //! Map that stores the annotations of the interface.
