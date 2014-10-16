@@ -100,4 +100,7 @@ public class PrimitiveTypeCode extends TypeCode
         
         return null;
     }
+
+    public boolean isIsType_5() { return getKind() == KIND_FLOAT;}
+    public boolean isIsType_6() { return getKind() == KIND_DOUBLE;}
 }

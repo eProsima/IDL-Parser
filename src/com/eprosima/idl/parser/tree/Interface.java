@@ -113,6 +113,7 @@ public class Interface extends ExportContainer implements Definition, Notebook
         {
             m_operations = new ArrayList<Operation>();
             
+            // Get own operations.
             for(int count = 0; count < getExports().size(); ++count)
             {
                 if(getExports().get(count).isIsOperation())
@@ -123,6 +124,31 @@ public class Interface extends ExportContainer implements Definition, Notebook
         }
         
         return m_operations;
+    }
+
+    public ArrayList<Operation> getAll_operations()
+    {
+        if(m_all_operations == null)
+        {
+            m_all_operations = new ArrayList<Operation>();
+
+            // Get parent operations.
+            for(Interface iface : m_bases.values())
+            {
+                m_all_operations.addAll(iface.getAll_operations());
+            }
+            
+            // Get own operations.
+            for(int count = 0; count < getExports().size(); ++count)
+            {
+                if(getExports().get(count).isIsOperation())
+                {
+                    m_all_operations.add((Operation)getExports().get(count));
+                }
+            }
+        }
+
+        return m_all_operations;
     }
     
     /*!
@@ -165,6 +191,7 @@ public class Interface extends ExportContainer implements Definition, Notebook
     private HashMap<String, Interface> m_bases = null;
     //! Contains all operations.
     private ArrayList<Operation> m_operations = null;
+    private ArrayList<Operation> m_all_operations = null;
     //! Map that stores the annotations of the interface.
     HashMap<String, String> m_annotations = null;
 }
