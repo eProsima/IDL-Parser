@@ -1,7 +1,7 @@
 grammar IDL;
 
 @header {
-    package com.eprosima.idl.parser.grammar;
+    //package com.eprosima.idl.parser.grammar;
     
     import com.eprosima.idl.context.Context;
     import com.eprosima.idl.generator.manager.TemplateManager;
@@ -534,7 +534,7 @@ type_decl returns [Pair<TypeDeclaration, TemplateGroup> returnPair = null]
     |   KW_NATIVE simple_declarator
     |   constr_forward_decl )
 	{
-        // TODO Añadir nombre al typedeclaration.
+        // TODO A?adir nombre al typedeclaration.
 	    if(ttg!=null)
 	        $returnPair = new Pair<TypeDeclaration, TemplateGroup>(new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), null, ttg.first()), ttg.second());
 	}
