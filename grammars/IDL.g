@@ -37,7 +37,20 @@ specification [Context context, TemplateManager templatemanager, TemplateGroup m
     ctx = context;
     tmanager = templatemanager;
 }
-    :   import_decl* (definition { dtg=$definition.dtg; if(dtg!=null){maintemplates.setAttribute("definitions", dtg.second()); ctx.addDefinition(dtg.first()); specificationChildren.add(dtg.first()); } })+
+    :   import_decl*
+	(
+		definition
+		{
+			dtg=$definition.dtg;
+			if (dtg!=null) { 
+				if(maintemplates != null) {
+					maintemplates.setAttribute("definitions", dtg.second());
+				}
+				ctx.addDefinition(dtg.first());
+				specificationChildren.add(dtg.first());
+			} 
+		}
+	)+
 	{
 		$spec = new Specification();
 		$spec.setDefinitions(specificationChildren);
@@ -98,10 +111,12 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 		ctx.setTmpAnnotations(moduleObject);
 		
 		if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
-			moduleTemplates = tmanager.createTemplateGroup("module");
-			moduleTemplates.setAttribute("ctx", ctx);
-			// Set the module object to the TemplateGroup of the module.
-			moduleTemplates.setAttribute("module", moduleObject);
+			if(tmanager != null) {
+				moduleTemplates = tmanager.createTemplateGroup("module");
+				moduleTemplates.setAttribute("ctx", ctx);
+				// Set the module object to the TemplateGroup of the module.
+				moduleTemplates.setAttribute("module", moduleObject);
+			}
 		}
 		
 		// Update to a new namespace.
@@ -134,9 +149,22 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 definition_list [DefinitionContainer dc] returns [TemplateGroup dlTemplates]
 @init{
     Pair<Definition, TemplateGroup> dtg = null;
-	$dlTemplates = tmanager.createTemplateGroup("definition_list");
+	if(tmanager != null) {
+		$dlTemplates = tmanager.createTemplateGroup("definition_list");
+	}
 }
-	:   (definition{ dtg=$definition.dtg; if(dtg!=null){dc.add(dtg.first()); $dlTemplates.setAttribute("definitions", dtg.second());}})+
+	:   (
+		definition
+		{
+			dtg=$definition.dtg;
+			if(dtg!=null) {
+				dc.add(dtg.first());
+				if($dlTemplates != null) {
+					$dlTemplates.setAttribute("definitions", dtg.second());
+				}
+			}
+		}
+		)+
 	;
 
 /*!
@@ -165,11 +193,13 @@ interface_decl returns [Pair<Interface, TemplateGroup> returnPair = null]
            ctx.setTmpAnnotations(interfaceObject);
            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
            {
-               interfaceTemplates = tmanager.createTemplateGroup("interface");
-               interfaceTemplates.setAttribute("ctx", ctx);
-               // Set the the interface object to the TemplateGroup of the module.
-               interfaceTemplates.setAttribute("interface", interfaceObject);
-           }
+			   if(tmanager != null) {
+					interfaceTemplates = tmanager.createTemplateGroup("interface");
+					interfaceTemplates.setAttribute("ctx", ctx);
+					// Set the the interface object to the TemplateGroup of the module.
+					interfaceTemplates.setAttribute("interface", interfaceObject);
+				}
+            }
 
 	       // Update to a new namespace.
            if(old_scope.isEmpty())
@@ -200,9 +230,23 @@ forward_decl
 interface_body [ExportContainer ec] returns [TemplateGroup elTemplates]
 @init{
         Pair<Export, TemplateGroup> etg = null;
-		$elTemplates = tmanager.createTemplateGroup("export_list");
+		if(tmanager != null) {
+			$elTemplates = tmanager.createTemplateGroup("export_list");
+		}
 }
-    :   ( export{ etg=$export.etg; if(etg!=null){ec.add(etg.first()); etg.first().resolve(ctx); $elTemplates.setAttribute("exports", etg.second());}} )*
+    :   (
+		export
+		{
+			etg=$export.etg;
+			if(etg!=null) {
+				ec.add(etg.first());
+				etg.first().resolve(ctx);
+				if($elTemplates != null) {
+					$elTemplates.setAttribute("exports", etg.second());
+				}
+			}
+		}
+		)*
     ;
 
 /*!
@@ -338,14 +382,19 @@ const_decl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
     ConstDeclaration constDecl = null;
     TypeCode typecode = null;
     String constName = null, constValue = null;
-    TemplateGroup constTemplates = tmanager.createTemplateGroup("const_decl");
+	TemplateGroup constTemplates = null;
+	if(tmanager != null) {
+		constTemplates = tmanager.createTemplateGroup("const_decl");
+	}
 }
     :   KW_CONST const_type { typecode=$const_type.typecode; } identifier { constName=$identifier.id; } EQUAL const_exp { constValue=$const_exp.literalStr; }
 	{
 		if(typecode != null) {
 			constDecl = new ConstDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), constName, typecode, constValue);
-			constTemplates.setAttribute("ctx", ctx);
-			constTemplates.setAttribute("const", constDecl);	       
+			if(constTemplates != null) {
+				constTemplates.setAttribute("ctx", ctx);
+				constTemplates.setAttribute("const", constDecl);
+			}			
 			$returnPair = new Pair<ConstDeclaration, TemplateGroup>(constDecl, constTemplates);
        } else {
           throw new RuntimeException("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Cannot parse constant declaration");
@@ -549,7 +598,10 @@ type_declarator returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     Vector<Pair<String, ContainerTypeCode>> declvector = null;
     TypeCode typecode = null;
     AliasTypeCode typedefTypecode = null;
-    TemplateGroup typedefTemplates = tmanager.createTemplateGroup("typedef_decl");
+    TemplateGroup typedefTemplates =  null;
+	if(tmanager != null) {
+		typedefTemplates = tmanager.createTemplateGroup("typedef_decl");
+	}
 }
     :   type_spec { typecode=$type_spec.typecode; } declarators { declvector=$declarators.declvector; }
 	{
@@ -571,12 +623,17 @@ type_declarator returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 	               typedefTypecode.setContentTypeCode(typecode);
 	           }
 	           
-	           typedefTemplates.setAttribute("typedefs", typedefTypecode);
+			   if(typedefTemplates != null) {
+					typedefTemplates.setAttribute("typedefs", typedefTypecode);
+			   }
+			   
 	           // Add alias typecode to the map with all typecodes.
 	           ctx.addTypeCode(typedefTypecode.getScopedname(), typedefTypecode);
 	       }
 
-           typedefTemplates.setAttribute("ctx", ctx);
+			if(typedefTemplates != null) {
+				typedefTemplates.setAttribute("ctx", ctx);
+			}
 	       
 	       $returnPair = new Pair<TypeCode, TemplateGroup>(typecode, typedefTemplates);
        }
@@ -701,7 +758,7 @@ signed_short_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_SHORT);
 }
-    :   KW_SHORT 
+    :   KW_SHORT  
     ;
 
 signed_long_int returns [TypeCode typecode]
@@ -728,21 +785,21 @@ unsigned_short_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_USHORT);
 }
-    :   KW_UNSIGNED KW_SHORT
+    :   KW_UNSIGNED KW_SHORT 
     ;
 
 unsigned_long_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONG);
 }
-    :   KW_UNSIGNED KW_LONG
+    :   KW_UNSIGNED KW_LONG 
     ;
 
 unsigned_longlong_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONGLONG);
 }
-    :   KW_UNSIGNED KW_LONG KW_LONG
+    :   KW_UNSIGNED KW_LONG KW_LONG 
     ;
 
 char_type returns [TypeCode typecode]
@@ -770,7 +827,7 @@ octet_type returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_OCTET);
 }
-    :   KW_OCTET 
+    :   KW_OCTET  
     ;
 
 any_type
@@ -803,10 +860,12 @@ annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = 
 			annotationDecl = new AnnotationDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), annotation.getName(), annotation);
 			
 			if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
-				annotationTemplates = tmanager.createTemplateGroup("annotation");
-				annotationTemplates.setAttribute("ctx", ctx);
-				// Set the annotation object to the TemplateGroup of the annotation.
-				annotationTemplates.setAttribute("annotation", annotationDecl);
+				if(tmanager != null) {
+					annotationTemplates = tmanager.createTemplateGroup("annotation");
+					annotationTemplates.setAttribute("ctx", ctx);
+					// Set the annotation object to the TemplateGroup of the annotation.
+					annotationTemplates.setAttribute("annotation", annotationDecl);
+				}
 			}
 			
 			$returnPair = new Pair<AnnotationDeclaration, TemplateGroup>(annotationDecl, annotationTemplates);
@@ -867,9 +926,11 @@ struct_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 		{
            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
            {
-               structTemplates = tmanager.createTemplateGroup("struct_type");
-               structTemplates.setAttribute("ctx", ctx);
-               structTemplates.setAttribute("struct", structTP);
+				if(tmanager != null) {
+				   structTemplates = tmanager.createTemplateGroup("struct_type");
+				   structTemplates.setAttribute("ctx", ctx);
+				   structTemplates.setAttribute("struct", structTP);
+				}
            }
            // Add struct typecode to the map with all typecodes.
            ctx.addTypeCode(structTP.getScopedname(), structTP);
@@ -932,7 +993,10 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     int line = 0;
     TypeCode dist_type = null;
     UnionTypeCode unionTP = null;
-    TemplateGroup unionTemplates = tmanager.createTemplateGroup("union_type");
+    TemplateGroup unionTemplates = null;
+	if(tmanager != null) {
+		unionTemplates = tmanager.createTemplateGroup("union_type");
+	}
 }
     :   KW_UNION
 	    identifier { name=$identifier.id; System.out.println("\tidentifier: " + name);}
@@ -946,8 +1010,10 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 	    {
 	       // Calculate default label.
 	       unionTP.setDefaultvalue(TemplateUtil.getUnionDefaultLabel(unionTP.getDiscriminator(), unionTP.getMembers(), ctx.getScopeFile(), line));
-	       unionTemplates.setAttribute("ctx", ctx);
-           unionTemplates.setAttribute("union", unionTP);
+		   if(unionTemplates != null) {
+			   unionTemplates.setAttribute("ctx", ctx);
+			   unionTemplates.setAttribute("union", unionTP);
+		   }
            
            // Add union typecode to the map with all typecodes.
            ctx.addTypeCode(unionTP.getScopedname(), unionTP);
@@ -1058,14 +1124,19 @@ enum_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 @init{
     String name = null;
     EnumTypeCode enumTP = null;
-    TemplateGroup enumTemplates = tmanager.createTemplateGroup("enum_type");
+    TemplateGroup enumTemplates = null;
+	if(tmanager != null) {
+		enumTemplates = tmanager.createTemplateGroup("enum_type");
+	}
 }
     :   KW_ENUM
 		identifier { name=$identifier.id; enumTP = new EnumTypeCode(ctx.getScope(), name); }
 		LEFT_BRACE  enumerator_list[enumTP] RIGHT_BRACE
 	   {
-           enumTemplates.setAttribute("ctx", ctx);
-           enumTemplates.setAttribute("enum", enumTP);
+			if(enumTemplates != null) {
+				enumTemplates.setAttribute("ctx", ctx);
+				enumTemplates.setAttribute("enum", enumTP);
+			}
            // Add enum typecode to the map with all typecodes.
            ctx.addTypeCode(enumTP.getScopedname(), enumTP);
            // Return the returned data.
@@ -1089,9 +1160,9 @@ sequence_type returns [SequenceTypeCode typecode = null]
     TypeCode type = null;
     String maxsize = null;
 }
-    :   ( (KW_SEQUENCE ) 
+    :   ( (KW_SEQUENCE) 
 		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
-    |   (KW_SEQUENCE ) 
+    |   (KW_SEQUENCE) 
 		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
 		{
 	       $typecode = new SequenceTypeCode(maxsize);
@@ -1159,10 +1230,12 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
-                exTemplates = tmanager.createTemplateGroup("exception");
-                exTemplates.setAttribute("ctx", ctx);
-                // Set the the exception object to the TemplateGroup of the module.
-                exTemplates.setAttribute("exception", exceptionObject);
+				if(tmanager != null) {
+					exTemplates = tmanager.createTemplateGroup("exception");
+					exTemplates.setAttribute("ctx", ctx);
+					// Set the the exception object to the TemplateGroup of the module.
+					exTemplates.setAttribute("exception", exceptionObject);
+				}
             }
             // Its a dependency.
             else
@@ -1197,7 +1270,10 @@ opt_member_list [com.eprosima.idl.parser.tree.Exception exceptionObject]
 op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
 @init {
         Operation operationObject = null;
-        TemplateGroup operationTemplates = tmanager.createTemplateGroup("operation");
+        TemplateGroup operationTemplates = null;
+		if(tmanager != null) {
+			operationTemplates = tmanager.createTemplateGroup("operation");
+		}
         TemplateGroup tpl = null;
         String name = "";
         boolean oneway = false;
@@ -1212,9 +1288,12 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
            operationObject = ctx.createOperation(name);
            // Set temporarily annotations.
            ctx.setTmpAnnotations(operationObject);
-           operationTemplates.setAttribute("ctx", ctx);
-           // Set the the interface object to the TemplateGroup of the module.
-           operationTemplates.setAttribute("operation", operationObject);
+		   
+		   if(operationTemplates != null) {
+			   operationTemplates.setAttribute("ctx", ctx);
+			   // Set the the interface object to the TemplateGroup of the module.
+			   operationTemplates.setAttribute("operation", operationObject);
+		   }
            
            // Set return type
            operationObject.setRettype(retType);
@@ -1241,8 +1320,10 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
 		)?
 		( context_expr )?
 	    {
-	       // Store the parameter list template group in the operation template group.
-	       operationTemplates.setAttribute("param_list", tpl);
+			if(operationTemplates != null) {
+				// Store the parameter list template group in the operation template group.
+				operationTemplates.setAttribute("param_list", tpl);
+			}
            // Create the returned data.
            $returnPair = new Pair<Operation, TemplateGroup>(operationObject, operationTemplates);
         }
@@ -1262,7 +1343,9 @@ op_type_spec returns [TypeCode typecode = null]
 
 parameter_decls [Operation operation] returns [TemplateGroup tpl]
 @init {
-	$tpl = tmanager.createTemplateGroup("param_list");
+	if(tmanager != null) {
+		$tpl = tmanager.createTemplateGroup("param_list");
+	}
 }
     :   LEFT_BRACKET (param_decl_list[operation, $tpl])? RIGHT_BRACKET
     ;
@@ -1271,13 +1354,34 @@ param_decl_list [Operation operation, TemplateGroup tpl]
 @init {
         Pair<Param, TemplateGroup> ptg = null;
 }
-	:   param_decl { ptg=$param_decl.returnPair; } {if(ptg!=null){operation.add(ptg.first()); tpl.setAttribute("parameters", ptg.second());}}
-	    (COMA param_decl { ptg=$param_decl.returnPair; } {if(ptg!=null){operation.add(ptg.first()); tpl.setAttribute("parameters", ptg.second());}})*
+	:   param_decl { ptg=$param_decl.returnPair; }
+		{
+			if(ptg!=null) {
+				operation.add(ptg.first());
+				if(tpl != null) {
+					tpl.setAttribute("parameters", ptg.second());
+				}
+			}
+		}
+	    (
+		COMA param_decl { ptg=$param_decl.returnPair; }
+		{
+			if(ptg!=null) {
+				operation.add(ptg.first());
+				if(tpl != null) {
+					tpl.setAttribute("parameters", ptg.second());
+				}
+			}
+		}
+		)*
 	;
 	
 param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
 @init{
-        TemplateGroup paramTemplate = tmanager.createTemplateGroup("param");
+        TemplateGroup paramTemplate = null;
+		if(tmanager != null) {
+			paramTemplate = tmanager.createTemplateGroup("param");
+		}
         Pair<String, ContainerTypeCode> pair = null;
         TypeCode typecode = null;
         String literalStr = _input.LT(1).getText();
@@ -1296,7 +1400,9 @@ param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
 		        else if(literalStr.equals("inout"))
 		            param = ctx.createParam(pair.first(), typecode, Param.Kind.INOUT_PARAM);
 		            
-		        paramTemplate.setAttribute("parameter", param);
+				if(paramTemplate != null) {
+					paramTemplate.setAttribute("parameter", param);
+				}
 		        $returnPair = new Pair<Param, TemplateGroup>(param, paramTemplate);
 	        }
 	        else
