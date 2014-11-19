@@ -108,6 +108,12 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     {
         return m_annotations;
     }
+	
+	@Override
+	public boolean isIsAnnotation()
+    {
+        return false;
+    }
     
     ////////// RESTful block //////////
     

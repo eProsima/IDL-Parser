@@ -53,6 +53,12 @@ public class Interface extends ExportContainer implements Definition, Notebook
     {
         return false;
     }
+	
+	@Override
+	public boolean isIsAnnotation()
+    {
+        return false;
+    }
 
     public boolean addBase(Interface interf)
     {

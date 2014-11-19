@@ -60,6 +60,12 @@ public class Exception extends TreeNode implements Export, Definition
     {
         return true;
     }
+	
+	@Override
+	public boolean isIsAnnotation()
+    {
+        return false;
+    }
     
     public List<Member> getMembers()
     {

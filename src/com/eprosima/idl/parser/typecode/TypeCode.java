@@ -35,6 +35,8 @@ public abstract class TypeCode
     public static final int KIND_WSTRING = 0x00000015;
     public static final int KIND_VALUE = 0x00000016;
     public static final int KIND_SPARSE = 0x00000017;
+    public static final int KIND_SET = 0x00000018;
+    public static final int KIND_MAP = 0x00000019;
     
     public static StringTemplateGroup idltypesgr = null;
     public static StringTemplateGroup cpptypesgr = null;

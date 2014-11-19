@@ -15,4 +15,6 @@ public interface Definition
     public boolean isIsTypeDeclaration();
 
     public boolean isIsConstDeclaration();
+	
+    public boolean isIsAnnotation();
 }

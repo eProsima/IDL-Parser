@@ -1,4 +1,4 @@
-package com.eprosima.idl.parser.tree;
+package com.eprosima.idl.parser.typecode;
 
 import com.eprosima.idl.parser.typecode.*;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.antlr.stringtemplate.StringTemplate;
 
-public class Annotation extends MemberedTypeCode
+public class Annotation extends MemberedTypeCode 
 {
     public Annotation(String scope, String name)
     {
@@ -29,6 +29,14 @@ public class Annotation extends MemberedTypeCode
         // TODO Launch error like arraytypecode.
         return "Error";
     }
+	
+    public void setParent(Object obj) {
+	    m_parent = obj;
+	}
+    
+    public Object getParent() {
+		return m_parent;
+	}
     
     /// Copy from StructTypeCode. Not necessary.
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
@@ -71,4 +79,6 @@ public class Annotation extends MemberedTypeCode
         return Integer.toString(getMaxSerializedSizeWithoutAlignment(0));
     }*/
     /// End copy.
+	
+    private Object m_parent = null;
 }

@@ -64,6 +64,12 @@ public class TypeDeclaration extends TreeNode implements Definition, Export
     {
         return false;
     }
+	
+	@Override
+	public boolean isIsAnnotation()
+    {
+        return false;
+    }
     
     @Override
     public boolean resolve(Context ctx)

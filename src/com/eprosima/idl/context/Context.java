@@ -15,7 +15,7 @@ import com.eprosima.idl.parser.tree.Module;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
 import com.eprosima.idl.parser.tree.Param;
-import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.typecode.Annotation;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
 import com.eprosima.idl.util.Util;
