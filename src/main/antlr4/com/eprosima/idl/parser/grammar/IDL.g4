@@ -1,7 +1,7 @@
-grammar KIARAIDL;
+grammar IDL;
 
 @header {
-    package com.eprosima.idl.parser.grammar;
+    //package com.eprosima.idl.parser.grammar;
     
     import com.eprosima.idl.context.Context;
     import com.eprosima.idl.generator.manager.TemplateManager;
@@ -101,7 +101,7 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
     // Store old namespace.
     String name = null, old_scope = ctx.getScope();
 }
-    :   ( KW_MODULE | KW_NAMESPACE )
+    :   ( KW_MODULE )
 	identifier
 	{
 		name=$identifier.id;
@@ -183,7 +183,7 @@ interface_decl returns [Pair<Interface, TemplateGroup> returnPair = null]
         TemplateGroup tg = null;
         String name = null, old_scope = ctx.getScope();
 }
-    :   ( ( KW_ABSTRACT | KW_LOCAL )? ( KW_INTERFACE | KW_SERVICE )
+    :   ( ( KW_ABSTRACT | KW_LOCAL )? ( KW_INTERFACE )
 		identifier
  	    {
 			name=$identifier.id;
@@ -218,7 +218,7 @@ interface_decl returns [Pair<Interface, TemplateGroup> returnPair = null]
     ;
 
 forward_decl
-    :   ( KW_ABSTRACT | KW_LOCAL )? ( KW_INTERFACE | KW_SERVICE ) ID
+    :   ( KW_ABSTRACT | KW_LOCAL )? ( KW_INTERFACE ) ID
     ;
 
 
@@ -587,7 +587,7 @@ type_decl returns [Pair<TypeDeclaration, TemplateGroup> returnPair = null]
     |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
     |   constr_forward_decl )
 	{
-        // TODO Añadir nombre al typedeclaration.
+        // TODO A?adir nombre al typedeclaration.
 	    if(ttg!=null)
 	        $returnPair = new Pair<TypeDeclaration, TemplateGroup>(new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), null, ttg.first()), ttg.second());
 	}
@@ -681,8 +681,6 @@ base_type_spec returns [TypeCode typecode = null]
 
 template_type_spec returns [TypeCode typecode = null]
     :   sequence_type { $typecode=$sequence_type.typecode; }
-	|   set_type { $typecode=$set_type.typecode; }
-	|   map_type { $typecode=$map_type.typecode; }
     |   string_type { $typecode=$string_type.typecode; }
     |   wide_string_type { $typecode=$wide_string_type.typecode; }
     |   fixed_pt_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'fixed' type."); }
@@ -742,9 +740,6 @@ floating_pt_type returns [TypeCode typecode = null]
     :   ( KW_FLOAT { $typecode = new PrimitiveTypeCode(TypeCode.KIND_FLOAT);}
 	| KW_DOUBLE { $typecode = new PrimitiveTypeCode(TypeCode.KIND_DOUBLE);}
 	| KW_LONG KW_DOUBLE { $typecode = new PrimitiveTypeCode(TypeCode.KIND_LONGDOUBLE);}
-	| KW_FLOAT32 { $typecode = new PrimitiveTypeCode(TypeCode.KIND_FLOAT);}
-	| KW_FLOAT64 { $typecode = new PrimitiveTypeCode(TypeCode.KIND_FLOAT);}
-	| KW_FLOAT128 { $typecode = new PrimitiveTypeCode(TypeCode.KIND_FLOAT);}
 	)
     ;
 
@@ -763,21 +758,21 @@ signed_short_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_SHORT);
 }
-    :   KW_SHORT | KW_I16 
+    :   KW_SHORT  
     ;
 
 signed_long_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_LONG);
 }
-    :   KW_LONG | KW_I32
+    :   KW_LONG 
     ;
 
 signed_longlong_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_LONGLONG);
 }
-    :   KW_LONG KW_LONG | KW_I64
+    :   KW_LONG KW_LONG 
     ;
 
 unsigned_int returns [TypeCode typecode = null]
@@ -790,21 +785,21 @@ unsigned_short_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_USHORT);
 }
-    :   KW_UNSIGNED KW_SHORT | KW_U16
+    :   KW_UNSIGNED KW_SHORT 
     ;
 
 unsigned_long_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONG);
 }
-    :   KW_UNSIGNED KW_LONG | KW_U32
+    :   KW_UNSIGNED KW_LONG 
     ;
 
 unsigned_longlong_int returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONGLONG);
 }
-    :   KW_UNSIGNED KW_LONG KW_LONG | KW_U64
+    :   KW_UNSIGNED KW_LONG KW_LONG 
     ;
 
 char_type returns [TypeCode typecode]
@@ -832,7 +827,7 @@ octet_type returns [TypeCode typecode]
 @init{
 	$typecode = new PrimitiveTypeCode(TypeCode.KIND_OCTET);
 }
-    :   KW_OCTET | KW_BYTE 
+    :   KW_OCTET  
     ;
 
 any_type
@@ -1165,9 +1160,9 @@ sequence_type returns [SequenceTypeCode typecode = null]
     TypeCode type = null;
     String maxsize = null;
 }
-    :   ( (KW_SEQUENCE | KW_LIST) 
+    :   ( (KW_SEQUENCE) 
 		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
-    |   (KW_SEQUENCE | KW_LIST) 
+    |   (KW_SEQUENCE) 
 		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
 		{
 	       $typecode = new SequenceTypeCode(maxsize);
@@ -1175,37 +1170,6 @@ sequence_type returns [SequenceTypeCode typecode = null]
 	    }
     ;
 	
-set_type returns [SetTypeCode typecode = null]
-@init {
-    TypeCode type = null;
-    String maxsize = null;
-} : ( KW_SET
-		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
-    |   KW_SET
-		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
-		{
-	       $typecode = new SetTypeCode(maxsize);
-	       $typecode.setContentTypeCode(type);
-	    }
-    ;
-	
-map_type returns [MapTypeCode typecode = null]
-@init {
-    TypeCode keyType = null;
-    TypeCode valueType = null;
-    String maxsize = null;
-} : ( KW_MAP
-		LEFT_ANG_BRACKET simple_type_spec { keyType=$simple_type_spec.typecode; } COMA simple_type_spec { valueType=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
-    |   KW_MAP
-		LEFT_ANG_BRACKET simple_type_spec { keyType=$simple_type_spec.typecode; } COMA simple_type_spec { valueType=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
-		{
-	       $typecode = new MapTypeCode(maxsize);
-	       $typecode.setKeyTypeCode(keyType);
-	       $typecode.setValueTypeCode(valueType);
-	    }
-    ;
-	
-
 string_type returns [TypeCode typecode = null]
 @init{
     String maxsize = null;
@@ -1978,21 +1942,6 @@ KW_LOCAL:               'local';
 KW_MANAGES:             'manages';
 KW_INTERFACE:           'interface';
 KW_COMPONENT:           'component';
-KW_NAMESPACE:           'namespace';
-KW_SERVICE:             'service';
-KW_FLOAT32:             'float32';
-KW_FLOAT64:             'float64';
-KW_FLOAT128:            'float128';
-KW_I16:                 'i16';
-KW_I32:                 'i32';
-KW_I64:                 'i64';
-KW_U16:                 'u16';
-KW_U32:                 'u32';
-KW_U64:                 'u64';
-KW_BYTE:                'byte';
-KW_LIST:                'list';
-KW_SET:                 'set';
-KW_MAP:                 'map';
 KW_AT_ANNOTATION:        '@annotation';
 
 ID
@@ -2022,4 +1971,4 @@ LINE_COMMENT
     :   '//' ~('\n' | '\r')* '\r'? '\n' -> channel(HIDDEN)
     ;
 
-// [EOF] KIARAIDL.g
+// [EOF] IDL.g
