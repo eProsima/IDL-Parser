@@ -88,7 +88,7 @@ public class Project
 			if(!m_parent.getOS().contains("Windows") ||
 					m_parent.existsProject(deps.get(count)))
 			{
-				System.out.println("Adding GUID of " + deps.get(count));
+				//System.out.println("Adding GUID of " + deps.get(count));
 				array.add(GUIDGenerator.genGUID(deps.get(count)));
 			}
 		}
