@@ -515,8 +515,10 @@ public class Context
     public void processPreprocessorLine(String line, int nline)
     { 	
     	// If there is a line referring to the content of an included file.
-    	if(line.charAt(0) == ' ')
+    	if(line.startsWith("# "))
     	{
+            String line_ = line.substring(2);
+
     	    /* The received preprocessor line has the following form:
              * ' numline filename flags'
     	     * where:
@@ -524,7 +526,7 @@ public class Context
     	     * - filename The filename whose content was included.
     	     * - flags
     	     */
-    	    Scanner scanner = new Scanner(line);
+    	    Scanner scanner = new Scanner(line_);
     	    
     	    // Read numline
     	    int numline = scanner.nextInt();
