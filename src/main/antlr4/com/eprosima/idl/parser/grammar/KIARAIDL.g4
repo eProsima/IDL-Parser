@@ -1422,19 +1422,21 @@ param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
         TypeCode typecode = null;
         String literalStr = _input.LT(1).getText();
 }
-    :   ('in' | 'out' | 'inout')
+    :   ('in' | 'out' | 'inout')?
 		param_type_spec { typecode=$param_type_spec.typecode; }
         pair=simple_declarator { pair=$simple_declarator.pair; }
 	    {
 	        if(typecode != null)
 	        {
 		        Param param = null;
-		        if(literalStr.equals("in"))
-		            param = ctx.createParam(pair.first(), typecode, Param.Kind.IN_PARAM);
-		        else if(literalStr.equals("out"))
-		            param = ctx.createParam(pair.first(), typecode, Param.Kind.OUT_PARAM);
-		        else if(literalStr.equals("inout"))
-		            param = ctx.createParam(pair.first(), typecode, Param.Kind.INOUT_PARAM);
+				
+		        if(literalStr.equals("out") || literalStr.equals("inout")) {
+					System.out.println("WARNING (File " + ctx.getFilename() + ", Line " +
+						(_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + 
+						"): The only supported parameter declaration is 'in'. Treating as 'in'...");
+				}
+				
+	            param = ctx.createParam(pair.first(), typecode, Param.Kind.IN_PARAM);
 		            
 				if(paramTemplate != null) {
 					paramTemplate.setAttribute("parameter", param);
