@@ -84,6 +84,22 @@ public class Exception extends TreeNode implements Export, Definition
     	return true;
     }
     
+    @Override
+    public Interface getFirstInterface(String idlFile)
+    {
+        return null;
+    }
+    
+    @Override
+    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
+    {
+    	
+    	if(getScopeFile().equals(idlFile))
+            return this;
+        
+        return null;
+    }
+    
     private Object m_parent = null;
     private List<Member> m_members = null;
 }

@@ -62,6 +62,32 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     }
     
     @Override
+    public Interface getFirstInterface(String idlFile)
+    {
+        Interface returnedValue = null;
+        
+        for(int count = 0; returnedValue == null && count < getDefinitions().size(); ++count)
+        {
+            returnedValue = getDefinitions().get(count).getFirstInterface(idlFile);
+        }
+        
+        return returnedValue;
+    }
+    
+    @Override
+    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
+    {
+    	com.eprosima.idl.parser.tree.Exception returnedValue = null;
+        
+        for(int count = 0; returnedValue == null && count < getDefinitions().size(); ++count)
+        {
+            returnedValue = getDefinitions().get(count).getFirstException(idlFile);
+        }
+        
+        return returnedValue;
+    }
+    
+    @Override
     public boolean isIsModule()
     {
         return true;

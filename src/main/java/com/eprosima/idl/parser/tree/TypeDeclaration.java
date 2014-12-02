@@ -77,6 +77,18 @@ public class TypeDeclaration extends TreeNode implements Definition, Export
     	return true;
     }
     
+    @Override
+    public Interface getFirstInterface(String idlFile)
+    {
+        return null;
+    }
+    
+    @Override
+    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
+    {
+        return null;
+    }
+    
     private TypeCode m_typecode = null;
     private Object m_parent = null;
 }

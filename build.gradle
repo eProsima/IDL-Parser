@@ -12,7 +12,10 @@ apply plugin: 'idea'	// InteliJ IDEA integration
 apply plugin: 'project-report'
 
 //general properties
-version = '0.0.1-SNAPSHOT'
+jar {
+	baseName = 'kiaraparser'
+    version =  '0.1.0'
+}
 
 description = """"""
 
