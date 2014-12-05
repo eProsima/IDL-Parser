@@ -30,6 +30,11 @@ public class StructTypeCode extends MemberedTypeCode
         return st.toString();
     }
     
+    @Override
+    public boolean isIsType_a(){
+    	return true;
+    }
+    
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
     {
         List<Member> members = getMembers();
