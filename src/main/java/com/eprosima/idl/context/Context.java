@@ -222,7 +222,7 @@ public class Context
         int lastIndex = -1;
         Interface returnedValue = m_interfaces.get(name);
 
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
@@ -295,7 +295,7 @@ public class Context
         com.eprosima.idl.parser.tree.Exception returnedValue = m_exceptions.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
@@ -392,7 +392,7 @@ public class Context
         Annotation returnedValue = m_annotations.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
