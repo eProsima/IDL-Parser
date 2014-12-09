@@ -539,9 +539,13 @@ public class Context
     	    
     	    // Read numline
     	    int numline = scanner.nextInt();
+
+	    line_ = scanner.nextLine();
+	    scanner = new Scanner(line_).useDelimiter("\"");
     	    
     	    // Read filename
-    	    String filename = scanner.next("\".*\"");
+	    scanner.next();
+    	    String filename = scanner.next();
     	    
     	    // Read flags.
     	    boolean systemFile = false, enteringFile = false, exitingFile = false;
@@ -550,6 +554,9 @@ public class Context
     	    {
         	    try
         	    {
+			line_ = scanner.nextLine();
+		        scanner = new Scanner(line_);
+
         	        while(true)
         	        {
         	            Integer flag = scanner.nextInt();
