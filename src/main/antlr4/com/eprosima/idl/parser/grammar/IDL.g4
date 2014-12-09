@@ -105,8 +105,20 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 	identifier
 	{
 		name=$identifier.id;
-		// Create the Module object.
-		moduleObject = new Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name);   
+        // Check if the module already was defined.
+        moduleObject = ctx.existsModule(ctx.getScope() + "::" + name);
+
+        if(moduleObject != null)
+        {
+            // Add the module to the context.
+            ctx.addModule(moduleObject);
+        }
+        else
+        {
+            // Create the Module object.
+            moduleObject = new Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name);   
+        }
+
 		// Set temporarily annotations.
 		ctx.setTmpAnnotations(moduleObject);
 		
@@ -124,9 +136,6 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 			ctx.setScope(name);
 		else
 			ctx.setScope(old_scope + "::" + name);
-
-		// Add the module to the context.
-		ctx.addModule(moduleObject);
 	}
 	// Each definition is stored in the Module and each TemplateGroup is set as attribute in the TemplateGroup of the module.
 	LEFT_BRACE
@@ -988,7 +997,6 @@ member returns [Vector<Pair<String, TypeCode>> newVector]
 
 union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 @init {
-	System.out.println("Entrando a union_type");
     String name = null;
     int line = 0;
     TypeCode dist_type = null;
@@ -999,7 +1007,7 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 	}
 }
     :   KW_UNION
-	    identifier { name=$identifier.id; System.out.println("\tidentifier: " + name);}
+	    identifier { name=$identifier.id;}
 		KW_SWITCH LEFT_BRACKET switch_type_spec { dist_type=$switch_type_spec.typecode; } RIGHT_BRACKET
 		{
             // TODO Check supported types for discriminator: long, enumeration, etc...
@@ -1024,7 +1032,6 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 
 switch_type_spec returns [TypeCode typecode = null]
 @init {
-	System.out.println("Entrando a switch_type_spec");
     String literalStr = null;
 }
     :   integer_type { $typecode=$integer_type.typecode; }
@@ -1044,21 +1051,18 @@ switch_type_spec returns [TypeCode typecode = null]
 
 switch_body [UnionTypeCode unionTP]
 @init {
-	System.out.println("Entrando a switch_body");
 }
     :   case_stmt_list[unionTP]
     ;
 	
 case_stmt_list [UnionTypeCode unionTP]
 @init {
-	System.out.println("Entrando a case_stmt_list");
 }
 	:  (case_stmt[unionTP])+
 	;
 
 case_stmt [UnionTypeCode unionTP]
 @init{
-	System.out.println("Entrando a case_stmt");
     Pair<String, TypeCode> element = null;
     String label = null;
     boolean defaul = false;
@@ -1067,7 +1071,6 @@ case_stmt [UnionTypeCode unionTP]
 	:	( KW_CASE const_exp
 		{
 			label=$const_exp.literalStr;
-			System.out.println("\tcase: " + label);		
 			member.addLabel(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), label, ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1));
 		} COLON
 		| KW_DEFAULT { defaul = true; } COLON

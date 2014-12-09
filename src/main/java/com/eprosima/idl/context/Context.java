@@ -181,11 +181,20 @@ public class Context
      */
     public void addModule(Module module)
     { 
-        Module prev = m_modules.put(module.getScopedname(), module);
-        
-        // TODO: Excepcion
-        if(prev != null)
-            System.out.println("Warning: Redefined module " + prev.getScopedname());
+        if(!m_modules.containsKey(module.getScopedname()))
+        {
+            m_modules.put(module.getScopedname(), module);
+        }
+    }
+
+    public Module existsModule(String scopedName)
+    {
+        if(m_modules.containsKey(scopedName))
+        {
+            return m_modules.get(scopedName);
+        }
+
+        return null;
     }
 
     public Interface createInterface(String name)
@@ -342,7 +351,7 @@ public class Context
         TypeCode returnedValue = m_types.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
