@@ -181,11 +181,20 @@ public class Context
      */
     public void addModule(Module module)
     { 
-        Module prev = m_modules.put(module.getScopedname(), module);
-        
-        // TODO: Excepcion
-        if(prev != null)
-            System.out.println("Warning: Redefined module " + prev.getScopedname());
+        if(!m_modules.containsKey(module.getScopedname()))
+        {
+            m_modules.put(module.getScopedname(), module);
+        }
+    }
+
+    public Module existsModule(String scopedName)
+    {
+        if(m_modules.containsKey(scopedName))
+        {
+            return m_modules.get(scopedName);
+        }
+
+        return null;
     }
 
     public Interface createInterface(String name)
@@ -213,7 +222,7 @@ public class Context
         int lastIndex = -1;
         Interface returnedValue = m_interfaces.get(name);
 
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
@@ -286,7 +295,7 @@ public class Context
         com.eprosima.idl.parser.tree.Exception returnedValue = m_exceptions.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
@@ -342,7 +351,7 @@ public class Context
         TypeCode returnedValue = m_types.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
@@ -383,7 +392,7 @@ public class Context
         Annotation returnedValue = m_annotations.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null && ((lastIndex = name.lastIndexOf("::")) == -1))
+        if(returnedValue == null)
         {
             String scope = m_scope;
 
@@ -515,8 +524,10 @@ public class Context
     public void processPreprocessorLine(String line, int nline)
     { 	
     	// If there is a line referring to the content of an included file.
-    	if(line.charAt(0) == ' ')
+    	if(line.startsWith("# "))
     	{
+            String line_ = line.substring(2);
+
     	    /* The received preprocessor line has the following form:
              * ' numline filename flags'
     	     * where:
@@ -524,45 +535,50 @@ public class Context
     	     * - filename The filename whose content was included.
     	     * - flags
     	     */
-    	    Scanner scanner = new Scanner(line);
+    	    Scanner scanner = new Scanner(line_);
     	    
     	    // Read numline
-    	    int numline = scanner.nextInt();
-    	    
-    	    // Read filename
-    	    String filename = scanner.next("\".*\"");
-    	    
-    	    // Read flags.
-    	    boolean systemFile = false, enteringFile = false, exitingFile = false;
-    	    
-    	    if(m_os.contains("Linux"))
+            int numline = scanner.nextInt();
+
+            line_ = scanner.nextLine();
+            scanner = new Scanner(line_).useDelimiter("\"");
+
+            // Read filename
+            scanner.next();
+            String file = scanner.next();
+
+            // Read flags.
+            boolean systemFile = false, enteringFile = false, exitingFile = false;
+
+            if(m_os.contains("Linux"))
     	    {
         	    try
-        	    {
-        	        while(true)
-        	        {
-        	            Integer flag = scanner.nextInt();
-    
-        	            if(flag == 1)
-        	                enteringFile = true;
-        	            else if(flag == 2)
-        	                exitingFile = true;
-        	            else if(flag == 3)
-        	                systemFile = true;
-        	        }
-        	    }
-        	    catch(NoSuchElementException ex)
-        	    {
-        	        // The line finishes.
-        	    }
+                {
+                    line_ = scanner.nextLine();
+                    scanner = new Scanner(line_);
+                    scanner.next();
+
+                    while(true)
+                    {
+                        Integer flag = scanner.nextInt();
+
+                        if(flag == 1)
+                            enteringFile = true;
+                        else if(flag == 2)
+                            exitingFile = true;
+                        else if(flag == 3)
+                            systemFile = true;
+                    }
+                }
+                catch(NoSuchElementException ex)
+                {
+                    // The line finishes.
+                }
     	    }
     	    
     	    // Only not system files are processed.
     	    if(!systemFile)
     	    {
-    	        // Remove "
-	            String file = filename.substring(1, filename.length() - 1);
-	            
 	            // Remove absolute directory where the application was executed
 	            if(startsWith(file, m_userdir))
 	            {
