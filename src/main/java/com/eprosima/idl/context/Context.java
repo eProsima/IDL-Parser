@@ -538,41 +538,42 @@ public class Context
     	    Scanner scanner = new Scanner(line_);
     	    
     	    // Read numline
-    	    int numline = scanner.nextInt();
+            int numline = scanner.nextInt();
 
-	    line_ = scanner.nextLine();
-	    scanner = new Scanner(line_).useDelimiter("\"");
-    	    
-    	    // Read filename
-	    scanner.next();
-    	    String filename = scanner.next();
-    	    
-    	    // Read flags.
-    	    boolean systemFile = false, enteringFile = false, exitingFile = false;
-    	    
-    	    if(m_os.contains("Linux"))
+            line_ = scanner.nextLine();
+            scanner = new Scanner(line_).useDelimiter("\"");
+
+            // Read filename
+            scanner.next();
+            String filename = scanner.next();
+
+            // Read flags.
+            boolean systemFile = false, enteringFile = false, exitingFile = false;
+
+            if(m_os.contains("Linux"))
     	    {
         	    try
-        	    {
-			line_ = scanner.nextLine();
-		        scanner = new Scanner(line_);
+                {
+                    line_ = scanner.nextLine();
+                    scanner = new Scanner(line_);
+                    scanner.next();
 
-        	        while(true)
-        	        {
-        	            Integer flag = scanner.nextInt();
-    
-        	            if(flag == 1)
-        	                enteringFile = true;
-        	            else if(flag == 2)
-        	                exitingFile = true;
-        	            else if(flag == 3)
-        	                systemFile = true;
-        	        }
-        	    }
-        	    catch(NoSuchElementException ex)
-        	    {
-        	        // The line finishes.
-        	    }
+                    while(true)
+                    {
+                        Integer flag = scanner.nextInt();
+
+                        if(flag == 1)
+                            enteringFile = true;
+                        else if(flag == 2)
+                            exitingFile = true;
+                        else if(flag == 3)
+                            systemFile = true;
+                    }
+                }
+                catch(NoSuchElementException ex)
+                {
+                    // The line finishes.
+                }
     	    }
     	    
     	    // Only not system files are processed.
