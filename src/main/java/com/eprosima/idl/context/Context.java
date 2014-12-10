@@ -545,7 +545,7 @@ public class Context
 
             // Read filename
             scanner.next();
-            String filename = scanner.next();
+            String file = scanner.next();
 
             // Read flags.
             boolean systemFile = false, enteringFile = false, exitingFile = false;
@@ -579,9 +579,6 @@ public class Context
     	    // Only not system files are processed.
     	    if(!systemFile)
     	    {
-    	        // Remove "
-	            String file = filename.substring(1, filename.length() - 1);
-	            
 	            // Remove absolute directory where the application was executed
 	            if(startsWith(file, m_userdir))
 	            {
