@@ -1302,7 +1302,12 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
            operationObject.setRettype(retType);
            
            // Set oneway
-           if(oneway) operationObject.setOneway(true);
+			if(oneway) {
+				operationObject.setOneway(true);
+				if(retType != null) {
+					throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The oneway operation '" + name + "' cannot have a return type.");
+				}
+			}
         }
 		parameter_decls[operationObject] { tpl=$parameter_decls.tpl; }
 		( 
