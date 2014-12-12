@@ -275,7 +275,7 @@ export returns [Pair<Export, TemplateGroup> etg = null]
     |   const_decl SEMICOLON { cetg=$const_decl.returnPair; if(cetg!=null){$etg = new Pair<Export, TemplateGroup>(cetg.first(), cetg.second());}} // Const Declaration
     |   except_decl SEMICOLON { eetg=$except_decl.returnPair; if(eetg!=null){$etg = new Pair<Export, TemplateGroup>(eetg.first(), eetg.second());}}  // Exception
     |   attr_decl SEMICOLON
-	{ System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Attribute declarations are not supported. Ignoring..."); }
+	{ System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Attribute declarations are not supported. Ignoring..."); }
     |   op_decl SEMICOLON { oetg=$op_decl.returnPair; if(oetg!=null){$etg = new Pair<Export, TemplateGroup>(oetg.first(), oetg.second());}}  // Operation
     |   type_id_decl SEMICOLON
     |   type_prefix_decl SEMICOLON
@@ -295,11 +295,11 @@ interface_inheritance_spec [Interface interfaceObject]
             if(base != null)
             {
                 if(!$interfaceObject.addBase(base))
-                    throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " is duplicated.");
+                    throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " is duplicated.");
             }
             else
             {
-	           throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " was not defined.");
+	           throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " was not defined.");
             }
         }
     }
@@ -329,7 +329,7 @@ scoped_name returns [String literalStr]
 
 value
 @init{
-    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): ValueType declarations are not supported. Ignoring...");
+    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): ValueType declarations are not supported. Ignoring...");
 }
     :   ( value_decl | value_abs_decl | value_box_decl | value_forward_decl )
     ;
@@ -406,7 +406,7 @@ const_decl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
 			}			
 			$returnPair = new Pair<ConstDeclaration, TemplateGroup>(constDecl, constTemplates);
        } else {
-          throw new RuntimeException("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Cannot parse constant declaration");
+          throw new RuntimeException("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Cannot parse constant declaration");
        }
     }
     ;
@@ -431,7 +431,7 @@ const_type returns [TypeCode typecode = null]
 	       $typecode = ctx.getTypeCode(literalStr);
 	       
 	       if($typecode == null)
-	           throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
+	           throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
 	    }
     |   octet_type { $typecode = $octet_type.typecode; }
     ;
@@ -579,7 +579,7 @@ positive_int_const returns [String literalStr = null]
                int value = Integer.parseInt($literalStr);
 
                if(value < 0)
-                   throw new ParseException(ctx.getFilename(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The expression '" + $literalStr + "' is not supported. You must use a positive integer.");
+                   throw new ParseException(ctx.getFilename(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The expression '" + $literalStr + "' is not supported. You must use a positive integer.");
            } catch(NumberFormatException e) {
            }
        }
@@ -593,7 +593,7 @@ type_decl returns [Pair<TypeDeclaration, TemplateGroup> returnPair = null]
     |   struct_type { ttg=$struct_type.returnPair; }
     |   union_type { ttg=$union_type.returnPair; }
     |   enum_type { ttg=$enum_type.returnPair; }
-    |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
+    |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
     |   constr_forward_decl )
 	{
         // TODO A?adir nombre al typedeclaration.
@@ -648,7 +648,7 @@ type_declarator returns [Pair<TypeCode, TemplateGroup> returnPair = null]
        }
        else
        {
-          throw new RuntimeException("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Cannot parse type declaration");
+          throw new RuntimeException("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Cannot parse type declaration");
        }
 	}
     ;
@@ -672,7 +672,7 @@ simple_type_spec returns [TypeCode typecode = null]
 	       $typecode = ctx.getTypeCode(literalStr);
 	       
 	       if($typecode == null)
-	           throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
+	           throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
 	    }
     ;
 
@@ -683,16 +683,16 @@ base_type_spec returns [TypeCode typecode = null]
     |   wide_char_type { $typecode=$wide_char_type.typecode; }
     |   boolean_type { $typecode=$boolean_type.typecode; }
     |   octet_type { $typecode=$octet_type.typecode; }
-    |   any_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'any' type."); }
-    |   object_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, ": Unsupported 'Object' type."); }
-    |   value_base_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'ValueBase' type."); }
+    |   any_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'any' type."); }
+    |   object_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, ": Unsupported 'Object' type."); }
+    |   value_base_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'ValueBase' type."); }
     ;
 
 template_type_spec returns [TypeCode typecode = null]
     :   sequence_type { $typecode=$sequence_type.typecode; }
     |   string_type { $typecode=$string_type.typecode; }
     |   wide_string_type { $typecode=$wide_string_type.typecode; }
-    |   fixed_pt_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'fixed' type."); }
+    |   fixed_pt_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'fixed' type."); }
     ;
 
 constr_type_spec
@@ -712,7 +712,7 @@ declarators returns [Vector<Pair<String, ContainerTypeCode>> declvector = new Ve
             if(pair != null)
                 $declvector.add(pair);
             else
-                throw new ParseException(ctx.getScopeFile(), (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1), "Cannot parse type declarator");
+                throw new ParseException(ctx.getScopeFile(), (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1), "Cannot parse type declarator");
         }
 		( COMA declarator
 		{
@@ -720,7 +720,7 @@ declarators returns [Vector<Pair<String, ContainerTypeCode>> declvector = new Ve
             if(pair != null)
                 $declvector.add(pair);
             else
-                throw new ParseException(ctx.getScopeFile(), (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1), "Cannot parse type declarator");
+                throw new ParseException(ctx.getScopeFile(), (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1), "Cannot parse type declarator");
         }
 		)*
     ;
@@ -1012,7 +1012,7 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 		{
             // TODO Check supported types for discriminator: long, enumeration, etc...
 	       unionTP = new UnionTypeCode(ctx.getScope(), name, dist_type);
-           line = _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1;
+           line = _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
 	    }
 		LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
 	    {
@@ -1045,7 +1045,7 @@ switch_type_spec returns [TypeCode typecode = null]
            $typecode = ctx.getTypeCode(literalStr);
            
            if($typecode == null)
-               throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
+               throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
         }
     ;
 
@@ -1071,7 +1071,7 @@ case_stmt [UnionTypeCode unionTP]
 	:	( KW_CASE const_exp
 		{
 			label=$const_exp.literalStr;
-			member.addLabel(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), label, ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1));
+			member.addLabel(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), label, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
 		} COLON
 		| KW_DEFAULT { defaul = true; } COLON
 		)+
@@ -1305,7 +1305,7 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
 			if(oneway) {
 				operationObject.setOneway(true);
 				if(retType != null) {
-					throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The oneway operation '" + name + "' cannot have a return type.");
+					throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The oneway operation '" + name + "' cannot have a return type.");
 				}
 			}
         }
@@ -1432,7 +1432,7 @@ raises_expr returns [Vector<String> exlist = null]
 
 context_expr
 @init {
-	System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Context declarations are not supported. Ignoring...");
+	System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Context declarations are not supported. Ignoring...");
 }
     :   KW_CONTEXT LEFT_BRACKET STRING_LITERAL ( COMA STRING_LITERAL )* RIGHT_BRACKET
     ;
@@ -1450,7 +1450,7 @@ param_type_spec returns [TypeCode typecode = null]
            $typecode = ctx.getTypeCode(literalStr);
            
            if($typecode == null)
-               throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
+               throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
        }
     ;
 
@@ -1474,7 +1474,7 @@ constr_forward_decl
 import_decl
     :   KW_IMPORT
 	{
-		System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Import declarations are not supported. Ignoring...");
+		System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Import declarations are not supported. Ignoring...");
 	}
 	imported_scope SEMICOLON
     ;
@@ -1486,7 +1486,7 @@ imported_scope
 type_id_decl
     :   KW_TYPEID
         {
-            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): TypeID declarations are not supported. Ignoring...");
+            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): TypeID declarations are not supported. Ignoring...");
         }
 		scoped_name STRING_LITERAL
     ;
@@ -1494,7 +1494,7 @@ type_id_decl
 type_prefix_decl
     :   KW_TYPEPREFIX
 	    {
-            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): TypePrefix declarations are not supported. Ignoring...");
+            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): TypePrefix declarations are not supported. Ignoring...");
         }
 		scoped_name STRING_LITERAL
     ;
@@ -1570,7 +1570,7 @@ component
 component_forward_decl
     :   KW_COMPONENT
 	    {
-            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Component declarations are not supported. Ignoring...");
+            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Component declarations are not supported. Ignoring...");
         }
 		ID
     ;
@@ -1631,7 +1631,7 @@ consumes_decl
 
 home_decl
 @init {
-    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Home declarations are not supported. Ignoring...");
+    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Home declarations are not supported. Ignoring...");
 }
     :   home_header home_body
     ;
@@ -1668,7 +1668,7 @@ finder_decl
 
 event
 @init{
-    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Event declarations are not supported. Ignoring...");
+    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Event declarations are not supported. Ignoring...");
 }
     :   ( event_decl | event_abs_decl | event_forward_decl)
     ;
@@ -1698,7 +1698,7 @@ annotation_appl
 	{
 		annotationId=$scoped_name.literalStr;
 		if(ctx.getAnnotation(annotationId) != null) {
-			throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + annotationId + " cannot be found.");
+			throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + annotationId + " cannot be found.");
 		}
 	} 
 	( LEFT_BRACKET ( annotation_appl_params[ctx.getAnnotation(annotationId)] )? RIGHT_BRACKET )?
@@ -1715,7 +1715,7 @@ annotation_appl_params [Annotation annotation]
         if(annotation.getMembers().size() == 1)
             ctx.addTmpAnnotation(annotation.getName(), valueStr);
         else
-            throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + annotation.getName() + " has defined more than one attribute.");
+            throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + annotation.getName() + " has defined more than one attribute.");
 	}
 	| annotation_appl_param[annotation] ( COMA annotation_appl_param[annotation] )*
 	;
@@ -1739,10 +1739,10 @@ annotation_application
                if(ctx.getAnnotation(id).getMembers().size() == 1)
                    ctx.addTmpAnnotation(id, valueStr);
                else
-                   throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + id + " has defined more than one attribute.");
+                   throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + id + " has defined more than one attribute.");
             }
             else
-                throw new ParseException(ctx.getScopeFile(), _input.LT(0) != null ? _input.LT(0).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + id + " cannot be found.");
+                throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + id + " cannot be found.");
         }
     ;
 */
