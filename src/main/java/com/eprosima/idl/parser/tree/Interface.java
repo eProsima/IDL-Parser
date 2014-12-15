@@ -174,35 +174,6 @@ public class Interface extends ExportContainer implements Definition, Notebook
     }
     
     @Override
-    public com.eprosima.idl.parser.tree.Exception getFirstException(String idlFile)
-    {
-    	
-    	if(getScopeFile().equals(idlFile))
-            return getFirstException();
-        
-        return null;
-    }
-    
-    /*!
-     * @brief This function returns the first exception of the interface.
-     */
-    public com.eprosima.idl.parser.tree.Exception getFirstException()
-    {
-    	for(int count = 0; m_firstexception == null && count < getExports().size(); ++count)
-        {
-            if(getExports().get(count).isIsException())
-            	m_firstexception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
-        }
-        return m_firstexception;
-    }
-    
-    /*@Override
-	public Exception getFirstException(String scopefile) {
-		// TODO Auto-generated method stub
-		return null;
-	}*/
-    
-    @Override
     public void addAnnotations(HashMap<String, String> annotations)
     {
         m_annotations.putAll(annotations);
@@ -219,25 +190,6 @@ public class Interface extends ExportContainer implements Definition, Notebook
     {
         return m_annotations;
     }
-    
-    @Override
-    public Interface getFirstInterface(String idlFile)
-    {
-        return null;
-    }
-    
-    /*!
-     * @brief This function returns the first operation of the interface.
-     */
-    public Operation getFirstOperation()
-    {
-        for(int count = 0; m_firstoperation == null && count < getExports().size(); ++count)
-        {
-            if(getExports().get(count).isIsOperation())
-                m_firstoperation = (Operation)getExports().get(count);
-        }
-        return m_firstoperation;
-    }
 
     private Object m_parent = null;
     
@@ -245,13 +197,7 @@ public class Interface extends ExportContainer implements Definition, Notebook
     private HashMap<String, Interface> m_bases = null;
     //! Contains all operations.
     private ArrayList<Operation> m_operations = null;
-    //! Cache the first operation.
-    private Operation m_firstoperation = null;
     private ArrayList<Operation> m_all_operations = null;
     //! Map that stores the annotations of the interface.
     HashMap<String, String> m_annotations = null;
-    //! Cache the first exception.
-    private com.eprosima.idl.parser.tree.Exception m_firstexception = null;
-	
-    
 }
