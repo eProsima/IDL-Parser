@@ -4,10 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Stack;
 import java.util.Scanner;
 import java.util.NoSuchElementException;
 
+import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.parser.tree.TreeNode;
 import com.eprosima.idl.parser.tree.Notebook;
 import com.eprosima.idl.parser.tree.Definition;
@@ -61,8 +65,9 @@ public class Context
         m_scopeFile = m_file;
 
         m_includePaths = new ArrayList<String>();
-        m_dependencies = new HashSet<String>();
+        m_dependencies = new LinkedHashSet<String>();
         m_directIncludeDependencies = new HashSet<String>();
+        m_scopeFilesStack = new Stack<Pair<String, Integer>>();
 
         for(int i = 0; i < includePaths.size(); ++i)
         {
@@ -160,6 +165,11 @@ public class Context
     public int getCurrentIncludeLine()
     {
     	return m_currentincludeline;
+    }
+
+    public Stack<Pair<String, Integer>> getScopeFilesStack()
+    {
+        return m_scopeFilesStack;
     }
     
     /*!
@@ -452,31 +462,32 @@ public class Context
     /*!
      * @brief This function get the library dependencies of a project.
      */
-    public HashSet getDependencies()
+    public LinkedHashSet getDependencies()
     {
-    	if(getOS().contains("Windows"))
-    	{
-    		HashSet<String> set = new HashSet<String>();
-    		Iterator<String> it = m_dependencies.iterator();
-    		
-    		while(it.hasNext())
-    		{
-    			String dep = it.next();
-    			
-	            // In windows substitute \\ by /
-	            int count = 0;
-	    		while((count = dep.indexOf("/")) != -1)
-	    		{
-	    			dep = dep.substring(0, count) + "\\" + dep.substring(count + 1);
-	    		}
-	    		
-	    		set.add(dep);
-    		}
-    		
-    		return set;
-    	}
-    	
-    	return m_dependencies;
+        // At this level the dependencies are in reverse order. Return them
+        // in correct order.
+        LinkedHashSet<String> set = new LinkedHashSet<String>();
+        LinkedList<String> list = new LinkedList<String>(m_dependencies);
+        Iterator<String> it = list.descendingIterator();
+
+        while(it.hasNext())
+        {
+            String dep = it.next();
+
+            if(getOS().contains("Windows"))
+            {
+                // In windows substitute \\ by /
+                int count = 0;
+                while((count = dep.indexOf("/")) != -1)
+                {
+                    dep = dep.substring(0, count) + "\\" + dep.substring(count + 1);
+                }
+            }
+
+            set.add(dep);
+        }
+
+        return set;
     }
 
     /*!
@@ -523,21 +534,21 @@ public class Context
      */
     public void processPreprocessorLine(String line, int nline)
     { 	
-    	// If there is a line referring to the content of an included file.
-    	if(line.startsWith("# "))
-    	{
+        // If there is a line referring to the content of an included file.
+        if(line.startsWith("# "))
+        {
             String line_ = line.substring(2);
 
-    	    /* The received preprocessor line has the following form:
+            /* The received preprocessor line has the following form:
              * ' numline filename flags'
-    	     * where:
-    	     * - numline Number of the line where the include was.
-    	     * - filename The filename whose content was included.
-    	     * - flags
-    	     */
-    	    Scanner scanner = new Scanner(line_);
-    	    
-    	    // Read numline
+             * where:
+             * - numline Number of the line where the include was.
+             * - filename The filename whose content was included.
+             * - flags
+             */
+            Scanner scanner = new Scanner(line_);
+
+            // Read numline
             int numline = scanner.nextInt();
 
             line_ = scanner.nextLine();
@@ -551,8 +562,8 @@ public class Context
             boolean systemFile = false, enteringFile = false, exitingFile = false;
 
             if(m_os.contains("Linux"))
-    	    {
-        	    try
+            {
+                try
                 {
                     line_ = scanner.nextLine();
                     scanner = new Scanner(line_);
@@ -574,64 +585,68 @@ public class Context
                 {
                     // The line finishes.
                 }
-    	    }
-    	    
-    	    // Only not system files are processed.
-    	    if(!systemFile)
-    	    {
-	            // Remove absolute directory where the application was executed
-	            if(startsWith(file, m_userdir))
-	            {
-	            	file = file.substring(m_userdir.length());
-	            	
-	            	// Remove possible separator    
-	                if(startsWith(file, java.io.File.separator))
-	                    file = file.substring(1);
-	            }
-	            // Remove relative ./ directory.
-	            if(startsWith(file, currentDirS))
-	            	file = file.substring(currentDirS.length());
-	            String depfile = file;
-	            // Remove relative directory if is equal that where the processed IDL is.
-	            if(m_directoryFile != null && startsWith(file, m_directoryFile))
-	            	file = file.substring(m_directoryFile.length());
-	            // Remove relative directory if is equal to a include path.
-	            for(int i = 0; i < m_includePaths.size(); ++i)
-	            {   
-	            	if(startsWith(file, m_includePaths.get(i)))
-	            	{
-	            		file = file.substring(m_includePaths.get(i).length());
-	                    break;
-	                }
-	            }
-	            // Remove possible separator    
-	            if(startsWith(file, java.io.File.separator))
-	            	file = file.substring(1);
-	            
-	            //if it is a idl file.
-	            if(file.substring(file.length() - 4, file.length()).equals(".idl"))
-	            {
-	                m_scopeFile = file;
-	                
-	                // Add to dependency if there is different IDL file than the processed
-	                if(!m_scopeFile.equals(m_file))
-	                {
-	                    m_dependencies.add(depfile);
-	                    
-	                    // See if it is a direct dependency.
-	                    if(m_lastDirectDependency != null &&
-	                            m_lastDirectDependency.equals(m_file))
-	                        m_directIncludeDependencies.add(m_scopeFile.substring(0, file.length() - 4));
-	                }
+            }
 
-	                // Update last direct dependency
-	                m_lastDirectDependency = m_scopeFile;
-	                
-	                //Update the current line.
-	                m_currentincludeline = nline - (numline - 1);
-    	        }
-    	    }
-    	}
+            // Only not system files are processed.
+            if(!systemFile)
+            {
+                // Remove absolute directory where the application was executed
+                if(startsWith(file, m_userdir))
+                {
+                    file = file.substring(m_userdir.length());
+
+                    // Remove possible separator    
+                    if(startsWith(file, java.io.File.separator))
+                        file = file.substring(1);
+                }
+                // Remove relative ./ directory.
+                if(startsWith(file, currentDirS))
+                    file = file.substring(currentDirS.length());
+                // Remove relative directory if is equal that where the processed IDL is.
+                if(m_directoryFile != null && startsWith(file, m_directoryFile))
+                    file = file.substring(m_directoryFile.length());
+                // Remove relative directory if is equal to a include path.
+                for(int i = 0; i < m_includePaths.size(); ++i)
+                {   
+                    if(startsWith(file, m_includePaths.get(i)))
+                    {
+                        file = file.substring(m_includePaths.get(i).length());
+                        break;
+                    }
+                }
+                // Remove possible separator    
+                if(startsWith(file, java.io.File.separator))
+                    file = file.substring(1);
+
+                //if it is a idl file.
+                if(file.substring(file.length() - 4, file.length()).equals(".idl"))
+                {
+                    if(!m_scopeFile.equals(file))
+                    {
+                        if(!m_scopeFilesStack.empty() && m_scopeFilesStack.peek().first().equals(file))
+                        {
+                            m_scopeFilesStack.pop();
+
+                            // Add to dependency if there is different IDL file than the processed
+                            addDependency(m_scopeFile);
+
+                            // See if it is a direct dependency.
+                            if(file.equals(m_file))
+                                m_directIncludeDependencies.add(m_scopeFile.substring(0, m_scopeFile.length() - 4));
+                        }
+                        else
+                        {
+                            m_scopeFilesStack.push(new Pair<String, Integer>(m_scopeFile, nline - m_currentincludeline - 1));
+                        }
+
+                        m_scopeFile = file;
+                    }
+                }
+
+                //Update the current line.
+                m_currentincludeline = nline - numline;
+            }
+        }
     }
 
     protected String getOS()
@@ -696,11 +711,10 @@ public class Context
 
     private ArrayList<String> m_includePaths = null;
     //! Set that contains the library dependencies that were found because there was a line of the preprocessor.
-    private HashSet<String> m_dependencies = null;
+    private LinkedHashSet<String> m_dependencies = null;
 
     //! Set that contains the direct include dependencies in the IDL file. Used to regenerate the IDL in a supported form.
     private HashSet<String> m_directIncludeDependencies = null;
-    private String m_lastDirectDependency = null;
 
     // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
     //! Set that contains the include dependencies that force to include our type generated file (right now only with exceptions in RTI DDS types).
@@ -708,4 +722,6 @@ public class Context
 
     // TODO Lleva la cuenta del nombre de variables para bucles anidados.
     private char m_loopVarName = 'a';
+
+    private Stack<Pair<String, Integer>> m_scopeFilesStack;
 }

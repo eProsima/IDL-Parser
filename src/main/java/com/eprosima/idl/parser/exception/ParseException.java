@@ -1,14 +1,21 @@
 package com.eprosima.idl.parser.exception;
 
-public class ParseException extends RuntimeException
+import com.eprosima.log.ColorMessage;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
+
+public class ParseException extends RecognitionException
 {
 	public ParseException()
     {
-        super();
+        super("", null, null, null);
     }
     
-    public ParseException(String file, int line, String message)
+    public ParseException(Token token, String message)
     {
-        super("In file " + file + " at line " + line + ": " + message);
+        super(message, null, null, null);
+
+        if(token != null)
+            setOffendingToken(token);
     }
 }

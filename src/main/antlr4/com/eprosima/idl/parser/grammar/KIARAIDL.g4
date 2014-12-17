@@ -10,18 +10,25 @@ grammar KIARAIDL;
     import com.eprosima.idl.parser.typecode.*;
     import com.eprosima.idl.parser.tree.*;
     import com.eprosima.idl.util.Pair;
+    import com.eprosima.idl.parser.strategy.DefaultErrorStrategy;
+    import com.eprosima.idl.parser.listener.DefaultErrorListener;
     import com.eprosima.idl.parser.exception.ParseException;
    
     import java.util.Vector;
 }
 
 @parser::members {
-    TemplateManager tmanager = null;
-    Context ctx = null;
+    private TemplateManager tmanager = null;
+    private Context ctx = null;
+
+    public Context getContext_()
+    {
+        return ctx;
+    }
 }
 
 @lexer::members{
-    Context ctx = null;
+    private Context ctx = null;
     
     public void setContext(Context _ctx)
     {
@@ -36,6 +43,15 @@ specification [Context context, TemplateManager templatemanager, TemplateGroup m
     List<Definition> specificationChildren = new ArrayList<Definition>();
     ctx = context;
     tmanager = templatemanager;
+
+    // Set error handler
+    DefaultErrorListener listener = new DefaultErrorListener(ctx);
+    this.setErrorHandler(DefaultErrorStrategy.INSTANCE);
+    // Select listener for errors.
+    ((Lexer)this._input.getTokenSource()).removeErrorListeners();
+    ((Lexer)this._input.getTokenSource()).addErrorListener(listener);
+    this.removeErrorListeners();
+    this.addErrorListener(listener);
 }
     :   import_decl*
 	(
@@ -52,8 +68,11 @@ specification [Context context, TemplateManager templatemanager, TemplateGroup m
 		}
 	)+
 	{
-		$spec = new Specification();
-		$spec.setDefinitions(specificationChildren);
+        if(getNumberOfSyntaxErrors() == 0)
+        {
+            $spec = new Specification();
+            $spec.setDefinitions(specificationChildren);
+        }
 	}
     ;
 
@@ -275,22 +294,22 @@ export returns [Pair<Export, TemplateGroup> etg = null]
 
 interface_inheritance_spec [Interface interfaceObject]
 @init{
-        Vector<String> iflist = null;
+        Vector<Pair<String, Token>> iflist = null;
 }
     :   COLON scoped_name_list { iflist=$scoped_name_list.retlist; }
     {
-        for(String str : iflist)
+        for(Pair<String, Token> pair : iflist)
         {
-            Interface base = ctx.getInterface(str);
+            Interface base = ctx.getInterface(pair.first());
 
             if(base != null)
             {
                 if(!$interfaceObject.addBase(base))
-                    throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " is duplicated.");
+                    throw new ParseException(pair.second(), " is duplicated.");
             }
             else
             {
-	           throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The inherated interface " + str + " was not defined.");
+	           throw new ParseException(pair.second(), "was not defined previously");
             }
         }
     }
@@ -300,22 +319,23 @@ interface_name
     :   scoped_name
     ;
 	
-scoped_name_list returns [Vector<String> retlist = null]
+scoped_name_list returns [Vector<Pair<String, Token>> retlist = null]
 @init{
-   String sname = null;
-   $retlist = new Vector<String>();
+   $retlist = new Vector<Pair<String, Token>>();
+   Pair<String, Token> pair = null;
 }
-	:    scoped_name{ sname=$scoped_name.literalStr; $retlist.add(sname);} (COMA scoped_name{ sname=$scoped_name.literalStr; $retlist.add(sname);})*
+	:    scoped_name{ pair=$scoped_name.pair; $retlist.add(pair);} (COMA scoped_name{ pair=$scoped_name.pair; $retlist.add(pair);})*
 	;
 
-scoped_name returns [String literalStr]
+scoped_name returns [Pair<String, Token> pair = null]
 @init{
-    String aux = null;
-	$literalStr = "";
+    String literalStr = "";
+    Token tk = _input.LT(1);
 }
-:   ( {$literalStr += _input.LT(1).getText();} DOUBLE_COLON )?
-	  {$literalStr += _input.LT(1).getText();} ID /* identifier */
-	( {$literalStr += _input.LT(1).getText();} DOUBLE_COLON identifier { aux=$identifier.id; $literalStr += aux;} )*
+:   ( {literalStr += _input.LT(1).getText();} DOUBLE_COLON )?
+	  {literalStr += _input.LT(1).getText();} ID /* identifier */
+	( {literalStr += _input.LT(1).getText();} DOUBLE_COLON identifier { literalStr+=$identifier.id; } )*
+    {$pair = new Pair<String, Token>(literalStr, tk);}
     ;
 
 value
@@ -389,15 +409,17 @@ const_decl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
 }
     :   KW_CONST const_type { typecode=$const_type.typecode; } identifier { constName=$identifier.id; } EQUAL const_exp { constValue=$const_exp.literalStr; }
 	{
-		if(typecode != null) {
+		if(typecode != null)
+        {
 			constDecl = new ConstDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), constName, typecode, constValue);
-			if(constTemplates != null) {
+
+			if(constTemplates != null)
+            {
 				constTemplates.setAttribute("ctx", ctx);
 				constTemplates.setAttribute("const", constDecl);
 			}			
+
 			$returnPair = new Pair<ConstDeclaration, TemplateGroup>(constDecl, constTemplates);
-       } else {
-          throw new RuntimeException("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Cannot parse constant declaration");
        }
     }
     ;
@@ -405,7 +427,7 @@ const_decl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
 // TODO Not supported fixed types: Show warning
 const_type returns [TypeCode typecode = null]
 @init{
-    String literalStr = null;
+    Pair<String, Token> pair = null;
 }
     :   integer_type { $typecode = $integer_type.typecode; }
     |   char_type { $typecode = $char_type.typecode; }
@@ -417,12 +439,12 @@ const_type returns [TypeCode typecode = null]
     |   fixed_pt_const_type
     |   scoped_name
 	    {
-			literalStr = $scoped_name.literalStr;
+		   pair = $scoped_name.pair;
 	       // Find typecode in the global map.
-	       $typecode = ctx.getTypeCode(literalStr);
+	       $typecode = ctx.getTypeCode(pair.first());
 	       
 	       if($typecode == null)
-	           throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
+	           throw new ParseException(pair.second(), "was not defined previously");
 	    }
     |   octet_type { $typecode = $octet_type.typecode; }
     ;
@@ -534,8 +556,8 @@ primary_expr  returns [String literalStr = null]
 @init{
     String aux = null;
 }
-    :   scoped_name { $literalStr = $scoped_name.literalStr; }
-    |   literal  { $literalStr = $literal.literalStr; }
+    :   scoped_name { $literalStr = $scoped_name.pair.first(); }
+    |   literal  { $literalStr = $literal.pair.first(); }
     |   {$literalStr = _input.LT(1).getText();}
 		LEFT_BRACKET
 		const_exp
@@ -543,9 +565,10 @@ primary_expr  returns [String literalStr = null]
 		RIGHT_BRACKET
     ;
 
-literal returns [String literalStr]
+literal returns [Pair<String, Token> pair = null]
 @init{
-    $literalStr = _input.LT(1).getText();
+    Token tk = _input.LT(1);
+    String literalStr = tk.getText();
 }
     :   ( HEX_LITERAL
 	| INTEGER_LITERAL
@@ -555,7 +578,8 @@ literal returns [String literalStr]
 	| WIDE_CHARACTER_LITERAL
 	| FIXED_PT_LITERAL
 	| FLOATING_PT_LITERAL
-	| boolean_literal { $literalStr = $boolean_literal.literalStr; } )
+	| boolean_literal {literalStr = $boolean_literal.literalStr;} )
+    {$pair = new Pair<String, Token>(literalStr, tk);}
     ;
 	
 boolean_literal returns [String literalStr = null]
@@ -566,13 +590,14 @@ boolean_literal returns [String literalStr = null]
 positive_int_const returns [String literalStr = null]
     :   const_exp { $literalStr = $const_exp.literalStr; }
 	    {
-           try {
+           // TODO Calcular expresion
+           /*try {
                int value = Integer.parseInt($literalStr);
 
                if(value < 0)
-                   throw new ParseException(ctx.getFilename(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The expression '" + $literalStr + "' is not supported. You must use a positive integer.");
+                   throw new ParseException($literalStr, "expression is not supported. You must use a positive integer.");
            } catch(NumberFormatException e) {
-           }
+           }*/
        }
     ;
 
@@ -637,10 +662,6 @@ type_declarator returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 	       
 	       $returnPair = new Pair<TypeCode, TemplateGroup>(typecode, typedefTemplates);
        }
-       else
-       {
-          throw new RuntimeException("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Cannot parse type declaration");
-       }
 	}
     ;
 
@@ -651,19 +672,19 @@ type_spec returns [TypeCode typecode = null]
 
 simple_type_spec returns [TypeCode typecode = null]
 @init {
-    String literalStr = null;
+    Pair<String, Token> pair = null;
 } 
     :   base_type_spec { $typecode=$base_type_spec.typecode; }
     |   template_type_spec { $typecode=$template_type_spec.typecode; }
     |   scoped_name
 	    {
-			literalStr=$scoped_name.literalStr;
+		   pair=$scoped_name.pair;
 			
 	       // Find typecode in the global map.
-	       $typecode = ctx.getTypeCode(literalStr);
+	       $typecode = ctx.getTypeCode(pair.first());
 	       
 	       if($typecode == null)
-	           throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
+	           throw new ParseException(pair.second(), "was not supported previously");
 	    }
     ;
 
@@ -674,9 +695,9 @@ base_type_spec returns [TypeCode typecode = null]
     |   wide_char_type { $typecode=$wide_char_type.typecode; }
     |   boolean_type { $typecode=$boolean_type.typecode; }
     |   octet_type { $typecode=$octet_type.typecode; }
-    |   any_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'any' type."); }
-    |   object_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, ": Unsupported 'Object' type."); }
-    |   value_base_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'ValueBase' type."); }
+    |   any_type
+    |   object_type
+    |   value_base_type
     ;
 
 template_type_spec returns [TypeCode typecode = null]
@@ -685,7 +706,7 @@ template_type_spec returns [TypeCode typecode = null]
 	|   map_type { $typecode=$map_type.typecode; }
     |   string_type { $typecode=$string_type.typecode; }
     |   wide_string_type { $typecode=$wide_string_type.typecode; }
-    |   fixed_pt_type {if(true) throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "Unsupported 'fixed' type."); }
+    |   fixed_pt_type
     ;
 
 constr_type_spec
@@ -705,7 +726,7 @@ declarators returns [Vector<Pair<String, ContainerTypeCode>> declvector = new Ve
             if(pair != null)
                 $declvector.add(pair);
             else
-                throw new ParseException(ctx.getScopeFile(), (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1), "Cannot parse type declarator");
+                throw new ParseException(null, "Cannot parse type declarator");
         }
 		( COMA declarator
 		{
@@ -713,7 +734,7 @@ declarators returns [Vector<Pair<String, ContainerTypeCode>> declvector = new Ve
             if(pair != null)
                 $declvector.add(pair);
             else
-                throw new ParseException(ctx.getScopeFile(), (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1), "Cannot parse type declarator");
+                throw new ParseException(null, "Cannot parse type declarator");
         }
 		)*
     ;
@@ -836,11 +857,19 @@ octet_type returns [TypeCode typecode]
     ;
 
 any_type
+@init{
+    Token tk = _input.LT(1);
+}
     :   KW_ANY
+    {throw new ParseException(tk, ". Any type is not supported"); }
     ;
 
 object_type
+@init{
+    Token tk = _input.LT(1);
+}
     :   KW_OBJECT
+    {throw new ParseException(tk, ". Object type is not supported"); }
     ;
 
 annotation_decl returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = null]
@@ -1029,8 +1058,7 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 
 switch_type_spec returns [TypeCode typecode = null]
 @init {
-	System.out.println("Entrando a switch_type_spec");
-    String literalStr = null;
+    Pair<String, Token> pair = null;
 }
     :   integer_type { $typecode=$integer_type.typecode; }
     |   char_type { $typecode=$char_type.typecode; }
@@ -1038,12 +1066,12 @@ switch_type_spec returns [TypeCode typecode = null]
     |   enum_type
     |   scoped_name
 	    {
-			literalStr=$scoped_name.literalStr;
+		   pair=$scoped_name.pair;
            // Find typecode in the global map.
-           $typecode = ctx.getTypeCode(literalStr);
+           $typecode = ctx.getTypeCode(pair.first());
            
            if($typecode == null)
-               throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
+               throw new ParseException(pair.second(), "was not defined previously");
         }
     ;
 
@@ -1072,7 +1100,6 @@ case_stmt [UnionTypeCode unionTP]
 	:	( KW_CASE const_exp
 		{
 			label=$const_exp.literalStr;
-			System.out.println("\tcase: " + label);		
 			member.addLabel(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), label, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
 		} COLON
 		| KW_DEFAULT { defaul = true; } COLON
@@ -1312,11 +1339,11 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
 		}
         TemplateGroup tpl = null;
         String name = "";
-        boolean oneway = false;
+        Token tkoneway = null;
         TypeCode retType = null;
-        Vector<String> exceptions = null;
+        Vector<Pair<String, Token>> exceptions = null;
 }
-    :   ( op_attribute { oneway=$op_attribute.ret; } )?
+    :   ( op_attribute { tkoneway=$op_attribute.token; } )?
 		op_type_spec { retType=$op_type_spec.typecode; }
 		{name += _input.LT(1).getText();} ID
 		{
@@ -1335,27 +1362,28 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
            operationObject.setRettype(retType);
            
            // Set oneway
-			if(oneway) {
-				operationObject.setOneway(true);
-				if(retType != null) {
-					throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The oneway operation '" + name + "' cannot have a return type.");
-				}
-			}
+           if(tkoneway != null) {
+               operationObject.setOneway(true);
+
+               if(retType != null)
+               {
+                   throw new ParseException(tkoneway, ". Oneway function cannot have a return type.");
+               }
+           }
         }
 		parameter_decls[operationObject] { tpl=$parameter_decls.tpl; }
 		( 
-			raises_expr { exceptions=$raises_expr.exlist; }
+		   raises_expr { exceptions=$raises_expr.exlist; }
 	       {
 	          // Search global exceptions and add them to the operation.
-	          for(int count = 0; count < exceptions.size(); ++count)
+              for(Pair<String, Token> pair : exceptions)
 	          {
-	             String ename = exceptions.get(count);
-	             com.eprosima.idl.parser.tree.Exception exception = ctx.getException(ename);
+	             com.eprosima.idl.parser.tree.Exception exception = ctx.getException(pair.first());
 	             
 	             if(exception != null)
 	                operationObject.addException(exception);
 	             else
-	                operationObject.addUnresolvedException(ename);
+	                operationObject.addUnresolvedException(pair.first());
 	          }
 	       }
 		)?
@@ -1370,11 +1398,11 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
         }
     ;
 
-op_attribute returns [boolean ret]
+op_attribute returns [Token token = null]
 @init {
-	$ret = false;
+    Token tk = _input.LT(1);
 }
-    :   KW_ONEWAY { $ret = true;}
+    :   KW_ONEWAY { $token = tk;}
     ;
 
 op_type_spec returns [TypeCode typecode = null]
@@ -1448,10 +1476,6 @@ param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
 				}
 		        $returnPair = new Pair<Param, TemplateGroup>(param, paramTemplate);
 	        }
-	        else
-	        {
-	            throw new RuntimeException("In function 'param_decl': null pointer.");
-	        }
 	    }
     ;
 
@@ -1461,7 +1485,7 @@ param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
 //    |   KW_INOUT
 //    ;
 
-raises_expr returns [Vector<String> exlist = null]
+raises_expr returns [Vector<Pair<String, Token>> exlist = null]
     :   KW_RAISES LEFT_BRACKET scoped_name_list { $exlist=$scoped_name_list.retlist; } RIGHT_BRACKET
     ;
 
@@ -1474,31 +1498,44 @@ context_expr
 
 param_type_spec returns [TypeCode typecode = null]
 @init{
-        String literalStr = null;
+    Pair<String, Token> pair = null;
 }
     :   base_type_spec { $typecode=$base_type_spec.typecode; }
     |   string_type { $typecode=$string_type.typecode; }
     |   wide_string_type { $typecode=$wide_string_type.typecode; }
-    |   scoped_name { literalStr=$scoped_name.literalStr; }
-	   {
+    |   scoped_name
+        {
+           pair=$scoped_name.pair;
            // Find typecode in the global map.
-           $typecode = ctx.getTypeCode(literalStr);
+           $typecode = ctx.getTypeCode(pair.first());
            
            if($typecode == null)
-               throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The type " + literalStr + " cannot be found.");
-       }
+               throw new ParseException(pair.second(), "was not defined previously");
+        }
     ;
 
 fixed_pt_type
+@init{
+    Token tk = _input.LT(1);
+}
     :   KW_FIXED LEFT_ANG_BRACKET positive_int_const COMA positive_int_const RIGHT_ANG_BRACKET
+    {throw new ParseException(tk, ". Fixed type is not supported");}
     ;
 
 fixed_pt_const_type
+@init{
+    Token tk = _input.LT(1);
+}
     :   KW_FIXED
+    {throw new ParseException(tk, ". Fixed type is not supported");}
     ;
 
 value_base_type
+@init{
+    Token tk = _input.LT(1);
+}
     :   KW_VALUEBASE
+    {throw new ParseException(tk, ". Value type is not supported");}
     ;
 
 constr_forward_decl
@@ -1559,10 +1596,6 @@ attr_spec returns [Vector<Pair<String, TypeCode>> newVector]
                    // Simple declaration
                    $newVector.add(new Pair<String, TypeCode>(declvector.get(count).first(), typecode));
                }
-           }
-           else
-           {
-               throw new RuntimeException("In function 'attr_spec': null pointer.");
            }
     	}
     ;
@@ -1726,20 +1759,21 @@ event_header
 
 annotation_appl
 @init {
-        String annotationId = null;
+    Pair<String, Token> pair = null;
 }
 : 
 	AT scoped_name
 	{
-		annotationId=$scoped_name.literalStr;
-		if(ctx.getAnnotation(annotationId) != null) {
-			throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + annotationId + " cannot be found.");
+		pair=$scoped_name.pair;
+		if(ctx.getAnnotation(pair.first()) != null) {
+			throw new ParseException(pair.second(), "was not defined previously");
 		}
 	} 
-	( LEFT_BRACKET ( annotation_appl_params[ctx.getAnnotation(annotationId)] )? RIGHT_BRACKET )?
+	( LEFT_BRACKET ( annotation_appl_params[ctx.getAnnotation(pair.first()), pair.second()] )? RIGHT_BRACKET )?
 	;
 	
-annotation_appl_params [Annotation annotation]
+// TODO Support several members in annotations.
+annotation_appl_params [Annotation annotation, Token tkannot]
 @init {
         String valueStr = null;
 }
@@ -1750,7 +1784,7 @@ annotation_appl_params [Annotation annotation]
         if(annotation.getMembers().size() == 1)
             ctx.addTmpAnnotation(annotation.getName(), valueStr);
         else
-            throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + annotation.getName() + " has defined more than one attribute.");
+            throw new ParseException(tkannot, "has defined more than one attribute.");
 	}
 	| annotation_appl_param[annotation] ( COMA annotation_appl_param[annotation] )*
 	;
@@ -1763,21 +1797,22 @@ annotation_appl_param [Annotation annotation]
 /*	
 annotation_application
 @init {
-        String id = null, valueStr = null;
+        String id = null;
+        Pair<String, Token> pair = null;
 }
     :
-        AT identifier { id=$identifier.id; } LEFT_BRACKET literal { valueStr=$literal.literalStr; } RIGHT_BRACKET
+        AT identifier { id=$identifier.id; } LEFT_BRACKET literal { pair=$literal.pair; } RIGHT_BRACKET
         {
             // Check if the annotation was defined and has only one member.
             if(ctx.getAnnotation(id) != null)
             {
                if(ctx.getAnnotation(id).getMembers().size() == 1)
-                   ctx.addTmpAnnotation(id, valueStr);
+                   ctx.addTmpAnnotation(id, pair.first());
                else
-                   throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + id + " has defined more than one attribute.");
+                   throw new ParseException(id, "annotation has defined more than one attribute.");
             }
             else
-                throw new ParseException(ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1, "The annotation " + id + " cannot be found.");
+                throw new ParseException(id, "was not defined previously");
         }
     ;
 */

@@ -40,7 +40,9 @@ public class TemplateUtil
                 }
                 else
                 {
-                    throw new ParseException(scopeFile, line, "Bad label to boolean type.");
+                    //TODO
+                    //throw new ParseException(((UnionMember)members.get(0)).getLabels().get(0), "is not a valid label for a boolean discriminator.");
+                    throw new ParseException(null, "is not a valid label for a boolean discriminator.");
                 }    
             }
         }
@@ -51,7 +53,7 @@ public class TemplateUtil
         }
         else
         {
-            throw new ParseException(scopeFile, line, "Not supported type discriminator.");
+            throw new ParseException(null, "Not supported type discriminator.");
         }
         
         return returnedValue;
@@ -71,7 +73,9 @@ public class TemplateUtil
                 {
                     if(!label.startsWith(enume.getScope()))
                     {
-                        throw new ParseException(scopeFile, line, "Cannot find the symbol " + label + "");
+                        //TODO
+                        //throw new ParseException(label,  "was not declared previously");
+                        throw new ParseException(null,  "was not declared previously");
                     }
                 }
                 else
@@ -82,7 +86,11 @@ public class TemplateUtil
             else
             {
                 if(label.contains("::"))
-                    throw new ParseException(scopeFile, line, "Cannot find the symbol " + label + "");
+                {
+                    //TODO
+                    //throw new ParseException(label, "was not declared previously");
+                    throw new ParseException(null, "was not declared previously");
+                }
             }
         }
 
