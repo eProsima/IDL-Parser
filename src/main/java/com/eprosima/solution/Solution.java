@@ -1,5 +1,6 @@
 package com.eprosima.solution;
 
+import com.eprosima.log.ColorMessage;
 import java.util.ArrayList;
 
 public class Solution
@@ -76,7 +77,8 @@ public class Solution
 						}
 						else
 						{
-							System.out.println("WARNING: File " + deps.get(count) + " wasn't parsed. The generated example will not work");
+							System.out.println(ColorMessage.yellow("warning:") + " File " + deps.get(count) + " wasn't parsed in this execution. The generated example will not work. "
+                                    + "To generate a successful example, try to execute this application passing all necessary IDL files.");
 						}
 					}
 				}

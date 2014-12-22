@@ -26,6 +26,11 @@ public class ColorMessage
         return ANSI_BOLD_RED + text + ANSI_RESET;
     }
 
+    public static String yellow(String text)
+    {
+        return ANSI_BOLD_YELLOW + text + ANSI_RESET;
+    }
+
     public static String debug()
     {
         return ANSI_BOLD_BLUE + "DEBUG: " + ANSI_RESET;

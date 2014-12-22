@@ -45,9 +45,11 @@ public class Context
             if(startsWith(m_file, java.io.File.separator))
                 m_file = m_file.substring(1);
         }
+        /*
         // Remove relative directory if is equal that where the processed IDL is.
         if(m_directoryFile != null && startsWith(m_file, m_directoryFile))
         	m_file = m_file.substring(m_directoryFile.length());
+        */
 
         m_definitions = new ArrayList<Definition>();
         m_modules = new HashMap<String, Module>();
@@ -602,21 +604,10 @@ public class Context
                 // Remove relative ./ directory.
                 if(startsWith(file, currentDirS))
                     file = file.substring(currentDirS.length());
-                // Remove relative directory if is equal that where the processed IDL is.
-                if(m_directoryFile != null && startsWith(file, m_directoryFile))
-                    file = file.substring(m_directoryFile.length());
-                // Remove relative directory if is equal to a include path.
-                for(int i = 0; i < m_includePaths.size(); ++i)
-                {   
-                    if(startsWith(file, m_includePaths.get(i)))
-                    {
-                        file = file.substring(m_includePaths.get(i).length());
-                        break;
-                    }
-                }
                 // Remove possible separator    
                 if(startsWith(file, java.io.File.separator))
                     file = file.substring(1);
+
 
                 //if it is a idl file.
                 if(file.substring(file.length() - 4, file.length()).equals(".idl"))
@@ -632,7 +623,23 @@ public class Context
 
                             // See if it is a direct dependency.
                             if(file.equals(m_file))
-                                m_directIncludeDependencies.add(m_scopeFile.substring(0, m_scopeFile.length() - 4));
+                            {
+                                String includeFile = m_scopeFile;
+                                // Remove relative directory if is equal that where the processed IDL is.
+                                if(m_directoryFile != null && startsWith(includeFile, m_directoryFile))
+                                    includeFile = includeFile.substring(m_directoryFile.length());
+                                // Remove relative directory if is equal to a include path.
+                                for(int i = 0; i < m_includePaths.size(); ++i)
+                                {   
+                                    if(startsWith(includeFile, m_includePaths.get(i)))
+                                    {
+                                        includeFile = includeFile.substring(m_includePaths.get(i).length());
+                                        break;
+                                    }
+                                }
+
+                                m_directIncludeDependencies.add(includeFile.substring(0, includeFile.length() - 4));
+                            }
                         }
                         else
                         {
