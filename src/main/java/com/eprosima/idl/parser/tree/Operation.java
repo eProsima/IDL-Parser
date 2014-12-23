@@ -1,6 +1,7 @@
 package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 
 import com.eprosima.idl.context.Context;
@@ -16,7 +17,7 @@ public class Operation extends TreeNode implements Export, Notebook
         m_params = new ArrayList<Param>();
         m_exceptions = new ArrayList<com.eprosima.idl.parser.tree.Exception>();
         m_unresolvedExceptions = new ArrayList<String>();
-        m_annotations = new HashMap<String, String>();
+        m_annotations = new HashMap<String, Annotation>();
     }
     
     public void setParent(Object obj)
@@ -186,19 +187,14 @@ public class Operation extends TreeNode implements Export, Notebook
     }
     
     @Override
-    public void addAnnotations(HashMap<String, String> annotations)
+    public void addAnnotation(Annotation annotation)
     {
-        m_annotations.putAll(annotations);
+        if(annotation != null)
+            m_annotations.put(annotation.getName(), annotation);
     }
     
     @Override
-    public void addAnnotation(String key, String value)
-    {
-        m_annotations.put(key, value);
-    }
-    
-    @Override
-    public HashMap<String, String> getAnnotations()
+    public Map<String, Annotation> getAnnotations()
     {
         return m_annotations;
     }
@@ -211,5 +207,5 @@ public class Operation extends TreeNode implements Export, Notebook
     private TypeCode m_rettype = null;
     private Param m_rettypeparam = null;
     //! Map that stores the annotations of the interface.
-    HashMap<String, String> m_annotations = null;
+    HashMap<String, Annotation> m_annotations = null;
 }

@@ -2,23 +2,39 @@ package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AnnotationDeclaration extends TreeNode implements Definition
 {
-    public AnnotationDeclaration(String scopeFile, boolean isInScope, String scope, String name, TypeCode typecode)
+    public AnnotationDeclaration(String scopeFile, boolean isInScope, String scope, String name)
     {
         super(scopeFile, isInScope, scope, name);
+        m_members = new HashMap<String, AnnotationMember>();
+    }
 
-        m_typecode = typecode;
-        // Set as parent to the Typecode.
-        m_typecode.setParent(this);
+    public List<AnnotationMember> getMembers()
+    {
+        return new ArrayList<AnnotationMember>(m_members.values());
+    }
+
+    public void addMembers(AnnotationDeclaration annotation)
+    {
+        m_members.putAll(annotation.m_members);
+    }
+
+    public boolean addMember(AnnotationMember member)
+    {
+        if(!m_members.containsKey(member.getName()))
+        {
+            m_members.put(member.getName(), member);
+            return true;
+        }
+
+        return false;
     }
     
-    public TypeCode getTypeCode()
-    {
-        return m_typecode;
-    }
-
     public void setParent(Object obj)
     {
         m_parent = obj;
@@ -65,6 +81,6 @@ public class AnnotationDeclaration extends TreeNode implements Definition
         return true;
     }
         
-    private TypeCode m_typecode = null;
     private Object m_parent = null;
+    private HashMap<String, AnnotationMember> m_members = null;
 }

@@ -1,6 +1,7 @@
 package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 
 public class Module extends DefinitionContainer implements Definition, Notebook
@@ -9,7 +10,7 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     {
         super(scopeFile, isInScope, scope, name);
 
-        m_annotations = new HashMap<String, String>();
+        m_annotations = new HashMap<String, Annotation>();
     }
     
     public void setParent(Object obj)
@@ -92,19 +93,14 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     }
     
     @Override
-    public void addAnnotations(HashMap<String, String> annotations)
+    public void addAnnotation(Annotation annotation)
     {
-        m_annotations.putAll(annotations);
+        if(annotation != null)
+            m_annotations.put(annotation.getName(), annotation);
     }
     
     @Override
-    public void addAnnotation(String key, String value)
-    {
-        m_annotations.put(key, value);
-    }
-    
-    @Override
-    public HashMap<String, String> getAnnotations()
+    public Map<String, Annotation> getAnnotations()
     {
         return m_annotations;
     }
@@ -119,22 +115,23 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     
     public String getResourceCompleteBaseUri()
     {
-        String baseUri = m_annotations.get("RESOURCES_BASE_URI");
+        Annotation baseUri = m_annotations.get("RESOURCES_BASE_URI");
+        String baseUriStr = baseUri.getValue("value");
         
-        if(baseUri != null)
+        if(baseUriStr != null)
         {
             // Remove http://
-            int posInit = baseUri.indexOf("//");
+            int posInit = baseUriStr.indexOf("//");
             
             if(posInit == -1)
                 posInit = 0;
             else
                 posInit += 2;
             
-            return baseUri.substring(posInit);
+            return baseUriStr.substring(posInit);
         }
         
-        return baseUri;
+        return baseUriStr;
     }
     
     /*
@@ -183,27 +180,28 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     }
     
     public String getResourceHost() {
-        String path =  m_annotations.get("RESOURCES_BASE_URI");
+        Annotation path =  m_annotations.get("RESOURCES_BASE_URI");
+        String pathStr = path.getValue("value");
         
         // Remove http://
-        int posInit = path.indexOf("//");
+        int posInit = pathStr.indexOf("//");
         if(posInit == -1)
             posInit = 0;
         else
             posInit += 2;
         
         // Remove path
-        int posEnd = path.indexOf('/', posInit);
+        int posEnd = pathStr.indexOf('/', posInit);
         
         if(posEnd == -1)
-            posEnd = path.length()-1;
+            posEnd = pathStr.length()-1;
         
-        return path.substring(posInit, posEnd);     
+        return pathStr.substring(posInit, posEnd);     
     }
     
     ////////// End RESTful block //////////
 
     private Object m_parent = null;
   //! Map that stores the annotations of the interface.
-    HashMap<String, String> m_annotations = null;
+    Map<String, Annotation> m_annotations = null;
 }

@@ -1,6 +1,7 @@
 package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 
 public class Interface extends ExportContainer implements Definition, Notebook
@@ -10,7 +11,7 @@ public class Interface extends ExportContainer implements Definition, Notebook
         super(scopeFile, isInScope, scope, name);
 
         m_bases = new HashMap<String, Interface>();
-        m_annotations = new HashMap<String, String>();
+        m_annotations = new HashMap<String, Annotation>();
     }
     
 
@@ -174,19 +175,14 @@ public class Interface extends ExportContainer implements Definition, Notebook
     }
     
     @Override
-    public void addAnnotations(HashMap<String, String> annotations)
+    public void addAnnotation(Annotation annotation)
     {
-        m_annotations.putAll(annotations);
+        if(annotation != null)
+            m_annotations.put(annotation.getName(), annotation);
     }
     
     @Override
-    public void addAnnotation(String key, String value)
-    {
-        m_annotations.put(key, value);
-    }
-    
-    @Override
-    public HashMap<String, String> getAnnotations()
+    public Map<String, Annotation> getAnnotations()
     {
         return m_annotations;
     }
@@ -199,5 +195,5 @@ public class Interface extends ExportContainer implements Definition, Notebook
     private ArrayList<Operation> m_operations = null;
     private ArrayList<Operation> m_all_operations = null;
     //! Map that stores the annotations of the interface.
-    HashMap<String, String> m_annotations = null;
+    HashMap<String, Annotation> m_annotations = null;
 }

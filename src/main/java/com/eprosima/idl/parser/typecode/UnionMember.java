@@ -1,25 +1,14 @@
 package com.eprosima.idl.parser.typecode;
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class UnionMember extends Member
 {
-    public UnionMember()
-    {
-        super();
-        m_labels = new ArrayList<String>();
-    }
-    
-    public UnionMember(TypeCode typecode, String name)
+    public UnionMember(TypeCode typecode, String name, List<String> labels, boolean isDefault)
     {
         super(typecode, name);
-        m_labels = new ArrayList<String>();
-    }
-    
-    public void addLabel(String label)
-    {
-        m_labels.add(label);
+        m_labels = labels;
+        m_default = isDefault;
     }
     
     public List<String> getLabels()
@@ -30,11 +19,6 @@ public class UnionMember extends Member
     public boolean isDefault()
     {
         return m_default;
-    }
-    
-    public void setDefault(boolean b)
-    {
-        m_default = b;
     }
     
     private List<String> m_labels = null;

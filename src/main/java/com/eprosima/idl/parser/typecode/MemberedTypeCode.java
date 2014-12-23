@@ -2,6 +2,7 @@ package com.eprosima.idl.parser.typecode;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public abstract class MemberedTypeCode extends TypeCode
 {    
@@ -10,7 +11,7 @@ public abstract class MemberedTypeCode extends TypeCode
         super(kind);
         m_scope = scope;
         m_name = name;
-        m_members = new ArrayList<Member>();
+        m_members = new LinkedHashMap<String, Member>();
     }
     
     public String getName()
@@ -38,13 +39,17 @@ public abstract class MemberedTypeCode extends TypeCode
     
     public List<Member> getMembers()
     {
-        return m_members;
+        return new ArrayList<Member>(m_members.values());
     }
     
-    public int addMember(Member member)
+    public boolean addMember(Member member)
     {
-        m_members.add(member);
-        return m_members.size() - 1;
+        if(!m_members.containsKey(member.getName()))
+        {
+            m_members.put(member.getName(), member);
+            return true;
+        }
+        return false;
     }
     
     @Override
@@ -57,5 +62,5 @@ public abstract class MemberedTypeCode extends TypeCode
     
     private String m_scope = null;
     
-    private List<Member> m_members = null;
+    private LinkedHashMap<String, Member> m_members = null;
 }

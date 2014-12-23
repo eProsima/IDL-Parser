@@ -15,9 +15,23 @@ public class UnionTypeCode extends MemberedTypeCode
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
     
+    /*!
+     * @return 0 is ok, -1 the member is repeated, -2 is another default member.
+     */
     public int addMember(UnionMember member)
     {
-        return addMember((Member)member);
+        if(member.isDefault())
+        {
+            if(m_defaultindex == -1)
+                m_defaultindex = getMembers().size();
+            else
+                return -2;
+        }
+
+        if(!addMember((Member)member))
+            return -1;
+
+        return 0;
     }
     
     @Override
@@ -34,15 +48,6 @@ public class UnionTypeCode extends MemberedTypeCode
         StringTemplate st = getIdlTypenameFromStringTemplate();
         st.setAttribute("name", getScopedname());
         return st.toString();
-    }
-    
-    public void setDefaultindex(int index)
-    {
-        if(m_defaultindex != -1)
-            ((UnionMember)getMembers().get(m_defaultindex)).setDefault(false);
-        
-        m_defaultindex = index;
-        ((UnionMember)getMembers().get(m_defaultindex)).setDefault(true);
     }
     
     public void setDefaultvalue(String value)

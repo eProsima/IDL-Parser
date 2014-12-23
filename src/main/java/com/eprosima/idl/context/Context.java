@@ -19,7 +19,7 @@ import com.eprosima.idl.parser.tree.Module;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
 import com.eprosima.idl.parser.tree.Param;
-import com.eprosima.idl.parser.typecode.Annotation;
+import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
 import com.eprosima.idl.util.Util;
@@ -56,8 +56,7 @@ public class Context
         m_interfaces = new HashMap<String, Interface>();
         m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
         m_types = new HashMap<String, TypeCode>();
-        m_annotations = new HashMap<String, Annotation>();
-        m_tmpAnnotations = new HashMap<String, String>();
+        m_annotations = new HashMap<String, AnnotationDeclaration>();
 
         // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
         m_includedependency = new HashSet<String>();
@@ -386,22 +385,30 @@ public class Context
         return returnedValue;
     }
 
+
+    public AnnotationDeclaration createAnnotationDeclaration(String name)
+    {
+        AnnotationDeclaration annotationObject = new AnnotationDeclaration(m_scopeFile, isInScopedFile(), m_scope, name);
+        addAnnotationDeclaration(annotationObject);
+        return annotationObject;
+    }
+
     /*!
      * @brief This function adds an annotation to the context.
      */
-    public void addAnnotation(Annotation annotation)
+    protected void addAnnotationDeclaration(AnnotationDeclaration annotation)
     {
-        Annotation prev = m_annotations.put(annotation.getScopedname(), annotation);
+        AnnotationDeclaration prev = m_annotations.put(annotation.getScopedname(), annotation);
         
         // TODO: Exception.
         if(prev != null)
             System.out.println("Warning: Redefined annotation " + prev.getScopedname());
     }
 
-    public Annotation getAnnotation(String name)
+    public AnnotationDeclaration getAnnotationDeclaration(String name)
     {
         int lastIndex = -1;
-        Annotation returnedValue = m_annotations.get(name);
+        AnnotationDeclaration returnedValue = m_annotations.get(name);
 
         // Probar si no tiene scope, con el scope actual.
         if(returnedValue == null)
@@ -425,32 +432,6 @@ public class Context
         }
 
         return returnedValue;
-    }
-    
-
-    /*!
-     * @brief This function add a temporarily annotation.
-     * This annotation will be linked with a future object.
-     * @param id Identifier of the annotation.
-     * @param value Value of the annotation.
-     */
-    public void addTmpAnnotation(String id, String value)
-    {    		
-    	String oldValue = m_tmpAnnotations.put(id, value);
-    	
-    	// TODO Lanzar una excepcion.
-    	if(oldValue != null)
-    		System.out.println("Annotation " + id + " was redefined");
-    }
-    
-    /*!
-     * @brief This function links the temporarily annotations with an object.
-     * @param notebook The object where the temporarily annotations will be stored.
-     */
-    public void setTmpAnnotations(Notebook notebook)
-    {
-        notebook.addAnnotations(m_tmpAnnotations);
-        m_tmpAnnotations.clear();
     }
     
     /*!
@@ -711,10 +692,8 @@ public class Context
     private HashMap<String, com.eprosima.idl.parser.tree.Exception> m_exceptions = null;
     //! Map that contains all types that were found processing the IDL file (after preprocessing).
     protected HashMap<String, TypeCode> m_types = null;
-  //! Map that contains all annotations that where found processing the IDL file.
-    private HashMap<String, Annotation> m_annotations = null;
-    //! Map that contains temporarily the annotations before to be linked with an element.
-    private HashMap<String, String> m_tmpAnnotations = null;
+    //! Map that contains all annotations that where found processing the IDL file.
+    private HashMap<String, AnnotationDeclaration> m_annotations = null;
 
     private ArrayList<String> m_includePaths = null;
     //! Set that contains the library dependencies that were found because there was a line of the preprocessor.

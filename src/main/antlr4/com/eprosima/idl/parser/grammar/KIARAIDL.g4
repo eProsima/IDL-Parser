@@ -126,8 +126,6 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 		name=$identifier.id;
 		// Create the Module object.
 		moduleObject = new Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name);   
-		// Set temporarily annotations.
-		ctx.setTmpAnnotations(moduleObject);
 		
 		if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
 			if(tmanager != null) {
@@ -208,8 +206,7 @@ interface_decl returns [Pair<Interface, TemplateGroup> returnPair = null]
 			name=$identifier.id;
            // Create the Interface object.
            interfaceObject = ctx.createInterface(name);
-           // Set temporarily annotations.
-           ctx.setTmpAnnotations(interfaceObject);
+
            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
            {
 			   if(tmanager != null) {
@@ -620,32 +617,30 @@ type_decl returns [Pair<TypeDeclaration, TemplateGroup> returnPair = null]
 
 type_declarator returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 @init {
-    Vector<Pair<String, ContainerTypeCode>> declvector = null;
-    TypeCode typecode = null;
     AliasTypeCode typedefTypecode = null;
     TemplateGroup typedefTemplates =  null;
 	if(tmanager != null) {
 		typedefTemplates = tmanager.createTemplateGroup("typedef_decl");
 	}
 }
-    :   type_spec { typecode=$type_spec.typecode; } declarators { declvector=$declarators.declvector; }
+    :   type_spec declarators
 	{
-	   if(typecode != null && declvector != null)
+	   if($type_spec.typecode != null)
 	   {
-	       for(int count = 0; count < declvector.size(); ++count)
+	       for(int count = 0; count < $declarators.ret.size(); ++count)
 	       {
-	           typedefTypecode = new AliasTypeCode(ctx.getScope(), declvector.get(count).first());
+	           typedefTypecode = new AliasTypeCode(ctx.getScope(), $declarators.ret.get(count).first().first());
 	           
-	           if(declvector.get(count).second() != null)
+	           if($declarators.ret.get(count).second() != null)
 	           {
 	               // Array declaration
-	               declvector.get(count).second().setContentTypeCode(typecode);
-	               typedefTypecode.setContentTypeCode(declvector.get(count).second());
+	               $declarators.ret.get(count).second().setContentTypeCode($type_spec.typecode);
+	               typedefTypecode.setContentTypeCode($declarators.ret.get(count).second());
 	           }
 	           else
 	           {
 	               // Simple declaration
-	               typedefTypecode.setContentTypeCode(typecode);
+	               typedefTypecode.setContentTypeCode($type_spec.typecode);
 	           }
 	           
 			   if(typedefTemplates != null) {
@@ -660,7 +655,7 @@ type_declarator returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 				typedefTemplates.setAttribute("ctx", ctx);
 			}
 	       
-	       $returnPair = new Pair<TypeCode, TemplateGroup>(typecode, typedefTemplates);
+	       $returnPair = new Pair<TypeCode, TemplateGroup>($type_spec.typecode, typedefTemplates);
        }
 	}
     ;
@@ -715,48 +710,43 @@ constr_type_spec
     |   enum_type
     ;
 
-declarators returns [Vector<Pair<String, ContainerTypeCode>> declvector = new Vector<Pair<String, ContainerTypeCode>>()]
-@init {
-    Pair<String, ContainerTypeCode> pair = null;
-	$declvector = new Vector<Pair<String, ContainerTypeCode>>();
-}
+declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
     :   declarator
 	    {
-			pair=$declarator.pair;
-            if(pair != null)
-                $declvector.add(pair);
+            if($declarator.ret != null)
+                $ret.add($declarator.ret);
             else
                 throw new ParseException(null, "Cannot parse type declarator");
         }
 		( COMA declarator
 		{
-			pair=$declarator.pair;
-            if(pair != null)
-                $declvector.add(pair);
+            if($declarator.ret != null)
+                $ret.add($declarator.ret);
             else
                 throw new ParseException(null, "Cannot parse type declarator");
         }
 		)*
     ;
 
-declarator returns [Pair<String, ContainerTypeCode> pair = null]
-    :   simple_declarator { $pair=$simple_declarator.pair; }
-    |   complex_declarator { $pair=$complex_declarator.pair; }
+declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = null]
+    :   simple_declarator { $ret=$simple_declarator.ret; }
+    |   complex_declarator { $ret=$complex_declarator.ret; }
     ;
 
-simple_declarator returns [Pair<String, ContainerTypeCode> pair = null]
-@init {
-    String name = null;
+simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = null]
+@init
+{
+    Token tk = _input.LT(1);
 }
     :  identifier
 	   {
-			name=$identifier.id;
-	       $pair = new Pair<String, ContainerTypeCode>(name, null);
+           Pair<String, Token> p = new Pair<String, Token>($identifier.id, tk);
+	       $ret = new Pair<Pair<String, Token>, ContainerTypeCode>(p, null);
 	   }
     ;
 
-complex_declarator returns [Pair<String, ContainerTypeCode> pair = null]
-    :   array_declarator { $pair=$array_declarator.pair; }
+complex_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = null]
+    :   array_declarator { $ret=$array_declarator.pair; }
     ;
 
 floating_pt_type returns [TypeCode typecode = null]
@@ -874,68 +864,80 @@ object_type
 
 annotation_decl returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = null]
 :
-	annotation_def { $returnPair=$annotation_def.returnPair; } SEMICOLON
+	annotation_def { $returnPair=$annotation_def.returnPair; }
 	| annotation_forward_dcl
 	;
 	
 annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = null]
-@init {
-    Annotation annotation = null;
-	AnnotationDeclaration annotationDecl = null;
+@init
+{
 	TemplateGroup annotationTemplates = null;
 }
-:
-	annotation_header[annotation] LEFT_BRACE annotation_body[annotation] RIGHT_BRACE
+    : annotation_header LEFT_BRACE annotation_body[$annotation_header.annotation] RIGHT_BRACE
 	{
-		if(annotation != null) {
-		    // Add anotation typecode to the map with all typecodes.
-			ctx.addAnnotation(annotation);
-			
-			annotationDecl = new AnnotationDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), annotation.getName(), annotation);
-			
-			if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
-				if(tmanager != null) {
+		if($annotation_header.annotation != null)
+        {
+			if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+				if(tmanager != null)
+                {
 					annotationTemplates = tmanager.createTemplateGroup("annotation");
 					annotationTemplates.setAttribute("ctx", ctx);
 					// Set the annotation object to the TemplateGroup of the annotation.
-					annotationTemplates.setAttribute("annotation", annotationDecl);
+					annotationTemplates.setAttribute("annotation", $annotation_header.annotation);
 				}
 			}
 			
-			$returnPair = new Pair<AnnotationDeclaration, TemplateGroup>(annotationDecl, annotationTemplates);
+			$returnPair = new Pair<AnnotationDeclaration, TemplateGroup>($annotation_header.annotation, annotationTemplates);
 		}
     }
 	;
 	
-annotation_header [Annotation annotation]
-@init {
-    String name = null;
-}
-:
-	KW_AT_ANNOTATION
-	identifier { name=$identifier.id; annotation = new Annotation(ctx.getScope(), name); }
-	( annotation_inheritance_spec )?
+annotation_header returns [AnnotationDeclaration annotation = null]
+    : KW_AT_ANNOTATION
+	identifier { $annotation = ctx.createAnnotationDeclaration($identifier.id); }
+	( annotation_inheritance_spec[$annotation] )?
 	;
 
-annotation_inheritance_spec
-:
+annotation_inheritance_spec [AnnotationDeclaration annotation]
+@init
+{
+    AnnotationDeclaration inhanno = null;
+}
+    :
 	COLON scoped_name
+    {
+        if(annotation != null)
+        {
+            inhanno = ctx.getAnnotationDeclaration($scoped_name.pair.first());
+
+            if(inhanno != null)
+            {
+                annotation.addMembers(inhanno);
+            }
+            else
+                throw new ParseException($scoped_name.pair.second(), "was not defined previously");
+        }
+    }
 	;
 	
-annotation_body [Annotation annotation]
+annotation_body [AnnotationDeclaration annotation]
 :
 	( annotation_member[annotation] )*
 	;
 
-annotation_member [Annotation annotation]
-@init{
-	TypeCode type = null;
-	Pair<String, ContainerTypeCode> pair = null;
+annotation_member [AnnotationDeclaration annotation]
+@init
+{
+    String literalStr = null;
 }
-:
-	const_type { type=$const_type.typecode;  } simple_declarator { pair=$simple_declarator.pair; } ( KW_DEFAULT const_exp )? SEMICOLON
+    :
+	const_type simple_declarator ( KW_DEFAULT const_exp { literalStr=$const_exp.literalStr; } )? SEMICOLON
 	{
-		$annotation.addMember(new Member(type, pair.first()));
+		if(!$annotation.addMember(new AnnotationMember($simple_declarator.ret.first().first(), $const_type.typecode, literalStr)))
+        {
+            throw new ParseException($simple_declarator.ret.first().second(), "was defined previously");
+        }
 	}
 	;
 
@@ -974,43 +976,61 @@ struct_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     ;
 
 member_list [StructTypeCode structTP]
-@init {
-    Vector<Pair<String, TypeCode>> declvector = null;
-}
     :   (
-			member
+			member_def
 	       {
-				declvector=$member.newVector;
-	           for(int count = 0; count < declvector.size(); ++count)
-	               $structTP.addMember(new Member(declvector.get(count).second(), declvector.get(count).first()));
+               if($member_def.ret != null)
+               {
+                   for(Pair<Pair<String, Token>, Member> pair : $member_def.ret)
+                   {
+	                   if(!$structTP.addMember(pair.second()))
+                           throw new ParseException(pair.first().second(), "was defined previously");
+                   }
+               }
 	       }
 		)+
     ;
 
-member returns [Vector<Pair<String, TypeCode>> newVector]
-@init{
-    Vector<Pair<String, ContainerTypeCode>> declvector = null;
-    TypeCode typecode = null;
-	$newVector = new Vector<Pair<String, TypeCode>>();
-}
-    :   type_spec { typecode=$type_spec.typecode; } declarators { declvector=$declarators.declvector; } SEMICOLON
+member_def returns [Vector<Pair<Pair<String, Token>, Member>> ret = null]
+    :   member { $ret=$member.ret; }
+    |   annotation_appl member_def
+        {
+            if($member_def.ret != null)
+            {
+                $ret=$member_def.ret; 
+
+                for(Pair<Pair<String, Token>, Member> pair : $ret)
+                {
+                    if(pair.second() != null)
+                        pair.second().addAnnotation($annotation_appl.annotation);
+                }
+            }
+        }
+    ; 
+
+member returns [Vector<Pair<Pair<String, Token>, Member>> ret = new Vector<Pair<Pair<String, Token>, Member>>()]
+    :   type_spec declarators SEMICOLON
 		{
-	       if(typecode!=null)
+	       if($type_spec.typecode!=null)
 	       {
-		       for(int count = 0; count < declvector.size(); ++count)
+		       for(int count = 0; count < $declarators.ret.size(); ++count)
 		       {
-		           if(declvector.get(count).second() != null)
+                   Member member = null;
+
+		           if($declarators.ret.get(count).second() != null)
 		           {
 		               // Array declaration
-		               declvector.get(count).second().setContentTypeCode(typecode);
-		               $newVector.add(new Pair<String, TypeCode>(declvector.get(count).first(), declvector.get(count).second()));
+		               $declarators.ret.get(count).second().setContentTypeCode($type_spec.typecode);
+                       member = new Member($declarators.ret.get(count).second(), $declarators.ret.get(count).first().first());
 		               
 		           }
 		           else
 		           {
 		               // Simple declaration
-		               $newVector.add(new Pair<String, TypeCode>(declvector.get(count).first(), typecode));
+                       member = new Member($type_spec.typecode, $declarators.ret.get(count).first().first());
 		           }
+
+                   $ret.add(new Pair<Pair<String, Token>, Member>($declarators.ret.get(count).first(), member));
 		       }
 	       }
 	       else
@@ -1090,28 +1110,27 @@ case_stmt_list [UnionTypeCode unionTP]
 	;
 
 case_stmt [UnionTypeCode unionTP]
-@init{
-	System.out.println("Entrando a case_stmt");
-    Pair<String, TypeCode> element = null;
-    String label = null;
+@init
+{
+    List<String> labels = new ArrayList<String>();
     boolean defaul = false;
-    UnionMember member = new UnionMember();
 }
 	:	( KW_CASE const_exp
 		{
-			label=$const_exp.literalStr;
-			member.addLabel(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), label, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
+			labels.add(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), $const_exp.literalStr, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
 		} COLON
 		| KW_DEFAULT { defaul = true; } COLON
 		)+
-		element_spec { element=$element_spec.newpair; } SEMICOLON
+		element_spec[labels, defaul] SEMICOLON
 	    {
-	       if(element!=null)
+	       if($element_spec.ret != null)
 	       {
-		       member.setTypecode(element.second());
-		       member.setName(element.first());
-		       int index = unionTP.addMember(member);
-		       if(defaul) unionTP.setDefaultindex(index);
+		       int ret = unionTP.addMember($element_spec.ret.second());
+
+               if(ret == -1)
+                   throw new ParseException($element_spec.ret.first().second(), " is already defined.");
+               else if(ret == -2)
+                   throw new ParseException($element_spec.ret.first().second(), " is also a default attribute. Another was defined previously.");
 	       }
 	       else
 	       {
@@ -1125,25 +1144,24 @@ case_stmt [UnionTypeCode unionTP]
 //    |   KW_DEFAULT COLON
 //    ;
 
-element_spec returns [Pair<String, TypeCode> newpair = null]
-@init {
-    Pair<String, ContainerTypeCode> decl = null;
-    TypeCode typecode = null;
-}
-    :   type_spec { typecode=$type_spec.typecode; } declarator
+element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<String, Token>, UnionMember> ret = null]
+    :   type_spec declarator
 	    {
-			decl=$declarator.pair;
-	        if(typecode!=null)
+	        if($type_spec.typecode != null)
 	        {
-	            if(decl.second() != null)
+                UnionMember member = null;
+
+	            if($declarator.ret.second() != null)
 	            {
-	                decl.second().setContentTypeCode(typecode);
-	                $newpair = new Pair<String, TypeCode>(decl.first(), decl.second());
+	                $declarator.ret.second().setContentTypeCode($type_spec.typecode);
+                    member = new UnionMember($declarator.ret.second(), $declarator.ret.first().first(), labels, isDefault);
 	            }
 	            else
 	            {
-	                $newpair = new Pair<String, TypeCode>(decl.first(), typecode);
+                    member = new UnionMember($type_spec.typecode, $declarator.ret.first().first(), labels, isDefault);
 	            }
+
+                $ret = new Pair<Pair<String, Token>, UnionMember>($declarator.ret.first(), member);
             }
             else
 	        {
@@ -1243,7 +1261,8 @@ string_type returns [TypeCode typecode = null]
     ;
 
 wide_string_type returns [TypeCode typecode = null]
-@init{
+@init
+{
     String maxsize = null;
 }
     :   ( KW_WSTRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
@@ -1251,20 +1270,22 @@ wide_string_type returns [TypeCode typecode = null]
 	   {$typecode = new StringTypeCode(TypeCode.KIND_WSTRING, maxsize);}
     ;
 
-array_declarator returns [Pair<String, ContainerTypeCode> pair = null]
-@init{
-    String name = _input.LT(1).getText(), size = null;
+array_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> pair = null]
+@init
+{
+    Token tk = _input.LT(1);
     ArrayTypeCode typecode = new ArrayTypeCode();
 }
     :   ID
 		(
-			fixed_array_size { size=$fixed_array_size.literalStr; }
+			fixed_array_size
 			{
-	           typecode.addDimension(size);
+	           typecode.addDimension($fixed_array_size.literalStr);
 	        }
 		)+
 	    {
-	       $pair = new Pair<String, ContainerTypeCode>(name, typecode);
+            Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
+            $pair = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
 	    }
     ;
 
@@ -1274,9 +1295,9 @@ fixed_array_size returns [String literalStr = null]
 		RIGHT_SQUARE_BRACKET
     ;
 
-attr_decl returns [Vector<Pair<String, TypeCode>> declvector = null]
+attr_decl returns [Vector<Pair<Pair<String, Token>, TypeCode>> ret = null]
     :   readonly_attr_spec
-    |   attr_spec { $declvector=$attr_spec.newVector; }
+    |   attr_spec { $ret=$attr_spec.ret; }
     ;
 
 except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup> returnPair = null]
@@ -1314,14 +1335,11 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
     ;
 	
 opt_member_list [com.eprosima.idl.parser.tree.Exception exceptionObject]
-@init{
-    Vector<Pair<String, TypeCode>> declvector = null;
-}
 	:  (
-	      member { declvector=$member.newVector; }
+	      member
 	      {
-	          for(int count = 0; count < declvector.size(); ++count)
-	              $exceptionObject.addMember(new Member(declvector.get(count).second(), declvector.get(count).first()));
+	          for(int count = 0; count < $member.ret.size(); ++count)
+	              $exceptionObject.addMember($member.ret.get(count).second());
 	      }
 	   )*
 	;
@@ -1349,10 +1367,9 @@ op_decl returns [Pair<Operation, TemplateGroup> returnPair = null]
 		{
            // Create the Operation object.
            operationObject = ctx.createOperation(name);
-           // Set temporarily annotations.
-           ctx.setTmpAnnotations(operationObject);
 		   
-		   if(operationTemplates != null) {
+		   if(operationTemplates != null)
+           {
 			   operationTemplates.setAttribute("ctx", ctx);
 			   // Set the the interface object to the TemplateGroup of the module.
 			   operationTemplates.setAttribute("operation", operationObject);
@@ -1451,13 +1468,12 @@ param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
 		if(tmanager != null) {
 			paramTemplate = tmanager.createTemplateGroup("param");
 		}
-        Pair<String, ContainerTypeCode> pair = null;
         TypeCode typecode = null;
         String literalStr = _input.LT(1).getText();
 }
     :   ('in' | 'out' | 'inout')?
 		param_type_spec { typecode=$param_type_spec.typecode; }
-        pair=simple_declarator { pair=$simple_declarator.pair; }
+        simple_declarator
 	    {
 	        if(typecode != null)
 	        {
@@ -1469,7 +1485,7 @@ param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
 						"): The only supported parameter declaration is 'in'. Treating as 'in'...");
 				}
 				
-	            param = ctx.createParam(pair.first(), typecode, Param.Kind.IN_PARAM);
+	            param = ctx.createParam($simple_declarator.ret.first().first(), typecode, Param.Kind.IN_PARAM);
 		            
 				if(paramTemplate != null) {
 					paramTemplate.setAttribute("parameter", param);
@@ -1580,34 +1596,31 @@ readonly_attr_declarator
     |   simple_declarator ( COMA simple_declarator )*
     ;
 
-attr_spec returns [Vector<Pair<String, TypeCode>> newVector]
+attr_spec returns [Vector<Pair<Pair<String, Token>, TypeCode>> ret = new Vector<Pair<Pair<String, Token>, TypeCode>>()]
 @init {
     TypeCode typecode = null;
-    Vector<Pair<String, ContainerTypeCode>> declvector = null;
-	$newVector = new Vector<Pair<String, TypeCode>>();
 }
-    :   KW_ATTRIBUTE param_type_spec { typecode=$param_type_spec.typecode; } attr_declarator { declvector=$attr_declarator.declvector; }
+    :   KW_ATTRIBUTE param_type_spec { typecode=$param_type_spec.typecode; } attr_declarator
     	{
     	   if(typecode != null)
            {
-               for(int count = 0; count < declvector.size(); ++count)
+               for(int count = 0; count < $attr_declarator.ret.size(); ++count)
                {
                    // attr_declarator always is a simple declarator. Not a complex (array):
                    // Simple declaration
-                   $newVector.add(new Pair<String, TypeCode>(declvector.get(count).first(), typecode));
+                   $ret.add(new Pair<Pair<String, Token>, TypeCode>($attr_declarator.ret.get(count).first(), typecode));
                }
            }
     	}
     ;
 
-attr_declarator returns [Vector<Pair<String, ContainerTypeCode>> declvector]
+attr_declarator returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret]
 @init {
-    Pair<String, ContainerTypeCode> pair = null;
-	$declvector = new Vector<Pair<String, ContainerTypeCode>>();
+	$ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>();
 }
-    :   simple_declarator { pair=$simple_declarator.pair; } {$declvector.add(pair);}
+    :   simple_declarator {$ret.add($simple_declarator.ret);}
 		( attr_raises_expr
-		| (COMA simple_declarator { pair=$simple_declarator.pair; } {$declvector.add(pair);})* 
+		| (COMA simple_declarator {$ret.add($simple_declarator.ret);})* 
 		)
     ;
 
@@ -1757,65 +1770,46 @@ event_header
     :   ( KW_CUSTOM )? KW_EVENTTYPE ID value_inheritance_spec
     ;
 
-annotation_appl
-@init {
-    Pair<String, Token> pair = null;
+annotation_appl returns [Annotation annotation = null]
+@init
+{
+    AnnotationDeclaration anndecl = null;
 }
 : 
 	AT scoped_name
 	{
-		pair=$scoped_name.pair;
-		if(ctx.getAnnotation(pair.first()) != null) {
-			throw new ParseException(pair.second(), "was not defined previously");
+        anndecl = ctx.getAnnotationDeclaration($scoped_name.pair.first());
+		if(anndecl == null)
+        {
+			throw new ParseException($scoped_name.pair.second(), "was not defined previously");
 		}
-	} 
-	( LEFT_BRACKET ( annotation_appl_params[ctx.getAnnotation(pair.first()), pair.second()] )? RIGHT_BRACKET )?
+
+        $annotation = new Annotation(anndecl);
+	}
+	( LEFT_BRACKET ( annotation_appl_params[$annotation, $scoped_name.pair.second()] )? RIGHT_BRACKET )?
 	;
 	
 // TODO Support several members in annotations.
 annotation_appl_params [Annotation annotation, Token tkannot]
-@init {
-        String valueStr = null;
-}
-:
-	const_exp
+    : const_exp
 	{
-		// Check if the annotation has only one member.
-        if(annotation.getMembers().size() == 1)
-            ctx.addTmpAnnotation(annotation.getName(), valueStr);
-        else
-            throw new ParseException(tkannot, "has defined more than one attribute.");
+        if(!annotation.addValue($const_exp.literalStr))
+            throw new ParseException(tkannot, "not has only one attribute.");
 	}
 	| annotation_appl_param[annotation] ( COMA annotation_appl_param[annotation] )*
 	;
 	
 annotation_appl_param [Annotation annotation]
-:
-	identifier EQUAL const_exp
-	;
-	
-/*	
-annotation_application
-@init {
-        String id = null;
-        Pair<String, Token> pair = null;
+@init
+{
+    Token tk = _input.LT(1);
 }
-    :
-        AT identifier { id=$identifier.id; } LEFT_BRACKET literal { pair=$literal.pair; } RIGHT_BRACKET
-        {
-            // Check if the annotation was defined and has only one member.
-            if(ctx.getAnnotation(id) != null)
-            {
-               if(ctx.getAnnotation(id).getMembers().size() == 1)
-                   ctx.addTmpAnnotation(id, pair.first());
-               else
-                   throw new ParseException(id, "annotation has defined more than one attribute.");
-            }
-            else
-                throw new ParseException(id, "was not defined previously");
-        }
-    ;
-*/
+    : identifier EQUAL const_exp
+    {
+        if(!annotation.addValue($identifier.id, $const_exp.literalStr))
+            throw new ParseException(tk, "is not an attribute of annotation " + annotation.getName());
+    }
+	;
 	
 identifier returns [String id]
 @init {
