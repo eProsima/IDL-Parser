@@ -959,7 +959,7 @@ struct_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 		identifier
 	    {
 			name=$identifier.id;
-	       structTP = new StructTypeCode(ctx.getScope(), name);
+	       structTP = ctx.createStructTypeCode(name);
 	    }
 		LEFT_BRACE member_list[structTP] RIGHT_BRACE
 		{
@@ -996,11 +996,11 @@ member_list [StructTypeCode structTP]
 
 member_def returns [Vector<Pair<Pair<String, Token>, Member>> ret = null]
     :   member { $ret=$member.ret; }
-    |   annotation_appl member_def
+    |   annotation_appl defret=member_def
         {
-            if($member_def.ret != null)
+            if($defret.ret != null)
             {
-                $ret=$member_def.ret; 
+                $ret=$defret.ret; 
 
                 for(Pair<Pair<String, Token>, Member> pair : $ret)
                 {

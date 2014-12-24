@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.antlr.stringtemplate.*;
 import org.antlr.stringtemplate.language.DefaultTemplateLexer;
@@ -30,8 +32,9 @@ public class TemplateManager
     }
 
     static private String m_loaderDirectories = "com/eprosima/idl/templates";
-    private Map<String, StringTemplateGroup> m_groups;
-    private StringTemplateGroup stackgr = null;
+    private Map<String, StringTemplateGroup> m_groups = null;
+    private Map<String, List<TemplateExtension>> m_extensions = null;
+    private StringTemplateGroup strackgr_ = null;
     
     public TemplateManager(String stackTemplateNames)
     {
@@ -43,6 +46,7 @@ public class TemplateManager
         TypeCode.cpptypesgr = StringTemplateGroup.loadGroup("Types", DefaultTemplateLexer.class, null);
 
         m_groups = new HashMap<String, StringTemplateGroup>();
+        m_extensions = new HashMap<String, List<TemplateExtension>>();
         
         // Load specific template rules.
         if(stackTemplateNames != null && !stackTemplateNames.isEmpty())
@@ -53,12 +57,12 @@ public class TemplateManager
             while((index = stackTemplateNames.indexOf(':', lastIndex)) != -1)
             {
                 templateName = stackTemplateNames.substring(lastIndex, index);
-                stackgr = StringTemplateGroup.loadGroup(templateName, DefaultTemplateLexer.class, stackgr); 
+                strackgr_ = StringTemplateGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_); 
                 lastIndex = index + 1;
             }
 
             templateName = stackTemplateNames.substring(lastIndex, stackTemplateNames.length());
-            stackgr = StringTemplateGroup.loadGroup(templateName, DefaultTemplateLexer.class, stackgr); 
+            strackgr_ = StringTemplateGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_); 
         }
     }
 
@@ -74,8 +78,33 @@ public class TemplateManager
 
     public void addGroup(String groupname)
     {
-        StringTemplateGroup group = StringTemplateGroup.loadGroup(groupname, DefaultTemplateLexer.class, stackgr);
+        StringTemplateGroup group = StringTemplateGroup.loadGroup(groupname, DefaultTemplateLexer.class, strackgr_);
         m_groups.put(groupname, group);
+    }
+
+    public void addGroup(String groupname, List<TemplateExtension> extensions)
+    {
+        addGroup(groupname);
+
+        for(TemplateExtension extension : extensions)
+        {
+            String str = groupname + "_" + extension.getRuleName();
+            List<TemplateExtension> list = null;
+
+            if(m_extensions.containsKey(str))
+            {
+                list = m_extensions.get(str);
+            }
+            else
+            {
+                list = new ArrayList<TemplateExtension>();
+            }
+
+            // Set the StringTemplate to the extension.
+            extension.setStringTemplate(m_groups.get(groupname).getInstanceOf(extension.getExtensionName()));
+            list.add(extension);
+            m_extensions.put(str, list);
+        }
     }
     
     public TemplateGroup createTemplateGroup(String templatename)
@@ -90,7 +119,15 @@ public class TemplateManager
             
             // Obtain instance
             StringTemplate template = m.getValue().getInstanceOf(templatename);
-            tg.addTemplate(m.getKey(), template);
+            
+            if(!m_extensions.containsKey(m.getKey() + "_" + template.getName()))
+            {
+                tg.addTemplate(m.getKey(), template);
+            }
+            else
+            {
+                tg.addTemplate(m.getKey(), template, m_extensions.get(m.getKey() + "_" + template.getName()));
+            }
         }
         
         return tg;
@@ -98,6 +135,6 @@ public class TemplateManager
     
     public StringTemplate createStringTemplate(String templatename)
     {     
-        return stackgr.getInstanceOf(templatename);
+        return strackgr_.getInstanceOf(templatename);
     }
 }

@@ -1,5 +1,6 @@
 package com.eprosima.idl.parser.tree;
 
+import java.util.Map;
 import java.util.HashMap;
 
 public class Annotation
@@ -53,6 +54,11 @@ public class Annotation
     public String getValue(String attribute)
     {
         return m_members.get(attribute).getValue();
+    }
+
+    public Map<String, AnnotationMember> getValues()
+    {
+        return m_members;
     }
 
     private HashMap<String, AnnotationMember> m_members = null;

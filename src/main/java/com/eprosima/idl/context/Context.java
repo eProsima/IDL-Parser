@@ -21,6 +21,7 @@ import com.eprosima.idl.parser.tree.Operation;
 import com.eprosima.idl.parser.tree.Param;
 import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.parser.typecode.StructTypeCode;
 
 import com.eprosima.idl.util.Util;
 
@@ -339,6 +340,12 @@ public class Context
     {
         Param paramObject = new Param(name, typecode, kind);
         return paramObject;
+    }
+
+    public StructTypeCode createStructTypeCode(String name)
+    {
+        StructTypeCode structObject = new StructTypeCode(m_scope, name);
+        return structObject;
     }
 
     /*!
