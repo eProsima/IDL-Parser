@@ -61,7 +61,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version:'4.10'
 }
 
-antlr4.source = project.file("src/main/antlr4")
+antlr4.source = project.file("src/main/antlr4/kiara")
 antlr4.listener = true
 antlr4.visitor = true
 antlr4.extraArgs=['-package', 'com.eprosima.idl.parser.grammar']

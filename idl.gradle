@@ -1,0 +1,44 @@
+// In this section you declare the used plugins
+// community plugins
+plugins {
+    id "me.champeau.gradle.antlr4" version "0.1" // antlr4 community plugin.
+}
+
+// internal plugins
+apply plugin: 'java'
+apply plugin: 'eclipse' // Eclipse integration
+
+description = """"""
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.antlr', name: 'antlr4', version:'4.2.2'
+    compile group: 'org.antlr', name: 'stringtemplate', version:'3.2'
+    testCompile group: 'junit', name: 'junit', version:'4.10'
+}
+
+antlr4.source = project.file("src/main/antlr4/omg")
+antlr4.listener = false
+antlr4.visitor = false
+antlr4.extraArgs=['-package', 'com.eprosima.idl.parser.grammar']
+
+// make the Java compile task depend on the antlr4 task
+compileJava.dependsOn antlr4
+
+// add the generated source files to the list of java sources
+sourceSets.main.java.srcDirs += antlr4.output
+
+// add antlr4 to classpath
+configurations {
+   compile.extendsFrom antlr4
+}
+
+//general properties
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	baseName = 'idlparser'
+    version =  '1.0.0'
+}
