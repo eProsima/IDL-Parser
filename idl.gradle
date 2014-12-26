@@ -31,6 +31,11 @@ compileJava.dependsOn antlr4
 // add the generated source files to the list of java sources
 sourceSets.main.java.srcDirs += antlr4.output
 
+sourceSets.main.resources {
+    srcDir 'src/main/java'
+    include '**/*.stg'
+}
+
 // add antlr4 to classpath
 configurations {
    compile.extendsFrom antlr4
