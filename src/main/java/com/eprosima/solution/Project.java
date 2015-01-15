@@ -8,13 +8,13 @@ import com.eprosima.idl.util.Util;
 
 public class Project
 {
-	public Project(String name, String file, LinkedHashSet dependencies)
+	public Project(String name, String file, LinkedHashSet<String> dependencies)
 	{
 		m_name = name;
 		m_file = file;
 		m_dependencies = dependencies;
-		m_commonsrcfiles = new ArrayList();
-		m_commonincludefiles = new ArrayList();
+		m_commonsrcfiles = new ArrayList<String>();
+		m_commonincludefiles = new ArrayList<String>();
 	}
 	
 	public void setParent(Solution sol)
@@ -37,7 +37,7 @@ public class Project
 		m_commonsrcfiles.add(file);
 	}
 	
-	public ArrayList getCommonSrcFiles()
+	public ArrayList<String> getCommonSrcFiles()
 	{
 		return m_commonsrcfiles;
 	}
@@ -47,7 +47,7 @@ public class Project
 		m_commonincludefiles.add(file);
 	}
 	
-	public ArrayList getCommonIncludeFiles()
+	public ArrayList<String> getCommonIncludeFiles()
 	{
 		return m_commonincludefiles;
 	}
@@ -55,9 +55,9 @@ public class Project
 	/*!
 	 * @brief Used in string templates.
 	 */
-	public ArrayList getDependencies()
+	public ArrayList<String> getDependencies()
 	{
-		ArrayList array = new ArrayList(m_dependencies);
+		ArrayList<String> array = new ArrayList<String>(m_dependencies);
 		
 		for(int count = 0; count < array.size(); ++count)
 		{
@@ -78,7 +78,7 @@ public class Project
 	/*!
 	 * @brief Used in string templates.
 	 */
-	public ArrayList getDependenciesGuids()
+	public ArrayList<String> getDependenciesGuids()
 	{
 		ArrayList<String> deps = new ArrayList<String>(m_dependencies);
 		ArrayList<String> array = new ArrayList<String>();
@@ -96,16 +96,16 @@ public class Project
 		return array;
 	}
 	
-	public ArrayList getFullDependencies()
+	public ArrayList<String> getFullDependencies()
 	{
-		return new ArrayList(m_dependencies);
+		return new ArrayList<String>(m_dependencies);
 	}
 	
 	private String m_name = null;
 	private String m_file = null;
-	private ArrayList m_commonsrcfiles = null;
-	private ArrayList m_commonincludefiles = null;
-	private LinkedHashSet m_dependencies = null;
+	private ArrayList<String> m_commonsrcfiles = null;
+	private ArrayList<String> m_commonincludefiles = null;
+	private LinkedHashSet<String> m_dependencies = null;
 	String m_guid = null;
 	Solution m_parent = null;
 }
