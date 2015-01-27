@@ -176,7 +176,11 @@ definition_list [DefinitionContainer dc] returns [TemplateGroup dlTemplates]
 			dtg=$definition.dtg;
 			if(dtg!=null) {
 				dc.add(dtg.first());
-				if($dlTemplates != null) {
+				if($dlTemplates != null)
+                {
+                    // Set parent
+                    dtg.second().setAttribute("parent", dc);
+                    // Print template into definitions rule
 					$dlTemplates.setAttribute("definitions", dtg.second());
 				}
 			}
@@ -257,7 +261,11 @@ interface_body [ExportContainer ec] returns [TemplateGroup elTemplates]
 			if(etg!=null) {
 				ec.add(etg.first());
 				etg.first().resolve(ctx);
-				if($elTemplates != null) {
+				if($elTemplates != null)
+                {
+                    // Add parent
+                    etg.second().setAttribute("parent", ec);
+                    // Print template into exports rule
 					$elTemplates.setAttribute("exports", etg.second());
 				}
 			}
