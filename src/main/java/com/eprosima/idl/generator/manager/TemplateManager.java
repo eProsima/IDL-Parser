@@ -100,8 +100,8 @@ public class TemplateManager
                 list = new ArrayList<TemplateExtension>();
             }
 
-            // Set the StringTemplate to the extension.
-            extension.setStringTemplate(m_groups.get(groupname).getInstanceOf(extension.getExtensionName()));
+            // Set stack groups.
+            extension.setCommonGroup(strackgr_);
             list.add(extension);
             m_extensions.put(str, list);
         }
@@ -126,7 +126,15 @@ public class TemplateManager
             }
             else
             {
-                tg.addTemplate(m.getKey(), template, m_extensions.get(m.getKey() + "_" + template.getName()));
+                List<TemplateExtension> extensions = m_extensions.get(m.getKey() + "_" + template.getName());
+                List<StringTemplate> extensionstemplates = new ArrayList<StringTemplate>();
+
+                for(TemplateExtension extension : extensions)
+                {
+                    extensionstemplates.add(extension.createStringTemplate());
+                }
+
+                tg.addTemplate(m.getKey(), template, extensionstemplates);
             }
         }
         

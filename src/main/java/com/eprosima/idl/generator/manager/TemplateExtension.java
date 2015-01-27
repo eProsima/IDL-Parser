@@ -1,6 +1,7 @@
 package com.eprosima.idl.generator.manager;
 
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
 
 public class TemplateExtension
 {
@@ -20,17 +21,17 @@ public class TemplateExtension
         return extensionName_;
     }
 
-    public void setStringTemplate(StringTemplate template)
+    public void setCommonGroup(StringTemplateGroup cgroup)
     {
-        template_ = template;
+        cgroup_ = cgroup;
     }
 
-    public StringTemplate getStringTemplate()
+    public StringTemplate createStringTemplate()
     {
-        return template_;
+        return cgroup_.getInstanceOf(extensionName_);
     }
 
     private String ruleName_ = null;
     private String extensionName_ = null;
-    private StringTemplate template_ = null;
+    private StringTemplateGroup cgroup_ = null;
 }

@@ -16,12 +16,12 @@ import com.eprosima.log.Log;
 public class TemplateGroup
 {
     private Map<String, StringTemplate> m_templates = null;
-    private Map<String, List<TemplateExtension>> m_extensions = null;
+    private Map<String, List<StringTemplate>> m_extensionstemplates = null;
     
     public TemplateGroup()
     {
         m_templates = new HashMap<String, StringTemplate>();
-        m_extensions = new HashMap<String, List<TemplateExtension>>();
+        m_extensionstemplates = new HashMap<String, List<StringTemplate>>();
     }
     
     public void addTemplate(String groupname, StringTemplate template)
@@ -29,10 +29,10 @@ public class TemplateGroup
         m_templates.put(groupname, template);
     }
 
-    public void addTemplate(String groupname, StringTemplate template, List<TemplateExtension> extensions)
+    public void addTemplate(String groupname, StringTemplate template, List<StringTemplate> extensionstemplates)
     {
         addTemplate(groupname, template);
-        m_extensions.put(groupname + "_" + template.getName(), extensions);
+        m_extensionstemplates.put(groupname + "_" + template.getName(), extensionstemplates);
     }
     
     public StringTemplate getTemplate(String groupname)
@@ -40,14 +40,14 @@ public class TemplateGroup
         StringTemplate template = m_templates.get(groupname);
 
         //If there is extensiones, add them before return the template.
-        if(m_extensions.containsKey(groupname + "_" + template.getName()))
+        if(m_extensionstemplates.containsKey(groupname + "_" + template.getName()))
         {
             List<StringTemplate> extemplates = new ArrayList<StringTemplate>();
-            List<TemplateExtension> extensions = m_extensions.get(groupname + "_" + template.getName());
+            List<StringTemplate> extensions = m_extensionstemplates.get(groupname + "_" + template.getName());
 
-            for(TemplateExtension extension : extensions)
+            for(StringTemplate extension : extensions)
             {
-                extemplates.add(extension.getStringTemplate());
+                extemplates.add(extension);
             }
 
             template.setAttribute("extensions", extemplates);
@@ -93,15 +93,12 @@ public class TemplateGroup
             StringTemplate template = m.getValue();
             template.setAttribute(attribute, obj1);
             // Update extensions
-            List<TemplateExtension> extensions = m_extensions.get(m.getKey() + "_" + template.getName());
+            List<StringTemplate> extensions = m_extensionstemplates.get(m.getKey() + "_" + template.getName());
             if(extensions != null)
             {
-                for(TemplateExtension extension : extensions)
+                for(StringTemplate extension : extensions)
                 {
-                    StringTemplate tp = extension.getStringTemplate();
-
-                    if(tp != null)
-                        tp.setAttribute(attribute, obj1);
+                    extension.setAttribute(attribute, obj1);
                 }
             }
         }
