@@ -4,6 +4,7 @@ import com.eprosima.idl.parser.typecode.*;
 import com.eprosima.idl.parser.exception.ParseException;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class TemplateUtil
 {
@@ -22,10 +23,48 @@ public class TemplateUtil
         String returnedValue = null;
         // TODO Faltan tipos: short, unsigneds...
         
-        if(dist_type.getKind() == TypeCode.KIND_LONG)
-            returnedValue = "-1000";
-        else if(dist_type.getKind() == TypeCode.KIND_CHAR)
-            returnedValue = "254";
+        if(dist_type.getKind() == TypeCode.KIND_SHORT ||
+                dist_type.getKind() == TypeCode.KIND_LONG ||
+                dist_type.getKind() == TypeCode.KIND_LONGLONG ||
+                dist_type.getKind() == TypeCode.KIND_USHORT ||
+                dist_type.getKind() == TypeCode.KIND_ULONG ||
+                dist_type.getKind() == TypeCode.KIND_ULONGLONG ||
+                dist_type.getKind() == TypeCode.KIND_CHAR)
+        {
+            long dvalue = -1;
+            boolean found = true;
+            List<Member> list = new ArrayList(members);
+
+            do
+            {
+                ++dvalue;
+                found = false;
+
+                for(Member member : list)
+                {
+                    if(member instanceof UnionMember)
+                    {
+                        UnionMember umember = (UnionMember)member;
+
+                        for(String label : umember.getLabels())
+                        {
+                            long value = Long.valueOf(label);
+
+                            if(dvalue == value)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(found) break;
+                }
+            }
+            while(found);
+
+            returnedValue = Long.toString(dvalue);
+        }
         else if(dist_type.getKind() == TypeCode.KIND_BOOLEAN)
         {
             if(members.size() == 1 && ((UnionMember)members.get(0)).getLabels().size() == 1)
@@ -44,6 +83,13 @@ public class TemplateUtil
                     //throw new ParseException(((UnionMember)members.get(0)).getLabels().get(0), "is not a valid label for a boolean discriminator.");
                     throw new ParseException(null, "is not a valid label for a boolean discriminator.");
                 }    
+            }
+            else
+            {
+                if(members.size() > 2)
+                    throw new ParseException(null, "boolean switch cannot have more than two elements.");
+
+                returnedValue = "false";
             }
         }
         else if(dist_type.getKind() == TypeCode.KIND_ENUM)

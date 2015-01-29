@@ -33,6 +33,14 @@ public class UnionTypeCode extends MemberedTypeCode
 
         return 0;
     }
+
+    public Member getDefaultMember()
+    {
+        if(m_defaultindex != -1)
+            return getMembers().get(m_defaultindex);
+
+        return null;
+    }
     
     @Override
     public String getCppTypename()
