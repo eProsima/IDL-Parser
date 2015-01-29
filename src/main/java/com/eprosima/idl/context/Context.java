@@ -27,7 +27,7 @@ import com.eprosima.idl.util.Util;
 
 public class Context
 {
-    public Context(String filename, String file, ArrayList includePaths)
+    public Context(String filename, String file, ArrayList<String> includePaths)
     {
         // Detect OS
         m_os = System.getProperty("os.name");
@@ -452,7 +452,7 @@ public class Context
     /*!
      * @brief This function get the library dependencies of a project.
      */
-    public LinkedHashSet getDependencies()
+    public LinkedHashSet<String> getDependencies()
     {
         // At this level the dependencies are in reverse order. Return them
         // in correct order.
