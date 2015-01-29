@@ -1058,9 +1058,6 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     TypeCode dist_type = null;
     UnionTypeCode unionTP = null;
     TemplateGroup unionTemplates = null;
-	if(tmanager != null) {
-		unionTemplates = tmanager.createTemplateGroup("union_type");
-	}
 }
     :   KW_UNION
 	    identifier { name=$identifier.id;}
@@ -1074,10 +1071,15 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 	    {
 	       // Calculate default label.
 	       unionTP.setDefaultvalue(TemplateUtil.getUnionDefaultLabel(unionTP.getDiscriminator(), unionTP.getMembers(), ctx.getScopeFile(), line));
-		   if(unionTemplates != null) {
-			   unionTemplates.setAttribute("ctx", ctx);
-			   unionTemplates.setAttribute("union", unionTP);
-		   }
+
+           if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+           {
+				if(tmanager != null) {
+                   unionTemplates = tmanager.createTemplateGroup("union_type");
+                   unionTemplates.setAttribute("ctx", ctx);
+                   unionTemplates.setAttribute("union", unionTP);
+				}
+           }
            
            // Add union typecode to the map with all typecodes.
            ctx.addTypeCode(unionTP.getScopedname(), unionTP);
@@ -1183,18 +1185,19 @@ enum_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     String name = null;
     EnumTypeCode enumTP = null;
     TemplateGroup enumTemplates = null;
-	if(tmanager != null) {
-		enumTemplates = tmanager.createTemplateGroup("enum_type");
-	}
 }
     :   KW_ENUM
 		identifier { name=$identifier.id; enumTP = new EnumTypeCode(ctx.getScope(), name); }
 		LEFT_BRACE  enumerator_list[enumTP] RIGHT_BRACE
 	   {
-			if(enumTemplates != null) {
-				enumTemplates.setAttribute("ctx", ctx);
-				enumTemplates.setAttribute("enum", enumTP);
-			}
+           if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+           {
+				if(tmanager != null) {
+                    enumTemplates = tmanager.createTemplateGroup("enum_type");
+				    enumTemplates.setAttribute("ctx", ctx);
+                    enumTemplates.setAttribute("enum", enumTP);
+                }
+		   }
            // Add enum typecode to the map with all typecodes.
            ctx.addTypeCode(enumTP.getScopedname(), enumTP);
            // Return the returned data.
