@@ -1,6 +1,9 @@
 package com.eprosima.idl.parser.tree;
 
-public class TreeNode
+import java.util.Map;
+import java.util.HashMap;
+
+public class TreeNode implements Notebook
 {
     public TreeNode(String scopeFile, boolean isInScope, String scope, String name)
     {
@@ -8,6 +11,7 @@ public class TreeNode
 		m_isinscope = isInScope;
         m_name = name;
         m_scope = scope;
+        m_annotations = new HashMap<String, Annotation>();
     }
 
 	public String getScopeFile()
@@ -58,10 +62,25 @@ public class TreeNode
     {
         return !(m_scope == null || m_scope.isEmpty());
     }
+
+    @Override
+    public void addAnnotation(Annotation annotation)
+    {
+        if(annotation != null)
+            m_annotations.put(annotation.getName(), annotation);
+    }
+    
+    @Override
+    public Map<String, Annotation> getAnnotations()
+    {
+        return m_annotations;
+    }
 	
 	private String m_scopeFile = null;
 	private boolean m_isinscope = false;
     private String m_name = null;
     private String m_scope = null;
+    //! Map that stores the annotations of the interface.
+    private HashMap<String, Annotation> m_annotations = null;
 }
 

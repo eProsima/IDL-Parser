@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-public class Interface extends ExportContainer implements Definition, Notebook
+public class Interface extends ExportContainer implements Definition
 {
     public Interface(String scopeFile, boolean isInScope, String scope, String name)
     {
         super(scopeFile, isInScope, scope, name);
 
         m_bases = new HashMap<String, Interface>();
-        m_annotations = new HashMap<String, Annotation>();
     }
     
 
@@ -173,27 +172,12 @@ public class Interface extends ExportContainer implements Definition, Notebook
         
         return returnedValue;
     }
-    
-    @Override
-    public void addAnnotation(Annotation annotation)
-    {
-        if(annotation != null)
-            m_annotations.put(annotation.getName(), annotation);
-    }
-    
-    @Override
-    public Map<String, Annotation> getAnnotations()
-    {
-        return m_annotations;
-    }
 
     private Object m_parent = null;
     
     //! Contains all interfaces it inherits from.
-    private HashMap<String, Interface> m_bases = null;
+    private Map<String, Interface> m_bases = null;
     //! Contains all operations.
     private ArrayList<Operation> m_operations = null;
     private ArrayList<Operation> m_all_operations = null;
-    //! Map that stores the annotations of the interface.
-    HashMap<String, Annotation> m_annotations = null;
 }

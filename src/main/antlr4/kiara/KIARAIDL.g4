@@ -104,7 +104,18 @@ definition returns [Pair<Definition, TemplateGroup> dtg = null]
     |   component SEMICOLON
     |   home_decl SEMICOLON
 	|	annotation_decl SEMICOLON { atg=$annotation_decl.returnPair; if(atg!=null){ $dtg = new Pair<Definition, TemplateGroup>(atg.first(), atg.second());}}
-	|	annotation_appl definition { $dtg=$definition.dtg; }
+	|	annotation_appl definition
+        {
+            $dtg=$definition.dtg;
+
+            if($dtg != null && $dtg.second() != null)
+            {
+                if($dtg.first() instanceof com.eprosima.idl.parser.tree.TreeNode)
+                {
+                    ((com.eprosima.idl.parser.tree.TreeNode)$dtg.first()).addAnnotation($annotation_appl.annotation);
+                }
+            }
+        }
     ;
 
 /*!

@@ -1,16 +1,12 @@
 package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
-public class Module extends DefinitionContainer implements Definition, Notebook
+public class Module extends DefinitionContainer implements Definition
 {   
     public Module(String scopeFile, boolean isInScope, String scope, String name)
     {
         super(scopeFile, isInScope, scope, name);
-
-        m_annotations = new HashMap<String, Annotation>();
     }
     
     public void setParent(Object obj)
@@ -92,19 +88,6 @@ public class Module extends DefinitionContainer implements Definition, Notebook
         return false;
     }
     
-    @Override
-    public void addAnnotation(Annotation annotation)
-    {
-        if(annotation != null)
-            m_annotations.put(annotation.getName(), annotation);
-    }
-    
-    @Override
-    public Map<String, Annotation> getAnnotations()
-    {
-        return m_annotations;
-    }
-	
 	@Override
 	public boolean isIsAnnotation()
     {
@@ -115,7 +98,7 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     
     public String getResourceCompleteBaseUri()
     {
-        Annotation baseUri = m_annotations.get("RESOURCES_BASE_URI");
+        Annotation baseUri = getAnnotations().get("RESOURCES_BASE_URI");
         String baseUriStr = baseUri.getValue("value");
         
         if(baseUriStr != null)
@@ -180,7 +163,7 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     }
     
     public String getResourceHost() {
-        Annotation path =  m_annotations.get("RESOURCES_BASE_URI");
+        Annotation path =  getAnnotations().get("RESOURCES_BASE_URI");
         String pathStr = path.getValue("value");
         
         // Remove http://
@@ -202,6 +185,4 @@ public class Module extends DefinitionContainer implements Definition, Notebook
     ////////// End RESTful block //////////
 
     private Object m_parent = null;
-  //! Map that stores the annotations of the interface.
-    Map<String, Annotation> m_annotations = null;
 }
