@@ -2,11 +2,13 @@ package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
 
+import org.antlr.v4.runtime.Token;
+
 public class Module extends DefinitionContainer implements Definition
 {   
-    public Module(String scopeFile, boolean isInScope, String scope, String name)
+    public Module(String scopeFile, boolean isInScope, String scope, String name, Token tk)
     {
-        super(scopeFile, isInScope, scope, name);
+        super(scopeFile, isInScope, scope, name, tk);
     }
     
     public void setParent(Object obj)

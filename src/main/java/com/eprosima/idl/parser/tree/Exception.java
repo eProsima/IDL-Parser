@@ -1,16 +1,17 @@
 package com.eprosima.idl.parser.tree;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.Member;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.antlr.v4.runtime.Token;
+
 public class Exception extends TreeNode implements Export, Definition
 {
-	public Exception(String scopeFile, boolean isInScope, String scope, String name)
+	public Exception(String scopeFile, boolean isInScope, String scope, String name, Token token)
     {
-        super(scopeFile, isInScope, scope, name);
+        super(scopeFile, isInScope, scope, name, token);
 
         m_members = new ArrayList<Member>();
     }

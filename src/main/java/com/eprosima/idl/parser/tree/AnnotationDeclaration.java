@@ -2,15 +2,17 @@ package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.antlr.v4.runtime.Token;
 
 public class AnnotationDeclaration extends TreeNode implements Definition
 {
-    public AnnotationDeclaration(String scopeFile, boolean isInScope, String scope, String name)
+    public AnnotationDeclaration(String scopeFile, boolean isInScope, String scope, String name, Token token)
     {
-        super(scopeFile, isInScope, scope, name);
+        super(scopeFile, isInScope, scope, name, token);
         m_members = new HashMap<String, AnnotationMember>();
     }
 

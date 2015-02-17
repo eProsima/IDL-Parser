@@ -1,12 +1,13 @@
 package com.eprosima.idl.parser.tree;
 
 import java.util.ArrayList;
+import org.antlr.v4.runtime.Token;
 
 public class DefinitionContainer extends TreeNode
 {
-    protected DefinitionContainer(String scopeFile, boolean isInScope, String scope, String name)
+    protected DefinitionContainer(String scopeFile, boolean isInScope, String scope, String name, Token token)
     {
-        super(scopeFile, isInScope, scope, name);
+        super(scopeFile, isInScope, scope, name, token);
 
         m_definitions = new ArrayList<Definition>();
     }

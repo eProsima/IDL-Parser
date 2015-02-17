@@ -3,11 +3,13 @@ package com.eprosima.idl.parser.tree;
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
+import org.antlr.v4.runtime.Token;
+
 public class TypeDeclaration extends TreeNode implements Definition, Export
 {
-    public TypeDeclaration(String scopeFile, boolean isInScope, String scope, String name, TypeCode typecode)
+    public TypeDeclaration(String scopeFile, boolean isInScope, String scope, String name, TypeCode typecode, Token token)
     {
-        super(scopeFile, isInScope, scope, name);
+        super(scopeFile, isInScope, scope, name, token);
 
         m_typecode = typecode;
         // Set as parent to the Typecode.

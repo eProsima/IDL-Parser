@@ -1,9 +1,11 @@
 package com.eprosima.idl.parser.typecode;
 
-import java.util.Map;
-import java.util.HashMap;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Notebook;
+import com.eprosima.idl.context.Context;
+
+import java.util.Map;
+import java.util.HashMap;
 
 public class Member implements Notebook
 {
@@ -56,7 +58,7 @@ public class Member implements Notebook
     }
 
     @Override
-    public void addAnnotation(Annotation annotation)
+    public void addAnnotation(Context ctx, Annotation annotation)
     {
         if(annotation != null)
             m_annotations.put(annotation.getName(), annotation);

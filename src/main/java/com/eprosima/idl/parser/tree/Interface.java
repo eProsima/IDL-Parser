@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.antlr.v4.runtime.Token;
+
 public class Interface extends ExportContainer implements Definition
 {
-    public Interface(String scopeFile, boolean isInScope, String scope, String name)
+    public Interface(String scopeFile, boolean isInScope, String scope, String name, Token tk)
     {
-        super(scopeFile, isInScope, scope, name);
+        super(scopeFile, isInScope, scope, name, tk);
 
         m_bases = new HashMap<String, Interface>();
     }

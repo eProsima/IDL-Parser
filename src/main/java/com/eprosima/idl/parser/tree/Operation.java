@@ -1,16 +1,17 @@
 package com.eprosima.idl.parser.tree;
 
-import java.util.ArrayList;
-
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
 import com.eprosima.idl.parser.tree.Param;
 
+import java.util.ArrayList;
+import org.antlr.v4.runtime.Token;
+
 public class Operation extends TreeNode implements Export
 {
-    public Operation(String scopeFile, boolean isInScope, String scope, String name)
+    public Operation(String scopeFile, boolean isInScope, String scope, String name, Token tk)
     {
-        super(scopeFile, isInScope, scope, name);
+        super(scopeFile, isInScope, scope, name, tk);
 
         m_params = new ArrayList<Param>();
         m_exceptions = new ArrayList<com.eprosima.idl.parser.tree.Exception>();

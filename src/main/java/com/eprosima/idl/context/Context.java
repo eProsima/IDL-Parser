@@ -25,6 +25,8 @@ import com.eprosima.idl.parser.typecode.StructTypeCode;
 
 import com.eprosima.idl.util.Util;
 
+import org.antlr.v4.runtime.Token;
+
 public class Context
 {
     public Context(String filename, String file, ArrayList<String> includePaths)
@@ -209,9 +211,9 @@ public class Context
         return null;
     }
 
-    public Interface createInterface(String name)
+    public Interface createInterface(String name, Token token)
     {
-        Interface interfaceObject = new Interface(m_scopeFile, isInScopedFile(), m_scope, name);
+        Interface interfaceObject = new Interface(m_scopeFile, isInScopedFile(), m_scope, name, token);
         addInterface(interfaceObject);
         return interfaceObject;
     }
@@ -279,9 +281,9 @@ public class Context
         return ret;
     }
 
-    public com.eprosima.idl.parser.tree.Exception createException(String name)
+    public com.eprosima.idl.parser.tree.Exception createException(String name, Token token)
     {
-        com.eprosima.idl.parser.tree.Exception exceptionObject = new com.eprosima.idl.parser.tree.Exception(m_scopeFile, isInScopedFile(), m_scope, name);
+        com.eprosima.idl.parser.tree.Exception exceptionObject = new com.eprosima.idl.parser.tree.Exception(m_scopeFile, isInScopedFile(), m_scope, name, token);
         addException(exceptionObject);
         return exceptionObject;
     }
@@ -330,9 +332,9 @@ public class Context
         return returnedValue;
     }
 
-    public Operation createOperation(String name)
+    public Operation createOperation(String name, Token token)
     {
-        Operation operationObject = new Operation(m_scopeFile, isInScopedFile(), null, name);
+        Operation operationObject = new Operation(m_scopeFile, isInScopedFile(), null, name, token);
         return operationObject;
     }
 
@@ -393,9 +395,9 @@ public class Context
     }
 
 
-    public AnnotationDeclaration createAnnotationDeclaration(String name)
+    public AnnotationDeclaration createAnnotationDeclaration(String name, Token token)
     {
-        AnnotationDeclaration annotationObject = new AnnotationDeclaration(m_scopeFile, isInScopedFile(), m_scope, name);
+        AnnotationDeclaration annotationObject = new AnnotationDeclaration(m_scopeFile, isInScopedFile(), m_scope, name, token);
         addAnnotationDeclaration(annotationObject);
         return annotationObject;
     }
