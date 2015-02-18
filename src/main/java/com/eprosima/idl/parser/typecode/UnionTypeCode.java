@@ -49,6 +49,14 @@ public class UnionTypeCode extends MemberedTypeCode
         st.setAttribute("name", getScopedname());
         return st.toString();
     }
+
+    @Override
+    public String getJavaTypename()
+    {
+        StringTemplate st = getJavaTypenameFromStringTemplate();
+        st.setAttribute("name", getJavaScopedname());
+        return st.toString();
+    }
     
     @Override
     public String getIdlTypename()

@@ -44,6 +44,7 @@ public class TemplateManager
         // Load IDL types for stringtemplates
         TypeCode.idltypesgr = StringTemplateGroup.loadGroup("idlTypes", DefaultTemplateLexer.class, null);
         TypeCode.cpptypesgr = StringTemplateGroup.loadGroup("Types", DefaultTemplateLexer.class, null);
+        TypeCode.javatypesgr = StringTemplateGroup.loadGroup("JavaTypes", DefaultTemplateLexer.class, null);
 
         m_groups = new HashMap<String, StringTemplateGroup>();
         m_extensions = new HashMap<String, List<TemplateExtension>>();
@@ -144,5 +145,10 @@ public class TemplateManager
     public StringTemplate createStringTemplate(String templatename)
     {     
         return strackgr_.getInstanceOf(templatename);
+    }
+
+    public StringTemplateGroup createStringTemplateGroup(String templateGroupName)
+    {
+        return StringTemplateGroup.loadGroup(templateGroupName, DefaultTemplateLexer.class, strackgr_);
     }
 }

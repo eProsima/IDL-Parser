@@ -25,6 +25,12 @@ public class StringTypeCode extends TypeCode
     {
         return getCppTypenameFromStringTemplate().toString();
     }
+
+    @Override
+    public String getJavaTypename()
+    {
+        return getJavaTypenameFromStringTemplate().toString();
+    }
     
     @Override
     public String getIdlTypename()

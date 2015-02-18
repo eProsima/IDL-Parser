@@ -26,6 +26,16 @@ public class MapTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getJavaTypename()
+    {
+        StringTemplate st = getJavaTypenameFromStringTemplate();
+        st.setAttribute("key", getKeyTypeCode().getJavaTypename());
+        st.setAttribute("value", getValueTypeCode().getJavaTypename());
+        st.setAttribute("maxsize", m_maxsize);
+        return st.toString();
+    }
+
+    @Override
     public String getIdlTypename()
     {
         StringTemplate st = getIdlTypenameFromStringTemplate();

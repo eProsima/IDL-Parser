@@ -25,6 +25,15 @@ public class SequenceTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getJavaTypename()
+    {
+        StringTemplate st = getJavaTypenameFromStringTemplate();
+        st.setAttribute("type", getContentTypeCode().getJavaTypename());
+        st.setAttribute("maxsize", m_maxsize);
+        return st.toString();
+    }
+
+    @Override
     public String getIdlTypename()
     {
         StringTemplate st = getIdlTypenameFromStringTemplate();

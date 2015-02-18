@@ -67,6 +67,14 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getJavaTypename()
+    {
+        StringTemplate st = getJavaTypenameFromStringTemplate();
+        st.setAttribute("name", getContentTypeCode().getJavaTypename());
+        return st.toString();
+    }
+
+    @Override
     public String getIdlTypename()
     {
         StringTemplate st = getIdlTypenameFromStringTemplate();

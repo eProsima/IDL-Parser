@@ -1,0 +1,61 @@
+/*************************************************************************
+ * Copyright (c) 2013 eProsima. All rights reserved.
+ *
+ * This copy of FastBuffers is licensed to you under the terms described in the
+ * FAST_BUFFERS_LICENSE file included in this distribution.
+ *
+ *************************************************************************/
+
+group Types;
+
+type_5(package) ::= <<float>>
+
+type_6(package) ::= <<double>>
+
+type_13(package) ::= <<long double>>
+
+type_1(package) ::= <<short>>
+
+type_2(package) ::= <<int>>
+
+type_11(package) ::= <<long>>
+
+type_3(package) ::= <<short>>
+
+type_4(package) ::= <<int>>
+
+type_12(package) ::= <<long>>
+
+type_8(package) ::= <<char>>
+
+type_14(package) ::= <<wchar_t>>
+
+type_7(package) ::= <<boolean>>
+
+type_9(package) ::= <<byte>>
+
+type_d(package) ::= <<String>>
+
+type_15(package) ::= <<std::wstring>>
+
+type_f_first(prev) ::= <<std::array<$prev$>>
+type_f_second(prev, size) ::= <<, $size$>$prev$>>
+type_f(package, firs, secon, type) ::= <<$firs$$type$$secon$>>
+
+type_a(package, name) ::= <<$package$$name$>>
+
+type_b(package, name) ::= <<$name$>>
+
+type_c(package, name) ::= <<$name$>>
+
+type_10(package, name) ::= <<$name$>>
+
+// TODO Para que sirve empty en FastBuffers?
+type_e(package, type, maxsize, empty) ::= <<ArrayList<$type$>$empty$>>
+
+initialValues ::= [
+        "type_d":"\"\"",
+        "type_15":"\"\"",
+        default: // not basic type.
+]
+

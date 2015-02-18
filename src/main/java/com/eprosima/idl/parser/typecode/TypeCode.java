@@ -40,6 +40,9 @@ public abstract class TypeCode
     
     public static StringTemplateGroup idltypesgr = null;
     public static StringTemplateGroup cpptypesgr = null;
+    public static StringTemplateGroup javatypesgr = null;
+    //TODO Revisar si es el mejor sitio.
+    public static String javapackage = "";
     
     public TypeCode(int kind)
     {
@@ -60,6 +63,15 @@ public abstract class TypeCode
     protected StringTemplate getCppTypenameFromStringTemplate()
     {
         return cpptypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
+    }
+
+    public abstract String getJavaTypename();
+    
+    protected StringTemplate getJavaTypenameFromStringTemplate()
+    {
+        StringTemplate st = javatypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
+        st.setAttribute("package", javapackage);
+        return st;
     }
 
     /*|

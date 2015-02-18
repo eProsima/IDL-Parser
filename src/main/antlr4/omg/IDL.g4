@@ -666,7 +666,15 @@ type_decl returns [Pair<TypeDeclaration, TemplateGroup> returnPair = null]
 	{
         // TODO A?adir nombre al typedeclaration.
 	    if(ttg!=null)
-	        $returnPair = new Pair<TypeDeclaration, TemplateGroup>(new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), null, ttg.first(), tk), ttg.second());
+        {
+            String name = null;
+            if(ttg.first() instanceof MemberedTypeCode)
+                name = ((MemberedTypeCode)ttg.first()).getName();
+            else if(ttg.first() instanceof AliasTypeCode)
+                name = ((AliasTypeCode)ttg.first()).getName();
+
+	        $returnPair = new Pair<TypeDeclaration, TemplateGroup>(new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, ttg.first(), tk), ttg.second());
+        }
 	}
     ;
 
@@ -710,7 +718,7 @@ type_declarator returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 				typedefTemplates.setAttribute("ctx", ctx);
 			}
 	       
-	       $returnPair = new Pair<TypeCode, TemplateGroup>($type_spec.typecode, typedefTemplates);
+	       $returnPair = new Pair<TypeCode, TemplateGroup>(typedefTypecode, typedefTemplates);
        }
 	}
     ;

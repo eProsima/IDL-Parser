@@ -27,6 +27,14 @@ public abstract class MemberedTypeCode extends TypeCode
         return m_scope + "::" + m_name;
     }
 
+    public String getJavaScopedname()
+    {
+        if(m_scope.isEmpty())
+            return m_name;
+
+        return m_scope + "." + m_name;
+    }
+
     public String getScope()
     {
         return m_scope;
@@ -54,6 +62,9 @@ public abstract class MemberedTypeCode extends TypeCode
     
     @Override
     public abstract String getCppTypename();
+
+    @Override
+    public abstract String getJavaTypename();
     
     @Override
     public abstract String getIdlTypename();
