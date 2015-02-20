@@ -32,7 +32,15 @@ public abstract class MemberedTypeCode extends TypeCode
         if(m_scope.isEmpty())
             return m_name;
 
-        return m_scope + "." + m_name;
+        return m_scope.replace("::", ".") + "." + m_name;
+    }
+
+    public String getJniScopedname()
+    {
+        if(m_scope.isEmpty())
+            return m_name;
+
+        return m_scope.replace("::", "/") + "/" + m_name;
     }
 
     public String getScope()

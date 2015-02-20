@@ -42,6 +42,14 @@ public class TreeNode implements Notebook
         return m_scope + "::" + m_name;
     }
 
+    public String getJavaScopedname()
+    {
+        if(m_scope.isEmpty())
+            return m_name;
+
+        return m_scope.replace("::", ".") + "." + m_name;
+    }
+
     public String getScope()
     {
         return m_scope;
