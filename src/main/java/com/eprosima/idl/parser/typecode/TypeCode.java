@@ -136,6 +136,7 @@ public abstract class TypeCode
  // By default a typecode is not string. Function used in stringtemplates 
     public boolean isIsType_5(){return false;}
     public boolean isIsType_6(){return false;}
+    public boolean isIsType_7(){return (m_kind == KIND_BOOLEAN);}
     public boolean isIsType_d(){return false;}
     public boolean isIsType_c(){return false;}
     public boolean isIsType_f(){return false;}

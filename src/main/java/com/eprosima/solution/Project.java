@@ -21,6 +21,11 @@ public class Project
 	{
 		m_parent = sol;
 	}
+
+    public Solution getParent()
+    {
+        return m_parent;
+    }
 	
 	public String getName()
 	{
