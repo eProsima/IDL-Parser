@@ -22,84 +22,86 @@ public class TemplateUtil
     {
         String returnedValue = null;
         // TODO Faltan tipos: short, unsigneds...
-        
-        if(dist_type.getKind() == TypeCode.KIND_SHORT ||
-                dist_type.getKind() == TypeCode.KIND_LONG ||
-                dist_type.getKind() == TypeCode.KIND_LONGLONG ||
-                dist_type.getKind() == TypeCode.KIND_USHORT ||
-                dist_type.getKind() == TypeCode.KIND_ULONG ||
-                dist_type.getKind() == TypeCode.KIND_ULONGLONG ||
-                dist_type.getKind() == TypeCode.KIND_CHAR)
+        if(dist_type != null)
         {
-            long dvalue = -1;
-            boolean found = true;
-            List<Member> list = new ArrayList(members);
-
-            do
+            if(dist_type.getKind() == TypeCode.KIND_SHORT ||
+                    dist_type.getKind() == TypeCode.KIND_LONG ||
+                    dist_type.getKind() == TypeCode.KIND_LONGLONG ||
+                    dist_type.getKind() == TypeCode.KIND_USHORT ||
+                    dist_type.getKind() == TypeCode.KIND_ULONG ||
+                    dist_type.getKind() == TypeCode.KIND_ULONGLONG ||
+                    dist_type.getKind() == TypeCode.KIND_CHAR)
             {
-                ++dvalue;
-                found = false;
+                long dvalue = -1;
+                boolean found = true;
+                List<Member> list = new ArrayList(members);
 
-                for(Member member : list)
+                do
                 {
-                    if(member instanceof UnionMember)
+                    ++dvalue;
+                    found = false;
+
+                    for(Member member : list)
                     {
-                        UnionMember umember = (UnionMember)member;
-
-                        for(String label : umember.getLabels())
+                        if(member instanceof UnionMember)
                         {
-                            long value = Long.valueOf(label);
+                            UnionMember umember = (UnionMember)member;
 
-                            if(dvalue == value)
+                            for(String label : umember.getLabels())
                             {
-                                found = true;
-                                break;
+                                long value = Long.valueOf(label);
+
+                                if(dvalue == value)
+                                {
+                                    found = true;
+                                    break;
+                                }
                             }
                         }
+
+                        if(found) break;
                     }
-
-                    if(found) break;
                 }
+                while(found);
+
+                returnedValue = Long.toString(dvalue);
             }
-            while(found);
-
-            returnedValue = Long.toString(dvalue);
-        }
-        else if(dist_type.getKind() == TypeCode.KIND_BOOLEAN)
-        {
-            if(members.size() == 1 && ((UnionMember)members.get(0)).getLabels().size() == 1)
+            else if(dist_type.getKind() == TypeCode.KIND_BOOLEAN)
             {
-                if(((UnionMember)members.get(0)).getLabels().get(0).equals("true"))
+                if(members.size() == 1 && ((UnionMember)members.get(0)).getLabels().size() == 1)
                 {
-                    returnedValue = "false";
-                }
-                else if(((UnionMember)members.get(0)).getLabels().get(0).equals("false"))
-                {
-                    returnedValue = "true";
+                    if(((UnionMember)members.get(0)).getLabels().get(0).equals("true"))
+                    {
+                        returnedValue = "false";
+                    }
+                    else if(((UnionMember)members.get(0)).getLabels().get(0).equals("false"))
+                    {
+                        returnedValue = "true";
+                    }
+                    else
+                    {
+                        //TODO
+                        //throw new ParseException(((UnionMember)members.get(0)).getLabels().get(0), "is not a valid label for a boolean discriminator.");
+                        throw new ParseException(null, "is not a valid label for a boolean discriminator.");
+                    }    
                 }
                 else
                 {
-                    //TODO
-                    //throw new ParseException(((UnionMember)members.get(0)).getLabels().get(0), "is not a valid label for a boolean discriminator.");
-                    throw new ParseException(null, "is not a valid label for a boolean discriminator.");
-                }    
+                    if(members.size() > 2)
+                        throw new ParseException(null, "boolean switch cannot have more than two elements.");
+
+                    returnedValue = "false";
+                }
+            }
+            else if(dist_type.getKind() == TypeCode.KIND_ENUM)
+            {
+                EnumTypeCode enume = (EnumTypeCode)dist_type;
+                returnedValue = enume.getInitialValue();
             }
             else
             {
-                if(members.size() > 2)
-                    throw new ParseException(null, "boolean switch cannot have more than two elements.");
-
-                returnedValue = "false";
+                throw new ParseException(null, "Not supported type discriminator.");
             }
-        }
-        else if(dist_type.getKind() == TypeCode.KIND_ENUM)
-        {
-            EnumTypeCode enume = (EnumTypeCode)dist_type;
-            returnedValue = enume.getInitialValue();
-        }
-        else
-        {
-            throw new ParseException(null, "Not supported type discriminator.");
         }
         
         return returnedValue;
@@ -108,34 +110,36 @@ public class TemplateUtil
     public static String checkUnionLabel(TypeCode dist_type, String label, String scopeFile, int line)
     {
         // TODO Faltan tipos: short, unsigneds...
-        
-        if(dist_type.getKind() == TypeCode.KIND_ENUM)
+        if(dist_type != null)
         {
-            EnumTypeCode enume = (EnumTypeCode)dist_type;
-
-            if(enume.getScope() != null)
+            if(dist_type.getKind() == TypeCode.KIND_ENUM)
             {
-                if(label.contains("::"))
+                EnumTypeCode enume = (EnumTypeCode)dist_type;
+
+                if(enume.getScope() != null)
                 {
-                    if(!label.startsWith(enume.getScope()))
+                    if(label.contains("::"))
                     {
-                        //TODO
-                        //throw new ParseException(label,  "was not declared previously");
-                        throw new ParseException(null,  "was not declared previously");
+                        if(!label.startsWith(enume.getScope()))
+                        {
+                            //TODO
+                            //throw new ParseException(label,  "was not declared previously");
+                            throw new ParseException(null,  "was not declared previously");
+                        }
+                    }
+                    else
+                    {
+                        return enume.getScope() + "::" + label;
                     }
                 }
                 else
                 {
-                    return enume.getScope() + "::" + label;
-                }
-            }
-            else
-            {
-                if(label.contains("::"))
-                {
-                    //TODO
-                    //throw new ParseException(label, "was not declared previously");
-                    throw new ParseException(null, "was not declared previously");
+                    if(label.contains("::"))
+                    {
+                        //TODO
+                        //throw new ParseException(label, "was not declared previously");
+                        throw new ParseException(null, "was not declared previously");
+                    }
                 }
             }
         }

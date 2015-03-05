@@ -1098,10 +1098,6 @@ member returns [Vector<Pair<Pair<String, Token>, Member>> ret = new Vector<Pair<
                    $ret.add(new Pair<Pair<String, Token>, Member>($declarators.ret.get(count).first(), member));
 		       }
 	       }
-	       else
-	       {
-	           throw new RuntimeException("In function 'member': null pointer.");
-	       }
 	   }
     ;
 
@@ -1119,7 +1115,7 @@ union_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 		{
             // TODO Check supported types for discriminator: long, enumeration, etc...
 	       unionTP = new UnionTypeCode(ctx.getScope(), name, dist_type);
-           line = _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
+           line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
 	    }
 		LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
 	    {
@@ -1196,10 +1192,6 @@ case_stmt [UnionTypeCode unionTP]
                else if(ret == -2)
                    throw new ParseException($element_spec.ret.first().second(), " is also a default attribute. Another was defined previously.");
 	       }
-	       else
-	       {
-	           throw new RuntimeException("In function 'case_stmt': null pointer.");
-	       }
 	    }
 	;
 
@@ -1227,10 +1219,6 @@ element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<String,
 
                 $ret = new Pair<Pair<String, Token>, UnionMember>($declarator.ret.first(), member);
             }
-            else
-	        {
-	            throw new RuntimeException("In function 'element_spec': null pointer.");
-	        }
         }
     ;
 
@@ -1280,8 +1268,11 @@ sequence_type returns [SequenceTypeCode typecode = null]
     |   (KW_SEQUENCE) 
 		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
 		{
-	       $typecode = new SequenceTypeCode(maxsize);
-	       $typecode.setContentTypeCode(type);
+           if(type != null)
+           {
+               $typecode = new SequenceTypeCode(maxsize);
+               $typecode.setContentTypeCode(type);
+           }
 	    }
     ;
 	
