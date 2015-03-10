@@ -15,9 +15,6 @@ public class StringTypeCode extends TypeCode
     }
 
     @Override
-    public boolean isPrimitive() {return true;}
-    
-    @Override
     public boolean isIsType_d(){return true;}
     
     @Override
