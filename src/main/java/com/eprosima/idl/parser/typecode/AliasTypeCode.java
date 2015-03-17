@@ -70,7 +70,7 @@ public class AliasTypeCode extends ContainerTypeCode
     public String getJavaTypename()
     {
         StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("name", getContentTypeCode().getJavaTypename());
+        st.setAttribute("name", getTypedefContentTypeCode().getJavaTypename());
         return st.toString();
     }
 
