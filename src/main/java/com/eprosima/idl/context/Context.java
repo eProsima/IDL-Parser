@@ -20,10 +20,12 @@ import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
 import com.eprosima.idl.parser.tree.Param;
 import com.eprosima.idl.parser.tree.AnnotationDeclaration;
+import com.eprosima.idl.parser.tree.TypeDeclaration;
 import com.eprosima.idl.parser.typecode.TypeCode;
 import com.eprosima.idl.parser.typecode.StructTypeCode;
 
 import com.eprosima.idl.util.Util;
+import com.eprosima.idl.parser.exception.ParseException;
 
 import org.antlr.v4.runtime.Token;
 
@@ -58,7 +60,7 @@ public class Context
         m_modules = new HashMap<String, Module>();
         m_interfaces = new HashMap<String, Interface>();
         m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
-        m_types = new HashMap<String, TypeCode>();
+        m_types = new HashMap<String, TypeDeclaration>();
         m_annotations = new HashMap<String, AnnotationDeclaration>();
 
         // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
@@ -353,13 +355,12 @@ public class Context
     /*!
      * @brief This function adds a global typecode to the context.
      */
-    public void addTypeCode(String scopedname, TypeCode typecode)
+    public void addTypeDeclaration(TypeDeclaration typedecl)
     {
-        TypeCode prev = m_types.put(scopedname, typecode);
+        TypeDeclaration prev = m_types.put(typedecl.getScopedname(), typedecl);
         
-        // TODO: Exception.
         if(prev != null)
-        	System.out.println("Warning: Redefined type " + scopedname);
+            throw new ParseException(typedecl.getToken(), "was redefined");
     }
 
     /*!
@@ -368,16 +369,17 @@ public class Context
     public TypeCode getTypeCode(String name)
     {
         int lastIndex = -1;
-        TypeCode returnedValue = m_types.get(name);
+        TypeCode returnedValue = null;
+        TypeDeclaration typedecl = m_types.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null)
+        if(typedecl == null)
         {
             String scope = m_scope;
 
-            while(returnedValue == null && !scope.isEmpty())
+            while(typedecl == null && !scope.isEmpty())
             {
-                returnedValue = m_types.get(scope + "::" + name);
+                typedecl = m_types.get(scope + "::" + name);
                 lastIndex = scope.lastIndexOf("::");
 
                 if(lastIndex != -1)
@@ -390,6 +392,10 @@ public class Context
                 }
             }
         }
+
+        if(typedecl != null)
+            returnedValue = typedecl.getTypeCode();
+
 
         return returnedValue;
     }
@@ -700,7 +706,7 @@ public class Context
     //! Map that contains all global exceptions that were found processing the IDL file (after preprocessing).
     private HashMap<String, com.eprosima.idl.parser.tree.Exception> m_exceptions = null;
     //! Map that contains all types that were found processing the IDL file (after preprocessing).
-    protected HashMap<String, TypeCode> m_types = null;
+    protected HashMap<String, TypeDeclaration> m_types = null;
     //! Map that contains all annotations that where found processing the IDL file.
     private HashMap<String, AnnotationDeclaration> m_annotations = null;
 
