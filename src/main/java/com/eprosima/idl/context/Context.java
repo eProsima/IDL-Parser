@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Scanner;
 import java.util.NoSuchElementException;
+import java.util.Collection;
 
 import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.parser.tree.TreeNode;
@@ -350,6 +351,11 @@ public class Context
     {
         StructTypeCode structObject = new StructTypeCode(m_scope, name);
         return structObject;
+    }
+
+    public Collection<TypeDeclaration> getTypes()
+    {
+        return m_types.values();
     }
 
     /*!
