@@ -28,6 +28,32 @@ public class UnionTypeCode extends MemberedTypeCode
                 return -2;
         }
 
+        // Generate labels
+        List<String> internal_labels = member.getInternalLabels();
+        List<String> labels = null;
+        List<String> javalabels = null;
+
+        if(m_discriminatorTypeCode.getKind() == TypeCode.KIND_ENUM)
+        {
+            EnumTypeCode enum_type = (EnumTypeCode)m_discriminatorTypeCode;
+            labels = new ArrayList<String>();
+            javalabels = new ArrayList<String>();
+
+            for(int count = 0; count < internal_labels.size(); ++count)
+            {
+                labels.add(enum_type.getScope() + "::" + internal_labels.get(count));
+                javalabels.add(javapackage + enum_type.getJavaScopedname() + "." + internal_labels.get(count));
+            }
+        }
+        else
+        {
+            labels = internal_labels;
+            javalabels = internal_labels;
+        }
+
+        member.setLabels(labels);
+        member.setJavaLabels(javalabels);
+
         if(!addMember((Member)member))
             return -1;
 
@@ -70,11 +96,22 @@ public class UnionTypeCode extends MemberedTypeCode
     {
         m_defaultValue = value;
     }
+
+    public void setJavaDefaultvalue(String value)
+    {
+        m_javaDefaultValue = value;
+    }
     
     // Used in stringtemplates
     public String getDefaultvalue()
     {
         return m_defaultValue;
+    }
+
+    // Used in stringtemplates
+    public String getJavaDefaultvalue()
+    {
+        return m_javaDefaultValue;
     }
     
     // Used in stringtemplates
@@ -162,4 +199,6 @@ public class UnionTypeCode extends MemberedTypeCode
     private int m_defaultindex = -1;
     
     private String m_defaultValue = null;
+
+    private String m_javaDefaultValue = null;
 }

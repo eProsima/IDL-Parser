@@ -44,18 +44,23 @@ type_f(package, firs, secon, type) ::= <<$firs$$type$$secon$>>
 
 type_a(package, name) ::= <<$package$$name$>>
 
-type_b(package, name) ::= <<$name$>>
+type_b(package, name) ::= <<$package$$name$>>
 
-type_c(package, name) ::= <<$name$>>
+type_c(package, name) ::= <<$package$$name$>>
 
 type_10(package, name) ::= <<$name$>>
 
 // TODO Para que sirve empty en FastBuffers?
-type_e(package, type, maxsize, empty) ::= <<ArrayList<$type$>$empty$>>
+type_e(package, type, maxsize, empty) ::= <<ArrayList<$if(type_e_content_types.(type))$$type_e_content_types.(type)$$else$$type$$endif$>$empty$>>
+
+type_e_content_types ::= [
+    "int":"Integer",
+    default:
+]
 
 initialValues ::= [
-        "type_d":"\"\"",
-        "type_15":"\"\"",
-        default: // not basic type.
+    "type_d":"\"\"",
+    "type_15":"\"\"",
+    default: // not basic type.
 ]
 

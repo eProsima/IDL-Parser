@@ -1148,7 +1148,7 @@ union_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 		LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
 	    {
 	       // Calculate default label.
-	       unionTP.setDefaultvalue(TemplateUtil.getUnionDefaultLabel(unionTP.getDiscriminator(), unionTP.getMembers(), ctx.getScopeFile(), line));
+	       TemplateUtil.setUnionDefaultLabel(unionTP, ctx.getScopeFile(), line);
 
            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
            {

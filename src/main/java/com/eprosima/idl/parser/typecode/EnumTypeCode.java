@@ -56,6 +56,17 @@ public class EnumTypeCode extends MemberedTypeCode
         
         return "";
     }
+
+    @Override
+    public String getJavaInitialValue()
+    {   
+        if(getMembers().size() > 0)
+        {
+            return javapackage + getJavaScopedname() + "." + getMembers().get(0).getName();
+        }
+        
+        return "";
+    }
     
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
     {
