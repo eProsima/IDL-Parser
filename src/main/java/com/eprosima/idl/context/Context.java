@@ -594,61 +594,64 @@ public class Context
             // Only not system files are processed.
             if(!systemFile)
             {
-                // Remove absolute directory where the application was executed
-                if(startsWith(file, m_userdir))
+                if(!m_scopeFile.equals(file))
                 {
-                    file = file.substring(m_userdir.length());
+                    // Remove absolute directory where the application was executed
+                    if(startsWith(file, m_userdir))
+                    {
+                        file = file.substring(m_userdir.length());
 
+                        // Remove possible separator    
+                        if(startsWith(file, java.io.File.separator))
+                            file = file.substring(1);
+                    }
+                    // Remove relative ./ directory.
+                    if(startsWith(file, currentDirS))
+                        file = file.substring(currentDirS.length());
                     // Remove possible separator    
                     if(startsWith(file, java.io.File.separator))
                         file = file.substring(1);
-                }
-                // Remove relative ./ directory.
-                if(startsWith(file, currentDirS))
-                    file = file.substring(currentDirS.length());
-                // Remove possible separator    
-                if(startsWith(file, java.io.File.separator))
-                    file = file.substring(1);
 
 
-                //if it is a idl file.
-                if(file.substring(file.length() - 4, file.length()).equals(".idl"))
-                {
-                    if(!m_scopeFile.equals(file))
+                    //if it is a idl file.
+                    if(file.substring(file.length() - 4, file.length()).equals(".idl"))
                     {
-                        if(!m_scopeFilesStack.empty() && m_scopeFilesStack.peek().first().equals(file))
+                        if(!m_scopeFile.equals(file))
                         {
-                            m_scopeFilesStack.pop();
-
-                            // Add to dependency if there is different IDL file than the processed
-                            addDependency(m_scopeFile);
-
-                            // See if it is a direct dependency.
-                            if(file.equals(m_file))
+                            if(!m_scopeFilesStack.empty() && m_scopeFilesStack.peek().first().equals(file))
                             {
-                                String includeFile = m_scopeFile;
-                                // Remove relative directory if is equal that where the processed IDL is.
-                                if(m_directoryFile != null && startsWith(includeFile, m_directoryFile))
-                                    includeFile = includeFile.substring(m_directoryFile.length());
-                                // Remove relative directory if is equal to a include path.
-                                for(int i = 0; i < m_includePaths.size(); ++i)
-                                {   
-                                    if(startsWith(includeFile, m_includePaths.get(i)))
-                                    {
-                                        includeFile = includeFile.substring(m_includePaths.get(i).length());
-                                        break;
+                                m_scopeFilesStack.pop();
+
+                                // Add to dependency if there is different IDL file than the processed
+                                addDependency(m_scopeFile);
+
+                                // See if it is a direct dependency.
+                                if(file.equals(m_file))
+                                {
+                                    String includeFile = m_scopeFile;
+                                    // Remove relative directory if is equal that where the processed IDL is.
+                                    if(m_directoryFile != null && startsWith(includeFile, m_directoryFile))
+                                        includeFile = includeFile.substring(m_directoryFile.length());
+                                    // Remove relative directory if is equal to a include path.
+                                    for(int i = 0; i < m_includePaths.size(); ++i)
+                                    {   
+                                        if(startsWith(includeFile, m_includePaths.get(i)))
+                                        {
+                                            includeFile = includeFile.substring(m_includePaths.get(i).length());
+                                            break;
+                                        }
                                     }
+
+                                    m_directIncludeDependencies.add(includeFile.substring(0, includeFile.length() - 4));
                                 }
-
-                                m_directIncludeDependencies.add(includeFile.substring(0, includeFile.length() - 4));
                             }
-                        }
-                        else
-                        {
-                            m_scopeFilesStack.push(new Pair<String, Integer>(m_scopeFile, nline - m_currentincludeline - 1));
-                        }
+                            else
+                            {
+                                m_scopeFilesStack.push(new Pair<String, Integer>(m_scopeFile, nline - m_currentincludeline - 1));
+                            }
 
-                        m_scopeFile = file;
+                            m_scopeFile = file;
+                        }
                     }
                 }
 
