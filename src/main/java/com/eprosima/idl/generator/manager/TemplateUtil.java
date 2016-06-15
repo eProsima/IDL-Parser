@@ -18,11 +18,12 @@ public class TemplateUtil
             return type;
     }
     
-    public static String getUnionDefaultLabel(TypeCode dist_type, List<Member> members, String scopeFile, int line)
+    public static void setUnionDefaultLabel(UnionTypeCode union_type, String scopeFile, int line)
     {
-        String returnedValue = null;
-        // TODO Faltan tipos: short, unsigneds...
-        if(dist_type != null)
+        TypeCode dist_type = union_type.getDiscriminator();
+        List<Member> members = union_type.getMembers();
+
+        if(dist_type != null && union_type.getDefaultMember() != null)
         {
             if(dist_type.getKind() == TypeCode.KIND_SHORT ||
                     dist_type.getKind() == TypeCode.KIND_LONG ||
@@ -64,7 +65,8 @@ public class TemplateUtil
                 }
                 while(found);
 
-                returnedValue = Long.toString(dvalue);
+                union_type.setDefaultvalue(Long.toString(dvalue));
+                union_type.setJavaDefaultvalue(Long.toString(dvalue));
             }
             else if(dist_type.getKind() == TypeCode.KIND_BOOLEAN)
             {
@@ -72,11 +74,13 @@ public class TemplateUtil
                 {
                     if(((UnionMember)members.get(0)).getLabels().get(0).equals("true"))
                     {
-                        returnedValue = "false";
+                        union_type.setDefaultvalue("false");
+                        union_type.setJavaDefaultvalue("false");
                     }
                     else if(((UnionMember)members.get(0)).getLabels().get(0).equals("false"))
                     {
-                        returnedValue = "true";
+                        union_type.setDefaultvalue("true");
+                        union_type.setJavaDefaultvalue("true");
                     }
                     else
                     {
@@ -90,21 +94,49 @@ public class TemplateUtil
                     if(members.size() > 2)
                         throw new ParseException(null, "boolean switch cannot have more than two elements.");
 
-                    returnedValue = "false";
+                    union_type.setDefaultvalue("false");
+                    union_type.setJavaDefaultvalue("false");
                 }
             }
             else if(dist_type.getKind() == TypeCode.KIND_ENUM)
             {
                 EnumTypeCode enume = (EnumTypeCode)dist_type;
-                returnedValue = enume.getInitialValue();
+                List<Member> list = new ArrayList(members);
+                List<Member> enum_members = new ArrayList<Member>();
+                enum_members.addAll(enume.getMembers());
+
+                for(Member member : members)
+                {
+                    UnionMember umember = (UnionMember)member;
+
+                    for(String label : umember.getInternalLabels())
+                    {
+                        int count = 0;
+
+                        for(; count < enum_members.size(); ++count)
+                        {
+                            if(((EnumMember)enum_members.get(count)).getName().equals(label))
+                                break;
+                        }
+
+                        if(count < enum_members.size())
+                            enum_members.remove(count);
+                    }
+                }
+
+                if(enum_members.size() > 0)
+                {
+                    union_type.setDefaultvalue(enume.getScope() + "::" + enum_members.get(0).getName());
+                    union_type.setJavaDefaultvalue(enume.javapackage + enume.getJavaScopedname() + "." + enum_members.get(0).getName());
+                }
+                else
+                    throw new ParseException(null, "All enumeration elements are used in the union");
             }
             else
             {
                 throw new ParseException(null, "Not supported type discriminator.");
             }
         }
-        
-        return returnedValue;
     }
 
     public static String checkUnionLabel(TypeCode dist_type, String label, String scopeFile, int line)
@@ -126,10 +158,10 @@ public class TemplateUtil
                             //throw new ParseException(label,  "was not declared previously");
                             throw new ParseException(null,  "was not declared previously");
                         }
-                    }
-                    else
-                    {
-                        return enume.getScope() + "::" + label;
+                        else
+                        {
+                            label = label.replaceFirst(enume.getScope() + "::", "");
+                        }
                     }
                 }
                 else

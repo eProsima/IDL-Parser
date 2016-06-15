@@ -107,6 +107,11 @@ public abstract class TypeCode
         return "";
     }
 
+    public String getJavaInitialValue()
+    {
+        return getInitialValue();
+    }
+
     protected String getInitialValueFromStringTemplate()
     {
         Map initialValues = cpptypesgr.getMap("initialValues");
