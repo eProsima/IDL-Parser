@@ -58,8 +58,6 @@ public class SetTypeCode extends ContainerTypeCode
 
     public String getMaxsize()
     {
-        if(m_maxsize == null)
-            return "100";
         return m_maxsize;
     }
 
