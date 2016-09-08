@@ -18,6 +18,8 @@ import org.antlr.stringtemplate.StringTemplate;
 
 import com.eprosima.idl.util.Pair;
 
+import java.util.List;
+
 public class AliasTypeCode extends ContainerTypeCode
 {
     public AliasTypeCode(String scope, String name)
@@ -165,6 +167,14 @@ public class AliasTypeCode extends ContainerTypeCode
     public String getSize()
     {
         return super.getContentTypeCode().getSize();
+    }
+
+    public List<String> getDimensions()
+    {
+        if(super.getContentTypeCode() instanceof ArrayTypeCode)
+            return ((ArrayTypeCode)super.getContentTypeCode()).getDimensions();
+
+        return null;
     }
     /*** End of functions that alias has to export because some typecodes have them*/
 
