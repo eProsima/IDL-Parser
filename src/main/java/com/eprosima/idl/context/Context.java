@@ -621,10 +621,12 @@ public class Context
                     }
                     // Remove relative ./ directory.
                     if(startsWith(file, currentDirS))
+                    {    
                         file = file.substring(currentDirS.length());
-                    // Remove possible separator    
-                    if(startsWith(file, java.io.File.separator))
-                        file = file.substring(1);
+                        // Remove possible separator    
+                        if(startsWith(file, java.io.File.separator))
+                            file = file.substring(1);
+                    }
 
 
                     //if it is a idl file.
