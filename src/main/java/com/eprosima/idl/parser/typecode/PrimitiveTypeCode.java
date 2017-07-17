@@ -100,6 +100,8 @@ public class PrimitiveTypeCode extends TypeCode
     {
         switch(getKind())
         {
+            case KIND_LONGDOUBLE:
+                return "16";
             case KIND_DOUBLE:
             case KIND_LONGLONG:
             case KIND_ULONGLONG:
