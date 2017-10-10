@@ -34,3 +34,5 @@ src/com/eprosima/idl/parser/grammar/IDLTokenTypes.txt
 /target/
 /build
 /.gradle
+.idea
+*.iml
