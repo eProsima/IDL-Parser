@@ -37,6 +37,15 @@ public class SequenceTypeCode extends ContainerTypeCode
         st.setAttribute("maxsize", m_maxsize);
         return st.toString();
     }
+    
+    @Override
+    public String getCTypename()
+    {
+        StringTemplate st = getCppTypenameFromStringTemplate();
+        st.setAttribute("type", getContentTypeCode().getCTypename());
+        st.setAttribute("maxsize", m_maxsize);
+        return st.toString();
+    }
 
     @Override
     public String getJavaTypename()

@@ -25,6 +25,9 @@ public abstract class ContainerTypeCode extends TypeCode
     public abstract String getCppTypename();
     
     @Override
+    public abstract String getCTypename();
+    
+    @Override
     public abstract String getIdlTypename();
     
     public TypeCode getContentTypeCode()

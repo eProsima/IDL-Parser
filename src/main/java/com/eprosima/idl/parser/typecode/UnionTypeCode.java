@@ -91,6 +91,14 @@ public class UnionTypeCode extends MemberedTypeCode
     }
 
     @Override
+    public String getCTypename()
+    {
+        StringTemplate st = getCTypenameFromStringTemplate();
+        st.setAttribute("name", getScopedname());
+        return st.toString();
+    }    
+    
+    @Override
     public String getJavaTypename()
     {
         StringTemplate st = getJavaTypenameFromStringTemplate();

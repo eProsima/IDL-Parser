@@ -84,6 +84,9 @@ public abstract class MemberedTypeCode extends TypeCode
     
     @Override
     public abstract String getCppTypename();
+    
+    @Override
+    public abstract String getCTypename();
 
     @Override
     public abstract String getJavaTypename();

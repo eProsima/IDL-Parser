@@ -30,6 +30,12 @@ public class PrimitiveTypeCode extends TypeCode
     {
         return getCppTypenameFromStringTemplate().toString();
     }
+    
+    @Override
+    public String getCTypename()
+    {
+        return getCTypenameFromStringTemplate().toString();
+    }
 
     @Override
     public String getJavaTypename()

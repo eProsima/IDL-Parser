@@ -65,6 +65,39 @@ public class ArrayTypeCode extends ContainerTypeCode
         
         return fin.toString();
     }
+    
+    @Override
+    public String getCTypename()
+    {
+        StringTemplate first = null, second = null, fin = null;
+        String prevf = null, prevs = null;
+        
+        for(int count = 0; count < m_dimensions.size(); ++count)
+        {     
+            first = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_first");
+            second = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_second");
+            second.setAttribute("size", m_dimensions.get(count));
+            
+            if(prevf != null)
+            {
+                first.setAttribute("prev", prevf);
+            }
+            if(prevs != null)
+            {
+                second.setAttribute("prev", prevs);
+            }
+            
+            prevf = first.toString();
+            prevs = second.toString();
+        }
+        
+        fin = getCppTypenameFromStringTemplate();
+        fin.setAttribute("firs", prevf);
+        fin.setAttribute("secon", prevs);
+        fin.setAttribute("type", getContentTypeCode().getCTypename());
+        
+        return fin.toString();
+    }
 
     @Override
     public String getJavaTypename()
