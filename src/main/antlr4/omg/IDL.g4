@@ -614,7 +614,7 @@ unary_expr returns [String literalStr = null]
     String aux = null;
 }
     :   
-		{$literalStr += _input.LT(1).getText();}
+		{$literalStr = _input.LT(1).getText();}
 		( MINUS | PLUS | TILDE )
 		primary_expr
 		{ aux=$primary_expr.literalStr; $literalStr += aux;}
