@@ -72,7 +72,7 @@ public class Context
         */
 
         m_definitions = new ArrayList<Definition>();
-        m_modules = new HashMap<String, Module>();
+        m_modules = new HashMap<String, com.eprosima.idl.parser.tree.Module>();
         m_interfaces = new HashMap<String, Interface>();
         m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
         m_types = new HashMap<String, TypeDeclaration>();
@@ -210,7 +210,7 @@ public class Context
      * @brief This function adds a module to the context.
      * This function is used in the parser.
      */
-    public void addModule(Module module)
+    public void addModule(com.eprosima.idl.parser.tree.Module module)
     { 
         if(!m_modules.containsKey(module.getScopedname()))
         {
@@ -218,7 +218,7 @@ public class Context
         }
     }
 
-    public Module existsModule(String scopedName)
+    public com.eprosima.idl.parser.tree.Module existsModule(String scopedName)
     {
         if(m_modules.containsKey(scopedName))
         {
@@ -725,7 +725,7 @@ public class Context
     //! Store all global definitions.
     private ArrayList<Definition> m_definitions;
     //! Map that contains all modules that were found processing the IDL file (after preprocessing):
-    private HashMap<String, Module> m_modules = null;
+    private HashMap<String, com.eprosima.idl.parser.tree.Module> m_modules = null;
     //! Map that contains all interfaces that were found processing the IDL file (after preprocessing):
     private HashMap<String, Interface> m_interfaces = null;
     //! Map that contains all global exceptions that were found processing the IDL file (after preprocessing).

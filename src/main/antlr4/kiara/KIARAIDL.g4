@@ -107,7 +107,7 @@ definition [Vector<Annotation> annotations] returns [Pair<Vector<Definition>, Te
     Pair<ConstDeclaration, TemplateGroup> cdtg = null;
     Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup> etg = null;
     Pair<Interface, TemplateGroup> itg = null;
-    Pair<Module, TemplateGroup> mtg = null;
+    Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> mtg = null;
     Pair<AnnotationDeclaration, TemplateGroup> atg = null;
 
     if(annotations == null) annotations = new Vector<Annotation>();
@@ -140,9 +140,9 @@ aux_definition [Vector<Annotation> annotations] returns [Pair<Vector<Definition>
  * @return This grammar expression returns the Module object as DefinitionContainer to be stored.
  * Also the TemplateGroup of module is returned.
  */
-module returns [Pair<Module, TemplateGroup> returnPair = null]
+module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnPair = null]
 @init{
-    Module moduleObject = null;
+    com.eprosima.idl.parser.tree.Module moduleObject = null;
     TemplateGroup moduleTemplates = null;
     TemplateGroup tg = null;
     // Store old namespace.
@@ -157,7 +157,7 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 	{
 		name=$identifier.id;
 		// Create the Module object.
-		moduleObject = new Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, tk);
+		moduleObject = new com.eprosima.idl.parser.tree.Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, tk);
 		
 		if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
 			if(tmanager != null) {
@@ -185,7 +185,7 @@ module returns [Pair<Module, TemplateGroup> returnPair = null]
 	    // Set the old namespace.
 	    ctx.setScope(old_scope);
 	    // Create the returned data.
-		$returnPair = new Pair<Module, TemplateGroup>(moduleObject, moduleTemplates);
+		$returnPair = new Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup>(moduleObject, moduleTemplates);
 	}
     ;
 	
