@@ -91,7 +91,7 @@ public class ArrayTypeCode extends ContainerTypeCode
             prevs = second.toString();
         }
         
-        fin = getCppTypenameFromStringTemplate();
+        fin = getCTypenameFromStringTemplate();
         fin.setAttribute("firs", prevf);
         fin.setAttribute("secon", prevs);
         fin.setAttribute("type", getContentTypeCode().getCTypename());

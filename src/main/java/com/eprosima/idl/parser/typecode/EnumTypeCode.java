@@ -47,7 +47,7 @@ public class EnumTypeCode extends MemberedTypeCode
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
+        StringTemplate st = getCTypenameFromStringTemplate();
         st.setAttribute("name", getScopedname());
         return st.toString();
     }

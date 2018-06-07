@@ -42,7 +42,7 @@ public class MapTypeCode extends ContainerTypeCode
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
+        StringTemplate st = getCTypenameFromStringTemplate();
         st.setAttribute("key", getKeyTypeCode().getCTypename());
         st.setAttribute("value", getValueTypeCode().getCTypename());
         st.setAttribute("maxsize", m_maxsize);
