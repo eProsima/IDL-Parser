@@ -51,44 +51,44 @@ public abstract class TypeCode
     public static final int KIND_SPARSE = 0x00000017;
     public static final int KIND_SET = 0x00000018;
     public static final int KIND_MAP = 0x00000019;
-    
+
     public static StringTemplateGroup idltypesgr  = null;
     public static StringTemplateGroup cpptypesgr  = null;
     public static StringTemplateGroup ctypesgr    = null;
     public static StringTemplateGroup javatypesgr = null;
     //TODO Revisar si es el mejor sitio.
     public static String javapackage = "";
-    
+
     public TypeCode(int kind)
     {
         m_kind = kind;
     }
-    
+
     public int getKind()
     {
         return m_kind;
     }
-    
+
     /*|
      * @brief This function returns the typename with the scope that is obtained using the cpptypesgr string template.
      * @return The IDL typename.
      */
     public abstract String getCppTypename();
-    
+
     public abstract String getCTypename();
-    
+
     protected StringTemplate getCppTypenameFromStringTemplate()
     {
         return cpptypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
-    
+
     protected StringTemplate getCTypenameFromStringTemplate()
     {
         return ctypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
 
     public abstract String getJavaTypename();
-    
+
     protected StringTemplate getJavaTypenameFromStringTemplate()
     {
         StringTemplate st = javatypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
@@ -101,12 +101,12 @@ public abstract class TypeCode
      * @return The typename.
      */
     public abstract String getIdlTypename();
-   
+
     protected StringTemplate getIdlTypenameFromStringTemplate()
     {
         return idltypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
-    
+
     /*!
      * @brief This function returns the type as a string: "type_2", where the number is the type kind.
      * This function is used in stringtemplates.
@@ -115,14 +115,14 @@ public abstract class TypeCode
     {
         return "type_" + Integer.toHexString(m_kind);
     }
-    
+
     // By default a typecode is not primitive. Function used in stringtemplates
     // TODO Cambiar a isIsPrimitive
     public boolean isPrimitive()
     {
         return false;
     }
-    
+
     // By default there is not initial value. Function used in stringtemplates.
     public String getInitialValue()
     {
@@ -139,13 +139,13 @@ public abstract class TypeCode
         Map initialValues = cpptypesgr.getMap("initialValues");
         return initialValues.get(getStType()).toString();
     }
-    
+
     // By default a typecode doesn't have a max size limit. Function used in stringtemplates
     public String getMaxsize()
     {
         return null;
     }
-    
+
     /*!
      * @brief This function returns the size of the datatype. By default is null string.
      * @return The size of the datatype.
@@ -154,13 +154,13 @@ public abstract class TypeCode
     {
         return null;
     }
-    
+
     //public abstract Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned);
-    
+
     //public abstract int getMaxSerializedSizeWithoutAlignment(int currentSize);
-    
+
     /*** Functions to know the type in string templates ***/
- // By default a typecode is not string. Function used in stringtemplates 
+ // By default a typecode is not string. Function used in stringtemplates
     public boolean isIsType_5(){return false;}
     public boolean isIsType_6(){return false;}
     public boolean isIsType_7(){return (m_kind == KIND_BOOLEAN);}
@@ -170,6 +170,91 @@ public abstract class TypeCode
     public boolean isIsType_e(){return false;}
     public boolean isIsType_a(){return false;}
     public boolean isIsType_10(){return false;}
+
+    public String getTypeIdentifier()
+    {
+        switch(m_kind)
+        {
+            case KIND_NULL:
+                return "TK_None";
+
+            case KIND_SHORT:
+                return "TK_INT16";
+
+            case KIND_LONG:
+                return "TK_INT32";
+
+            case KIND_USHORT:
+                return "TK_UINT16";
+
+            case KIND_ULONG:
+                return "TK_UINT32";
+
+            case KIND_FLOAT:
+                return "TK_FLOAT32";
+
+            case KIND_DOUBLE:
+                return "TK_FLOAT64";
+
+            case KIND_BOOLEAN:
+                return "TK_BOOLEAN";
+
+            case KIND_CHAR:
+                return "TK_CHAR8";
+
+            case KIND_OCTET:
+                return "TK_BYTE";
+
+            case KIND_STRUCT:
+                return "EK_MINIMAL";
+
+            case KIND_UNION:
+                return "EK_MINIMAL";
+
+            case KIND_ENUM:
+                return "EK_MINIMAL";
+
+            case KIND_STRING:
+                return "TI_STRING8_SMALL";
+
+            case KIND_SEQUENCE:
+                return "TI_PLAIN_SEQUENCE_SMALL";
+
+            case KIND_ARRAY:
+                return "TI_PLAIN_ARRAY_SMALL";
+
+            case KIND_ALIAS:
+                return "EK_MINIMAL";
+
+            case KIND_LONGLONG:
+                return "TK_INT64";
+
+            case KIND_ULONGLONG:
+                return "TK_UINT64";
+
+            case KIND_LONGDOUBLE:
+                return "TK_FLOAT128";
+
+            case KIND_WCHAR:
+                return "TK_CHAR16";
+
+            case KIND_WSTRING:
+                return "TI_STRING16_SMALL";
+
+            //case KIND_VALUE:
+            //
+            //case KIND_SPARSE:
+            //
+            case KIND_SET:
+                return "TI_PLAIN_SEQUENCE_SMALL";
+
+            case KIND_MAP:
+                return "TI_PLAIN_MAP_SMALL";
+
+            default:
+                return "TK_None";
+        }
+    }
     /*** End of functions to know the type in string templates ***/
 
     public Object getParent()
@@ -181,7 +266,7 @@ public abstract class TypeCode
     {
         m_parent = parent;
     }
-    
+
     private int m_kind = KIND_NULL;
 
     // Added parent object to typecode because was needed in DDS with our types (TopicsPlugin_gettypecode)
