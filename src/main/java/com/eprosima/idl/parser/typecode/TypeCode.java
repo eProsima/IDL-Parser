@@ -171,6 +171,7 @@ public abstract class TypeCode
     public boolean isIsType_a(){return false;}
     public boolean isIsType_10(){return false;}
 
+    // Functions to ease TypeIdentifier and TypeObject generation.
     public String getTypeIdentifier()
     {
         switch(m_kind)
@@ -253,6 +254,125 @@ public abstract class TypeCode
 
             default:
                 return "TK_None";
+        }
+    }
+
+    public boolean isPrimitiveType()
+    {
+        switch(m_kind)
+        {
+            case KIND_SHORT:
+            case KIND_LONG:
+            case KIND_USHORT:
+            case KIND_ULONG:
+            case KIND_FLOAT:
+            case KIND_DOUBLE:
+            case KIND_BOOLEAN:
+            case KIND_CHAR:
+            case KIND_OCTET:
+            case KIND_LONGLONG:
+            case KIND_ULONGLONG:
+            case KIND_LONGDOUBLE:
+            case KIND_WCHAR:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isPlainType()
+    {
+        switch(m_kind)
+        {
+            case KIND_STRING:
+            case KIND_SEQUENCE:
+            case KIND_ARRAY:
+            case KIND_WSTRING:
+            case KIND_SET:
+            case KIND_MAP:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isIsStringType()
+    {
+        switch(m_kind)
+        {
+            case KIND_STRING:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isIsWStringType()
+    {
+        switch(m_kind)
+        {
+            case KIND_WSTRING:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isIsSetType()
+    {
+        switch(m_kind)
+        {
+            case KIND_SET:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isIsMapType()
+    {
+        switch(m_kind)
+        {
+            case KIND_MAP:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isIsSequenceType()
+    {
+        switch(m_kind)
+        {
+            case KIND_SEQUENCE:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isIsArrayType()
+    {
+        switch(m_kind)
+        {
+            case KIND_ARRAY:
+            return true;
+            default:
+            return false;
+        }
+    }
+
+    public boolean isObjectType()
+    {
+        switch(m_kind)
+        {
+            case KIND_ALIAS:
+            case KIND_STRUCT:
+            case KIND_UNION:
+            case KIND_ENUM:
+            return true;
+            default:
+            return false;
         }
     }
     /*** End of functions to know the type in string templates ***/

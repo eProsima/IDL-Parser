@@ -177,7 +177,12 @@ public class ArrayTypeCode extends ContainerTypeCode
         return ret;
     }
 
-    // TODO Used in stringtemplate for (previous c) types.
+    public TypeCode getArrayContentTypeCode()
+    {
+        return super.getContentTypeCode();
+    }
+
+    // TODO Used in stringtemplate for RTI DDS types.
     public String getArrayExtension()
     {
         String ret = "";
