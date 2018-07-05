@@ -800,6 +800,8 @@ base_type_spec returns [TypeCode typecode = null]
 
 template_type_spec returns [TypeCode typecode = null]
     :   sequence_type { $typecode=$sequence_type.typecode; }
+	|   set_type { $typecode=$set_type.typecode; }
+	|   map_type { $typecode=$map_type.typecode; }
     |   string_type { $typecode=$string_type.typecode; }
     |   wide_string_type { $typecode=$wide_string_type.typecode; }
     |   fixed_pt_type
@@ -1321,6 +1323,36 @@ sequence_type returns [SequenceTypeCode typecode = null]
                $typecode.setContentTypeCode(type);
            }
         }
+    ;
+
+set_type returns [SetTypeCode typecode = null]
+@init {
+    TypeCode type = null;
+    String maxsize = null;
+} : ( KW_SET
+		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+    |   KW_SET
+		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
+		{
+	       $typecode = new SetTypeCode(maxsize);
+	       $typecode.setContentTypeCode(type);
+	    }
+    ;
+
+map_type returns [MapTypeCode typecode = null]
+@init {
+    TypeCode keyType = null;
+    TypeCode valueType = null;
+    String maxsize = null;
+} : ( KW_MAP
+		LEFT_ANG_BRACKET simple_type_spec { keyType=$simple_type_spec.typecode; } COMA simple_type_spec { valueType=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+    |   KW_MAP
+		LEFT_ANG_BRACKET simple_type_spec { keyType=$simple_type_spec.typecode; } COMA simple_type_spec { valueType=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
+		{
+	       $typecode = new MapTypeCode(maxsize);
+	       $typecode.setKeyTypeCode(keyType);
+	       $typecode.setValueTypeCode(valueType);
+	    }
     ;
 
 string_type returns [TypeCode typecode = null]
@@ -2100,6 +2132,8 @@ KW_LOCAL:               'local';
 KW_MANAGES:             'manages';
 KW_INTERFACE:           'interface';
 KW_COMPONENT:           'component';
+KW_SET:                 'set';
+KW_MAP:                 'map';
 KW_AT_ANNOTATION:        '@annotation';
 
 ID
