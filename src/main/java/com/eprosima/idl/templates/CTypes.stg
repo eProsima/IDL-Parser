@@ -40,7 +40,7 @@ type_7() ::= <<bool>>
 
 type_9() ::= <<uint8_t>>
 
-type_d() ::= <<char*>>
+type_d() ::= <<char>>
 
 type_15() ::= <<std::wstring>>
 
