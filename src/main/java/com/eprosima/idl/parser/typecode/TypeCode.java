@@ -170,6 +170,7 @@ public abstract class TypeCode
     public boolean isIsType_e(){return false;}
     public boolean isIsType_a(){return false;}
     public boolean isIsType_10(){return false;}
+    public boolean isIsType_13(){return (m_kind == KIND_LONGDOUBLE);}
 
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getTypeIdentifier()
