@@ -307,6 +307,17 @@ public abstract class TypeCode
         }
     }
 
+    public boolean isIsWCharType()
+    {
+        switch(m_kind)
+        {
+            case KIND_WCHAR:
+            return true;
+            default:
+            return false;
+        }
+    }
+
     public boolean isIsWStringType()
     {
         switch(m_kind)

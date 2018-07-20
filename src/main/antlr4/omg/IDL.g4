@@ -1191,6 +1191,7 @@ switch_type_spec returns [TypeCode typecode = null]
 }
     :   integer_type { $typecode=$integer_type.typecode; }
     |   char_type { $typecode=$char_type.typecode; }
+    |   wide_char_type { $typecode = $wide_char_type.typecode; }
     |   octet_type { $typecode=$octet_type.typecode; }
     |   boolean_type { $typecode=$boolean_type.typecode; }
     |   enum_type
