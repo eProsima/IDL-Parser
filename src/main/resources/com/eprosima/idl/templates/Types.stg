@@ -44,7 +44,7 @@ type_d() ::= <<std::string>>
 
 type_15() ::= <<std::wstring>>
 
-type_19(key, value, maxsize, empty) ::= <<std::map<$key$, $value$$if(maxsize)$, $maxsize$$endif$>$empty$>>
+type_19(key, value, maxsize, empty) ::= <<std::map<$key$, $value$>$empty$>>
 
 type_f_first(prev) ::= <<std::array<$prev$>>
 type_f_second(prev, size) ::= <<, $size$>$prev$>>
