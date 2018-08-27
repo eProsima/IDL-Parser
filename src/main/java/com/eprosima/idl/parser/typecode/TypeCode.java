@@ -51,6 +51,9 @@ public abstract class TypeCode
     public static final int KIND_SPARSE = 0x00000017;
     public static final int KIND_SET = 0x00000018;
     public static final int KIND_MAP = 0x00000019;
+    public static final int KIND_BITSET = 0x0000001A;
+    public static final int KIND_BITMASK = 0x0000001B;
+    public static final int KIND_BITFIELD = 0x0000001C;
 
     public static StringTemplateGroup idltypesgr  = null;
     public static StringTemplateGroup cpptypesgr  = null;

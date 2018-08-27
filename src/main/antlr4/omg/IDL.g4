@@ -684,6 +684,7 @@ type_decl [Vector<Annotation> annotations] returns [Pair<Vector<TypeDeclaration>
     |   struct_type { ttg=$struct_type.returnPair; }
     |   union_type { ttg=$union_type.returnPair; }
     |   enum_type { ttg=$enum_type.returnPair; }
+    |   bitset_type { ttg=$bitset_type.returnPair; }
     |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
     |   constr_forward_decl )
     {
@@ -786,6 +787,12 @@ simple_type_spec returns [TypeCode typecode = null]
         }
     ;
 
+bitfield_type_spec returns [TypeCode typecode = null]
+    :   integer_type { $typecode=$integer_type.typecode; }
+    |   boolean_type { $typecode=$boolean_type.typecode; }
+    |   octet_type { $typecode=$octet_type.typecode; }
+    ;
+
 base_type_spec returns [TypeCode typecode = null]
     :   floating_pt_type { $typecode=$floating_pt_type.typecode; }
     |   integer_type { $typecode=$integer_type.typecode; }
@@ -811,6 +818,8 @@ constr_type_spec
     :   struct_type
     |   union_type
     |   enum_type
+    |   bitset_type
+    //|   bitmask_dcl
     ;
 
 declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
@@ -825,6 +834,24 @@ declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = 
         {
             if($declarator.ret != null)
                 $ret.add($declarator.ret);
+            else
+                throw new ParseException(null, "Cannot parse type declarator");
+        }
+        )*
+    ;
+
+simple_declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
+    :   simple_declarator
+        {
+            if($simple_declarator.ret != null)
+                $ret.add($simple_declarator.ret);
+            else
+                throw new ParseException(null, "Cannot parse type declarator");
+        }
+        ( COMA simple_declarator
+        {
+            if($simple_declarator.ret != null)
+                $ret.add($simple_declarator.ret);
             else
                 throw new ParseException(null, "Cannot parse type declarator");
         }
@@ -1054,6 +1081,87 @@ annotation_member [AnnotationDeclaration annotation]
 annotation_forward_dcl
 :
     KW_AT_ANNOTATION scoped_name
+    ;
+
+bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+@init {
+    String name = null;
+    Vector<TypeCode> vector = null;
+    BitsetTypeCode typecode = null;
+    BitsetTypeCode superType = null;
+    TemplateGroup bitsetTemplates = null;
+} :     KW_BITSET
+        identifier
+        {
+           name=$identifier.id;
+           typecode = ctx.createBitsetTypeCode(name);
+        }
+        LEFT_BRACE bitfield[typecode] RIGHT_BRACE
+    /*|   KW_BITSET
+        identifier
+        {
+           name=$identifier.id;
+           typecode = ctx.createBitsetTypeCode(name);
+        }
+        COLON bitset_type { superType=$bitset_type.typecode; }
+        LEFT_BRACE bitfield[typecode] RIGHT_BRACE */
+        {
+            // typecode.addParent(superType);
+
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    bitsetTemplates = tmanager.createTemplateGroup("bitset_type");
+                    bitsetTemplates.setAttribute("ctx", ctx);
+                    bitsetTemplates.setAttribute("bitset", typecode);
+                }
+            }
+
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            vector.add(typecode);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, bitsetTemplates);
+        }
+    ;
+
+bitfield [BitsetTypeCode owner]
+    :   (
+            bitfield_spec simple_declarators SEMICOLON
+            {
+                if($bitfield_spec.bitfieldType != null)
+                {
+                    for(int count = 0; count < $simple_declarators.ret.size(); ++count)
+                    {
+                        Bitfield bitfield = null;
+
+                        // Only simple declaration
+                        bitfield = new Bitfield($bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
+
+                        $owner.addBitfield(bitfield);
+
+                        if(!$owner.addMember(bitfield))
+                            throw new ParseException($simple_declarators.ret.get(count).first().second(), "was defined previously");
+                    }
+                }
+            }
+       )+
+    ;
+
+bitfield_spec returns [BitfieldTypeCode bitfieldType = null]
+@init {
+    TypeCode type = null;
+    String bitsize = null;
+}
+    : KW_BITFIELD
+        LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+        {
+            $bitfieldType = ctx.createBitfieldTypeCode(bitsize, null);
+        }
+    | KW_BITFIELD
+        LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } COMA bitfield_type_spec { type=$bitfield_type_spec.typecode; } RIGHT_ANG_BRACKET
+        {
+            $bitfieldType = ctx.createBitfieldTypeCode(bitsize, type);
+        }
     ;
 
 struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
@@ -2135,6 +2243,9 @@ KW_INTERFACE:           'interface';
 KW_COMPONENT:           'component';
 KW_SET:                 'set';
 KW_MAP:                 'map';
+KW_BITFIELD:            'bitfield';
+KW_BITSET:              'bitset';
+KW_BITMASK:             'bitmask';
 KW_AT_ANNOTATION:        '@annotation';
 
 ID

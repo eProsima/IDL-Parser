@@ -38,6 +38,8 @@ import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
 import com.eprosima.idl.parser.typecode.TypeCode;
 import com.eprosima.idl.parser.typecode.StructTypeCode;
+import com.eprosima.idl.parser.typecode.BitfieldTypeCode;
+import com.eprosima.idl.parser.typecode.BitsetTypeCode;
 
 import com.eprosima.idl.util.Util;
 import com.eprosima.idl.parser.exception.ParseException;
@@ -365,6 +367,18 @@ public class Context
     {
         StructTypeCode structObject = new StructTypeCode(m_scope, name);
         return structObject;
+    }
+
+    public BitfieldTypeCode createBitfieldTypeCode(String size, TypeCode type)
+    {
+        BitfieldTypeCode object = new BitfieldTypeCode(m_scope, size, type);
+        return object;
+    }
+
+    public BitsetTypeCode createBitsetTypeCode(String name)
+    {
+        BitsetTypeCode object = new BitsetTypeCode(m_scope, name);
+        return object;
     }
 
     public Collection<TypeDeclaration> getTypes()
