@@ -40,9 +40,10 @@ type_7() ::= <<bool>>
 
 type_9() ::= <<uint8_t>>
 
-type_d() ::= <<char>>
+type_d(maxsize) ::= <<char>>
 
-type_15() ::= <<std::wstring>>
+//TODO
+type_15() ::= <<wchar>>
 
 type_f_first(prev) ::= <<$prev$>>
 type_f_second(prev, size) ::= <<>>
@@ -56,11 +57,8 @@ type_c(name) ::= <<$name$>>
 
 type_10(name) ::= <<$name$>>
 
-// TODO Para que sirve empty en FastBuffers?
-type_e(type, maxsize, empty) ::= <<$type$$empty$>>
+type_e(type, maxsize) ::= <<$type$>>
 
 initialValues ::= [
-        "type_d":"NULL",
-        "type_15":"\"\"",
         default: // not basic type.
 ]

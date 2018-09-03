@@ -14,8 +14,6 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import java.util.List;
-
 import org.antlr.stringtemplate.StringTemplate;
 
 import com.eprosima.idl.util.Pair;
@@ -40,7 +38,9 @@ public class StringTypeCode extends TypeCode
     @Override
     public String getCTypename()
     {
-        return getCTypenameFromStringTemplate().toString();
+        StringTemplate st = getCTypenameFromStringTemplate();
+        st.setAttribute("maxsize", getMaxsize());
+        return st.toString();
     }
 
     @Override

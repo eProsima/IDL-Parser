@@ -26,7 +26,6 @@ public class ArrayTypeCode extends ContainerTypeCode
     public ArrayTypeCode()
     {
         super(TypeCode.KIND_ARRAY);
-        
         m_dimensions = new ArrayList<String>();
     }
     
@@ -97,6 +96,17 @@ public class ArrayTypeCode extends ContainerTypeCode
         fin.setAttribute("type", getContentTypeCode().getCTypename());
         
         return fin.toString();
+    }
+    public String getCTypeDimensions()
+    {
+        String dimensions = getArrayExtension();
+        
+        if(getContentTypeCode() instanceof StringTypeCode)
+        {
+            dimensions += "[" + ((StringTypeCode)getContentTypeCode()).getMaxsize() + "]";
+        }
+        
+        return dimensions;
     }
 
     @Override
