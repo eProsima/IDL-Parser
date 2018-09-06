@@ -28,36 +28,36 @@ public class Interface extends ExportContainer implements Definition
 
         m_bases = new HashMap<String, Interface>();
     }
-    
+
 
     public void setParent(Object obj)
     {
         m_parent = obj;
     }
-    
+
     public Object getParent()
     {
         return m_parent;
     }
-    
+
     @Override
     public boolean isIsModule()
     {
         return false;
     }
-    
+
     @Override
     public boolean isIsInterface()
     {
     	return true;
     }
-    
+
     @Override
     public boolean isIsException()
     {
     	return false;
     }
-    
+
     @Override
     public boolean isIsTypeDeclaration()
     {
@@ -69,7 +69,7 @@ public class Interface extends ExportContainer implements Definition
     {
         return false;
     }
-	
+
 	@Override
 	public boolean isIsAnnotation()
     {
@@ -90,22 +90,22 @@ public class Interface extends ExportContainer implements Definition
     {
         return new ArrayList<Interface>(m_bases.values());
     }
-    
+
     /*!
      * @brief This function returns the exception defined inside the interface.
      */
     public Exception getException(String currentScope, String ename)
     {
     	com.eprosima.idl.parser.tree.Exception exception = null;
-    	
+
     	for(int count = 0; exception == null && count < getExports().size(); ++count)
         {
     		int lastIndex = -1;
-    		
+
     		if(getExports().get(count).isIsException())
     		{
                 String tmpname = ((com.eprosima.idl.parser.tree.Exception)getExports().get(count)).getScopedname();
-                
+
                 if(tmpname.equals(ename))
                 {
                 	exception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
@@ -117,11 +117,11 @@ public class Interface extends ExportContainer implements Definition
                     		tmpname.equals(currentScope + ename))
                     {
                     	exception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
-                    }	
+                    }
                 }
     		}
         }
-    	
+
     	return exception;
     }
 
@@ -134,7 +134,7 @@ public class Interface extends ExportContainer implements Definition
         if(m_operations == null)
         {
             m_operations = new ArrayList<Operation>();
-            
+
             // Get own operations.
             for(int count = 0; count < getExports().size(); ++count)
             {
@@ -144,7 +144,7 @@ public class Interface extends ExportContainer implements Definition
                 }
             }
         }
-        
+
         return m_operations;
     }
 
@@ -159,7 +159,7 @@ public class Interface extends ExportContainer implements Definition
             {
                 m_all_operations.addAll(iface.getAll_operations());
             }
-            
+
             // Get own operations.
             for(int count = 0; count < getExports().size(); ++count)
             {
@@ -172,25 +172,25 @@ public class Interface extends ExportContainer implements Definition
 
         return m_all_operations;
     }
-    
+
     /*!
-     * @brief This function is used in stringtemplates to not generate module in some cases (Right now in generated RTI idl).
+     * @brief This function is used in stringtemplates to not generate module in some cases (Right now in generated (previous c) idl).
      */
     public boolean isThereAreDeclarations()
     {
         boolean returnedValue = false;
-        
+
         for(int count = 0; !returnedValue && count < getExports().size(); ++count)
         {
             returnedValue = getExports().get(count).isIsTypeDeclaration() ||
                 getExports().get(count).isIsConstDeclaration() || getExports().get(count).isIsException();
         }
-        
+
         return returnedValue;
     }
 
     private Object m_parent = null;
-    
+
     //! Contains all interfaces it inherits from.
     private Map<String, Interface> m_bases = null;
     //! Contains all operations.

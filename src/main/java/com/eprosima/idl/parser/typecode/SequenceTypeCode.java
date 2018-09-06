@@ -43,8 +43,19 @@ public class SequenceTypeCode extends ContainerTypeCode
     {
         StringTemplate st = getCTypenameFromStringTemplate();
         st.setAttribute("type", getContentTypeCode().getCTypename());
-        st.setAttribute("maxsize", m_maxsize);
+        st.setAttribute("maxsize", getMaxsize());
         return st.toString();
+    }
+
+    public String getCTypeDimensions()
+    {
+        String dimensions = "[" + getMaxsize()  + "]";
+        if(getContentTypeCode() instanceof StringTypeCode)
+        {
+            dimensions += "[" + ((StringTypeCode)getContentTypeCode()).getMaxsize() + "]";
+        }
+        
+        return dimensions;
     }
 
     @Override
@@ -68,11 +79,11 @@ public class SequenceTypeCode extends ContainerTypeCode
     public String getMaxsize()
     {
         if(m_maxsize == null)
-            return "100";
+            return "255";
 
         return m_maxsize;
     }
-    
+
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
     {
         int lcontainTypeSize = getContentTypeCode().getSize();

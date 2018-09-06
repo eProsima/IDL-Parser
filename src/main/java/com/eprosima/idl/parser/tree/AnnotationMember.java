@@ -31,16 +31,16 @@ public class AnnotationMember
         m_name = ann.m_name;
         m_value = ann.m_value;
     }
-    
+
     public String getName()
     {
         return m_name;
     }
-    
+
     /*
-     * @brief This function is used with RTI DDS types because array names contains [].
+     * @brief This function is used with (previous c) types because array names contains [].
      */
-    
+
     public TypeCode getTypecode()
     {
         return m_typecode;
@@ -49,15 +49,15 @@ public class AnnotationMember
     public String getValue()
     {
         return m_value;
-    } 
+    }
 
     public void setValue(String value)
     {
         m_value = value;
     }
-    
+
     private String m_name = null;
-    
+
     private TypeCode m_typecode = null;
 
     private String m_value = null;

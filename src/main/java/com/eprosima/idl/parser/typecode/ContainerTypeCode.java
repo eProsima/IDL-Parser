@@ -40,7 +40,7 @@ public abstract class ContainerTypeCode extends TypeCode
         m_contentTypeCode = contentTypeCode;
     }
     
-     public int getDepth()
+    public int getDepth()
     {
     	int ret = 1;
     	
