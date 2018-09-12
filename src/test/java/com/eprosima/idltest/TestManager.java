@@ -6,11 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.inject.Inject;
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-
-public class TestManager implements Plugin<Project>
+public class TestManager
 {
     public enum TestLevel
     {
@@ -42,7 +38,6 @@ public class TestManager implements Plugin<Project>
     private List<String> cMakeArgs;
     private boolean errorOutputOnly;
 
-    @Inject 
     public TestManager(TestLevel level, String generatorName, String outputPath)
     {
         this.level = level;
@@ -165,13 +160,5 @@ public class TestManager implements Plugin<Project>
             System.out.println("ERROR");
         }
         return status;
-    }
-
-    public void apply(Project project)
-    {
-        project.getTasks().create("hello", Greeting.class, (task) -> { 
-            task.setMessage("Hello");
-            task.setRecipient("World");                                
-        });
     }
 }

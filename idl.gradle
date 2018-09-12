@@ -47,11 +47,22 @@ compileJava {
 }
 
 // add the generated source files to the list of java sources
-sourceSets.main.java.srcDirs += antlr4.output
-sourceSets.main.resources {
-    srcDir 'src/test/java'
-    srcDir 'src/main/java'
-    include '**/*.stg'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir antlr4.output
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+    }
 }
 
 // add antlr4 to classpath
