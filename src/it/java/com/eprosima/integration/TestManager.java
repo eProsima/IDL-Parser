@@ -1,4 +1,4 @@
-package com.eprosima.idltest;
+package com.eprosima.integration;
 
 import java.util.ArrayList;
 
@@ -78,16 +78,18 @@ public class TestManager
         }
     }
 
-    public void runTests()
+    public boolean runTests()
     {
         for(IDL idl: idls)
         {
             Test test = new Test(idl, outputPath, errorOutputOnly);
             if(!run(test))
             {
-                return;
+                return false;
             }
         }
+
+        return true;
     }
 
     private boolean prepare(Test test)
@@ -102,7 +104,12 @@ public class TestManager
         if(precondition && level.getValue() >= TestLevel.GENERATE.getValue())
         {
             printHeader(test.getIDL(), TestLevel.GENERATE);
-            return printlnStatus(test.generate(generatorName, level == TestLevel.RUN));
+
+            // --- REMOVE this when run() for IDL.INCLUDE is supported
+            boolean notRunIncludeIDL = test.getIDL() != IDL.INCLUDE;
+            // ---
+
+            return printlnStatus(test.generate(generatorName, level == TestLevel.RUN && notRunIncludeIDL));
         }
 
         return precondition;
@@ -138,6 +145,14 @@ public class TestManager
         if(precondition && level.getValue() >= TestLevel.RUN.getValue())
         {
             printHeader(test.getIDL(), TestLevel.RUN);
+
+            // --- REMOVE this when run() for IDL.INCLUDE is supported
+            if(test.getIDL() == IDL.INCLUDE)
+            {
+                return printlnStatus(true);
+            }
+            // --- 
+                
             return printlnStatus(test.run());
         }
 
@@ -146,19 +161,12 @@ public class TestManager
 
     private void printHeader(IDL idl, TestLevel level)
     {
-        System.out.print("\n\n>>> " + idl.toString() + " TEST: " + level.toString() + "... ");
+        System.out.println("\n\n>>> " + idl.toString() + " TEST: " + level.toString() + "...");
     }
 
     private boolean printlnStatus(boolean status)
     {
-        if(status)
-        {
-            System.out.println("OK!");
-        }
-        else
-        {
-            System.out.println("ERROR");
-        }
+        System.out.println("    RESULT: " + (status ? "OK!" : "ERROR"));
         return status;
     }
 }

@@ -52,6 +52,7 @@ sourceSets {
     main {
         java {
             srcDir 'src/main/java'
+            srcDir 'src/it/java' //integration tests
             srcDir antlr4.output
         }
         resources {
@@ -60,7 +61,7 @@ sourceSets {
     }
     test {
         java {
-            srcDir 'src/test/java'
+            //unitary test here
         }
     }
 }

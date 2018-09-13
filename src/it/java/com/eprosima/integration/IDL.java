@@ -1,4 +1,4 @@
-package com.eprosima.idltest;
+package com.eprosima.integration;
 
 public enum IDL
 {
@@ -13,14 +13,14 @@ public enum IDL
     SEQUENCE_STRING,
     SEQUENCE_CUSTOM,
     SEQUENCE_NESTED,
-    INCLUDED_TYPE(BASIC);
+    INCLUDE(BASIC);
 
     private IDL required = null;
 
     IDL(){}
     IDL(IDL required)
     {
-        required = null;
+        this.required = required;
     }
 
     public IDL getRequired()
