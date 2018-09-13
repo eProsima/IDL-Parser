@@ -34,15 +34,17 @@ public class TestManager
     private TestLevel level;
     private ArrayList<IDL> idls;
     private String generatorName;
+    private String inputPath;
     private String outputPath;
     private List<String> cMakeArgs;
     private boolean errorOutputOnly;
 
-    public TestManager(TestLevel level, String generatorName, String outputPath)
+    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath)
     {
         this.level = level;
         this.idls = new ArrayList<IDL>(Arrays.asList(ALL_IDLS));
         this.generatorName = generatorName;
+        this.inputPath = inputPath;
         this.outputPath = outputPath;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
@@ -109,7 +111,7 @@ public class TestManager
             boolean notRunIncludeIDL = test.getIDL() != IDL.INCLUDE;
             // ---
 
-            return printlnStatus(test.generate(generatorName, level == TestLevel.RUN && notRunIncludeIDL));
+            return printlnStatus(test.generate(generatorName, inputPath, level == TestLevel.RUN && notRunIncludeIDL));
         }
 
         return precondition;

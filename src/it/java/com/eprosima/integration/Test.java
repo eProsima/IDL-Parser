@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Test
 {
-    private static final String IDL_PATH = "thirdparty/IDL-Parser/test/idls";
 
     private IDL idl;
     private String outputPath;
@@ -43,7 +42,7 @@ public class Test
         return prepared;
     }
 
-    public boolean generate(String generatorName, boolean testFlag)
+    public boolean generate(String generatorName, String inputPath, boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
         String flags = " -replace -example" + (testFlag ? " -test" : "");
@@ -51,7 +50,7 @@ public class Test
         String idlPaths = "";
         for(IDL aux = idl; aux != null; aux = aux.getRequired())
         {
-            idlPaths += " " + IDL_PATH + "/" + aux.toString().toLowerCase() + ".idl";
+            idlPaths += " " + inputPath + "/" + aux.toString().toLowerCase() + ".idl";
         }
 
         String command = program + flags + output + idlPaths;
