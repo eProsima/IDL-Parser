@@ -47,11 +47,23 @@ compileJava {
 }
 
 // add the generated source files to the list of java sources
-sourceSets.main.java.srcDirs += antlr4.output
 
-sourceSets.main.resources {
-    srcDir 'src/main/java'
-    include '**/*.stg'
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'src/it/java' //integration tests
+            srcDir antlr4.output
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+    test {
+        java {
+            //unitary test here
+        }
+    }
 }
 
 // add antlr4 to classpath
@@ -65,3 +77,4 @@ jar {
 	baseName = 'idlparser'
     version =  '1.0.0'
 }
+
