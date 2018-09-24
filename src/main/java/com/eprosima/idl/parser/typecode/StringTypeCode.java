@@ -64,7 +64,7 @@ public class StringTypeCode extends TypeCode
     public String getMaxsize()
     {
         if(m_maxsize == null)
-            return "100";
+            return "255";
 
         return m_maxsize;
     }
