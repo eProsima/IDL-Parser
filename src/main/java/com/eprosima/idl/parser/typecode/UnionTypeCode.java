@@ -14,23 +14,22 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
-import java.util.List;
-import java.util.ArrayList;
 
 public class UnionTypeCode extends MemberedTypeCode
 {
     public UnionTypeCode(String scope, String name, TypeCode discriminatorTypeCode)
     {
-        super(TypeCode.Kind.KIND_UNION, scope, name);
+        super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         return "EK_MINIMAL";
     }
@@ -56,7 +55,7 @@ public class UnionTypeCode extends MemberedTypeCode
         List<String> labels = null;
         List<String> javalabels = null;
 
-        if(m_discriminatorTypeCode.getKind() == TypeCode.Kind.KIND_ENUM)
+        if(m_discriminatorTypeCode.getKind() == Kind.KIND_ENUM)
         {
             EnumTypeCode enum_type = (EnumTypeCode)m_discriminatorTypeCode;
             labels = new ArrayList<String>();

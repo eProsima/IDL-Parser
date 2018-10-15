@@ -4456,14 +4456,14 @@ public class IDLParser extends Parser {
 				{
 				setState(928);
 				match(KW_FLOAT);
-				 ((Floating_pt_typeContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_FLOAT);
+				 ((Floating_pt_typeContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_FLOAT);
 				}
 				break;
 			case KW_DOUBLE:
 				{
 				setState(930);
 				match(KW_DOUBLE);
-				 ((Floating_pt_typeContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_DOUBLE);
+				 ((Floating_pt_typeContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_DOUBLE);
 				}
 				break;
 			case KW_LONG:
@@ -4472,7 +4472,7 @@ public class IDLParser extends Parser {
 				match(KW_LONG);
 				setState(933);
 				match(KW_DOUBLE);
-				 ((Floating_pt_typeContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_LONGDOUBLE);
+				 ((Floating_pt_typeContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_LONGDOUBLE);
 				}
 				break;
 			default:
@@ -4623,7 +4623,7 @@ public class IDLParser extends Parser {
 		Signed_short_intContext _localctx = new Signed_short_intContext(_ctx, getState());
 		enterRule(_localctx, 118, RULE_signed_short_int);
 
-		    ((Signed_short_intContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_SHORT);
+		    ((Signed_short_intContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_SHORT);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4656,7 +4656,7 @@ public class IDLParser extends Parser {
 		Signed_long_intContext _localctx = new Signed_long_intContext(_ctx, getState());
 		enterRule(_localctx, 120, RULE_signed_long_int);
 
-		    ((Signed_long_intContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_LONG);
+		    ((Signed_long_intContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_LONG);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4692,7 +4692,7 @@ public class IDLParser extends Parser {
 		Signed_longlong_intContext _localctx = new Signed_longlong_intContext(_ctx, getState());
 		enterRule(_localctx, 122, RULE_signed_longlong_int);
 
-		    ((Signed_longlong_intContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_LONGLONG);
+		    ((Signed_longlong_intContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_LONGLONG);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4792,7 +4792,7 @@ public class IDLParser extends Parser {
 		Unsigned_short_intContext _localctx = new Unsigned_short_intContext(_ctx, getState());
 		enterRule(_localctx, 126, RULE_unsigned_short_int);
 
-		    ((Unsigned_short_intContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_USHORT);
+		    ((Unsigned_short_intContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_USHORT);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4828,7 +4828,7 @@ public class IDLParser extends Parser {
 		Unsigned_long_intContext _localctx = new Unsigned_long_intContext(_ctx, getState());
 		enterRule(_localctx, 128, RULE_unsigned_long_int);
 
-		    ((Unsigned_long_intContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_ULONG);
+		    ((Unsigned_long_intContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_ULONG);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4867,7 +4867,7 @@ public class IDLParser extends Parser {
 		Unsigned_longlong_intContext _localctx = new Unsigned_longlong_intContext(_ctx, getState());
 		enterRule(_localctx, 130, RULE_unsigned_longlong_int);
 
-		    ((Unsigned_longlong_intContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_ULONGLONG);
+		    ((Unsigned_longlong_intContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_ULONGLONG);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4904,7 +4904,7 @@ public class IDLParser extends Parser {
 		Char_typeContext _localctx = new Char_typeContext(_ctx, getState());
 		enterRule(_localctx, 132, RULE_char_type);
 
-		    ((Char_typeContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_CHAR);
+		    ((Char_typeContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_CHAR);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4937,7 +4937,7 @@ public class IDLParser extends Parser {
 		Wide_char_typeContext _localctx = new Wide_char_typeContext(_ctx, getState());
 		enterRule(_localctx, 134, RULE_wide_char_type);
 
-		    ((Wide_char_typeContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_WCHAR);
+		    ((Wide_char_typeContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_WCHAR);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4970,7 +4970,7 @@ public class IDLParser extends Parser {
 		Boolean_typeContext _localctx = new Boolean_typeContext(_ctx, getState());
 		enterRule(_localctx, 136, RULE_boolean_type);
 
-		    ((Boolean_typeContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_BOOLEAN);
+		    ((Boolean_typeContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_BOOLEAN);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -5003,7 +5003,7 @@ public class IDLParser extends Parser {
 		Octet_typeContext _localctx = new Octet_typeContext(_ctx, getState());
 		enterRule(_localctx, 138, RULE_octet_type);
 
-		    ((Octet_typeContext)_localctx).typecode =  new PrimitiveTypeCode(TypeCode.KIND_OCTET);
+		    ((Octet_typeContext)_localctx).typecode =  new PrimitiveTypeCode(Kind.KIND_OCTET);
 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -5603,7 +5603,7 @@ public class IDLParser extends Parser {
 				                        Bitfield bitfield = null;
 
 				                        // Only simple declaration
-				                        bitfield = new Bitfield(((BitfieldContext)_localctx).bitfield_spec.bitfieldType, ((BitfieldContext)_localctx).simple_declarators.ret.get(count).first().first());
+				                        bitfield = new Bitfield(_localctx.owner, ((BitfieldContext)_localctx).bitfield_spec.bitfieldType, ((BitfieldContext)_localctx).simple_declarators.ret.get(count).first().first());
 
 				                        _localctx.owner.addBitfield(bitfield);
 
@@ -6970,7 +6970,7 @@ public class IDLParser extends Parser {
 				}
 				break;
 			}
-			((String_typeContext)_localctx).typecode =  new StringTypeCode(TypeCode.KIND_STRING, maxsize);
+			((String_typeContext)_localctx).typecode =  new StringTypeCode(Kind.KIND_STRING, maxsize);
 			}
 		}
 		catch (RecognitionException re) {
@@ -7031,7 +7031,7 @@ public class IDLParser extends Parser {
 				}
 				break;
 			}
-			((Wide_string_typeContext)_localctx).typecode =  new StringTypeCode(TypeCode.KIND_WSTRING, maxsize);
+			((Wide_string_typeContext)_localctx).typecode =  new StringTypeCode(Kind.KIND_WSTRING, maxsize);
 			}
 		}
 		catch (RecognitionException re) {

@@ -16,13 +16,12 @@ package com.eprosima.idl.parser.typecode;
 
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
 public class SequenceTypeCode extends ContainerTypeCode
 {
     public SequenceTypeCode(String maxsize)
     {
-        super(TypeCode.Kind.KIND_SEQUENCE);
+        super(Kind.KIND_SEQUENCE);
         m_maxsize = maxsize;
     }
 
@@ -30,7 +29,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     public boolean isIsType_e(){return true;}
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         return "TI_PLAIN_SEQUENCE_SMALL";
     }

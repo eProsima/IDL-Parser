@@ -14,11 +14,11 @@
 
 package com.eprosima.idl.generator.manager;
 
-import com.eprosima.idl.parser.typecode.*;
 import com.eprosima.idl.parser.exception.ParseException;
-
-import java.util.List;
+import com.eprosima.idl.parser.typecode.*;
 import java.util.ArrayList;
+import java.util.List;
+
 
 public class TemplateUtil
 {
@@ -39,13 +39,13 @@ public class TemplateUtil
 
         if(dist_type != null && union_type.getDefaultMember() != null)
         {
-            if(dist_type.getKind() == TypeCode.Kind.KIND_SHORT ||
-                    dist_type.getKind() == TypeCode.Kind.KIND_LONG ||
-                    dist_type.getKind() == TypeCode.Kind.KIND_LONGLONG ||
-                    dist_type.getKind() == TypeCode.Kind.KIND_USHORT ||
-                    dist_type.getKind() == TypeCode.Kind.KIND_ULONG ||
-                    dist_type.getKind() == TypeCode.Kind.KIND_ULONGLONG ||
-                    dist_type.getKind() == TypeCode.Kind.KIND_CHAR)
+            if(dist_type.getKind() == Kind.KIND_SHORT ||
+                    dist_type.getKind() == Kind.KIND_LONG ||
+                    dist_type.getKind() == Kind.KIND_LONGLONG ||
+                    dist_type.getKind() == Kind.KIND_USHORT ||
+                    dist_type.getKind() == Kind.KIND_ULONG ||
+                    dist_type.getKind() == Kind.KIND_ULONGLONG ||
+                    dist_type.getKind() == Kind.KIND_CHAR)
             {
                 long dvalue = -1;
                 boolean found = true;
@@ -82,7 +82,7 @@ public class TemplateUtil
                 union_type.setDefaultvalue(Long.toString(dvalue));
                 union_type.setJavaDefaultvalue(Long.toString(dvalue));
             }
-            else if(dist_type.getKind() == TypeCode.Kind.KIND_BOOLEAN)
+            else if(dist_type.getKind() == Kind.KIND_BOOLEAN)
             {
                 if(members.size() == 1 && ((UnionMember)members.get(0)).getLabels().size() == 1)
                 {
@@ -112,7 +112,7 @@ public class TemplateUtil
                     union_type.setJavaDefaultvalue("false");
                 }
             }
-            else if(dist_type.getKind() == TypeCode.Kind.KIND_ENUM)
+            else if(dist_type.getKind() == Kind.KIND_ENUM)
             {
                 EnumTypeCode enume = (EnumTypeCode)dist_type;
                 List<Member> list = new ArrayList(members);
@@ -158,7 +158,7 @@ public class TemplateUtil
         // TODO Faltan tipos: short, unsigneds...
         if(dist_type != null)
         {
-            if(dist_type.getKind() == TypeCode.Kind.KIND_ENUM)
+            if(dist_type.getKind() == Kind.KIND_ENUM)
             {
                 EnumTypeCode enume = (EnumTypeCode)dist_type;
 

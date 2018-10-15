@@ -14,9 +14,9 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.util.Pair;
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
 public class StringTypeCode extends TypeCode
 {
@@ -30,7 +30,7 @@ public class StringTypeCode extends TypeCode
     public boolean isIsType_d(){return true;}
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         switch(getKind())
         {
@@ -38,6 +38,8 @@ public class StringTypeCode extends TypeCode
                 return "TI_STRING8_SMALL";
             case Kind.KIND_WSTRING:
                 return "TI_STRING16_SMALL";
+            default:
+                return "TK_None";
         }
     }
 

@@ -16,13 +16,12 @@ package com.eprosima.idl.parser.typecode;
 
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
 public class EnumTypeCode extends MemberedTypeCode
 {
     public EnumTypeCode(String scope, String name)
     {
-        super(TypeCode.Kind.KIND_ENUM, scope, name);
+        super(Kind.KIND_ENUM, scope, name);
     }
 
     @Override
@@ -32,7 +31,7 @@ public class EnumTypeCode extends MemberedTypeCode
     public boolean isIsType_c(){return true;}
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         return "EK_MINIMAL";
     }

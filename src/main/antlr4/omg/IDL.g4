@@ -880,9 +880,9 @@ complex_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = n
     ;
 
 floating_pt_type returns [TypeCode typecode = null]
-    :   ( KW_FLOAT { $typecode = new PrimitiveTypeCode(TypeCode.KIND_FLOAT);}
-    | KW_DOUBLE { $typecode = new PrimitiveTypeCode(TypeCode.KIND_DOUBLE);}
-    | KW_LONG KW_DOUBLE { $typecode = new PrimitiveTypeCode(TypeCode.KIND_LONGDOUBLE);}
+    :   ( KW_FLOAT { $typecode = new PrimitiveTypeCode(Kind.KIND_FLOAT);}
+    | KW_DOUBLE { $typecode = new PrimitiveTypeCode(Kind.KIND_DOUBLE);}
+    | KW_LONG KW_DOUBLE { $typecode = new PrimitiveTypeCode(Kind.KIND_LONGDOUBLE);}
     )
     ;
 
@@ -899,21 +899,21 @@ signed_int returns [TypeCode typecode = null]
 
 signed_short_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_SHORT);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_SHORT);
 }
     :   KW_SHORT
     ;
 
 signed_long_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_LONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_LONG);
 }
     :   KW_LONG
     ;
 
 signed_longlong_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_LONGLONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_LONGLONG);
 }
     :   KW_LONG KW_LONG
     ;
@@ -926,49 +926,49 @@ unsigned_int returns [TypeCode typecode = null]
 
 unsigned_short_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_USHORT);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_USHORT);
 }
     :   KW_UNSIGNED KW_SHORT
     ;
 
 unsigned_long_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_ULONG);
 }
     :   KW_UNSIGNED KW_LONG
     ;
 
 unsigned_longlong_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONGLONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_ULONGLONG);
 }
     :   KW_UNSIGNED KW_LONG KW_LONG
     ;
 
 char_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_CHAR);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_CHAR);
 }
     :   KW_CHAR
     ;
 
 wide_char_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_WCHAR);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_WCHAR);
 }
     :   KW_WCHAR
     ;
 
 boolean_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_BOOLEAN);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_BOOLEAN);
 }
     :   KW_BOOLEAN
     ;
 
 octet_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_OCTET);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_OCTET);
 }
     :   KW_OCTET
     ;
@@ -1135,7 +1135,7 @@ bitfield [BitsetTypeCode owner]
                         Bitfield bitfield = null;
 
                         // Only simple declaration
-                        bitfield = new Bitfield($bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
+                        bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
 
                         $owner.addBitfield(bitfield);
 
@@ -1470,7 +1470,7 @@ string_type returns [TypeCode typecode = null]
 }
     :   ( KW_STRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_STRING )
-       {$typecode = new StringTypeCode(TypeCode.KIND_STRING, maxsize);}
+       {$typecode = new StringTypeCode(Kind.KIND_STRING, maxsize);}
     ;
 
 wide_string_type returns [TypeCode typecode = null]
@@ -1480,7 +1480,7 @@ wide_string_type returns [TypeCode typecode = null]
 }
     :   ( KW_WSTRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_WSTRING )
-       {$typecode = new StringTypeCode(TypeCode.KIND_WSTRING, maxsize);}
+       {$typecode = new StringTypeCode(Kind.KIND_WSTRING, maxsize);}
     ;
 
 array_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> pair = null]

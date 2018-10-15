@@ -62,25 +62,21 @@ public class BitfieldSpec
         return !m_scope.isEmpty();
     }
 
-    @Override
     public String getCppTypename()
     {
         return m_type.getCppTypename();
     }
 
-    @Override
     public String getCTypename()
     {
         return m_type.getCTypename();
     }
 
-    @Override
     public String getJavaTypename()
     {
         return m_type.getJavaTypename();
     }
 
-    @Override
     public String getIdlTypename() // TODO al template?
     {
         if (m_type == null)
@@ -93,7 +89,6 @@ public class BitfieldSpec
         }
     }
 
-    @Override
     public boolean isPrimitive()
     {
         return true; // Use it as alias of m_type
@@ -105,7 +100,6 @@ public class BitfieldSpec
         return Integer.parseInt(m_bitsize);
     }
 
-    @Override
     public String getSize()
     {
         return (m_type != null) ? m_type.getSize() : "0";
@@ -116,7 +110,6 @@ public class BitfieldSpec
         return m_type;
     }
 
-    @Override
     public String getInitialValue()
     {
         return m_type.getInitialValue();

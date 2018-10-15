@@ -16,13 +16,12 @@ package com.eprosima.idl.parser.typecode;
 
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
 public class MapTypeCode extends ContainerTypeCode
 {
     public MapTypeCode(String maxsize)
     {
-        super(MapTypeCode.Kind.KIND_MAP);
+        super(Kind.KIND_MAP);
         m_maxsize = maxsize;
     }
 
@@ -30,7 +29,7 @@ public class MapTypeCode extends ContainerTypeCode
     public boolean isIsType_e(){return true;}
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         return "TI_PLAIN_MAP_SMALL";
     }

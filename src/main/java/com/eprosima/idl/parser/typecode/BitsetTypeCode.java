@@ -14,19 +14,18 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.util.Pair;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-
+import java.util.List;
 import org.antlr.stringtemplate.StringTemplate;
+
+
 
 public class BitsetTypeCode extends MemberedTypeCode
 {
     public BitsetTypeCode(String scope, String name)
     {
-        super(TypeCode.Kind.KIND_BITSET, scope, name);
+        super(Kind.KIND_BITSET, scope, name);
         m_bitfields = new LinkedHashMap<String, Bitfield>();
     }
 
@@ -73,7 +72,7 @@ public class BitsetTypeCode extends MemberedTypeCode
         {
             m_bitfields.put(bitfield.getName(), bitfield);
             bitfield.setBasePosition(m_current_base);
-            m_current_base += ((BitfieldSpec)bitfield.getTypecode()).getBitSize();
+            m_current_base += bitfield.getSpec().getBitSize();
             return true;
         }
         return false;
@@ -94,7 +93,7 @@ public class BitsetTypeCode extends MemberedTypeCode
         int size = 0;
         for (Bitfield bf : m_bitfields.values())
         {
-            size += ((BitfieldSpec)bf.getTypecode()).getBitSize();
+            size += bf.getSpec().getBitSize();
         }
         return size;
     }

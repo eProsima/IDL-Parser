@@ -150,7 +150,7 @@ public abstract class TypeCode
     public boolean isIsArrayType() { return false; }
 
     // Functions to ease TypeIdentifier and TypeObject generation.
-    public String getTypeIdentifier() { return "TK_None" }
+    public String getTypeIdentifier() { return "TK_None"; }
     public boolean isPrimitiveType() { return false; }
     public boolean isVariableSizeType() { return false; }
     public boolean isObjectType() { return false; }

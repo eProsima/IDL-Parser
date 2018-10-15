@@ -14,22 +14,19 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.util.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.antlr.stringtemplate.StringTemplate;
+
+
 
 public class StructTypeCode extends MemberedTypeCode
 {
     public StructTypeCode(String scope, String name)
     {
-        super(TypeCode.Kind.KIND_STRUCT, scope, name);
+        super(Kind.KIND_STRUCT, scope, name);
     }
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         return "EK_MINIMAL";
     }

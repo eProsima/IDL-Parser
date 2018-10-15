@@ -14,17 +14,17 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.util.Pair;
+import java.util.List;
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
-import java.util.List;
 
 public class AliasTypeCode extends ContainerTypeCode
 {
     public AliasTypeCode(String scope, String name)
     {
-        super(TypeCode.Kind.KIND_ALIAS);
+        super(Kind.KIND_ALIAS);
         m_scope = scope;
         m_name = name;
     }
@@ -169,7 +169,7 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         return "EK_MINIMAL";
     }

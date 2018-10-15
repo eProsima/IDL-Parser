@@ -14,12 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.parser.tree.Annotation;
-import com.eprosima.idl.parser.tree.Notebook;
-import com.eprosima.idl.context.Context;
 
-import java.util.Map;
-import java.util.HashMap;
 
 public class Bitfield extends Member
 {
@@ -28,9 +23,10 @@ public class Bitfield extends Member
         super();
     }
 
-    public Bitfield(TypeCode typecode, String name)
+    public Bitfield(BitsetTypeCode typecode, BitfieldSpec spec, String name)
     {
         super(typecode, name);
+        m_spec = spec;
     }
 
     public void setBasePosition(int position)
@@ -43,5 +39,11 @@ public class Bitfield extends Member
         return m_base;
     }
 
+    public BitfieldSpec getSpec()
+    {
+        return m_spec;
+    }
+
     private int m_base = -1;
+    private BitfieldSpec m_spec = null;
 }

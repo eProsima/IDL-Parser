@@ -14,9 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
 public class PrimitiveTypeCode extends TypeCode
 {
@@ -56,7 +54,7 @@ public class PrimitiveTypeCode extends TypeCode
     }
 
     @Override
-    public boolean getTypeIdentifier()
+    public String getTypeIdentifier()
     {
         switch(getKind())
         {
@@ -86,6 +84,8 @@ public class PrimitiveTypeCode extends TypeCode
                 return "TK_FLOAT128";
             case Kind.KIND_WCHAR:
                 return "TK_CHAR16";
+            default:
+                return "TK_None";
         }
     }
 
