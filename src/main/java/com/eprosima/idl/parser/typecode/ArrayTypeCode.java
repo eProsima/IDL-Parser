@@ -39,7 +39,7 @@ public class ArrayTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isVariableSizeType() { return true; }
 
     @Override
     public boolean isIsArrayType() { return true; }
@@ -187,11 +187,6 @@ public class ArrayTypeCode extends ContainerTypeCode
             ret += ")";
 
         return ret;
-    }
-
-    public TypeCode getArrayContentTypeCode()
-    {
-        return super.getContentTypeCode();
     }
 
     // TODO Used in stringtemplate for RTI DDS types.

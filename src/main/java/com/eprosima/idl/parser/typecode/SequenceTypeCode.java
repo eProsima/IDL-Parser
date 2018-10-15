@@ -36,7 +36,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     }    
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isVariableSizeType() { return true; }
 
     @Override
     public boolean isIsSequenceType() { return true; }
@@ -94,11 +94,6 @@ public class SequenceTypeCode extends ContainerTypeCode
             return "100";
 
         return m_maxsize;
-    }
-
-    public TypeCode getSequenceContentTypeCode()
-    {
-        return super.getContentTypeCode();
     }
 
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)

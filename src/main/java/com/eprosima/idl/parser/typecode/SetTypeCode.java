@@ -36,7 +36,7 @@ public class SetTypeCode extends ContainerTypeCode
     }    
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isVariableSizeType() { return true; }
 
     @Override
     public boolean isIsSetType() { return true; }
@@ -75,11 +75,6 @@ public class SetTypeCode extends ContainerTypeCode
         st.setAttribute("type", getContentTypeCode().getIdlTypename());
         st.setAttribute("maxsize", m_maxsize);
         return st.toString();
-    }
-
-    public TypeCode getSetContentTypeCode()
-    {
-        return super.getContentTypeCode();
     }
 
     public String getMaxsize()
