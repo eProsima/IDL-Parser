@@ -29,6 +29,15 @@ public class StructTypeCode extends MemberedTypeCode
     }
 
     @Override
+    public boolean getTypeIdentifier()
+    {
+        return "EK_MINIMAL";
+    }    
+
+    @Override
+    public boolean isObjectType() { return true; }
+
+    @Override
     public String getCppTypename()
     {
         StringTemplate st = getCppTypenameFromStringTemplate();

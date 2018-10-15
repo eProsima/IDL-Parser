@@ -46,6 +46,9 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode();
     }
 
+    @Override
+    public boolean isObjectType() { return true; }
+
     public TypeCode getTypedefContentTypeCode()
     {
         return super.getContentTypeCode();
@@ -164,6 +167,13 @@ public class AliasTypeCode extends ContainerTypeCode
     {
         return true;
     }
+
+    @Override
+    public boolean getTypeIdentifier()
+    {
+        return "EK_MINIMAL";
+    }
+
     /*** End of functions to know the type in string templates ***/
 
     /*** Functions that alias has to export because some typecodes have them*/

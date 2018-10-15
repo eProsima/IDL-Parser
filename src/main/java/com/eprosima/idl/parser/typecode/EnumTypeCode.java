@@ -31,6 +31,15 @@ public class EnumTypeCode extends MemberedTypeCode
     @Override
     public boolean isIsType_c(){return true;}
     
+    @Override
+    public boolean getTypeIdentifier()
+    {
+        return "EK_MINIMAL";
+    }    
+
+    @Override
+    public boolean isObjectType() { return true; }
+    
     public void addMember(EnumMember member)
     {
         addMember((Member)member);

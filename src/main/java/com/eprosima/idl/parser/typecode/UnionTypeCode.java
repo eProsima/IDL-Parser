@@ -29,6 +29,15 @@ public class UnionTypeCode extends MemberedTypeCode
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
     
+    @Override
+    public boolean getTypeIdentifier()
+    {
+        return "EK_MINIMAL";
+    }    
+    
+    @Override
+    public boolean isObjectType() { return true; }
+    
     /*!
      * @return 0 is ok, -1 the member is repeated, -2 is another default member.
      */

@@ -30,6 +30,18 @@ public class SequenceTypeCode extends ContainerTypeCode
     public boolean isIsType_e(){return true;}
 
     @Override
+    public boolean getTypeIdentifier()
+    {
+        return "TI_PLAIN_SEQUENCE_SMALL";
+    }    
+
+    @Override
+    public boolean isPlainType() { return true; }
+
+    @Override
+    public boolean isIsSequenceType() { return true; }
+
+    @Override
     public String getCppTypename()
     {
         StringTemplate st = getCppTypenameFromStringTemplate();

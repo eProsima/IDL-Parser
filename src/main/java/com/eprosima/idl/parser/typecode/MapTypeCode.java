@@ -30,6 +30,18 @@ public class MapTypeCode extends ContainerTypeCode
     public boolean isIsType_e(){return true;}
 
     @Override
+    public boolean getTypeIdentifier()
+    {
+        return "TI_PLAIN_MAP_SMALL";
+    }    
+
+    @Override
+    public boolean isPlainType() { return true; }
+
+    @Override
+    public boolean isIsMapType() { return true; }
+
+    @Override
     public String getCppTypename()
     {
         StringTemplate st = getCppTypenameFromStringTemplate();

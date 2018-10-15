@@ -163,233 +163,31 @@ public abstract class TypeCode
     //public abstract int getMaxSerializedSizeWithoutAlignment(int currentSize);
 
     /*** Functions to know the type in string templates ***/
- // By default a typecode is not string. Function used in stringtemplates
+    // By default a typecode is not string. Function used in stringtemplates
     public boolean isIsType_5(){return false;}
     public boolean isIsType_6(){return false;}
-    public boolean isIsType_7(){return (m_kind == KIND_BOOLEAN);}
+    public boolean isIsType_7(){return false;}
     public boolean isIsType_d(){return false;}
     public boolean isIsType_c(){return false;}
     public boolean isIsType_f(){return false;}
     public boolean isIsType_e(){return false;}
     public boolean isIsType_a(){return false;}
     public boolean isIsType_10(){return false;}
-    public boolean isIsType_13(){return (m_kind == KIND_LONGDOUBLE);}
+    public boolean isIsType_13(){return false;}
+    public boolean isIsStringType() { return false;}
+    public boolean isIsWStringType() { return false;}
+    public boolean isIsWCharType() { return false;}
+    public boolean isIsSetType() { return false; }
+    public boolean isIsMapType() { return false; }
+    public boolean isIsSequenceType() { return false; }
+    public boolean isIsArrayType() { return false; }
 
     // Functions to ease TypeIdentifier and TypeObject generation.
-    public String getTypeIdentifier()
-    {
-        switch(m_kind)
-        {
-            case KIND_NULL:
-                return "TK_None";
-
-            case KIND_SHORT:
-                return "TK_INT16";
-
-            case KIND_LONG:
-                return "TK_INT32";
-
-            case KIND_USHORT:
-                return "TK_UINT16";
-
-            case KIND_ULONG:
-                return "TK_UINT32";
-
-            case KIND_FLOAT:
-                return "TK_FLOAT32";
-
-            case KIND_DOUBLE:
-                return "TK_FLOAT64";
-
-            case KIND_BOOLEAN:
-                return "TK_BOOLEAN";
-
-            case KIND_CHAR:
-                return "TK_CHAR8";
-
-            case KIND_OCTET:
-                return "TK_BYTE";
-
-            case KIND_STRUCT:
-                return "EK_MINIMAL";
-
-            case KIND_UNION:
-                return "EK_MINIMAL";
-
-            case KIND_ENUM:
-                return "EK_MINIMAL";
-
-            case KIND_STRING:
-                return "TI_STRING8_SMALL";
-
-            case KIND_SEQUENCE:
-                return "TI_PLAIN_SEQUENCE_SMALL";
-
-            case KIND_ARRAY:
-                return "TI_PLAIN_ARRAY_SMALL";
-
-            case KIND_ALIAS:
-                return "EK_MINIMAL";
-
-            case KIND_LONGLONG:
-                return "TK_INT64";
-
-            case KIND_ULONGLONG:
-                return "TK_UINT64";
-
-            case KIND_LONGDOUBLE:
-                return "TK_FLOAT128";
-
-            case KIND_WCHAR:
-                return "TK_CHAR16";
-
-            case KIND_WSTRING:
-                return "TI_STRING16_SMALL";
-
-            //case KIND_VALUE:
-            //
-            //case KIND_SPARSE:
-            //
-            case KIND_SET:
-                return "TI_PLAIN_SEQUENCE_SMALL";
-
-            case KIND_MAP:
-                return "TI_PLAIN_MAP_SMALL";
-
-            default:
-                return "TK_None";
-        }
-    }
-
-    public boolean isPrimitiveType()
-    {
-        switch(m_kind)
-        {
-            case KIND_SHORT:
-            case KIND_LONG:
-            case KIND_USHORT:
-            case KIND_ULONG:
-            case KIND_FLOAT:
-            case KIND_DOUBLE:
-            case KIND_BOOLEAN:
-            case KIND_CHAR:
-            case KIND_OCTET:
-            case KIND_LONGLONG:
-            case KIND_ULONGLONG:
-            case KIND_LONGDOUBLE:
-            case KIND_WCHAR:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isPlainType()
-    {
-        switch(m_kind)
-        {
-            case KIND_STRING:
-            case KIND_SEQUENCE:
-            case KIND_ARRAY:
-            case KIND_WSTRING:
-            case KIND_SET:
-            case KIND_MAP:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isIsStringType()
-    {
-        switch(m_kind)
-        {
-            case KIND_STRING:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isIsWCharType()
-    {
-        switch(m_kind)
-        {
-            case KIND_WCHAR:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isIsWStringType()
-    {
-        switch(m_kind)
-        {
-            case KIND_WSTRING:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isIsSetType()
-    {
-        switch(m_kind)
-        {
-            case KIND_SET:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isIsMapType()
-    {
-        switch(m_kind)
-        {
-            case KIND_MAP:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isIsSequenceType()
-    {
-        switch(m_kind)
-        {
-            case KIND_SEQUENCE:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isIsArrayType()
-    {
-        switch(m_kind)
-        {
-            case KIND_ARRAY:
-            return true;
-            default:
-            return false;
-        }
-    }
-
-    public boolean isObjectType()
-    {
-        switch(m_kind)
-        {
-            case KIND_ALIAS:
-            case KIND_STRUCT:
-            case KIND_UNION:
-            case KIND_ENUM:
-            return true;
-            default:
-            return false;
-        }
-    }
+    public String getTypeIdentifier() { return "TK_None" }
+    public boolean isPrimitiveType() { return false; }
+    public boolean isPlainType() { return false; }
+    public boolean isObjectType() { return false; }
+    
     /*** End of functions to know the type in string templates ***/
 
     public Object getParent()

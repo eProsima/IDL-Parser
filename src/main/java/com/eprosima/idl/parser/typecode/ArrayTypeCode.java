@@ -33,6 +33,18 @@ public class ArrayTypeCode extends ContainerTypeCode
     public boolean isIsType_f(){return true;}
 
     @Override
+    public boolean getTypeIdentifier()
+    {
+        return "TI_PLAIN_ARRAY_SMALL";
+    }
+
+    @Override
+    public boolean isPlainType() { return true; }
+
+    @Override
+    public boolean isIsArrayType() { return true; }
+
+    @Override
     public String getCppTypename()
     {
         StringTemplate first = null, second = null, fin = null;

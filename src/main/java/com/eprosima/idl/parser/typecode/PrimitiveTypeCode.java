@@ -56,6 +56,43 @@ public class PrimitiveTypeCode extends TypeCode
     }
     
     @Override
+    public boolean getTypeIdentifier()
+    {
+        switch(getKind())
+        {
+            case KIND_SHORT:
+                return "TK_INT16";
+            case KIND_LONG:
+                return "TK_INT32";
+            case KIND_USHORT:
+                return "TK_UINT16";
+            case KIND_ULONG:
+                return "TK_UINT32";
+            case KIND_FLOAT:
+                return "TK_FLOAT32";
+            case KIND_DOUBLE:
+                return "TK_FLOAT64";
+            case KIND_BOOLEAN:
+                return "TK_BOOLEAN";
+            case KIND_CHAR:
+                return "TK_CHAR8";
+            case KIND_OCTET:
+                return "TK_BYTE";
+            case KIND_LONGLONG:
+                return "TK_INT64";
+            case KIND_ULONGLONG:
+                return "TK_UINT64";
+            case KIND_LONGDOUBLE:
+                return "TK_FLOAT128";
+            case KIND_WCHAR:
+                return "TK_CHAR16";
+        }
+    }    
+
+    @Override
+    public boolean isPrimitiveType() { return true; }
+
+    @Override
     public String getInitialValue()
     {   
         switch(getKind())
@@ -129,6 +166,18 @@ public class PrimitiveTypeCode extends TypeCode
         return null;
     }
 
+    @Override
     public boolean isIsType_5() { return getKind() == KIND_FLOAT;}
+    
+    @Override
     public boolean isIsType_6() { return getKind() == KIND_DOUBLE;}
+    
+    @Override
+    public boolean isIsType_7() { return getKind() == KIND_BOOLEAN;}
+
+    @Override
+    public boolean isIsType_13() { return getKind() == KIND_LONGDOUBLE;}
+
+    @Override
+    public boolean isIsWCharType() { return getKind() == KIND_WCHAR; }
 }

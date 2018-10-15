@@ -30,6 +30,27 @@ public class StringTypeCode extends TypeCode
     public boolean isIsType_d(){return true;}
 
     @Override
+    public boolean getTypeIdentifier()
+    {
+        switch(getKind())
+        {
+            case KIND_STRING:
+                return "TI_STRING8_SMALL";
+            case KIND_WSTRING:
+                return "TI_STRING16_SMALL";
+        }
+    }    
+
+    @Override
+    public boolean isPlainType() { return true; }
+
+    @Override
+    public boolean isIsStringType() { return getKind() == KIND_STRING; }
+
+    @Override
+    public boolean isIsWStringType() { return getKind() == KIND_WSTRING; }
+
+    @Override
     public String getCppTypename()
     {
         return getCppTypenameFromStringTemplate().toString();
