@@ -25,14 +25,14 @@ public class StructTypeCode extends MemberedTypeCode
 {
     public StructTypeCode(String scope, String name)
     {
-        super(TypeCode.KIND_STRUCT, scope, name);
+        super(TypeCode.Kind.KIND_STRUCT, scope, name);
     }
 
     @Override
     public boolean getTypeIdentifier()
     {
         return "EK_MINIMAL";
-    }    
+    }
 
     @Override
     public boolean isObjectType() { return true; }

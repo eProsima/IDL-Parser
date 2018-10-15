@@ -22,7 +22,7 @@ public class SetTypeCode extends ContainerTypeCode
 {
     public SetTypeCode(String maxsize)
     {
-        super(TypeCode.KIND_SET);
+        super(TypeCode.Kind.KIND_SET);
         m_maxsize = maxsize;
     }
 
@@ -33,7 +33,7 @@ public class SetTypeCode extends ContainerTypeCode
     public boolean getTypeIdentifier()
     {
         return "TI_PLAIN_SEQUENCE_SMALL";
-    }    
+    }
 
     @Override
     public boolean isVariableSizeType() { return true; }

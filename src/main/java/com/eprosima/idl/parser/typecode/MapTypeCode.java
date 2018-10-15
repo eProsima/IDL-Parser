@@ -22,7 +22,7 @@ public class MapTypeCode extends ContainerTypeCode
 {
     public MapTypeCode(String maxsize)
     {
-        super(MapTypeCode.KIND_MAP);
+        super(MapTypeCode.Kind.KIND_MAP);
         m_maxsize = maxsize;
     }
 
@@ -33,7 +33,7 @@ public class MapTypeCode extends ContainerTypeCode
     public boolean getTypeIdentifier()
     {
         return "TI_PLAIN_MAP_SMALL";
-    }    
+    }
 
     @Override
     public boolean isVariableSizeType() { return true; }
@@ -50,7 +50,7 @@ public class MapTypeCode extends ContainerTypeCode
         st.setAttribute("maxsize", m_maxsize);
         return st.toString();
     }
-    
+
     @Override
     public String getCTypename()
     {
@@ -88,27 +88,27 @@ public class MapTypeCode extends ContainerTypeCode
 
         return m_maxsize;
     }
-	
+
     public TypeCode getKeyTypeCode()
     {
         return m_keyTypeCode;
     }
-    
+
     public void setKeyTypeCode(TypeCode keyTypeCode)
     {
         m_keyTypeCode = keyTypeCode;
     }
-	
+
 	public TypeCode getValueTypeCode()
     {
         return m_valueTypeCode;
     }
-    
+
     public void setValueTypeCode(TypeCode valueTypeCode)
     {
         m_valueTypeCode = valueTypeCode;
     }
-    
+
     private TypeCode m_keyTypeCode = null;
 	private TypeCode m_valueTypeCode = null;
     private String m_maxsize = null;

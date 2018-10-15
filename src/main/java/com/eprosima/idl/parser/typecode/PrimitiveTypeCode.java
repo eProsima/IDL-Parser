@@ -30,7 +30,7 @@ public class PrimitiveTypeCode extends TypeCode
     {
         return getCppTypenameFromStringTemplate().toString();
     }
-    
+
     @Override
     public String getCTypename()
     {
@@ -42,86 +42,86 @@ public class PrimitiveTypeCode extends TypeCode
     {
         return getJavaTypenameFromStringTemplate().toString();
     }
-    
+
     @Override
     public String getIdlTypename()
     {
         return getIdlTypenameFromStringTemplate().toString();
     }
-    
+
     @Override
     public boolean isPrimitive()
     {
         return true;
     }
-    
+
     @Override
     public boolean getTypeIdentifier()
     {
         switch(getKind())
         {
-            case KIND_SHORT:
+            case Kind.KIND_SHORT:
                 return "TK_INT16";
-            case KIND_LONG:
+            case Kind.KIND_LONG:
                 return "TK_INT32";
-            case KIND_USHORT:
+            case Kind.KIND_USHORT:
                 return "TK_UINT16";
-            case KIND_ULONG:
+            case Kind.KIND_ULONG:
                 return "TK_UINT32";
-            case KIND_FLOAT:
+            case Kind.KIND_FLOAT:
                 return "TK_FLOAT32";
-            case KIND_DOUBLE:
+            case Kind.KIND_DOUBLE:
                 return "TK_FLOAT64";
-            case KIND_BOOLEAN:
+            case Kind.KIND_BOOLEAN:
                 return "TK_BOOLEAN";
-            case KIND_CHAR:
+            case Kind.KIND_CHAR:
                 return "TK_CHAR8";
-            case KIND_OCTET:
+            case Kind.KIND_OCTET:
                 return "TK_BYTE";
-            case KIND_LONGLONG:
+            case Kind.KIND_LONGLONG:
                 return "TK_INT64";
-            case KIND_ULONGLONG:
+            case Kind.KIND_ULONGLONG:
                 return "TK_UINT64";
-            case KIND_LONGDOUBLE:
+            case Kind.KIND_LONGDOUBLE:
                 return "TK_FLOAT128";
-            case KIND_WCHAR:
+            case Kind.KIND_WCHAR:
                 return "TK_CHAR16";
         }
-    }    
+    }
 
     @Override
     public boolean isPrimitiveType() { return true; }
 
     @Override
     public String getInitialValue()
-    {   
+    {
         switch(getKind())
         {
-            case KIND_LONGDOUBLE:
-            case KIND_DOUBLE:
-            case KIND_FLOAT:
+            case Kind.KIND_LONGDOUBLE:
+            case Kind.KIND_DOUBLE:
+            case Kind.KIND_FLOAT:
                 return "0.0";
-            case KIND_LONGLONG:
-            case KIND_ULONGLONG:
-            case KIND_LONG:
-            case KIND_ULONG:
-            case KIND_WCHAR:
-            case KIND_SHORT:
-            case KIND_USHORT:
-            case KIND_CHAR:
-            case KIND_OCTET:
-                return "0";         
-            case KIND_BOOLEAN:
-                return "false";               
+            case Kind.KIND_LONGLONG:
+            case Kind.KIND_ULONGLONG:
+            case Kind.KIND_LONG:
+            case Kind.KIND_ULONG:
+            case Kind.KIND_WCHAR:
+            case Kind.KIND_SHORT:
+            case Kind.KIND_USHORT:
+            case Kind.KIND_CHAR:
+            case Kind.KIND_OCTET:
+                return "0";
+            case Kind.KIND_BOOLEAN:
+                return "false";
         }
-    	
+
     	return "";
     }
-    
+
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
     {
         int size = getSize();
-        
+
         if(size <= lastDataAligned)
         {
             return new Pair<Integer, Integer>(currentSize + size, size);
@@ -132,52 +132,52 @@ public class PrimitiveTypeCode extends TypeCode
             return new Pair<Integer, Integer>(currentSize + size + align, size);
         }
     }
-    
+
     public int getMaxSerializedSizeWithoutAlignment(int currentSize)
     {
         return currentSize + getSize();
     }*/
-    
+
     @Override
     public String getSize()
     {
         switch(getKind())
         {
-            case KIND_LONGDOUBLE:
+            case Kind.KIND_LONGDOUBLE:
                 return "16";
-            case KIND_DOUBLE:
-            case KIND_LONGLONG:
-            case KIND_ULONGLONG:
+            case Kind.KIND_DOUBLE:
+            case Kind.KIND_LONGLONG:
+            case Kind.KIND_ULONGLONG:
                 return "8";
-            case KIND_LONG:
-            case KIND_ULONG:
-            case KIND_FLOAT:
-            case KIND_WCHAR:
-                return "4";         
-            case KIND_SHORT:
-            case KIND_USHORT:
+            case Kind.KIND_LONG:
+            case Kind.KIND_ULONG:
+            case Kind.KIND_FLOAT:
+            case Kind.KIND_WCHAR:
+                return "4";
+            case Kind.KIND_SHORT:
+            case Kind.KIND_USHORT:
                 return "2";
-            case KIND_BOOLEAN:
-            case KIND_CHAR:
-            case KIND_OCTET:
-                return "1";               
+            case Kind.KIND_BOOLEAN:
+            case Kind.KIND_CHAR:
+            case Kind.KIND_OCTET:
+                return "1";
         }
-        
+
         return null;
     }
 
     @Override
-    public boolean isIsType_5() { return getKind() == KIND_FLOAT;}
-    
-    @Override
-    public boolean isIsType_6() { return getKind() == KIND_DOUBLE;}
-    
-    @Override
-    public boolean isIsType_7() { return getKind() == KIND_BOOLEAN;}
+    public boolean isIsType_5() { return getKind() == Kind.KIND_FLOAT;}
 
     @Override
-    public boolean isIsType_13() { return getKind() == KIND_LONGDOUBLE;}
+    public boolean isIsType_6() { return getKind() == Kind.KIND_DOUBLE;}
 
     @Override
-    public boolean isIsWCharType() { return getKind() == KIND_WCHAR; }
+    public boolean isIsType_7() { return getKind() == Kind.KIND_BOOLEAN;}
+
+    @Override
+    public boolean isIsType_13() { return getKind() == Kind.KIND_LONGDOUBLE;}
+
+    @Override
+    public boolean isIsWCharType() { return getKind() == Kind.KIND_WCHAR; }
 }

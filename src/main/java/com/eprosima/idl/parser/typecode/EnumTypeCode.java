@@ -22,24 +22,24 @@ public class EnumTypeCode extends MemberedTypeCode
 {
     public EnumTypeCode(String scope, String name)
     {
-        super(TypeCode.KIND_ENUM, scope, name);
+        super(TypeCode.Kind.KIND_ENUM, scope, name);
     }
 
     @Override
     public boolean isPrimitive() {return true;}
-    
+
     @Override
     public boolean isIsType_c(){return true;}
-    
+
     @Override
     public boolean getTypeIdentifier()
     {
         return "EK_MINIMAL";
-    }    
+    }
 
     @Override
     public boolean isObjectType() { return true; }
-    
+
     public void addMember(EnumMember member)
     {
         addMember((Member)member);
@@ -52,7 +52,7 @@ public class EnumTypeCode extends MemberedTypeCode
         st.setAttribute("name", getScopedname());
         return st.toString();
     }
-    
+
     @Override
     public String getCTypename()
     {
@@ -68,7 +68,7 @@ public class EnumTypeCode extends MemberedTypeCode
         st.setAttribute("name", getJavaScopedname());
         return st.toString();
     }
-    
+
     @Override
     public String getIdlTypename()
     {
@@ -76,33 +76,33 @@ public class EnumTypeCode extends MemberedTypeCode
         st.setAttribute("name", getScopedname());
         return st.toString();
     }
-    
+
     @Override
     public String getInitialValue()
-    {   
+    {
         if(getMembers().size() > 0)
         {
             return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
         }
-        
+
         return "";
     }
 
     @Override
     public String getJavaInitialValue()
-    {   
+    {
         if(getMembers().size() > 0)
         {
             return javapackage + getJavaScopedname() + "." + getMembers().get(0).getName();
         }
-        
+
         return "";
     }
-    
+
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
     {
         int size = getSize();
-        
+
         if(size <= lastDataAligned)
         {
             return new Pair<Integer, Integer>(currentSize + size, size);
@@ -113,15 +113,15 @@ public class EnumTypeCode extends MemberedTypeCode
             return new Pair<Integer, Integer>(currentSize + size + align, size);
         }
     }
-    
+
     public int getMaxSerializedSizeWithoutAlignment(int currentSize)
     {
         return currentSize + getSize();
     }*/
-    
+
     @Override
     public String getSize()
-    {    
+    {
         return "4";
     }
 

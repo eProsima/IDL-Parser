@@ -22,7 +22,7 @@ public class SequenceTypeCode extends ContainerTypeCode
 {
     public SequenceTypeCode(String maxsize)
     {
-        super(TypeCode.KIND_SEQUENCE);
+        super(TypeCode.Kind.KIND_SEQUENCE);
         m_maxsize = maxsize;
     }
 
@@ -33,7 +33,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     public boolean getTypeIdentifier()
     {
         return "TI_PLAIN_SEQUENCE_SMALL";
-    }    
+    }
 
     @Override
     public boolean isVariableSizeType() { return true; }
@@ -66,7 +66,7 @@ public class SequenceTypeCode extends ContainerTypeCode
         {
             dimensions += "[" + ((StringTypeCode)getContentTypeCode()).getMaxsize() + "]";
         }
-        
+
         return dimensions;
     }
 

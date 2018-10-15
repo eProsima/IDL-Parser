@@ -34,21 +34,21 @@ public class StringTypeCode extends TypeCode
     {
         switch(getKind())
         {
-            case KIND_STRING:
+            case Kind.KIND_STRING:
                 return "TI_STRING8_SMALL";
-            case KIND_WSTRING:
+            case Kind.KIND_WSTRING:
                 return "TI_STRING16_SMALL";
         }
-    }    
+    }
 
     @Override
     public boolean isVariableSizeType() { return true; }
 
     @Override
-    public boolean isIsStringType() { return getKind() == KIND_STRING; }
+    public boolean isIsStringType() { return getKind() == Kind.KIND_STRING; }
 
     @Override
-    public boolean isIsWStringType() { return getKind() == KIND_WSTRING; }
+    public boolean isIsWStringType() { return getKind() == Kind.KIND_WSTRING; }
 
     @Override
     public String getCppTypename()

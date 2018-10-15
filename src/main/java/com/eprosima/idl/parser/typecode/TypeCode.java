@@ -14,47 +14,14 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import java.util.Map;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.stringtemplate.language.DefaultTemplateLexer;
 
-import java.util.Map;
 
-import com.eprosima.idl.generator.manager.TemplateUtil;
-import com.eprosima.idl.util.Pair;
 
 public abstract class TypeCode
 {
-    public static final int KIND_NULL = 0x00000000;
-    public static final int KIND_SHORT = 0x00000001;
-    public static final int KIND_LONG = 0x00000002;
-    public static final int KIND_USHORT = 0x00000003;
-    public static final int KIND_ULONG = 0x00000004;
-    public static final int KIND_FLOAT = 0x00000005;
-    public static final int KIND_DOUBLE = 0x00000006;
-    public static final int KIND_BOOLEAN = 0x00000007;
-    public static final int KIND_CHAR = 0x00000008;
-    public static final int KIND_OCTET = 0x00000009;
-    public static final int KIND_STRUCT = 0x0000000a;
-    public static final int KIND_UNION = 0x0000000b;
-    public static final int KIND_ENUM = 0x0000000c;
-    public static final int KIND_STRING = 0x0000000d;
-    public static final int KIND_SEQUENCE = 0x0000000e;
-    public static final int KIND_ARRAY = 0x0000000f;
-    public static final int KIND_ALIAS = 0x00000010;
-    public static final int KIND_LONGLONG = 0x00000011;
-    public static final int KIND_ULONGLONG = 0x00000012;
-    public static final int KIND_LONGDOUBLE = 0x00000013;
-    public static final int KIND_WCHAR = 0x00000014;
-    public static final int KIND_WSTRING = 0x00000015;
-    public static final int KIND_VALUE = 0x00000016;
-    public static final int KIND_SPARSE = 0x00000017;
-    public static final int KIND_SET = 0x00000018;
-    public static final int KIND_MAP = 0x00000019;
-    public static final int KIND_BITSET = 0x0000001A;
-    public static final int KIND_BITMASK = 0x0000001B;
-    public static final int KIND_BITFIELD = 0x0000001C;
-
     public static StringTemplateGroup idltypesgr  = null;
     public static StringTemplateGroup cpptypesgr  = null;
     public static StringTemplateGroup ctypesgr    = null;
@@ -187,7 +154,7 @@ public abstract class TypeCode
     public boolean isPrimitiveType() { return false; }
     public boolean isVariableSizeType() { return false; }
     public boolean isObjectType() { return false; }
-    
+
     /*** End of functions to know the type in string templates ***/
 
     public Object getParent()
@@ -200,7 +167,7 @@ public abstract class TypeCode
         m_parent = parent;
     }
 
-    private int m_kind = KIND_NULL;
+    private int m_kind = Kind.KIND_NULL;
 
     // Added parent object to typecode because was needed in DDS with our types (TopicsPlugin_gettypecode)
     private Object m_parent = null;

@@ -14,38 +14,35 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
-public class BitfieldTypeCode extends TypeCode
+public class BitfieldSpec
 {
-    public BitfieldTypeCode(String scope, String bitsize, TypeCode type)
+    public BitfieldSpec(String scope, String bitsize, TypeCode type)
     {
-        super(KIND_BITFIELD);
+        m_kind = Kind.KIND_BITFIELD;
         m_scope = scope;
         if (type == null)
         {
             int size = Integer.parseInt(bitsize);
             if (size == 1)
             {
-                m_type = new PrimitiveTypeCode(KIND_BOOLEAN);
+                m_type = new PrimitiveTypeCode(Kind.KIND_BOOLEAN);
             }
             else if (size <= 8)
             {
-                m_type = new PrimitiveTypeCode(KIND_CHAR);
+                m_type = new PrimitiveTypeCode(Kind.KIND_CHAR);
             }
             else if (size <= 16)
             {
-                m_type = new PrimitiveTypeCode(KIND_USHORT);
+                m_type = new PrimitiveTypeCode(Kind.KIND_USHORT);
             }
             else if (size <= 32)
             {
-                m_type = new PrimitiveTypeCode(KIND_ULONG);
+                m_type = new PrimitiveTypeCode(Kind.KIND_ULONG);
             }
             else if (size <= 64)
             {
-                m_type = new PrimitiveTypeCode(KIND_ULONGLONG);
+                m_type = new PrimitiveTypeCode(Kind.KIND_ULONGLONG);
             }
         }
         else
@@ -124,6 +121,8 @@ public class BitfieldTypeCode extends TypeCode
     {
         return m_type.getInitialValue();
     }
+
+    private int m_kind = Kind.KIND_NULL;
 
     private TypeCode m_type = null;
 

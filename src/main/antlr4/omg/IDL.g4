@@ -1147,7 +1147,7 @@ bitfield [BitsetTypeCode owner]
        )+
     ;
 
-bitfield_spec returns [BitfieldTypeCode bitfieldType = null]
+bitfield_spec returns [BitfieldSpec bitfieldType = null]
 @init {
     TypeCode type = null;
     String bitsize = null;
@@ -1155,12 +1155,12 @@ bitfield_spec returns [BitfieldTypeCode bitfieldType = null]
     : KW_BITFIELD
         LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
         {
-            $bitfieldType = ctx.createBitfieldTypeCode(bitsize, null);
+            $bitfieldType = ctx.createBitfieldSpec(bitsize, null);
         }
     | KW_BITFIELD
         LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } COMA bitfield_type_spec { type=$bitfield_type_spec.typecode; } RIGHT_ANG_BRACKET
         {
-            $bitfieldType = ctx.createBitfieldTypeCode(bitsize, type);
+            $bitfieldType = ctx.createBitfieldSpec(bitsize, type);
         }
     ;
 

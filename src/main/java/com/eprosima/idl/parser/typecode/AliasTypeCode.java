@@ -24,7 +24,7 @@ public class AliasTypeCode extends ContainerTypeCode
 {
     public AliasTypeCode(String scope, String name)
     {
-        super(TypeCode.KIND_ALIAS);
+        super(TypeCode.Kind.KIND_ALIAS);
         m_scope = scope;
         m_name = name;
     }
@@ -84,7 +84,7 @@ public class AliasTypeCode extends ContainerTypeCode
         st.setAttribute("name", getScopedname());
         return st.toString();
     }
-    
+
     @Override
     public String getCTypename()
     {
@@ -123,7 +123,7 @@ public class AliasTypeCode extends ContainerTypeCode
 
     @Override
     public String getInitialValue()
-    {   
+    {
         return super.getContentTypeCode().getInitialValue();
     }
 

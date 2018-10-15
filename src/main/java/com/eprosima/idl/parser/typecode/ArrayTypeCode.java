@@ -25,7 +25,7 @@ public class ArrayTypeCode extends ContainerTypeCode
 {
     public ArrayTypeCode()
     {
-        super(TypeCode.KIND_ARRAY);
+        super(TypeCode.Kind.KIND_ARRAY);
         m_dimensions = new ArrayList<String>();
     }
 
@@ -52,8 +52,8 @@ public class ArrayTypeCode extends ContainerTypeCode
 
         for(int count = 0; count < m_dimensions.size(); ++count)
         {
-            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_first");
-            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_second");
+            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.Kind.KIND_ARRAY) + "_first");
+            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
             if(prevf != null)
@@ -85,8 +85,8 @@ public class ArrayTypeCode extends ContainerTypeCode
 
         for(int count = 0; count < m_dimensions.size(); ++count)
         {
-            first = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_first");
-            second = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_second");
+            first = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.Kind.KIND_ARRAY) + "_first");
+            second = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
             if(prevf != null)
@@ -129,8 +129,8 @@ public class ArrayTypeCode extends ContainerTypeCode
 
         for(int count = 0; count < m_dimensions.size(); ++count)
         {
-            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_first");
-            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_second");
+            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.Kind.KIND_ARRAY) + "_first");
+            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
             if(prevf != null)

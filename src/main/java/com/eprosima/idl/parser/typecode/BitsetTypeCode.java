@@ -26,7 +26,7 @@ public class BitsetTypeCode extends MemberedTypeCode
 {
     public BitsetTypeCode(String scope, String name)
     {
-        super(TypeCode.KIND_BITSET, scope, name);
+        super(TypeCode.Kind.KIND_BITSET, scope, name);
         m_bitfields = new LinkedHashMap<String, Bitfield>();
     }
 
@@ -73,7 +73,7 @@ public class BitsetTypeCode extends MemberedTypeCode
         {
             m_bitfields.put(bitfield.getName(), bitfield);
             bitfield.setBasePosition(m_current_base);
-            m_current_base += ((BitfieldTypeCode)bitfield.getTypecode()).getBitSize();
+            m_current_base += ((BitfieldSpec)bitfield.getTypecode()).getBitSize();
             return true;
         }
         return false;
@@ -94,7 +94,7 @@ public class BitsetTypeCode extends MemberedTypeCode
         int size = 0;
         for (Bitfield bf : m_bitfields.values())
         {
-            size += ((BitfieldTypeCode)bf.getTypecode()).getBitSize();
+            size += ((BitfieldSpec)bf.getTypecode()).getBitSize();
         }
         return size;
     }
