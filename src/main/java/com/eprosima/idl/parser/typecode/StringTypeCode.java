@@ -44,7 +44,7 @@ public class StringTypeCode extends TypeCode
     }
 
     @Override
-    public boolean isVariableSizeType() { return true; }
+    public boolean isPlainType() { return true; }
 
     @Override
     public boolean isIsStringType() { return getKind() == Kind.KIND_STRING; }

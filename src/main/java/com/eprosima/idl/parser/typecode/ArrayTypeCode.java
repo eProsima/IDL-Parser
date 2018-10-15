@@ -38,7 +38,7 @@ public class ArrayTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isVariableSizeType() { return true; }
+    public boolean isPlainType() { return true; }
 
     @Override
     public boolean isIsArrayType() { return true; }

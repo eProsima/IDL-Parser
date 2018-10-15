@@ -152,7 +152,7 @@ public abstract class TypeCode
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getTypeIdentifier() { return "TK_None"; }
     public boolean isPrimitiveType() { return false; }
-    public boolean isVariableSizeType() { return false; }
+    public boolean isPlainType() { return false; }
     public boolean isObjectType() { return false; }
 
     /*** End of functions to know the type in string templates ***/

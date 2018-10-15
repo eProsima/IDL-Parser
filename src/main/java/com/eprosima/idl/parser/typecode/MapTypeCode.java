@@ -35,7 +35,7 @@ public class MapTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isVariableSizeType() { return true; }
+    public boolean isPlainType() { return true; }
 
     @Override
     public boolean isIsMapType() { return true; }

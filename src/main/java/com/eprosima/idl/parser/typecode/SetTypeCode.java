@@ -35,7 +35,7 @@ public class SetTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isVariableSizeType() { return true; }
+    public boolean isPlainType() { return true; }
 
     @Override
     public boolean isIsSetType() { return true; }
