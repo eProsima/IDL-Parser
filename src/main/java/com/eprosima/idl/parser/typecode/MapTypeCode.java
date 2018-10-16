@@ -16,18 +16,29 @@ package com.eprosima.idl.parser.typecode;
 
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
 public class MapTypeCode extends ContainerTypeCode
 {
     public MapTypeCode(String maxsize)
     {
-        super(MapTypeCode.KIND_MAP);
+        super(Kind.KIND_MAP);
         m_maxsize = maxsize;
     }
 
     @Override
     public boolean isIsType_e(){return true;}
+
+    @Override
+    public String getTypeIdentifier()
+    {
+        return "TI_PLAIN_MAP_SMALL";
+    }
+
+    @Override
+    public boolean isPlainType() { return true; }
+
+    @Override
+    public boolean isIsMapType() { return true; }
 
     @Override
     public String getCppTypename()
@@ -38,7 +49,7 @@ public class MapTypeCode extends ContainerTypeCode
         st.setAttribute("maxsize", m_maxsize);
         return st.toString();
     }
-    
+
     @Override
     public String getCTypename()
     {
@@ -76,27 +87,27 @@ public class MapTypeCode extends ContainerTypeCode
 
         return m_maxsize;
     }
-	
+
     public TypeCode getKeyTypeCode()
     {
         return m_keyTypeCode;
     }
-    
+
     public void setKeyTypeCode(TypeCode keyTypeCode)
     {
         m_keyTypeCode = keyTypeCode;
     }
-	
+
 	public TypeCode getValueTypeCode()
     {
         return m_valueTypeCode;
     }
-    
+
     public void setValueTypeCode(TypeCode valueTypeCode)
     {
         m_valueTypeCode = valueTypeCode;
     }
-    
+
     private TypeCode m_keyTypeCode = null;
 	private TypeCode m_valueTypeCode = null;
     private String m_maxsize = null;

@@ -14,23 +14,34 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import java.util.List;
 import java.util.ArrayList;
-
+import java.util.List;
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
+
 
 public class ArrayTypeCode extends ContainerTypeCode
 {
     public ArrayTypeCode()
     {
-        super(TypeCode.KIND_ARRAY);
+        super(Kind.KIND_ARRAY);
         m_dimensions = new ArrayList<String>();
     }
 
     @Override
     public boolean isIsType_f(){return true;}
+
+    @Override
+    public String getTypeIdentifier()
+    {
+        return "TI_PLAIN_ARRAY_SMALL";
+    }
+
+    @Override
+    public boolean isPlainType() { return true; }
+
+    @Override
+    public boolean isIsArrayType() { return true; }
 
     @Override
     public String getCppTypename()
@@ -40,8 +51,8 @@ public class ArrayTypeCode extends ContainerTypeCode
 
         for(int count = 0; count < m_dimensions.size(); ++count)
         {
-            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_first");
-            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_second");
+            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
+            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
             if(prevf != null)
@@ -73,8 +84,8 @@ public class ArrayTypeCode extends ContainerTypeCode
 
         for(int count = 0; count < m_dimensions.size(); ++count)
         {
-            first = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_first");
-            second = ctypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_second");
+            first = ctypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
+            second = ctypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
             if(prevf != null)
@@ -117,8 +128,8 @@ public class ArrayTypeCode extends ContainerTypeCode
 
         for(int count = 0; count < m_dimensions.size(); ++count)
         {
-            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_first");
-            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(TypeCode.KIND_ARRAY) + "_second");
+            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
+            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
             if(prevf != null)
@@ -177,7 +188,7 @@ public class ArrayTypeCode extends ContainerTypeCode
         return ret;
     }
 
-    // TODO Used in stringtemplate for (previous c) types.
+    // TODO Used in stringtemplate for RTI DDS types.
     public String getArrayExtension()
     {
         String ret = "";

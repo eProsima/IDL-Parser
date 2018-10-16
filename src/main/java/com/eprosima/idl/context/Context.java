@@ -14,35 +14,34 @@
 
 package com.eprosima.idl.context;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Stack;
-import java.util.Scanner;
-import java.util.NoSuchElementException;
-import java.util.Collection;
-
-import com.eprosima.idl.util.Pair;
-import com.eprosima.idl.parser.tree.TreeNode;
-import com.eprosima.idl.parser.tree.Notebook;
+import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.tree.Definition;
-import com.eprosima.idl.parser.tree.Module;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
 import com.eprosima.idl.parser.tree.Param;
-import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
-import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.parser.typecode.BitfieldSpec;
+import com.eprosima.idl.parser.typecode.BitsetTypeCode;
 import com.eprosima.idl.parser.typecode.StructTypeCode;
-
+import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.util.Util;
-import com.eprosima.idl.parser.exception.ParseException;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.Stack;
 import org.antlr.v4.runtime.Token;
+
+
+
 
 public class Context
 {
@@ -365,6 +364,18 @@ public class Context
     {
         StructTypeCode structObject = new StructTypeCode(m_scope, name);
         return structObject;
+    }
+
+    public BitfieldSpec createBitfieldSpec(String size, TypeCode type)
+    {
+        BitfieldSpec object = new BitfieldSpec(m_scope, size, type);
+        return object;
+    }
+
+    public BitsetTypeCode createBitsetTypeCode(String name)
+    {
+        BitsetTypeCode object = new BitsetTypeCode(m_scope, name);
+        return object;
     }
 
     public Collection<TypeDeclaration> getTypes()
@@ -703,6 +714,7 @@ public class Context
     {
         return Character.toString(++m_loopVarName);
     }
+
     /*** End ***/
 
     // OS
