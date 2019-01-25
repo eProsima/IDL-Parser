@@ -13,6 +13,9 @@
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>4.2.2</version>
+				<configuration>
+					<sourceDirectory>src/main/antlr4/omg</sourceDirectory>
+				</configuration>
 				<executions>
 					<execution>
 						<id>antlr</id>
