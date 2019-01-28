@@ -38,6 +38,16 @@ public class MapTypeCode extends ContainerTypeCode
         st.setAttribute("maxsize", m_maxsize);
         return st.toString();
     }
+    
+    @Override
+    public String getCTypename()
+    {
+        StringTemplate st = getCTypenameFromStringTemplate();
+        st.setAttribute("key", getKeyTypeCode().getCTypename());
+        st.setAttribute("value", getValueTypeCode().getCTypename());
+        st.setAttribute("maxsize", m_maxsize);
+        return st.toString();
+    }
 
     @Override
     public String getJavaTypename()

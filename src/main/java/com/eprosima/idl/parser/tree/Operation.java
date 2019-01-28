@@ -119,7 +119,7 @@ public class Operation extends TreeNode implements Export
         return inoutput;
     }
     
-    // TODO Eliminar cuando añadamos los cambios de estandard.
+    // TODO Delete when standard change.
     public void setRettype(TypeCode rettype)
     {
         if(rettype != null)

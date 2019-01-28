@@ -39,6 +39,15 @@ public class SetTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getCTypename()
+    {
+        StringTemplate st = getCTypenameFromStringTemplate();
+        st.setAttribute("type", getContentTypeCode().getCTypename());
+        st.setAttribute("maxsize", m_maxsize);
+        return st.toString();
+    }
+    
+    @Override
     public String getJavaTypename()
     {
         StringTemplate st = getJavaTypenameFromStringTemplate();

@@ -52,8 +52,9 @@ public abstract class TypeCode
     public static final int KIND_SET = 0x00000018;
     public static final int KIND_MAP = 0x00000019;
     
-    public static StringTemplateGroup idltypesgr = null;
-    public static StringTemplateGroup cpptypesgr = null;
+    public static StringTemplateGroup idltypesgr  = null;
+    public static StringTemplateGroup cpptypesgr  = null;
+    public static StringTemplateGroup ctypesgr    = null;
     public static StringTemplateGroup javatypesgr = null;
     //TODO Revisar si es el mejor sitio.
     public static String javapackage = "";
@@ -74,9 +75,16 @@ public abstract class TypeCode
      */
     public abstract String getCppTypename();
     
+    public abstract String getCTypename();
+    
     protected StringTemplate getCppTypenameFromStringTemplate()
     {
         return cpptypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
+    }
+    
+    protected StringTemplate getCTypenameFromStringTemplate()
+    {
+        return ctypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
 
     public abstract String getJavaTypename();

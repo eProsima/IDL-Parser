@@ -60,8 +60,8 @@ public class Context
         if(startsWith(m_file, m_userdir))
         {
         	m_file = m_file.substring(m_userdir.length());
-        	
-        	// Remove possible separator    
+
+        	// Remove possible separator
             if(startsWith(m_file, java.io.File.separator))
                 m_file = m_file.substring(1);
         }
@@ -72,13 +72,13 @@ public class Context
         */
 
         m_definitions = new ArrayList<Definition>();
-        m_modules = new HashMap<String, Module>();
+        m_modules = new HashMap<String, com.eprosima.idl.parser.tree.Module>();
         m_interfaces = new HashMap<String, Interface>();
         m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
         m_types = new HashMap<String, TypeDeclaration>();
         m_annotations = new HashMap<String, AnnotationDeclaration>();
 
-        // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
+        // TODO Quitar porque solo es para tipos (previous c) (usado para las excepciones). Mirar alternativa.
         m_includedependency = new HashSet<String>();
 
         // The scope file has to be initialized because could occur the preprocessor
@@ -98,8 +98,8 @@ public class Context
             if(startsWith(include, m_userdir))
             {
             	include = include.substring(m_userdir.length());
-            	
-            	// Remove possible separator    
+
+            	// Remove possible separator
                 if(startsWith(include, java.io.File.separator))
                     include = include.substring(1);
             }
@@ -110,13 +110,13 @@ public class Context
                 include += java.io.File.separator;
             m_includePaths.add(include);
         }
-        
+
         // Reorder include paths;
         int pointer = 0;
         while(pointer < m_includePaths.size())
         {
             int count = pointer + 1;
-            
+
             while(count < m_includePaths.size())
             {
                 if(startsWith(m_includePaths.get(count), m_includePaths.get(pointer)))
@@ -129,7 +129,7 @@ public class Context
                 }
                 ++count;
             }
-            
+
             if(count == m_includePaths.size())
                 ++pointer;
         }
@@ -159,7 +159,7 @@ public class Context
     {
         m_scope = scope;
     }
-    
+
     /*!
      * @return True if current call is in scoped file.
      */
@@ -192,7 +192,7 @@ public class Context
     {
         return m_scopeFilesStack;
     }
-    
+
     /*!
      * @brief This function stores a global definition of the IDL file.
      */
@@ -210,15 +210,15 @@ public class Context
      * @brief This function adds a module to the context.
      * This function is used in the parser.
      */
-    public void addModule(Module module)
-    { 
+    public void addModule(com.eprosima.idl.parser.tree.Module module)
+    {
         if(!m_modules.containsKey(module.getScopedname()))
         {
             m_modules.put(module.getScopedname(), module);
         }
     }
 
-    public Module existsModule(String scopedName)
+    public com.eprosima.idl.parser.tree.Module existsModule(String scopedName)
     {
         if(m_modules.containsKey(scopedName))
         {
@@ -240,9 +240,9 @@ public class Context
      * This function is used in the parser.
      */
     protected void addInterface(Interface interf)
-    { 
+    {
         Interface prev = m_interfaces.put(interf.getScopedname(), interf);
-        
+
         // TODO: Excepcion
         if(prev != null)
             System.out.println("Warning: Redefined interface " + prev.getScopedname());
@@ -304,14 +304,14 @@ public class Context
         addException(exceptionObject);
         return exceptionObject;
     }
-    
+
     /*!
      * @brief This function adds a global exception to the context.
      */
     protected void addException(com.eprosima.idl.parser.tree.Exception exception)
     {
     	com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(exception.getScopedname(), exception);
-        
+
         // TODO: Exception.
         if(prev != null)
         	System.out.println("Warning: Redefined exception " + prev.getScopedname());
@@ -378,7 +378,7 @@ public class Context
     public void addTypeDeclaration(TypeDeclaration typedecl)
     {
         TypeDeclaration prev = m_types.put(typedecl.getScopedname(), typedecl);
-        
+
         if(prev != null)
             throw new ParseException(typedecl.getToken(), "was redefined");
     }
@@ -434,7 +434,7 @@ public class Context
     protected void addAnnotationDeclaration(AnnotationDeclaration annotation)
     {
         AnnotationDeclaration prev = m_annotations.put(annotation.getScopedname(), annotation);
-        
+
         // TODO: Exception.
         if(prev != null)
             System.out.println("Warning: Redefined annotation " + prev.getScopedname());
@@ -468,7 +468,7 @@ public class Context
 
         return returnedValue;
     }
-    
+
     /*!
      * @brief This function add a new library dependency to the project.
      */
@@ -517,11 +517,11 @@ public class Context
         return new ArrayList<String>(m_directIncludeDependencies);
     }
 
-    // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
+    // TODO Quitar porque solo es para tipos (previous c) (usado para las excepciones). Mirar alternativa.
     /*!
      * @brief This function add a new include dependency to the project.
      * This dependency will be needed to include our generated file with the types that
-     * the RTI DDS middleware doesn't generate (right now only exceptions).
+     * the (previous c) DDS middleware doesn't generate (right now only exceptions).
      * The include dependencies are added without the .idl extension.
      */
     public void addIncludeDependency(String dependency)
@@ -533,8 +533,8 @@ public class Context
         	dep = dep.substring(m_directoryFile.length());
     	m_includedependency.add(dep);
     }
-    
-    // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
+
+    // TODO Quitar porque solo es para tipos (previous c) (usado para las excepciones). Mirar alternativa.
     /*!
      * @brief This function is used in the stringtemplates. For these reason this function
      * returns an ArrayList
@@ -543,7 +543,7 @@ public class Context
     {
     	return new ArrayList<String>(m_includedependency);
     }
-    
+
     /*!
      * @brief This function is call when a preprocessor line was found by the lexer.
      * In case the line referring to the content included file, this function sets this file as current scope file.
@@ -551,7 +551,7 @@ public class Context
      * In case it is a #include directive, this is saved as direct include dependency.
      */
     public void processPreprocessorLine(String line, int nline)
-    { 	
+    {
         // If there is a line referring to the content of an included file.
         if(line.startsWith("# "))
         {
@@ -615,15 +615,15 @@ public class Context
                     {
                         file = file.substring(m_userdir.length());
 
-                        // Remove possible separator    
+                        // Remove possible separator
                         if(startsWith(file, java.io.File.separator))
                             file = file.substring(1);
                     }
                     // Remove relative ./ directory.
                     if(startsWith(file, currentDirS))
-                    {    
+                    {
                         file = file.substring(currentDirS.length());
-                        // Remove possible separator    
+                        // Remove possible separator
                         if(startsWith(file, java.io.File.separator))
                             file = file.substring(1);
                     }
@@ -650,7 +650,7 @@ public class Context
                                         includeFile = includeFile.substring(m_directoryFile.length());
                                     // Remove relative directory if is equal to a include path.
                                     for(int i = 0; i < m_includePaths.size(); ++i)
-                                    {   
+                                    {
                                         if(startsWith(includeFile, m_includePaths.get(i)))
                                         {
                                             includeFile = includeFile.substring(m_includePaths.get(i).length());
@@ -681,14 +681,14 @@ public class Context
     {
         return m_os;
     }
-    
+
     protected boolean startsWith(String st, String prefix)
     {
     	if(m_os.contains("Windows"))
     	{
     		return st.toLowerCase().startsWith(prefix.toLowerCase());
     	}
-    	
+
     	return st.startsWith(prefix);
     }
 
@@ -725,7 +725,7 @@ public class Context
     //! Store all global definitions.
     private ArrayList<Definition> m_definitions;
     //! Map that contains all modules that were found processing the IDL file (after preprocessing):
-    private HashMap<String, Module> m_modules = null;
+    private HashMap<String, com.eprosima.idl.parser.tree.Module> m_modules = null;
     //! Map that contains all interfaces that were found processing the IDL file (after preprocessing):
     private HashMap<String, Interface> m_interfaces = null;
     //! Map that contains all global exceptions that were found processing the IDL file (after preprocessing).
@@ -742,8 +742,8 @@ public class Context
     //! Set that contains the direct include dependencies in the IDL file. Used to regenerate the IDL in a supported form.
     private HashSet<String> m_directIncludeDependencies = null;
 
-    // TODO Quitar porque solo es para tipos RTI (usado para las excepciones). Mirar alternativa.
-    //! Set that contains the include dependencies that force to include our type generated file (right now only with exceptions in RTI DDS types).
+    // TODO Quitar porque solo es para tipos (previous c) (usado para las excepciones). Mirar alternativa.
+    //! Set that contains the include dependencies that force to include our type generated file (right now only with exceptions in (previous c) DDS types).
     private HashSet<String> m_includedependency = null;
 
     // TODO Lleva la cuenta del nombre de variables para bucles anidados.
