@@ -25,6 +25,12 @@ apply plugin: 'eclipse' // Eclipse integration
 
 description = """"""
 
+ext {
+    publishURL = project.hasProperty('publishURL') ? project.publishURL.toString() : ''
+    publishUsername = project.hasProperty('publishUsername') ? project.publishUsername.toString() : ''
+    publishPassword = project.hasProperty('publishPassword') ? project.publishPassword.toString() : ''
+}
+
 repositories {
     mavenCentral()
 }
