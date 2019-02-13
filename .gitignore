@@ -35,6 +35,10 @@ src/com/eprosima/idl/parser/grammar/IDLTokenTypes.txt
 /build
 /.gradle
 
+# IntelliJ files
+.idea
+*.iml
+
 # Eclipse files
 .project
 .classpath

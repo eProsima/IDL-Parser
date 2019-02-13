@@ -20,9 +20,16 @@ plugins {
 
 // internal plugins
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 apply plugin: 'eclipse' // Eclipse integration
 
 description = """"""
+
+ext {
+    publishURL = project.hasProperty('publishURL') ? project.publishURL.toString() : ''
+    publishUsername = project.hasProperty('publishUsername') ? project.publishUsername.toString() : ''
+    publishPassword = project.hasProperty('publishPassword') ? project.publishPassword.toString() : ''
+}
 
 repositories {
     mavenCentral()
@@ -35,6 +42,7 @@ dependencies {
 }
 
 antlr4.source = project.file("src/main/antlr4/omg")
+antlr4.output = project.file("src/main/generated-java")
 antlr4.listener = false
 antlr4.visitor = false
 antlr4.extraArgs=['-package', 'com.eprosima.idl.parser.grammar']
@@ -71,10 +79,46 @@ configurations {
    compile.extendsFrom antlr4
 }
 
+group = "com.eprosima"
+version = "1.0.0"
+
 //general properties
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	baseName = 'idlparser'
-    version =  '1.0.0'
+	 baseName = 'idlparser'
+}
+
+task sourceJar(type: Jar, dependsOn: classes) {
+   classifier = 'sources'
+   from sourceSets.main.allJava
+}
+
+/**
+ * Set up publishing. User must set the following properties
+ * in ~/.gradle/gradle.properties or pass via -Pproperty=value
+ * on command line.
+ *
+ * publishUsername=yourusername
+ * publishPassword=yourpassword
+ * publishUrl=https://some.url/maven/orgname/reponame/projectname
+ */
+publishing {
+   publications {
+      mavenJava(MavenPublication) {
+         artifactId = "idl-parser"
+         from components.java
+
+         artifact sourceJar {
+            classifier 'sources'
+         }
+      }
+   }
+   repositories {
+      maven {
+         url publishURL
+         credentials.username = publishUsername
+         credentials.password = publishPassword
+      }
+   }
 }
 
