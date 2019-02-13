@@ -14,19 +14,25 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.util.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.antlr.stringtemplate.StringTemplate;
+
+
 
 public class StructTypeCode extends MemberedTypeCode
 {
     public StructTypeCode(String scope, String name)
     {
-        super(TypeCode.KIND_STRUCT, scope, name);
+        super(Kind.KIND_STRUCT, scope, name);
     }
+
+    @Override
+    public String getTypeIdentifier()
+    {
+        return "EK_MINIMAL";
+    }
+
+    @Override
+    public boolean isObjectType() { return true; }
 
     @Override
     public String getCppTypename()

@@ -14,9 +14,9 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.util.Pair;
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
 public class StringTypeCode extends TypeCode
 {
@@ -28,6 +28,29 @@ public class StringTypeCode extends TypeCode
 
     @Override
     public boolean isIsType_d(){return true;}
+
+    @Override
+    public String getTypeIdentifier()
+    {
+        switch(getKind())
+        {
+            case Kind.KIND_STRING:
+                return "TI_STRING8_SMALL";
+            case Kind.KIND_WSTRING:
+                return "TI_STRING16_SMALL";
+            default:
+                return "TK_None";
+        }
+    }
+
+    @Override
+    public boolean isPlainType() { return true; }
+
+    @Override
+    public boolean isIsStringType() { return getKind() == Kind.KIND_STRING; }
+
+    @Override
+    public boolean isIsWStringType() { return getKind() == Kind.KIND_WSTRING; }
 
     @Override
     public String getCppTypename()

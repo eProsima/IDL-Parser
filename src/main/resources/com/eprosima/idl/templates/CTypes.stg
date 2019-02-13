@@ -57,7 +57,10 @@ type_c(name) ::= <<$name$>>
 
 type_10(name) ::= <<$name$>>
 
-type_e(type, maxsize) ::= <<$type$>>
+type_19() ::= <<std::map>>
+
+// TODO Para que sirve empty en FastBuffers?
+type_e(type, maxsize, empty) ::= <<$type$$empty$>>
 
 initialValues ::= [
         default: // not basic type.

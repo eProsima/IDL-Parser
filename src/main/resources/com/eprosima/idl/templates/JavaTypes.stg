@@ -44,6 +44,8 @@ type_d(package) ::= <<String>>
 
 type_15(package) ::= <<std::wstring>>
 
+type_19(package) ::= <<std::map>>
+
 type_f_first(prev) ::= <<std::array<$prev$>>
 type_f_second(prev, size) ::= <<, $size$>$prev$>>
 type_f(package, firs, secon, type) ::= <<$firs$$type$$secon$>>

@@ -14,21 +14,29 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.antlr.stringtemplate.StringTemplate;
 
-import com.eprosima.idl.util.Pair;
 
-import java.util.List;
-import java.util.ArrayList;
 
 public class UnionTypeCode extends MemberedTypeCode
 {
     public UnionTypeCode(String scope, String name, TypeCode discriminatorTypeCode)
     {
-        super(TypeCode.KIND_UNION, scope, name);
+        super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
-    
+
+    @Override
+    public String getTypeIdentifier()
+    {
+        return "EK_MINIMAL";
+    }
+
+    @Override
+    public boolean isObjectType() { return true; }
+
     /*!
      * @return 0 is ok, -1 the member is repeated, -2 is another default member.
      */
@@ -47,7 +55,7 @@ public class UnionTypeCode extends MemberedTypeCode
         List<String> labels = null;
         List<String> javalabels = null;
 
-        if(m_discriminatorTypeCode.getKind() == TypeCode.KIND_ENUM)
+        if(m_discriminatorTypeCode.getKind() == Kind.KIND_ENUM)
         {
             EnumTypeCode enum_type = (EnumTypeCode)m_discriminatorTypeCode;
             labels = new ArrayList<String>();
@@ -81,7 +89,7 @@ public class UnionTypeCode extends MemberedTypeCode
 
         return null;
     }
-    
+
     @Override
     public String getCppTypename()
     {
@@ -96,8 +104,8 @@ public class UnionTypeCode extends MemberedTypeCode
         StringTemplate st = getCTypenameFromStringTemplate();
         st.setAttribute("name", getScopedname());
         return st.toString();
-    }    
-    
+    }
+
     @Override
     public String getJavaTypename()
     {
@@ -105,7 +113,7 @@ public class UnionTypeCode extends MemberedTypeCode
         st.setAttribute("name", getJavaScopedname());
         return st.toString();
     }
-    
+
     @Override
     public String getIdlTypename()
     {
@@ -113,7 +121,7 @@ public class UnionTypeCode extends MemberedTypeCode
         st.setAttribute("name", getScopedname());
         return st.toString();
     }
-    
+
     public void setDefaultvalue(String value)
     {
         m_defaultValue = value;
@@ -123,7 +131,7 @@ public class UnionTypeCode extends MemberedTypeCode
     {
         m_javaDefaultValue = value;
     }
-    
+
     // Used in stringtemplates
     public String getDefaultvalue()
     {
@@ -135,20 +143,20 @@ public class UnionTypeCode extends MemberedTypeCode
     {
         return m_javaDefaultValue;
     }
-    
+
     // Used in stringtemplates
     public TypeCode getDiscriminator()
     {
         return m_discriminatorTypeCode;
     }
-    
+
     // Used in stringtemplates
     public List<String> getTotallabels()
     {
         List<String> returnList = new ArrayList<String>();
         List<Member> mlist = getMembers();
         List<String> labels = null;
-        
+
         for(int count = 0; count < mlist.size(); ++count)
         {
             if(count != m_defaultindex)
@@ -158,19 +166,19 @@ public class UnionTypeCode extends MemberedTypeCode
                     returnList.add(labels.get(i));
             }
         }
-        
+
         return returnList;
     }
-    
+
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
     {
         List<Member> members = getMembers();
         int lcurrentSize = currentSize, lmaxSize = 0;
         int llastDataAligned = 0;
-        
+
         Pair<Integer, Integer> dpair = m_discriminatorTypeCode.getMaxSerializedSize(lcurrentSize, lastDataAligned);
         lcurrentSize = dpair.first();
-        
+
         for(int count = 0; count < members.size(); ++count)
         {
             Pair<Integer, Integer> pair = members.get(count).getTypecode().getMaxSerializedSize(lcurrentSize, dpair.second());
@@ -181,45 +189,45 @@ public class UnionTypeCode extends MemberedTypeCode
                 llastDataAligned = pair.second();
             }
         }
-        
+
         return new Pair<Integer, Integer>(lmaxSize, llastDataAligned);
     }
-    
+
     public int getMaxSerializedSizeWithoutAlignment(int currentSize)
     {
         List<Member> members = getMembers();
         int lcurrentSize = currentSize, lmaxSize = 0;
-        
+
         lcurrentSize = m_discriminatorTypeCode.getMaxSerializedSizeWithoutAlignment(lcurrentSize);
-        
+
         for(int count = 0; count < members.size(); ++count)
         {
             int aux = members.get(count).getTypecode().getMaxSerializedSizeWithoutAlignment(lcurrentSize);
-            
+
             if(aux > lmaxSize)
             {
                 lmaxSize = aux;
             }
         }
-        
+
         return lmaxSize;
     }
-    
+
     public String getMaxSerializedSize()
     {
         Pair<Integer, Integer> pair = getMaxSerializedSize(0, 0);
         return pair.first().toString();
     }
-    
+
     public String getMaxSerializedSizeWithoutAlignment()
     {
         return Integer.toString(getMaxSerializedSizeWithoutAlignment(0));
     }*/
-    
+
     private TypeCode m_discriminatorTypeCode = null;
-    
+
     private int m_defaultindex = -1;
-    
+
     private String m_defaultValue = null;
 
     private String m_javaDefaultValue = null;

@@ -684,6 +684,7 @@ type_decl [Vector<Annotation> annotations] returns [Pair<Vector<TypeDeclaration>
     |   struct_type { ttg=$struct_type.returnPair; }
     |   union_type { ttg=$union_type.returnPair; }
     |   enum_type { ttg=$enum_type.returnPair; }
+    |   bitset_type { ttg=$bitset_type.returnPair; }
     |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
     |   constr_forward_decl )
     {
@@ -786,6 +787,12 @@ simple_type_spec returns [TypeCode typecode = null]
         }
     ;
 
+bitfield_type_spec returns [TypeCode typecode = null]
+    :   integer_type { $typecode=$integer_type.typecode; }
+    |   boolean_type { $typecode=$boolean_type.typecode; }
+    |   octet_type { $typecode=$octet_type.typecode; }
+    ;
+
 base_type_spec returns [TypeCode typecode = null]
     :   floating_pt_type { $typecode=$floating_pt_type.typecode; }
     |   integer_type { $typecode=$integer_type.typecode; }
@@ -800,6 +807,8 @@ base_type_spec returns [TypeCode typecode = null]
 
 template_type_spec returns [TypeCode typecode = null]
     :   sequence_type { $typecode=$sequence_type.typecode; }
+	|   set_type { $typecode=$set_type.typecode; }
+	|   map_type { $typecode=$map_type.typecode; }
     |   string_type { $typecode=$string_type.typecode; }
     |   wide_string_type { $typecode=$wide_string_type.typecode; }
     |   fixed_pt_type
@@ -809,6 +818,8 @@ constr_type_spec
     :   struct_type
     |   union_type
     |   enum_type
+    |   bitset_type
+    //|   bitmask_dcl
     ;
 
 declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
@@ -823,6 +834,24 @@ declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = 
         {
             if($declarator.ret != null)
                 $ret.add($declarator.ret);
+            else
+                throw new ParseException(null, "Cannot parse type declarator");
+        }
+        )*
+    ;
+
+simple_declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
+    :   simple_declarator
+        {
+            if($simple_declarator.ret != null)
+                $ret.add($simple_declarator.ret);
+            else
+                throw new ParseException(null, "Cannot parse type declarator");
+        }
+        ( COMA simple_declarator
+        {
+            if($simple_declarator.ret != null)
+                $ret.add($simple_declarator.ret);
             else
                 throw new ParseException(null, "Cannot parse type declarator");
         }
@@ -851,9 +880,9 @@ complex_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = n
     ;
 
 floating_pt_type returns [TypeCode typecode = null]
-    :   ( KW_FLOAT { $typecode = new PrimitiveTypeCode(TypeCode.KIND_FLOAT);}
-    | KW_DOUBLE { $typecode = new PrimitiveTypeCode(TypeCode.KIND_DOUBLE);}
-    | KW_LONG KW_DOUBLE { $typecode = new PrimitiveTypeCode(TypeCode.KIND_LONGDOUBLE);}
+    :   ( KW_FLOAT { $typecode = new PrimitiveTypeCode(Kind.KIND_FLOAT);}
+    | KW_DOUBLE { $typecode = new PrimitiveTypeCode(Kind.KIND_DOUBLE);}
+    | KW_LONG KW_DOUBLE { $typecode = new PrimitiveTypeCode(Kind.KIND_LONGDOUBLE);}
     )
     ;
 
@@ -870,21 +899,21 @@ signed_int returns [TypeCode typecode = null]
 
 signed_short_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_SHORT);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_SHORT);
 }
     :   KW_SHORT
     ;
 
 signed_long_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_LONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_LONG);
 }
     :   KW_LONG
     ;
 
 signed_longlong_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_LONGLONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_LONGLONG);
 }
     :   KW_LONG KW_LONG
     ;
@@ -897,49 +926,49 @@ unsigned_int returns [TypeCode typecode = null]
 
 unsigned_short_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_USHORT);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_USHORT);
 }
     :   KW_UNSIGNED KW_SHORT
     ;
 
 unsigned_long_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_ULONG);
 }
     :   KW_UNSIGNED KW_LONG
     ;
 
 unsigned_longlong_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_ULONGLONG);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_ULONGLONG);
 }
     :   KW_UNSIGNED KW_LONG KW_LONG
     ;
 
 char_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_CHAR);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_CHAR);
 }
     :   KW_CHAR
     ;
 
 wide_char_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_WCHAR);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_WCHAR);
 }
     :   KW_WCHAR
     ;
 
 boolean_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_BOOLEAN);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_BOOLEAN);
 }
     :   KW_BOOLEAN
     ;
 
 octet_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(TypeCode.KIND_OCTET);
+    $typecode = new PrimitiveTypeCode(Kind.KIND_OCTET);
 }
     :   KW_OCTET
     ;
@@ -1052,6 +1081,87 @@ annotation_member [AnnotationDeclaration annotation]
 annotation_forward_dcl
 :
     KW_AT_ANNOTATION scoped_name
+    ;
+
+bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+@init {
+    String name = null;
+    Vector<TypeCode> vector = null;
+    BitsetTypeCode typecode = null;
+    BitsetTypeCode superType = null;
+    TemplateGroup bitsetTemplates = null;
+} :     KW_BITSET
+        identifier
+        {
+           name=$identifier.id;
+           typecode = ctx.createBitsetTypeCode(name);
+        }
+        LEFT_BRACE bitfield[typecode] RIGHT_BRACE
+    /*|   KW_BITSET
+        identifier
+        {
+           name=$identifier.id;
+           typecode = ctx.createBitsetTypeCode(name);
+        }
+        COLON bitset_type { superType=$bitset_type.typecode; }
+        LEFT_BRACE bitfield[typecode] RIGHT_BRACE */
+        {
+            // typecode.addParent(superType);
+
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    bitsetTemplates = tmanager.createTemplateGroup("bitset_type");
+                    bitsetTemplates.setAttribute("ctx", ctx);
+                    bitsetTemplates.setAttribute("bitset", typecode);
+                }
+            }
+
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            vector.add(typecode);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, bitsetTemplates);
+        }
+    ;
+
+bitfield [BitsetTypeCode owner]
+    :   (
+            bitfield_spec simple_declarators SEMICOLON
+            {
+                if($bitfield_spec.bitfieldType != null)
+                {
+                    for(int count = 0; count < $simple_declarators.ret.size(); ++count)
+                    {
+                        Bitfield bitfield = null;
+
+                        // Only simple declaration
+                        bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
+
+                        $owner.addBitfield(bitfield);
+
+                        if(!$owner.addMember(bitfield))
+                            throw new ParseException($simple_declarators.ret.get(count).first().second(), "was defined previously");
+                    }
+                }
+            }
+       )+
+    ;
+
+bitfield_spec returns [BitfieldSpec bitfieldType = null]
+@init {
+    TypeCode type = null;
+    String bitsize = null;
+}
+    : KW_BITFIELD
+        LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+        {
+            $bitfieldType = ctx.createBitfieldSpec(bitsize, null);
+        }
+    | KW_BITFIELD
+        LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } COMA bitfield_type_spec { type=$bitfield_type_spec.typecode; } RIGHT_ANG_BRACKET
+        {
+            $bitfieldType = ctx.createBitfieldSpec(bitsize, type);
+        }
     ;
 
 struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
@@ -1189,6 +1299,7 @@ switch_type_spec returns [TypeCode typecode = null]
 }
     :   integer_type { $typecode=$integer_type.typecode; }
     |   char_type { $typecode=$char_type.typecode; }
+    |   wide_char_type { $typecode = $wide_char_type.typecode; }
     |   octet_type { $typecode=$octet_type.typecode; }
     |   boolean_type { $typecode=$boolean_type.typecode; }
     |   enum_type
@@ -1323,13 +1434,43 @@ sequence_type returns [SequenceTypeCode typecode = null]
         }
     ;
 
+set_type returns [SetTypeCode typecode = null]
+@init {
+    TypeCode type = null;
+    String maxsize = null;
+} : ( KW_SET
+		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+    |   KW_SET
+		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
+		{
+	       $typecode = new SetTypeCode(maxsize);
+	       $typecode.setContentTypeCode(type);
+	    }
+    ;
+
+map_type returns [MapTypeCode typecode = null]
+@init {
+    TypeCode keyType = null;
+    TypeCode valueType = null;
+    String maxsize = null;
+} : ( KW_MAP
+		LEFT_ANG_BRACKET simple_type_spec { keyType=$simple_type_spec.typecode; } COMA simple_type_spec { valueType=$simple_type_spec.typecode; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+    |   KW_MAP
+		LEFT_ANG_BRACKET simple_type_spec { keyType=$simple_type_spec.typecode; } COMA simple_type_spec { valueType=$simple_type_spec.typecode; } RIGHT_ANG_BRACKET )
+		{
+	       $typecode = new MapTypeCode(maxsize);
+	       $typecode.setKeyTypeCode(keyType);
+	       $typecode.setValueTypeCode(valueType);
+	    }
+    ;
+
 string_type returns [TypeCode typecode = null]
 @init{
     String maxsize = null;
 }
     :   ( KW_STRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_STRING )
-       {$typecode = new StringTypeCode(TypeCode.KIND_STRING, maxsize);}
+       {$typecode = new StringTypeCode(Kind.KIND_STRING, maxsize);}
     ;
 
 wide_string_type returns [TypeCode typecode = null]
@@ -1339,7 +1480,7 @@ wide_string_type returns [TypeCode typecode = null]
 }
     :   ( KW_WSTRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_WSTRING )
-       {$typecode = new StringTypeCode(TypeCode.KIND_WSTRING, maxsize);}
+       {$typecode = new StringTypeCode(Kind.KIND_WSTRING, maxsize);}
     ;
 
 array_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> pair = null]
@@ -2100,6 +2241,11 @@ KW_LOCAL:               'local';
 KW_MANAGES:             'manages';
 KW_INTERFACE:           'interface';
 KW_COMPONENT:           'component';
+KW_SET:                 'set';
+KW_MAP:                 'map';
+KW_BITFIELD:            'bitfield';
+KW_BITSET:              'bitset';
+KW_BITMASK:             'bitmask';
 KW_AT_ANNOTATION:        '@annotation';
 
 ID
