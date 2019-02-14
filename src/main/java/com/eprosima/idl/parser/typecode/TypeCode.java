@@ -14,13 +14,18 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Notebook;
+import com.eprosima.idl.context.Context;
+
 import java.util.Map;
+import java.util.HashMap;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 
 
-public abstract class TypeCode
+public abstract class TypeCode implements Notebook
 {
     public static StringTemplateGroup idltypesgr  = null;
     public static StringTemplateGroup cpptypesgr  = null;
@@ -32,6 +37,7 @@ public abstract class TypeCode
     public TypeCode(int kind)
     {
         m_kind = kind;
+        m_annotations = new HashMap<String, Annotation>();
     }
 
     public int getKind()
@@ -167,8 +173,23 @@ public abstract class TypeCode
         m_parent = parent;
     }
 
+    @Override
+    public void addAnnotation(Context ctx, Annotation annotation)
+    {
+        if(annotation != null)
+            m_annotations.put(annotation.getName(), annotation);
+    }
+
+    @Override
+    public Map<String, Annotation> getAnnotations()
+    {
+        return m_annotations;
+    }
+
     private int m_kind = Kind.KIND_NULL;
 
     // Added parent object to typecode because was needed in DDS with our types (TopicsPlugin_gettypecode)
     private Object m_parent = null;
+
+    private HashMap<String, Annotation> m_annotations = null;
 }

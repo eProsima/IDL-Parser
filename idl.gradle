@@ -88,6 +88,14 @@ jar {
 	 baseName = 'idlparser'
 }
 
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    baseName = 'TestIDLParser'
+    manifest {
+        attributes("Created-By": "eProsima", "Main-Class": "com.eprosima.idl.test.TestIDLParser")
+    }
+}
+
 task sourceJar(type: Jar, dependsOn: classes) {
    classifier = 'sources'
    from sourceSets.main.allJava
@@ -121,4 +129,3 @@ publishing {
       }
    }
 }
-

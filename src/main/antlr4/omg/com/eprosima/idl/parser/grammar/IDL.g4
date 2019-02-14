@@ -123,7 +123,7 @@ definition [Vector<Annotation> annotations] returns [Pair<Vector<Definition>, Te
     |   event SEMICOLON
     |   component SEMICOLON
     |   home_decl SEMICOLON
-    |    annotation_decl SEMICOLON { atg=$annotation_decl.returnPair; if(atg!=null){ vector.add(atg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, atg.second());}}
+    |   annotation_decl SEMICOLON { atg=$annotation_decl.returnPair; if(atg!=null){ vector.add(atg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, atg.second());}}
     |   annotation_appl
         {
             annotations.add($annotation_appl.annotation);
@@ -353,7 +353,7 @@ export [Vector<Annotation> annotations] returns [Pair<Vector<Export>, TemplateGr
     |   op_decl[annotations] SEMICOLON { oetg=$op_decl.returnPair; if(oetg!=null){ vector.add(oetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, oetg.second());}}  // Operation
     |   type_id_decl SEMICOLON
     |   type_prefix_decl SEMICOLON
-    |    annotation_appl
+    |   annotation_appl
         {
             annotations.add($annotation_appl.annotation);
         }
@@ -685,6 +685,7 @@ type_decl [Vector<Annotation> annotations] returns [Pair<Vector<TypeDeclaration>
     |   union_type { ttg=$union_type.returnPair; }
     |   enum_type { ttg=$enum_type.returnPair; }
     |   bitset_type { ttg=$bitset_type.returnPair; }
+    |   bitmask_type { ttg=$bitmask_type.returnPair; }
     |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
     |   constr_forward_decl )
     {
@@ -704,7 +705,12 @@ type_decl [Vector<Annotation> annotations] returns [Pair<Vector<TypeDeclaration>
 
                 // Add annotations
                 for(Annotation annotation : annotations)
-                    typedeclaration.addAnnotation(ctx, annotation);
+                {
+                    if (annotation != null) // Some annotations may be ignored
+                    {
+                        typedeclaration.addAnnotation(ctx, annotation);
+                    }
+                }
 
                 // Add type declaration to the map with all typedeclarations.
                 ctx.addTypeDeclaration(typedeclaration);
@@ -814,12 +820,12 @@ template_type_spec returns [TypeCode typecode = null]
     |   fixed_pt_type
     ;
 
-constr_type_spec
+constr_type_spec returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
     :   struct_type
     |   union_type
     |   enum_type
     |   bitset_type
-    //|   bitmask_dcl
+    |   bitmask_type
     ;
 
 declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
@@ -1052,7 +1058,6 @@ annotation_inheritance_spec [AnnotationDeclaration annotation]
             else
             {
                 System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + $scoped_name.pair.first() + " not supported. Ignoring...");
-                //throw new ParseException($scoped_name.pair.second(), "was not defined previously");
             }
         }
     }
@@ -1060,7 +1065,10 @@ annotation_inheritance_spec [AnnotationDeclaration annotation]
 
 annotation_body [AnnotationDeclaration annotation]
 :
-    ( annotation_member[annotation] )*
+    ( annotation_member[annotation]
+        /* enum_type SEMICOLON
+        | const_decl SEMICOLON
+        | type_declarator SEMICOLON */ )*
     ;
 
 annotation_member [AnnotationDeclaration annotation]
@@ -1126,25 +1134,45 @@ bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 
 bitfield [BitsetTypeCode owner]
     :   (
-            bitfield_spec simple_declarators SEMICOLON
-            {
-                if($bitfield_spec.bitfieldType != null)
+            (
+                bitfield_spec simple_declarators SEMICOLON
                 {
-                    for(int count = 0; count < $simple_declarators.ret.size(); ++count)
+                    if($bitfield_spec.bitfieldType != null)
+                    {
+                        for(int count = 0; count < $simple_declarators.ret.size(); ++count)
+                        {
+                            Bitfield bitfield = null;
+
+                            // Only simple declaration
+                            bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
+
+                            $owner.addBitfield(bitfield);
+
+                            if(!$owner.addMember(bitfield))
+                                throw new ParseException($simple_declarators.ret.get(count).first().second(), " was defined previously");
+                        }
+                    }
+                }
+            )
+        |
+            (
+                bitfield_spec SEMICOLON
+                {
+                    if($bitfield_spec.bitfieldType != null)
                     {
                         Bitfield bitfield = null;
 
                         // Only simple declaration
-                        bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
+                        bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, "");
 
                         $owner.addBitfield(bitfield);
 
                         if(!$owner.addMember(bitfield))
-                            throw new ParseException($simple_declarators.ret.get(count).first().second(), "was defined previously");
+                            System.out.println("Empty space failed to be inserted.");
                     }
                 }
-            }
-       )+
+            )
+        )+
     ;
 
 bitfield_spec returns [BitfieldSpec bitfieldType = null]
@@ -1162,6 +1190,65 @@ bitfield_spec returns [BitfieldSpec bitfieldType = null]
         {
             $bitfieldType = ctx.createBitfieldSpec(bitsize, type);
         }
+    ;
+
+bitmask_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+@init {
+    String name = null;
+    Vector<TypeCode> vector = null;
+    BitmaskTypeCode typecode = null;
+    TemplateGroup bitmaskTemplates = null;
+}   :   KW_BITMASK
+        identifier
+        {
+           name=$identifier.id;
+           typecode = ctx.createBitmaskTypeCode(name);
+        }
+        LEFT_BRACE bit_values[typecode] RIGHT_BRACE
+        {
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    bitmaskTemplates = tmanager.createTemplateGroup("bitmask_type");
+                    bitmaskTemplates.setAttribute("ctx", ctx);
+                    bitmaskTemplates.setAttribute("bitmast", typecode);
+                }
+            }
+
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            vector.add(typecode);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, bitmaskTemplates);
+        }
+    ;
+
+bit_values [BitmaskTypeCode owner]
+@init
+{
+    Vector<Annotation> annots = new Vector<Annotation>();
+}   :
+        (annotation_appl { annots.add($annotation_appl.annotation); })* identifier
+        {
+            Bitmask bitmask_f = new Bitmask(owner, $identifier.id);
+            for (Annotation ann : annots)
+            {
+                bitmask_f.addAnnotation(ctx, ann);
+            }
+            owner.addBitmask(bitmask_f);
+            annots = new Vector<Annotation>();
+        }
+        (
+            COMA (annotation_appl { annots.add($annotation_appl.annotation); })* identifier
+            {
+                Bitmask bitmask_o = new Bitmask(owner, $identifier.id);
+                for (Annotation ann : annots)
+                {
+                    bitmask_o.addAnnotation(ctx, ann);
+                }
+                owner.addBitmask(bitmask_o);
+                annots = new Vector<Annotation>();
+            }
+        )*
     ;
 
 struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
@@ -2006,7 +2093,6 @@ annotation_appl returns [Annotation annotation = null]
         if(anndecl == null)
         {
             System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + $scoped_name.pair.first() + " not supported. Ignoring...");
-            //throw new ParseException($scoped_name.pair.second(), "was not defined previously");
         }
         else
         {

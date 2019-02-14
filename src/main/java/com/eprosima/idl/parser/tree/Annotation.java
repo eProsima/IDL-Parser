@@ -65,6 +65,13 @@ public class Annotation
         return true;
     }
 
+    public String getValue()
+    {
+        if(m_members.size() != 1) return null;
+
+        return ((AnnotationMember)m_members.values().toArray()[0]).getValue();
+    }
+
     public String getValue(String attribute)
     {
         return m_members.get(attribute).getValue();
