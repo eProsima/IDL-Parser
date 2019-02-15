@@ -23,3 +23,9 @@ struct BitsetBitmask
 	MyBitset mybitset;
 	MyBitMask mybitmask;
 };
+
+struct BM2 : BitsetBitmask
+{
+	MyBitMask two;
+	long mylong;
+};

@@ -13,16 +13,21 @@
 // limitations under the License.
 
 package com.eprosima.idl.parser.typecode;
+import com.eprosima.idl.parser.tree.Inherits;
+import com.eprosima.idl.context.Context;
 
 import org.antlr.stringtemplate.StringTemplate;
 
+import java.util.List;
+import java.util.ArrayList;
 
 
-public class StructTypeCode extends MemberedTypeCode
+public class StructTypeCode extends MemberedTypeCode implements Inherits
 {
     public StructTypeCode(String scope, String name)
     {
         super(Kind.KIND_STRUCT, scope, name);
+        superTypes_ = new ArrayList<StructTypeCode>();
     }
 
     @Override
@@ -110,4 +115,38 @@ public class StructTypeCode extends MemberedTypeCode
       {
       return Integer.toString(getMaxSerializedSizeWithoutAlignment(0));
       }*/
+
+    @Override
+    public void addInheritance(Context ctx, TypeCode parent)
+    {
+        if (parent instanceof StructTypeCode)
+        {
+            superTypes_.add((StructTypeCode)parent);
+        }
+    }
+
+    @Override
+    public ArrayList<TypeCode> getInheritances()
+    {
+        ArrayList<TypeCode> result = new ArrayList<TypeCode>();
+        for (StructTypeCode parent : superTypes_)
+        {
+            result.add(parent);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Member> getMembers()
+    {
+        List<Member> allMembers = super.getMembers();
+
+        for (StructTypeCode p : superTypes_)
+        {
+            allMembers.addAll(p.getMembers());
+        }
+        return allMembers;
+    }
+
+    private ArrayList<StructTypeCode> superTypes_;
 }

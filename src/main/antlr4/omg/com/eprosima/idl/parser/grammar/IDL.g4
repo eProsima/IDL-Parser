@@ -1256,14 +1256,28 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
     String name = null;
     Vector<TypeCode> vector = null;
     StructTypeCode structTP = null;
+    StructTypeCode parentStruct = null;
     TemplateGroup structTemplates = null;
 }
     :   KW_STRUCT
         identifier
         {
             name=$identifier.id;
-           structTP = ctx.createStructTypeCode(name);
+            structTP = ctx.createStructTypeCode(name);
         }
+        (COLON scoped_name
+            {
+                TypeCode scopedType = ctx.getTypeCode($scoped_name.pair.first());
+                if (scopedType instanceof StructTypeCode)
+                {
+                    parentStruct = (StructTypeCode)scopedType;
+                }
+                else
+                {
+                    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Structs only can inherit from other structs.");
+                }
+            }
+        )?
         LEFT_BRACE member_list[structTP] RIGHT_BRACE
         {
            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
@@ -1277,6 +1291,10 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
            // Return the returned data.
            vector = new Vector<TypeCode>();
            vector.add(structTP);
+           if (parentStruct != null)
+           {
+               structTP.addInheritance(ctx, parentStruct);
+           }
            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
         }
     ;
