@@ -1,0 +1,31 @@
+
+struct ForwardStruct;
+union ForwardUnion;
+
+struct Struct_One
+{
+	long mylong;
+	ForwardStruct myfwstruct;
+	ForwardUnion myfsunion;
+};
+
+struct ForwardStruct
+{
+	long mylong_two;
+	int8 myint8;
+	uint8 myuint8;
+	int16 myint16;
+	uint16 myuint16;
+	int32 myint32;
+	uint32 myuint32;
+	int64 myint64;
+	uint64 myuint64;
+};
+
+union ForwardUnion switch (long)
+{
+	case 0:
+		long case_zero;
+	case 1:
+		long case_one;
+};

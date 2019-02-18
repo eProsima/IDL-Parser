@@ -901,6 +901,14 @@ signed_int returns [TypeCode typecode = null]
     :   signed_short_int { $typecode = $signed_short_int.typecode; }
     |   signed_long_int { $typecode = $signed_long_int.typecode; }
     |   signed_longlong_int { $typecode = $signed_longlong_int.typecode; }
+    |   signed_tiny_int { $typecode = $signed_tiny_int.typecode; }
+    ;
+
+signed_tiny_int returns [TypeCode typecode]
+@init{
+    $typecode = new PrimitiveTypeCode(Kind.KIND_INT8);
+}
+    :   KW_INT8
     ;
 
 signed_short_int returns [TypeCode typecode]
@@ -908,6 +916,7 @@ signed_short_int returns [TypeCode typecode]
     $typecode = new PrimitiveTypeCode(Kind.KIND_SHORT);
 }
     :   KW_SHORT
+    |   KW_INT16
     ;
 
 signed_long_int returns [TypeCode typecode]
@@ -915,6 +924,7 @@ signed_long_int returns [TypeCode typecode]
     $typecode = new PrimitiveTypeCode(Kind.KIND_LONG);
 }
     :   KW_LONG
+    |   KW_INT32
     ;
 
 signed_longlong_int returns [TypeCode typecode]
@@ -922,12 +932,21 @@ signed_longlong_int returns [TypeCode typecode]
     $typecode = new PrimitiveTypeCode(Kind.KIND_LONGLONG);
 }
     :   KW_LONG KW_LONG
+    |   KW_INT64
     ;
 
 unsigned_int returns [TypeCode typecode = null]
     :   unsigned_short_int { $typecode = $unsigned_short_int.typecode; }
     |   unsigned_long_int { $typecode = $unsigned_long_int.typecode; }
     |   unsigned_longlong_int { $typecode = $unsigned_longlong_int.typecode; }
+    |   unsigned_tiny_int { $typecode = $unsigned_tiny_int.typecode; }
+    ;
+
+unsigned_tiny_int returns [TypeCode typecode]
+@init{
+    $typecode = new PrimitiveTypeCode(Kind.KIND_UINT8);
+}
+    :   KW_UINT8
     ;
 
 unsigned_short_int returns [TypeCode typecode]
@@ -935,6 +954,7 @@ unsigned_short_int returns [TypeCode typecode]
     $typecode = new PrimitiveTypeCode(Kind.KIND_USHORT);
 }
     :   KW_UNSIGNED KW_SHORT
+    |   KW_UINT16
     ;
 
 unsigned_long_int returns [TypeCode typecode]
@@ -942,6 +962,7 @@ unsigned_long_int returns [TypeCode typecode]
     $typecode = new PrimitiveTypeCode(Kind.KIND_ULONG);
 }
     :   KW_UNSIGNED KW_LONG
+    |   KW_UINT32
     ;
 
 unsigned_longlong_int returns [TypeCode typecode]
@@ -949,6 +970,7 @@ unsigned_longlong_int returns [TypeCode typecode]
     $typecode = new PrimitiveTypeCode(Kind.KIND_ULONGLONG);
 }
     :   KW_UNSIGNED KW_LONG KW_LONG
+    |   KW_UINT64
     ;
 
 char_type returns [TypeCode typecode]
@@ -1258,12 +1280,32 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
     StructTypeCode structTP = null;
     StructTypeCode parentStruct = null;
     TemplateGroup structTemplates = null;
+    Boolean fw_declaration = false;
 }
     :   KW_STRUCT
         identifier
         {
             name=$identifier.id;
-            structTP = ctx.createStructTypeCode(name);
+
+            // Find typecode in the global map.
+            TypeCode typecode = ctx.getTypeCode(name);
+
+            if(typecode != null)
+            {
+                if (typecode instanceof StructTypeCode)
+                {
+                    fw_declaration = true;
+                    structTP = (StructTypeCode)typecode;
+                }
+                else
+                {
+                    System.out.println("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Identifier already used.");
+                }
+            }
+            else
+            {
+                structTP = ctx.createStructTypeCode(name);
+            }
         }
         (COLON scoped_name
             {
@@ -1280,22 +1322,48 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
         )?
         LEFT_BRACE member_list[structTP] RIGHT_BRACE
         {
-           if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-           {
-                if(tmanager != null) {
-                   structTemplates = tmanager.createTemplateGroup("struct_type");
-                   structTemplates.setAttribute("ctx", ctx);
-                   structTemplates.setAttribute("struct", structTP);
+            if (!fw_declaration)
+            {
+                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+                {
+                    if(tmanager != null) {
+                        structTemplates = tmanager.createTemplateGroup("struct_type");
+                        structTemplates.setAttribute("ctx", ctx);
+                        structTemplates.setAttribute("struct", structTP);
+                    }
                 }
-           }
-           // Return the returned data.
-           vector = new Vector<TypeCode>();
-           vector.add(structTP);
-           if (parentStruct != null)
-           {
-               structTP.addInheritance(ctx, parentStruct);
-           }
-           $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
+                // Return the returned data.
+                vector = new Vector<TypeCode>();
+                vector.add(structTP);
+                if (parentStruct != null)
+                {
+                    structTP.addInheritance(ctx, parentStruct);
+                }
+                $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
+            }
+            else
+            {
+                $returnPair = null;
+            }
+        }
+    |
+        KW_STRUCT
+        identifier
+        {
+            name=$identifier.id;
+            structTP = ctx.createStructTypeCode(name);
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    structTemplates = tmanager.createTemplateGroup("struct_type");
+                    structTemplates.setAttribute("ctx", ctx);
+                    structTemplates.setAttribute("struct", structTP);
+                }
+            }
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            vector.add(structTP);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
         }
     ;
 
@@ -1368,33 +1436,93 @@ union_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
     Vector<TypeCode> vector = null;
     UnionTypeCode unionTP = null;
     TemplateGroup unionTemplates = null;
+    Boolean fw_decl = false;
 }
     :   KW_UNION
-        identifier { name=$identifier.id;}
+        identifier
+        {
+            name=$identifier.id;
+
+            // Find typecode in the global map.
+            TypeCode typecode = ctx.getTypeCode(name);
+
+            if(typecode != null)
+            {
+                if (typecode instanceof UnionTypeCode)
+                {
+                    fw_decl = true;
+                    unionTP = (UnionTypeCode)typecode;
+                }
+                else
+                {
+                    System.out.println("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Identifier already used.");
+                }
+            }
+        }
         KW_SWITCH LEFT_BRACKET switch_type_spec { dist_type=$switch_type_spec.typecode; } RIGHT_BRACKET
         {
             // TODO Check supported types for discriminator: long, enumeration, etc...
-           unionTP = new UnionTypeCode(ctx.getScope(), name, dist_type);
-           line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
+            if (fw_decl)
+            {
+                unionTP.setDiscriminatorType(dist_type);
+            }
+            else
+            {
+                unionTP = new UnionTypeCode(ctx.getScope(), name, dist_type);
+            }
+            line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
         }
         LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
         {
-           // Calculate default label.
-           TemplateUtil.setUnionDefaultLabel(unionTP, ctx.getScopeFile(), line);
+            if (!fw_decl)
+            {
+                // Calculate default label.
+                TemplateUtil.setUnionDefaultLabel(unionTP, ctx.getScopeFile(), line);
 
-           if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-           {
-                if(tmanager != null) {
-                   unionTemplates = tmanager.createTemplateGroup("union_type");
-                   unionTemplates.setAttribute("ctx", ctx);
-                   unionTemplates.setAttribute("union", unionTP);
+                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+                {
+                    if(tmanager != null) {
+                        unionTemplates = tmanager.createTemplateGroup("union_type");
+                        unionTemplates.setAttribute("ctx", ctx);
+                        unionTemplates.setAttribute("union", unionTP);
+                    }
                 }
-           }
 
-           // Return the returned data.
-           vector = new Vector<TypeCode>();
-           vector.add(unionTP);
-           $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
+                // Return the returned data.
+                vector = new Vector<TypeCode>();
+                vector.add(unionTP);
+                $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
+            }
+            else
+            {
+                $returnPair = null;
+            }
+        }
+    |
+        KW_UNION
+        identifier
+        {
+            name=$identifier.id;
+            // TODO Check supported types for discriminator: long, enumeration, etc...
+            unionTP = new UnionTypeCode(ctx.getScope(), name);
+            line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
+            // Calculate default label.
+            TemplateUtil.setUnionDefaultLabel(unionTP, ctx.getScopeFile(), line);
+
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    unionTemplates = tmanager.createTemplateGroup("union_type");
+                    unionTemplates.setAttribute("ctx", ctx);
+                    unionTemplates.setAttribute("union", unionTP);
+                }
+            }
+
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            vector.add(unionTP);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
+
         }
     ;
 
@@ -2350,7 +2478,15 @@ KW_MAP:                 'map';
 KW_BITFIELD:            'bitfield';
 KW_BITSET:              'bitset';
 KW_BITMASK:             'bitmask';
-KW_AT_ANNOTATION:        '@annotation';
+KW_INT8:                'int8';
+KW_UINT8:               'uint8';
+KW_INT16:               'int16';
+KW_UINT16:              'uint16';
+KW_INT32:               'int32';
+KW_UINT32:              'uint32';
+KW_INT64:               'int64';
+KW_UINT64:              'uint64';
+KW_AT_ANNOTATION:       '@annotation';
 
 ID
     :   LETTER (LETTER|ID_DIGIT)*

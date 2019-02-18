@@ -150,6 +150,9 @@ public class TestIDLParser {
 			case Kind.KIND_STRUCT:
 				parseStruct((StructTypeCode)typeDeclarationDef.getTypeCode());
 			break;
+			case Kind.KIND_UNION:
+				parseUnion((UnionTypeCode)typeDeclarationDef.getTypeCode());
+			break;
 			case Kind.KIND_ENUM:
 				parseEnum((EnumTypeCode)typeDeclarationDef.getTypeCode());
 			break;
@@ -177,28 +180,72 @@ public class TestIDLParser {
 	public void parseAlias(AliasTypeCode aliasType) {
 		System.out.println("Start Alias (TypeDef) ");
 		System.out.println("End Alias: \n");
-	}
+    }
+
+    public void parseMember(Member member)
+    {
+        if (member.getTypecode() instanceof EnumTypeCode){
+            parseEnumField(member);
+        } else if (member.getTypecode() instanceof StructTypeCode){
+            parseStructField(member);
+        } else if (member.getTypecode() instanceof UnionTypeCode){
+            parseUnionField(member);
+        } else if (member.getTypecode() instanceof AliasTypeCode) {
+            parseAliasField(member);
+        } else if (member.getTypecode() instanceof PrimitiveTypeCode) {
+            parsePrimitiveField(member);
+        } else if (member.getTypecode() instanceof BitsetTypeCode) {
+           parseBitsetField(member);
+        } else if (member.getTypecode() instanceof BitmaskTypeCode) {
+           parseBitmaskField(member);
+        } else {
+            parseDefaultField(member);
+        }
+    }
+
+    public void parseUnionMember(UnionMember member)
+    {
+        for (String label : member.getLabels())
+        {
+            System.out.print(label + " - ");
+        }
+        if (member.isDefault())
+        {
+            System.out.print("Default - ");
+        }
+        if (member.getTypecode() instanceof EnumTypeCode){
+            parseEnumField(member);
+        } else if (member.getTypecode() instanceof StructTypeCode){
+            parseStructField(member);
+        } else if (member.getTypecode() instanceof UnionTypeCode){
+            parseUnionField(member);
+        } else if (member.getTypecode() instanceof AliasTypeCode) {
+            parseAliasField(member);
+        } else if (member.getTypecode() instanceof PrimitiveTypeCode) {
+            parsePrimitiveField(member);
+        } else if (member.getTypecode() instanceof BitsetTypeCode) {
+           parseBitsetField(member);
+        } else if (member.getTypecode() instanceof BitmaskTypeCode) {
+           parseBitmaskField(member);
+        } else {
+            parseDefaultField(member);
+        }
+    }
 
 	public void parseStruct(StructTypeCode struct) {
 		System.out.println("Start Struct: " + struct.getName());
      	for (Member member: struct.getMembers()) {
-     		if (member.getTypecode() instanceof EnumTypeCode){
-     			parseEnumField(member);
-     		} else if (member.getTypecode() instanceof StructTypeCode){
-     			parseStructField(member);
-     		} else if (member.getTypecode() instanceof AliasTypeCode) {
-     			parseAliasField(member);
-     		} else if (member.getTypecode() instanceof PrimitiveTypeCode) {
-     			parsePrimitiveField(member);
-     		} else if (member.getTypecode() instanceof BitsetTypeCode) {
-                parseBitsetField(member);
-            } else if (member.getTypecode() instanceof BitmaskTypeCode) {
-                parseBitmaskField(member);
-            } else {
-     			parseDefaultField(member);
-     		}
+             parseMember(member);
      	}
 		System.out.println("End Struct: \n");
+	}
+
+	public void parseUnion(UnionTypeCode union) {
+		System.out.println("Start Union: " + union.getName() + " (" + union.getDiscriminator().getTypeIdentifier() + ")");
+     	for (Member member: union.getMembers()) {
+             parseUnionMember((UnionMember)member);
+     	}
+		System.out.println("End Union: \n");
 	}
 
 	public void parseBitset(BitsetTypeCode bitset) {
@@ -226,7 +273,7 @@ public class TestIDLParser {
 	}
 
 	public static void parsePrimitiveField(Member member) {
-		System.out.println("	Field Primitive: " + member.getName() );
+		System.out.println("	Field " + member.getTypecode().getTypeIdentifier() + ": " + member.getName() );
 	}
 
 	public static void parseDefaultField(Member member) {
@@ -258,6 +305,11 @@ public class TestIDLParser {
 	public void parseStructField(Member member) {
 		StructTypeCode typeCode = (StructTypeCode) member.getTypecode();
 		System.out.println("	Field Struct: " + typeCode.getName() + " " + member.getName());
+	}
+
+	public void parseUnionField(Member member) {
+		UnionTypeCode typeCode = (UnionTypeCode) member.getTypecode();
+		System.out.println("	Field Union: " + typeCode.getName() + " " + member.getName());
 	}
 
 	public void parseAliasField(Member member) {

@@ -22,9 +22,20 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class UnionTypeCode extends MemberedTypeCode
 {
+    public UnionTypeCode(String scope, String name)
+    {
+        super(Kind.KIND_UNION, scope, name);
+        m_discriminatorTypeCode = null;
+    }
+
     public UnionTypeCode(String scope, String name, TypeCode discriminatorTypeCode)
     {
         super(Kind.KIND_UNION, scope, name);
+        m_discriminatorTypeCode = discriminatorTypeCode;
+    }
+
+    public void setDiscriminatorType(TypeCode discriminatorTypeCode)
+    {
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
 

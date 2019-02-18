@@ -46,4 +46,6 @@ public class Kind
     public static final int KIND_BITSET = 0x0000001A;
     public static final int KIND_BITMASK = 0x0000001B;
     public static final int KIND_BITFIELD = 0x0000001C;
+    public static final int KIND_INT8 = 0x0000001D;
+    public static final int KIND_UINT8 = 0x0000001E;
 }
