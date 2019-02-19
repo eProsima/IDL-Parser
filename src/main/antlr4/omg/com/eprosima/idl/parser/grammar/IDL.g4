@@ -679,10 +679,11 @@ type_decl [Vector<Annotation> annotations] returns [Pair<Vector<TypeDeclaration>
     Pair<Vector<TypeCode>, TemplateGroup> ttg = null;
     Vector<TypeDeclaration> vector = null;
     Token tk = null;
+    String fw_name = null;
 }
     :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator { ttg=$type_declarator.returnPair; }
-    |   struct_type { ttg=$struct_type.returnPair; }
-    |   union_type { ttg=$union_type.returnPair; }
+    |   struct_type { ttg=$struct_type.returnPair; fw_name = $struct_type.fw_name; }
+    |   union_type { ttg=$union_type.returnPair; fw_name = $union_type.fw_name; }
     |   enum_type { ttg=$enum_type.returnPair; }
     |   bitset_type { ttg=$bitset_type.returnPair; }
     |   bitmask_type { ttg=$bitmask_type.returnPair; }
@@ -718,6 +719,22 @@ type_decl [Vector<Annotation> annotations] returns [Pair<Vector<TypeDeclaration>
                 vector.add(typedeclaration);
 
                 $returnPair = new Pair<Vector<TypeDeclaration>, TemplateGroup>(vector, ttg.second());
+            }
+        }
+        else if (fw_name != null) // It was a forward declaration
+        {
+            if (ctx.getScope() != null && !ctx.getScope().isEmpty())
+            {
+                fw_name = ctx.getScope() + "::" + fw_name;
+            }
+            TypeDeclaration typedeclaration = ctx.getTypeDeclaration(fw_name);
+            // Add annotations
+            for(Annotation annotation : annotations)
+            {
+                if (annotation != null) // Some annotations may be ignored
+                {
+                    typedeclaration.addAnnotation(ctx, annotation);
+                }
             }
         }
     }
@@ -1126,17 +1143,22 @@ bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
            name=$identifier.id;
            typecode = ctx.createBitsetTypeCode(name);
         }
+        ( COLON scoped_name
+            {
+                TypeCode scopedType = ctx.getTypeCode($scoped_name.pair.first());
+                if (scopedType instanceof BitsetTypeCode)
+                {
+                    superType = (BitsetTypeCode)scopedType;
+                }
+                else
+                {
+                    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Bitset only can inherit from other bitsets.");
+                }
+            }
+        )?
         LEFT_BRACE bitfield[typecode] RIGHT_BRACE
-    /*|   KW_BITSET
-        identifier
         {
-           name=$identifier.id;
-           typecode = ctx.createBitsetTypeCode(name);
-        }
-        COLON bitset_type { superType=$bitset_type.typecode; }
-        LEFT_BRACE bitfield[typecode] RIGHT_BRACE */
-        {
-            // typecode.addParent(superType);
+            if (superType != null) typecode.addParent(superType);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -1273,7 +1295,7 @@ bit_values [BitmaskTypeCode owner]
         )*
     ;
 
-struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
 @init{
     String name = null;
     Vector<TypeCode> vector = null;
@@ -1340,10 +1362,12 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
                     structTP.addInheritance(ctx, parentStruct);
                 }
                 $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
+                $fw_name = null;
             }
             else
             {
                 $returnPair = null;
+                $fw_name = name;
             }
         }
     |
@@ -1364,6 +1388,7 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
             vector = new Vector<TypeCode>();
             vector.add(structTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
+            $fw_name = null;
         }
     ;
 
@@ -1428,7 +1453,7 @@ member returns [Vector<Pair<Pair<String, Token>, Member>> ret = new Vector<Pair<
        }
     ;
 
-union_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+union_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
 @init {
     String name = null;
     int line = 0;
@@ -1492,10 +1517,12 @@ union_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
                 vector = new Vector<TypeCode>();
                 vector.add(unionTP);
                 $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
+                $fw_name = null;
             }
             else
             {
                 $returnPair = null;
+                $fw_name = name;
             }
         }
     |
@@ -1522,6 +1549,7 @@ union_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
             vector = new Vector<TypeCode>();
             vector.add(unionTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
+            $fw_name = null;
 
         }
     ;

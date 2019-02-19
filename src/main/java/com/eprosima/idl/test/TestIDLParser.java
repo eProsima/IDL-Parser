@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Collection;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -19,6 +21,8 @@ import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.grammar.IDLLexer;
 import com.eprosima.idl.parser.grammar.IDLParser;
 import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.AnnotationDeclaration;
+import com.eprosima.idl.parser.tree.AnnotationMember;
 import com.eprosima.idl.parser.tree.ConstDeclaration;
 import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Interface;
@@ -106,7 +110,7 @@ public class TestIDLParser {
 		           } else
 
 		           if (definition.isIsAnnotation()) {
-		         	  parseAnnotation((Annotation)definition);
+		         	  parseAnnotation((AnnotationDeclaration)definition);
 		           } else {
 		             		System.out.println("Unknown Type");
 		           	}
@@ -142,10 +146,38 @@ public class TestIDLParser {
 	}
 
 	public void parseException(Exception exceptionDef) {
-	}
+    }
 
-	public void parseTypeDeclaration(TypeDeclaration typeDeclarationDef) {
+    public void parseAnnotations(Collection<Annotation> annotations, boolean new_line, String tab)
+    {
+        for (Annotation annotation : annotations)
+        {
+            System.out.print(tab + "@" + annotation.getName());
+            if (annotation.getValues().size() > 0)
+            {
+                boolean first = true;
+                System.out.print(" (");
+                for (AnnotationMember member : annotation.getValues().values())
+                {
+                    if (!first)
+                    {
+                        System.out.print(", ");
+                    }
+                    System.out.print(member.getName() + " = " + member.getValue());
+                    first = false;
+                }
+                if (new_line) System.out.println(")");
+                else System.out.print(") ");
+            }
+        }
+    }
 
+    public void parseTypeDeclaration(TypeDeclaration typeDeclarationDef)
+    {
+        if (typeDeclarationDef.getAnnotations().size() > 0)
+        {
+            parseAnnotations(typeDeclarationDef.getAnnotations().values(), true , "");
+        }
 		switch (typeDeclarationDef.getTypeCode().getKind()) {
 			case Kind.KIND_STRUCT:
 				parseStruct((StructTypeCode)typeDeclarationDef.getTypeCode());
@@ -173,8 +205,13 @@ public class TestIDLParser {
 	public void parseConstDeclaration(ConstDeclaration constDeclarationDef) {
 	}
 
-	public void parseAnnotation(Annotation annotationDef) {
-
+	public void parseAnnotation(AnnotationDeclaration annotationDef) {
+        System.out.println("Start Annotation: " + annotationDef.getName());
+        for (AnnotationMember member : annotationDef.getMembers())
+        {
+            System.out.println("    " + member.getTypecode().getTypeIdentifier() + " " + member.getName());
+        }
+        System.out.println("End Annotation: \n");
 	}
 
 	public void parseAlias(AliasTypeCode aliasType) {
@@ -184,6 +221,11 @@ public class TestIDLParser {
 
     public void parseMember(Member member)
     {
+        if (member.getAnnotations().size() > 0)
+        {
+            parseAnnotations(member.getAnnotations().values(), false, "        ");
+        }
+
         if (member.getTypecode() instanceof EnumTypeCode){
             parseEnumField(member);
         } else if (member.getTypecode() instanceof StructTypeCode){
@@ -195,9 +237,9 @@ public class TestIDLParser {
         } else if (member.getTypecode() instanceof PrimitiveTypeCode) {
             parsePrimitiveField(member);
         } else if (member.getTypecode() instanceof BitsetTypeCode) {
-           parseBitsetField(member);
+            parseBitsetField(member);
         } else if (member.getTypecode() instanceof BitmaskTypeCode) {
-           parseBitmaskField(member);
+            parseBitmaskField(member);
         } else {
             parseDefaultField(member);
         }
@@ -207,12 +249,18 @@ public class TestIDLParser {
     {
         for (String label : member.getLabels())
         {
-            System.out.print(label + " - ");
+            System.out.print("        " + label + " - ");
         }
         if (member.isDefault())
         {
-            System.out.print("Default - ");
+            System.out.print("        Default - ");
         }
+
+        if (member.getAnnotations().size() > 0)
+        {
+            parseAnnotations(member.getAnnotations().values(), false, "        ");
+        }
+
         if (member.getTypecode() instanceof EnumTypeCode){
             parseEnumField(member);
         } else if (member.getTypecode() instanceof StructTypeCode){

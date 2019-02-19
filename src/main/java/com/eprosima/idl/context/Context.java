@@ -497,6 +497,14 @@ public class Context
     }
 
     /*!
+     * @brief This function returns a global typecode of the context.
+     */
+    public TypeDeclaration getTypeDeclaration(String scopedName)
+    {
+        return m_types.get(scopedName);
+    }
+
+    /*!
      * @brief This function tries to retrieve a global typecode.
      */
     public TypeCode getTypeCode(String name)

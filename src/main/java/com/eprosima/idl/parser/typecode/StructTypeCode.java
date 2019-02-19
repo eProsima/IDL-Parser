@@ -139,12 +139,13 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public List<Member> getMembers()
     {
-        List<Member> allMembers = super.getMembers();
+        List<Member> allMembers = new ArrayList<Member>();
 
         for (StructTypeCode p : superTypes_)
         {
             allMembers.addAll(p.getMembers());
         }
+        allMembers.addAll(super.getMembers());
         return allMembers;
     }
 

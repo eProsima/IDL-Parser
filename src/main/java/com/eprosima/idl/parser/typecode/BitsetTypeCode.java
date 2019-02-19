@@ -27,6 +27,7 @@ public class BitsetTypeCode extends MemberedTypeCode
     {
         super(Kind.KIND_BITSET, scope, name);
         m_bitfields = new LinkedHashMap<String, Bitfield>();
+        m_parents = new ArrayList<BitsetTypeCode>();
     }
 
     @Override
@@ -63,7 +64,13 @@ public class BitsetTypeCode extends MemberedTypeCode
 
     public List<Bitfield> getBitfields()
     {
-        return new ArrayList<Bitfield>(m_bitfields.values());
+        ArrayList<Bitfield> result = new ArrayList<Bitfield>();
+        for (BitsetTypeCode m_parent :  m_parents)
+        {
+            result.addAll(m_parent.getBitfields());
+        }
+        result.addAll(m_bitfields.values());
+        return result;
     }
 
     public boolean addBitfield(Bitfield bitfield)
@@ -78,14 +85,14 @@ public class BitsetTypeCode extends MemberedTypeCode
         return false;
     }
 
-    public void setParent(BitsetTypeCode parent)
+    public void addParent(BitsetTypeCode parent)
     {
-        m_parent = parent;
+        m_parents.add(parent);
     }
 
-    public BitsetTypeCode getParent()
+    public List<BitsetTypeCode> getParents()
     {
-        return m_parent;
+        return m_parents;
     }
 
     public int getBitSize()
@@ -98,7 +105,7 @@ public class BitsetTypeCode extends MemberedTypeCode
         return size;
     }
 
-    private BitsetTypeCode m_parent = null;
+    private ArrayList<BitsetTypeCode> m_parents = null;
     private LinkedHashMap<String, Bitfield> m_bitfields = null;
     private int m_current_base = 0;
 }
