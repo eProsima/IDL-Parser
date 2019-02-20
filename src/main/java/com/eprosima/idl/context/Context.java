@@ -456,6 +456,12 @@ public class Context
         return paramObject;
     }
 
+    public Param createParam(String name, Definition definition, Param.Kind kind)
+    {
+        Param paramObject = new Param(name, definition, kind);
+        return paramObject;
+    }
+
     public StructTypeCode createStructTypeCode(String name)
     {
         StructTypeCode structObject = new StructTypeCode(m_scope, name);

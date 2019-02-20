@@ -85,36 +85,42 @@ public class TestIDLParser {
 			lexer.setContext(context);
 			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 			IDLParser parser = new IDLParser(tokenStream);
-			Specification specification  = parser.specification(context, null, null).spec;
+            Specification specification  = parser.specification(context, null, null).spec;
 
-		       for( Definition definition: specification.getDefinitions()) {
+            if (specification != null)
+            {
+		        for( Definition definition: specification.getDefinitions()) {
 
-		           if (definition.isIsModule()) {
-		         	  parseModule((Module)definition);
-		           } else
-
-		           if (definition.isIsInterface()) {
-		         	  parseInterface((Interface)definition);
-		           } else
-
-		           if (definition.isIsException()) {
-		         	  parseException((Exception)definition);
-		           } else
-
-		           if (definition.isIsTypeDeclaration()) {
-		              parseTypeDeclaration((TypeDeclaration)definition);
-		           } else
-
-		           if (definition.isIsConstDeclaration()) {
-		         	  parseConstDeclaration((ConstDeclaration)definition);
-		           } else
-
-		           if (definition.isIsAnnotation()) {
-		         	  parseAnnotation((AnnotationDeclaration)definition);
-		           } else {
-		             		System.out.println("Unknown Type");
+                    if (definition.isIsModule())
+                    {
+		         	    parseModule((Module)definition);
+                    }
+                    else if (definition.isIsInterface())
+                    {
+		         	    parseInterface((Interface)definition);
+                    }
+                    else if (definition.isIsException())
+                    {
+		         	    parseException((com.eprosima.idl.parser.tree.Exception)definition);
+                    }
+                    else if (definition.isIsTypeDeclaration())
+                    {
+		                parseTypeDeclaration((TypeDeclaration)definition);
+                    }
+                    else if (definition.isIsConstDeclaration())
+                    {
+		         	    parseConstDeclaration((ConstDeclaration)definition);
+                    }
+                    else if (definition.isIsAnnotation())
+                    {
+		         	    parseAnnotation((AnnotationDeclaration)definition);
+                    }
+                    else
+                    {
+		                System.out.println("Unknown Type");
 		           	}
-		         }
+                }
+            }
 
 		} catch (IOException e) {
     			e.printStackTrace();
@@ -126,14 +132,34 @@ public class TestIDLParser {
 	public void parseModule(Module moduleDef) {
 		System.out.println("Start Module: " + moduleDef.getName() + "\n");
 
-		for( Definition moduleDefinition: moduleDef.getDefinitions()) {
-			if (moduleDefinition.isIsTypeDeclaration()) {
+        for( Definition moduleDefinition: moduleDef.getDefinitions())
+        {
+            if (moduleDefinition.isIsTypeDeclaration())
+            {
 				parseTypeDeclaration((TypeDeclaration) moduleDefinition);
-			} else
-
-			if (moduleDefinition.isIsInterface()) {
-           		parseInterface((Interface)moduleDefinition);
-        	} else {
+            }
+            else if (moduleDefinition.isIsInterface())
+            {
+                parseInterface((Interface)moduleDefinition);
+        	}
+            else if (moduleDefinition.isIsModule())
+            {
+                parseModule((Module)moduleDefinition);
+            }
+            else if (moduleDefinition.isIsException())
+            {
+                parseException((com.eprosima.idl.parser.tree.Exception)moduleDefinition);
+            }
+            else if (moduleDefinition.isIsConstDeclaration())
+            {
+                parseConstDeclaration((ConstDeclaration)moduleDefinition);
+            }
+            else if (moduleDefinition.isIsAnnotation())
+            {
+                parseAnnotation((AnnotationDeclaration)moduleDefinition);
+            }
+            else
+            {
         		System.out.println("Module Unrecognized Option ");
         	}
 		}
@@ -145,7 +171,10 @@ public class TestIDLParser {
 		System.out.println("End Interface: \n");
 	}
 
-	public void parseException(Exception exceptionDef) {
+    public void parseException(com.eprosima.idl.parser.tree.Exception exceptionDef)
+    {
+        System.out.println("Start Exception: " + exceptionDef.getName());
+        System.out.println("End Annotation: \n");
     }
 
     public void parseAnnotations(Collection<Annotation> annotations, boolean new_line, String tab)
@@ -202,7 +231,12 @@ public class TestIDLParser {
 		}
 	}
 
-	public void parseConstDeclaration(ConstDeclaration constDeclarationDef) {
+    public void parseConstDeclaration(ConstDeclaration constDeclarationDef)
+    {
+        System.out.println("Start ConstDeclaration: " + constDeclarationDef.getName());
+        System.out.println("    - Type: " + constDeclarationDef.getTypeCode().getTypeIdentifier());
+        System.out.println("    - Value: " + constDeclarationDef.getValue());
+        System.out.println("End Annotation: \n");
 	}
 
 	public void parseAnnotation(AnnotationDeclaration annotationDef) {
