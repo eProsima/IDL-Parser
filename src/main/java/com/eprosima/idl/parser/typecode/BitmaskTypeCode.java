@@ -127,6 +127,27 @@ public class BitmaskTypeCode extends MemberedTypeCode
         return m_bit_bound;
     }
 
+    public String getBoundType()
+    {
+        if (m_bit_bound <= 8)
+        {
+            return " : uint8_t";
+        }
+        else if (m_bit_bound <= 16)
+        {
+            return " : uint16_t";
+        }
+        else if (m_bit_bound <= 32)
+        {
+            return " : uint32_t";
+        }
+        else if (m_bit_bound <= 64)
+        {
+            return " : uint64_t";
+        }
+        return "";
+    }
+
     @Override
     public void addAnnotation(Context ctx, Annotation annotation)
     {

@@ -1294,7 +1294,7 @@ bitmask_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
                 if(tmanager != null) {
                     bitmaskTemplates = tmanager.createTemplateGroup("bitmask_type");
                     bitmaskTemplates.setAttribute("ctx", ctx);
-                    bitmaskTemplates.setAttribute("bitmast", typecode);
+                    bitmaskTemplates.setAttribute("bitmask", typecode);
                 }
             }
 
