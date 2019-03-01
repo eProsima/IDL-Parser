@@ -316,7 +316,7 @@ public class TestIDLParser {
 
 	public void parseStruct(StructTypeCode struct) {
 		System.out.println("Start Struct: " + struct.getName());
-     	for (Member member: struct.getMembers()) {
+     	for (Member member: struct.getMembers(true)) {
              parseMember(member);
      	}
 		System.out.println("End Struct: \n");
@@ -332,7 +332,7 @@ public class TestIDLParser {
 
 	public void parseBitset(BitsetTypeCode bitset) {
 		System.out.println("Start Bitset: " + bitset.getName());
-     	for (Bitfield field : bitset.getBitfields()) {
+     	for (Bitfield field : bitset.getBitfields(true)) {
             parseBitfield(field);
      	}
 		System.out.println("End Bitset: \n");

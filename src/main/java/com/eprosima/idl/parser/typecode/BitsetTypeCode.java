@@ -64,11 +64,21 @@ public class BitsetTypeCode extends MemberedTypeCode
 
     public List<Bitfield> getBitfields()
     {
+        return getBitfields(false);
+    }
+
+    public List<Bitfield> getBitfields(boolean includeParents)
+    {
         ArrayList<Bitfield> result = new ArrayList<Bitfield>();
-        for (BitsetTypeCode m_parent :  m_parents)
+
+        if (includeParents)
         {
-            result.addAll(m_parent.getBitfields());
+            for (BitsetTypeCode m_parent : m_parents)
+            {
+                result.addAll(m_parent.getBitfields());
+            }
         }
+
         result.addAll(m_bitfields.values());
         return result;
     }
