@@ -44,6 +44,16 @@ public class Bitfield extends Member
         return m_spec;
     }
 
+    @Override
+    public String getName()
+    {
+        if (super.getName().isEmpty())
+        {
+            return null;
+        }
+        return super.getName();
+    }
+
     private int m_base = -1;
     private BitfieldSpec m_spec = null;
 }
