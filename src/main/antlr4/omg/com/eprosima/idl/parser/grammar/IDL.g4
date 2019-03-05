@@ -113,7 +113,7 @@ definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
     if(annotations == null) annotations = new Vector<Annotation>();
 }
     :   type_decl[annotations, defs] SEMICOLON { tdtg=$type_decl.returnPair; if(tdtg!=null){ for(TypeDeclaration tydl : tdtg.first()) vector.add(tydl); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, tdtg.second());}}  // Type Declaration
-    |   const_decl SEMICOLON { cdtg=$const_decl.returnPair; if(cdtg!=null){ vector.add(cdtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, cdtg.second());}} // Const Declaration
+    |   const_decl[null] SEMICOLON { cdtg=$const_decl.returnPair; if(cdtg!=null){ vector.add(cdtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, cdtg.second());}} // Const Declaration
     |   except_decl SEMICOLON { etg=$except_decl.returnPair; if(etg!=null){ vector.add(etg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, etg.second());}} // Exception.
     |   interface_or_forward_decl[annotations] SEMICOLON { itg=$interface_or_forward_decl.itg; if(itg!=null){ vector.add(itg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());}} // Interface
     |   module SEMICOLON { mtg=$module.returnPair; if(mtg!=null){ vector.add(mtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, mtg.second());}} // Module
@@ -375,7 +375,7 @@ export [Vector<Annotation> annotations] returns [Pair<Vector<Export>, TemplateGr
         if(annotations == null) annotations = new Vector<Annotation>();
 }
     :   type_decl[annotations, null] SEMICOLON { tetg=$type_decl.returnPair; if(tetg!=null){ for(TypeDeclaration tydl : tetg.first()) vector.add(tydl); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, tetg.second());} }  // Type Declaration
-    |   const_decl SEMICOLON { cetg=$const_decl.returnPair; if(cetg!=null){ vector.add(cetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, cetg.second());}} // Const Declaration
+    |   const_decl[null] SEMICOLON { cetg=$const_decl.returnPair; if(cetg!=null){ vector.add(cetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, cetg.second());}} // Const Declaration
     |   except_decl SEMICOLON { eetg=$except_decl.returnPair; if(eetg!=null){ vector.add(eetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, eetg.second());}}  // Exception
     |   attr_decl SEMICOLON
     { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Attribute declarations are not supported. Ignoring..."); }
@@ -451,7 +451,7 @@ value_forward_decl
     ;
 
 value_box_decl
-    :   KW_VALUETYPE ID type_spec
+    :   KW_VALUETYPE ID type_spec[null]
     ;
 
 value_abs_decl
@@ -479,7 +479,7 @@ value_element
     ;
 
 state_member
-    :   ( KW_PUBLIC | KW_PRIVATE ) type_spec declarators SEMICOLON
+    :   ( KW_PUBLIC | KW_PRIVATE ) type_spec[null] declarators SEMICOLON
     ;
 
 init_decl
@@ -498,7 +498,7 @@ init_param_attribute
     :   KW_IN
     ;
 
-const_decl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
+const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
 @init {
     ConstDeclaration constDecl = null;
     TypeCode typecode = null;
@@ -509,7 +509,7 @@ const_decl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
     }
     Token tk = null;
 }
-    :   KW_CONST const_type { typecode=$const_type.typecode; tk = _input.LT(1);} identifier { constName=$identifier.id; } EQUAL const_exp { constValue=$const_exp.literalStr; }
+    :   KW_CONST const_type[annotation] { typecode=$const_type.typecode; tk = _input.LT(1);} identifier { constName=$identifier.id; } EQUAL const_exp { constValue=$const_exp.literalStr; }
     {
         if(typecode != null)
         {
@@ -527,7 +527,7 @@ const_decl returns [Pair<ConstDeclaration, TemplateGroup> returnPair = null]
     ;
 
 // TODO Not supported fixed types: Show warning
-const_type returns [TypeCode typecode = null]
+const_type[AnnotationDeclaration annotation] returns [TypeCode typecode = null]
 @init{
     Pair<String, Token> pair = null;
 }
@@ -541,14 +541,24 @@ const_type returns [TypeCode typecode = null]
     |   fixed_pt_const_type
     |   scoped_name
         {
-           pair = $scoped_name.pair;
-           // Find typecode in the global map.
-           $typecode = ctx.getTypeCode(pair.first());
+            pair = $scoped_name.pair;
 
-           if($typecode == null)
-           {
-               throw new ParseException(pair.second(), "was not defined previously");
-           }
+            // Find first at annotation scope
+            if ($annotation != null)
+            {
+                $typecode = $annotation.getTypeCode(pair.first());
+            }
+
+            // Find typecode in the global map if not found.
+            if ($typecode == null)
+            {
+                $typecode = ctx.getTypeCode(pair.first());
+            }
+
+            if($typecode == null)
+            {
+                throw new ParseException(pair.second(), "was not defined previously");
+            }
         }
     |   octet_type { $typecode = $octet_type.typecode; }
     ;
@@ -712,7 +722,7 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     Token tk = null;
     String fw_name = null;
 }
-    :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator { ttg=$type_declarator.returnPair; }
+    :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator[null] { ttg=$type_declarator.returnPair; }
     |   struct_type { ttg=$struct_type.returnPair; fw_name = $struct_type.fw_name; }
     |   union_type[defs] { ttg=$union_type.returnPair; fw_name = $union_type.fw_name; }
     |   enum_type { ttg=$enum_type.returnPair; }
@@ -771,7 +781,7 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     }
     ;
 
-type_declarator returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+type_declarator [AnnotationDeclaration annotation] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 @init {
     Vector<TypeCode> vector = null;
     AliasTypeCode typedefTypecode = null;
@@ -780,7 +790,7 @@ type_declarator returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null
         typedefTemplates = tmanager.createTemplateGroup("typedef_decl");
     }
 }
-    :   type_spec declarators
+    :   type_spec[annotation] declarators
     {
        if($type_spec.typecode != null)
        {
@@ -818,12 +828,12 @@ type_declarator returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null
     }
     ;
 
-type_spec returns [TypeCode typecode = null, Definition def = null]
-    :   simple_type_spec { $typecode=$simple_type_spec.typecode; $def=$simple_type_spec.def; }
+type_spec [AnnotationDeclaration annotation] returns [TypeCode typecode = null, Definition def = null]
+    :   simple_type_spec[annotation] { $typecode=$simple_type_spec.typecode; $def=$simple_type_spec.def; }
     |   constr_type_spec
     ;
 
-simple_type_spec returns [TypeCode typecode = null, Definition def = null]
+simple_type_spec [AnnotationDeclaration annotation] returns [TypeCode typecode = null, Definition def = null]
 @init {
     Pair<String, Token> pair = null;
 }
@@ -833,8 +843,17 @@ simple_type_spec returns [TypeCode typecode = null, Definition def = null]
         {
             pair=$scoped_name.pair;
 
+            // Look for it first on annotation
+            if ($annotation != null)
+            {
+                $typecode = $annotation.getTypeCode(pair.first());
+            }
+
             // Find typecode in the global map.
-            $typecode = ctx.getTypeCode(pair.first());
+            if($typecode == null)
+            {
+                $typecode = ctx.getTypeCode(pair.first());
+            }
 
             if($typecode == null)
             {
@@ -1142,11 +1161,30 @@ annotation_inheritance_spec [AnnotationDeclaration annotation]
     ;
 
 annotation_body [AnnotationDeclaration annotation]
+@init
+{
+    Pair<Vector<TypeCode>, TemplateGroup> pairtype = null;
+    Pair<ConstDeclaration, TemplateGroup> pairconst = null;
+}
 :
-    ( annotation_member[annotation]
-        /* enum_type SEMICOLON
-        | const_decl SEMICOLON
-        | type_declarator SEMICOLON */ )*
+    (
+      annotation_member[annotation]
+    | enum_type SEMICOLON
+        {
+            pairtype = $enum_type.returnPair;
+            $annotation.addEnums(pairtype.first());
+        }
+    | const_decl[annotation] SEMICOLON
+        {
+            pairconst = $const_decl.returnPair;
+            $annotation.addConstDecl(pairconst.first());
+        }
+    | KW_TYPEDEF type_declarator[annotation] SEMICOLON
+        {
+            pairtype = $type_declarator.returnPair;
+            $annotation.addTypeDefs(pairtype.first());
+        }
+    )*
     ;
 
 annotation_member [AnnotationDeclaration annotation]
@@ -1155,7 +1193,7 @@ annotation_member [AnnotationDeclaration annotation]
     String literalStr = null;
 }
     :
-    const_type simple_declarator ( KW_DEFAULT const_exp { literalStr=$const_exp.literalStr; } )? SEMICOLON
+    const_type[annotation] simple_declarator ( KW_DEFAULT const_exp { literalStr=$const_exp.literalStr; } )? SEMICOLON
     {
         if(!$annotation.addMember(new AnnotationMember($simple_declarator.ret.first().first(), $const_type.typecode, literalStr)))
         {
@@ -1465,7 +1503,7 @@ member_def [StructTypeCode structTP] returns [Vector<Pair<Pair<String, Token>, M
     ;
 
 member [StructTypeCode structTP] returns [Vector<Pair<Pair<String, Token>, Member>> ret = new Vector<Pair<Pair<String, Token>, Member>>()]
-    :   type_spec declarators SEMICOLON
+    :   type_spec[null] declarators SEMICOLON
         {
             /*
             if (structTP != null)
@@ -1663,7 +1701,7 @@ case_stmt [UnionTypeCode unionTP]
 //    ;
 
 element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<String, Token>, UnionMember> ret = null]
-    :   type_spec declarator
+    :   type_spec[null] declarator
         {
             if($type_spec.typecode != null)
             {
@@ -1729,9 +1767,9 @@ sequence_type returns [SequenceTypeCode typecode = null]
     Definition def = null;
 }
     :   ( (KW_SEQUENCE)
-        LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   (KW_SEQUENCE)
-        LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
+        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
         {
            if(type != null)
            {
@@ -1752,9 +1790,9 @@ set_type returns [SetTypeCode typecode = null]
     String maxsize = null;
     Definition def = null;
 } : ( KW_SET
-		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+		LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_SET
-		LEFT_ANG_BRACKET simple_type_spec { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
+		LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
 		{
 	        $typecode = new SetTypeCode(maxsize);
             if (type != null)
@@ -1776,12 +1814,12 @@ map_type returns [MapTypeCode typecode = null]
     Definition valueDef = null;
     String maxsize = null;
 }   :   KW_MAP
-		LEFT_ANG_BRACKET simple_type_spec
+		LEFT_ANG_BRACKET simple_type_spec[null]
         {
             keyType=$simple_type_spec.typecode;
             keyDef=$simple_type_spec.def;
         }
-        COMA simple_type_spec
+        COMA simple_type_spec[null]
         {
             valueType=$simple_type_spec.typecode;
             valueDef=$simple_type_spec.def;
