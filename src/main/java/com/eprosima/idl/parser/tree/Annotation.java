@@ -16,6 +16,7 @@ package com.eprosima.idl.parser.tree;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collection;
 
 public class Annotation
 {
@@ -80,6 +81,11 @@ public class Annotation
     public Map<String, AnnotationMember> getValues()
     {
         return m_members;
+    }
+
+    public Collection<AnnotationMember> getValueList()
+    {
+        return m_members.values();
     }
 
     private HashMap<String, AnnotationMember> m_members = null;

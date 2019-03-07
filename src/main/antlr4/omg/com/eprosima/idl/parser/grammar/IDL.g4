@@ -538,6 +538,7 @@ const_type[AnnotationDeclaration annotation] returns [TypeCode typecode = null]
     |   floating_pt_type { $typecode = $floating_pt_type.typecode; }
     |   string_type { $typecode = $string_type.typecode; }
     |   wide_string_type { $typecode = $wide_string_type.typecode; }
+    |   any_type { $typecode = $any_type.typecode; }
     |   fixed_pt_const_type
     |   scoped_name
         {
@@ -1076,12 +1077,11 @@ octet_type returns [TypeCode typecode]
     :   KW_OCTET
     ;
 
-any_type
+any_type returns [TypeCode typecode]
 @init{
-    Token tk = _input.LT(1);
+    $typecode = new AnyTypeCode();
 }
     :   KW_ANY
-    {throw new ParseException(tk, ". Any type is not supported"); }
     ;
 
 object_type
@@ -1674,6 +1674,7 @@ case_stmt [UnionTypeCode unionTP]
 {
     List<String> labels = new ArrayList<String>();
     boolean defaul = false;
+    List<Annotation> annotations = new ArrayList<Annotation>();
 }
     :    ( KW_CASE const_exp
         {
@@ -1681,17 +1682,26 @@ case_stmt [UnionTypeCode unionTP]
         } COLON
         | KW_DEFAULT { defaul = true; } COLON
         )+
-        element_spec[labels, defaul] SEMICOLON
+        (annotation_appl { annotations.add($annotation_appl.annotation); })* element_spec[labels, defaul] SEMICOLON
         {
-           if($element_spec.ret != null)
-           {
-               int ret = unionTP.addMember($element_spec.ret.second());
+            if($element_spec.ret != null)
+            {
+                int ret = unionTP.addMember($element_spec.ret.second());
 
-               if(ret == -1)
-                   throw new ParseException($element_spec.ret.first().second(), " is already defined.");
-               else if(ret == -2)
-                   throw new ParseException($element_spec.ret.first().second(), " is also a default attribute. Another was defined previously.");
-           }
+                if(ret == -1)
+                {
+                    throw new ParseException($element_spec.ret.first().second(), " is already defined.");
+                }
+                else if(ret == -2)
+                {
+                    throw new ParseException($element_spec.ret.first().second(), " is also a default attribute. Another was defined previously.");
+                }
+
+                for (Annotation ann : annotations)
+                {
+                    $element_spec.ret.second().addAnnotation(ctx, ann);
+                }
+            }
         }
     ;
 
@@ -1732,21 +1742,21 @@ enum_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
     :   KW_ENUM
         identifier { name=$identifier.id; enumTP = new EnumTypeCode(ctx.getScope(), name); }
         LEFT_BRACE  enumerator_list[enumTP] RIGHT_BRACE
-       {
-           if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-           {
+        {
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
                 if(tmanager != null) {
                     enumTemplates = tmanager.createTemplateGroup("enum_type");
                     enumTemplates.setAttribute("ctx", ctx);
                     enumTemplates.setAttribute("enum", enumTP);
                 }
-           }
+            }
 
-           // Return the returned data.
-           vector = new Vector<TypeCode>();
-           vector.add(enumTP);
-           $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, enumTemplates);
-       }
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            vector.add(enumTP);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, enumTemplates);
+        }
     ;
 
 enumerator_list [EnumTypeCode enumTP]
@@ -1756,8 +1766,19 @@ enumerator_list [EnumTypeCode enumTP]
 enumerator [EnumTypeCode enumTP]
 @init{
     String name = null;
+    ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 }
-    :   identifier{ name=$identifier.id; enumTP.addMember(new EnumMember(name));}
+    //:   identifier{ name=$identifier.id; enumTP.addMember(new EnumMember(name));}
+    :   (annotation_appl { annotations.add($annotation_appl.annotation); })* identifier
+        {
+            name=$identifier.id;
+            EnumMember new_field = new EnumMember(name);
+            for (Annotation ann : annotations)
+            {
+                new_field.addAnnotation(ctx, ann);
+            }
+            enumTP.addMember(new_field);
+        }
     ;
 
 sequence_type returns [SequenceTypeCode typecode = null]
@@ -2417,29 +2438,37 @@ annotation_appl returns [Annotation annotation = null]
 @init
 {
     AnnotationDeclaration anndecl = null;
+    String name;
 }
     :
-    AT scoped_name
+    AT
+    (
+        scoped_name { name = $scoped_name.pair.first(); }
+        | KW_DEFAULT { name = "default"; }
+    )
     {
-        anndecl = ctx.getAnnotationDeclaration($scoped_name.pair.first());
+        anndecl = ctx.getAnnotationDeclaration(name);
         if(anndecl == null)
         {
-            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + $scoped_name.pair.first() + " not supported. Ignoring...");
+            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + name + " not supported. Ignoring...");
         }
         else
         {
             $annotation = new Annotation(anndecl);
         }
+
     }
-    ( LEFT_BRACKET ( annotation_appl_params[$annotation, $scoped_name.pair.second()] )? RIGHT_BRACKET )?
+    ( LEFT_BRACKET ( annotation_appl_params[$annotation, name] )? RIGHT_BRACKET )?
     ;
 
 // TODO Support several members in annotations.
-annotation_appl_params [Annotation annotation, Token tkannot]
+annotation_appl_params [Annotation annotation, String tkannot]
     : const_exp
     {
         if(annotation != null && !annotation.addValue($const_exp.literalStr))
-            throw new ParseException(tkannot, "not has only one attribute.");
+        {
+            System.out.println("WARNING: " + tkannot + " doesn't has only one attribute.");
+        }
     }
     | annotation_appl_param[annotation] ( COMA annotation_appl_param[annotation] )*
     ;

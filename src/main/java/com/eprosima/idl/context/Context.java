@@ -31,6 +31,7 @@ import com.eprosima.idl.parser.typecode.Kind;
 import com.eprosima.idl.parser.typecode.PrimitiveTypeCode;
 import com.eprosima.idl.parser.typecode.StructTypeCode;
 import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.parser.typecode.AnyTypeCode;
 import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.util.Util;
 import java.io.File;
@@ -156,7 +157,7 @@ public class Context
         positionann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_SHORT), "-1"));
 
         AnnotationDeclaration valueann = createAnnotationDeclaration("value", null);
-        valueann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_NULL), null));
+        valueann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
 
         AnnotationDeclaration extensibilityann = createAnnotationDeclaration("extensibility", null);
         EnumTypeCode extensibilityannenum = new EnumTypeCode(extensibilityann.getScopedname(), "extensibilityannenum");
@@ -180,22 +181,22 @@ public class Context
         createAnnotationDeclaration("default_literal", null);
 
         AnnotationDeclaration rangeann = createAnnotationDeclaration("range", null);
-        rangeann.addMember(new AnnotationMember("min", new PrimitiveTypeCode(Kind.KIND_NULL), null));
+        rangeann.addMember(new AnnotationMember("min", new AnyTypeCode(), null));
             //String.valueOf(Integer.MIN_VALUE)));
-        rangeann.addMember(new AnnotationMember("max", new PrimitiveTypeCode(Kind.KIND_NULL), null));
+        rangeann.addMember(new AnnotationMember("max", new AnyTypeCode(), null));
             //String.valueOf(Integer.MAX_VALUE)));
 
         AnnotationDeclaration unitsann = createAnnotationDeclaration("units", null);
         unitsann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
 
         AnnotationDeclaration defaultann = createAnnotationDeclaration("default", null);
-        defaultann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_NULL), null));
+        defaultann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
 
         AnnotationDeclaration minann = createAnnotationDeclaration("min", null);
-        minann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_NULL), null));
+        minann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
 
         AnnotationDeclaration maxann = createAnnotationDeclaration("max", null);
-        maxann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_NULL), null));
+        maxann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
 
         AnnotationDeclaration bit_boundann = createAnnotationDeclaration("bit_bound", null);
         bit_boundann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_USHORT), "-1"));

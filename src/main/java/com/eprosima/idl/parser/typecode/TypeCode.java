@@ -20,6 +20,7 @@ import com.eprosima.idl.context.Context;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collection;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
@@ -43,6 +44,11 @@ public abstract class TypeCode implements Notebook
     public int getKind()
     {
         return m_kind;
+    }
+
+    public boolean isIsAnyTypeCode()
+    {
+        return m_kind == Kind.KIND_NULL;
     }
 
     /*|
@@ -184,6 +190,66 @@ public abstract class TypeCode implements Notebook
     public Map<String, Annotation> getAnnotations()
     {
         return m_annotations;
+    }
+
+    public Collection<Annotation> getAnnotationList()
+    {
+        return m_annotations.values();
+    }
+
+    public boolean isAnnotationFinal()
+    {
+        Annotation ann = m_annotations.get("final");
+        if (ann != null)
+        {
+            return true;
+        }
+        ann = m_annotations.get("extensibility");
+        if (ann != null)
+        {
+            return ann.getValue().equals("FINAL");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationAppendable()
+    {
+        Annotation ann = m_annotations.get("appendable");
+        if (ann != null)
+        {
+            return true;
+        }
+        ann = m_annotations.get("extensibility");
+        if (ann != null)
+        {
+            return ann.getValue().equals("APPENDABLE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationMutable()
+    {
+        Annotation ann = m_annotations.get("mutable");
+        if (ann != null)
+        {
+            return true;
+        }
+        ann = m_annotations.get("extensibility");
+        if (ann != null)
+        {
+            return ann.getValue().equals("MUTABLE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationNested()
+    {
+        Annotation ann = m_annotations.get("nested");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
     }
 
     private int m_kind = Kind.KIND_NULL;

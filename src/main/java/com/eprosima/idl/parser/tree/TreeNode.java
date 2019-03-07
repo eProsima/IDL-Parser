@@ -25,7 +25,7 @@ public class TreeNode implements Notebook
 {
     public TreeNode(String scopeFile, boolean isInScope, String scope, String name, Token tk)
     {
-        m_scopeFile = scopeFile;	
+        m_scopeFile = scopeFile;
         m_isinscope = isInScope;
         m_name = name;
         m_scope = scope;
@@ -125,4 +125,3 @@ public class TreeNode implements Notebook
     //! IDL Parser token
     Token tk_ = null;
 }
-
