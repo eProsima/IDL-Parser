@@ -79,7 +79,6 @@ public class AnnotationMember
 
     public void setValue(String value)
     {
-        System.out.println("Setting value " + value);
         m_value = value;
     }
 

@@ -76,7 +76,19 @@ public class Member implements Notebook
     public void addAnnotation(Context ctx, Annotation annotation)
     {
         if(annotation != null)
-            m_annotations.put(annotation.getName(), annotation);
+        {
+            if (((annotation.getName().equals("key") || annotation.getName().equals("Key") )
+                && isAnnotationNonSerialized())
+                || (annotation.getName().equals("non_serialized") && isAnnotationKey()))
+            {
+                System.err.println("ERROR: Member " + m_name + " has incompatible annotations key and non_serialized.");
+                System.exit(1);
+            }
+            else
+            {
+                m_annotations.put(annotation.getName(), annotation);
+            }
+        }
     }
 
     @Override

@@ -229,6 +229,10 @@ public class Context
 
         AnnotationDeclaration amiann = createAnnotationDeclaration("ami", null);
         amiann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        // Create default @non_serialized annotation.
+        AnnotationDeclaration non_serializedann = createAnnotationDeclaration("non_serialized", null);
+        non_serializedann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
     }
 
     public String getFilename()
