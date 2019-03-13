@@ -36,6 +36,7 @@ public class TestManager
     private String generatorName;
     private String inputPath;
     private String outputPath;
+    private String exampleArch;
     private List<String> cMakeArgs;
     private boolean errorOutputOnly;
 
@@ -46,6 +47,19 @@ public class TestManager
         this.generatorName = generatorName;
         this.inputPath = inputPath;
         this.outputPath = outputPath;
+        this.exampleArch = null;
+        this.cMakeArgs = new ArrayList<String>();
+        this.errorOutputOnly = true;
+    }
+
+    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath, String exampleArch)
+    {
+        this.level = level;
+        this.idls = new ArrayList<IDL>(Arrays.asList(ALL_IDLS));
+        this.generatorName = generatorName;
+        this.inputPath = inputPath;
+        this.outputPath = outputPath;
+        this.exampleArch = exampleArch;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
     }
@@ -111,7 +125,16 @@ public class TestManager
             boolean notRunIncludeIDL = test.getIDL() != IDL.INCLUDE;
             // ---
 
-            return printlnStatus(test.generate(generatorName, inputPath, level == TestLevel.RUN && notRunIncludeIDL));
+            if (exampleArch == null)
+            {
+                return printlnStatus(
+                    test.generate(generatorName, inputPath, level == TestLevel.RUN && notRunIncludeIDL));
+            }
+            else
+            {
+                return printlnStatus(
+                    test.generate(generatorName, inputPath, exampleArch, level == TestLevel.RUN && notRunIncludeIDL));
+            }
         }
 
         return precondition;
@@ -153,8 +176,8 @@ public class TestManager
             {
                 return printlnStatus(true);
             }
-            // --- 
-                
+            // ---
+
             return printlnStatus(test.run());
         }
 
