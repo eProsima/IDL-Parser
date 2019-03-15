@@ -48,6 +48,9 @@ public class UnionTypeCode extends MemberedTypeCode
     @Override
     public boolean isObjectType() { return true; }
 
+    @Override
+    public boolean isIsUnionType() {return true; }
+
     /*!
      * @return 0 is ok, -1 the member is repeated, -2 is another default member.
      */

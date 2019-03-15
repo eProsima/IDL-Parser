@@ -61,7 +61,9 @@ type_10(name) ::= <<$name$>>
 // TODO Para que sirve empty en FastBuffers?
 type_e(type, maxsize, empty) ::= <<std::vector<$type$>$empty$>>
 
-type_1a(name, type) ::= <<>>
+type_1a(name, type) ::= <<$name$>>
+
+type_1b(name) ::= <<$name$>>
 
 type_1d(name) ::= <<int8_t>>
 

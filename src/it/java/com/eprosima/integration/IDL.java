@@ -13,7 +13,11 @@ public enum IDL
     SEQUENCE_STRING,
     SEQUENCE_CUSTOM,
     SEQUENCE_NESTED,
-    INCLUDE(BASIC);
+    INCLUDE(BASIC),
+    BITSET_BITMASK,
+    COVERAGE_BASIC,
+    COVERAGE_COMPLEX,
+    FORWARD_DECLS;
 
     private IDL required = null;
 

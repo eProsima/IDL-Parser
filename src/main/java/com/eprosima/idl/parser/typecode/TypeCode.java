@@ -153,6 +153,8 @@ public abstract class TypeCode implements Notebook
     public boolean isIsType_a(){return false;}
     public boolean isIsType_10(){return false;}
     public boolean isIsType_13(){return false;}
+    public boolean isIsBitmaskType(){return false;}
+    public boolean isIsBitsetType(){return false;}
     public boolean isIsStringType() { return false;}
     public boolean isIsWStringType() { return false;}
     public boolean isIsWCharType() { return false;}
@@ -160,6 +162,8 @@ public abstract class TypeCode implements Notebook
     public boolean isIsMapType() { return false; }
     public boolean isIsSequenceType() { return false; }
     public boolean isIsArrayType() { return false; }
+    public boolean isIsStructType() {return isIsType_a(); }
+    public boolean isIsUnionType() {return m_kind == Kind.KIND_UNION; }
 
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getTypeIdentifier() { return "TK_None"; }

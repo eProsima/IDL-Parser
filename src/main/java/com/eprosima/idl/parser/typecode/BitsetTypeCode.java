@@ -31,6 +31,9 @@ public class BitsetTypeCode extends MemberedTypeCode
     }
 
     @Override
+    public boolean isIsBitsetType(){return true;}
+
+    @Override
     public String getCppTypename()
     {
         StringTemplate st = getCppTypenameFromStringTemplate();

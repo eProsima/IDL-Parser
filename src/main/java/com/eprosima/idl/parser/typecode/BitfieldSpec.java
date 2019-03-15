@@ -14,7 +14,6 @@
 
 package com.eprosima.idl.parser.typecode;
 
-
 public class BitfieldSpec
 {
     public BitfieldSpec(String scope, String bitsize, TypeCode type)

@@ -43,6 +43,45 @@ public class BitmaskTypeCode extends MemberedTypeCode
     }
 
     @Override
+    public boolean isPrimitive() {return true;}
+
+    @Override
+    public boolean isIsBitmaskType(){return true;}
+
+    @Override
+    public String getSize()
+    {
+        if (m_bit_bound <= 8)
+        {
+            return "1";
+        }
+        else if (m_bit_bound <= 16)
+        {
+            return "2";
+        }
+        else if (m_bit_bound <= 32)
+        {
+            return "4";
+        }
+        else if (m_bit_bound <= 64)
+        {
+            return "8";
+        }
+        return "4";
+    }
+
+    @Override
+    public String getInitialValue()
+    {
+        if(getMembers().size() > 0)
+        {
+            return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
+        }
+
+        return "";
+    }
+
+    @Override
     public String getCppTypename()
     {
         StringTemplate st = getCppTypenameFromStringTemplate();
@@ -144,6 +183,27 @@ public class BitmaskTypeCode extends MemberedTypeCode
         else if (m_bit_bound <= 64)
         {
             return " : uint64_t";
+        }
+        return "";
+    }
+
+    public String getCastingType()
+    {
+        if (m_bit_bound <= 8)
+        {
+            return "uint8_t";
+        }
+        else if (m_bit_bound <= 16)
+        {
+            return "uint16_t";
+        }
+        else if (m_bit_bound <= 32)
+        {
+            return "uint32_t";
+        }
+        else if (m_bit_bound <= 64)
+        {
+            return "uint64_t";
         }
         return "";
     }
