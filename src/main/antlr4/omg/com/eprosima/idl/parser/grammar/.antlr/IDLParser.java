@@ -326,7 +326,7 @@ public class IDLParser extends Parser {
 
 				            dtg=((SpecificationContext)_localctx).definition.dtg;
 				            if (dtg!=null) {
-				                if(maintemplates != null) {
+				                if(maintemplates != null && dtg.second() != null) { // Don't add templates for forward decl.
 				                    maintemplates.setAttribute("definitions", dtg.second());
 				                }
 				                for(int count = 0; count < dtg.first().size(); ++count)
@@ -453,7 +453,15 @@ public class IDLParser extends Parser {
 				((DefinitionContext)_localctx).type_decl = type_decl(annotations, defs);
 				setState(346);
 				match(SEMICOLON);
-				 tdtg=((DefinitionContext)_localctx).type_decl.returnPair; if(tdtg!=null){ for(TypeDeclaration tydl : tdtg.first()) vector.add(tydl); ((DefinitionContext)_localctx).dtg =  new Pair<Vector<Definition>, TemplateGroup>(vector, tdtg.second());}
+
+				            tdtg=((DefinitionContext)_localctx).type_decl.returnPair;
+				            if(tdtg!=null)
+				            {
+				                for(TypeDeclaration tydl : tdtg.first())
+				                    vector.add(tydl);
+				                ((DefinitionContext)_localctx).dtg =  new Pair<Vector<Definition>, TemplateGroup>(vector, tdtg.second());
+				            }
+				        
 				}
 				break;
 			case 2:
@@ -3628,7 +3636,16 @@ public class IDLParser extends Parser {
 			                else if(ttg.first().get(count) instanceof AliasTypeCode)
 			                    name = ((AliasTypeCode)ttg.first().get(count)).getName();
 
-			                TypeDeclaration typedeclaration = new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, ttg.first().get(count), tk);
+			                if (fw_name != null)
+			                {
+			                    if (ctx.getScope() != null && !ctx.getScope().isEmpty())
+			                    {
+			                        fw_name = ctx.getScope() + "::" + fw_name;
+			                    }
+			                }
+
+			                TypeDeclaration typedeclaration = (fw_name == null) ? new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, ttg.first().get(count), tk) : ctx.getTypeDeclaration(fw_name);
+			                //System.out.println("Type ttg not null: " + name);
 
 			                // Add annotations
 			                for(Annotation annotation : annotations)
@@ -3640,27 +3657,14 @@ public class IDLParser extends Parser {
 			                }
 
 			                // Add type declaration to the map with all typedeclarations.
-			                ctx.addTypeDeclaration(typedeclaration);
+			                if (fw_name == null)
+			                {
+			                    ctx.addTypeDeclaration(typedeclaration);
+			                }
 
 			                vector.add(typedeclaration);
 
 			                ((Type_declContext)_localctx).returnPair =  new Pair<Vector<TypeDeclaration>, TemplateGroup>(vector, ttg.second());
-			            }
-			        }
-			        else if (fw_name != null) // It was a forward declaration
-			        {
-			            if (ctx.getScope() != null && !ctx.getScope().isEmpty())
-			            {
-			                fw_name = ctx.getScope() + "::" + fw_name;
-			            }
-			            TypeDeclaration typedeclaration = ctx.getTypeDeclaration(fw_name);
-			            // Add annotations
-			            for(Annotation annotation : annotations)
-			            {
-			                if (annotation != null) // Some annotations may be ignored
-			                {
-			                    typedeclaration.addAnnotation(ctx, annotation);
-			                }
 			            }
 			        }
 			    
@@ -6536,31 +6540,24 @@ public class IDLParser extends Parser {
 				setState(1180);
 				match(RIGHT_BRACE);
 
-				            if (!fw_declaration)
+				            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
 				            {
-				                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-				                {
-				                    if(tmanager != null) {
-				                        structTemplates = tmanager.createTemplateGroup("struct_type");
-				                        structTemplates.setAttribute("ctx", ctx);
-				                        structTemplates.setAttribute("struct", structTP);
-				                    }
+				                if(tmanager != null) {
+				                    structTemplates = tmanager.createTemplateGroup("struct_type");
+				                    structTemplates.setAttribute("ctx", ctx);
+				                    structTemplates.setAttribute("struct", structTP);
 				                }
-				                // Return the returned data.
-				                vector = new Vector<TypeCode>();
-				                vector.add(structTP);
-				                if (parentStruct != null)
-				                {
-				                    structTP.addInheritance(ctx, parentStruct);
-				                }
-				                ((Struct_typeContext)_localctx).returnPair =  new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
-				                ((Struct_typeContext)_localctx).fw_name =  null;
 				            }
-				            else
+				            // Return the returned data.
+				            vector = new Vector<TypeCode>();
+				            structTP.setForwarded(fw_declaration);
+				            vector.add(structTP);
+				            if (parentStruct != null)
 				            {
-				                ((Struct_typeContext)_localctx).returnPair =  null;
-				                ((Struct_typeContext)_localctx).fw_name =  name;
+				                structTP.addInheritance(ctx, parentStruct);
 				            }
+				            ((Struct_typeContext)_localctx).returnPair =  new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
+				            ((Struct_typeContext)_localctx).fw_name =  (fw_declaration) ? name : null;
 				        
 				}
 				break;
@@ -6572,18 +6569,22 @@ public class IDLParser extends Parser {
 				setState(1184);
 				((Struct_typeContext)_localctx).identifier = identifier();
 
+				            // Forward declaration
 				            name=((Struct_typeContext)_localctx).identifier.id;
 				            structTP = ctx.createStructTypeCode(name);
+
 				            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
 				            {
 				                if(tmanager != null) {
-				                    structTemplates = tmanager.createTemplateGroup("struct_type");
+				                    structTemplates = tmanager.createTemplateGroup("fwd_decl");
 				                    structTemplates.setAttribute("ctx", ctx);
-				                    structTemplates.setAttribute("struct", structTP);
+				                    structTemplates.setAttribute("type", structTP);
 				                }
 				            }
+
 				            // Return the returned data.
 				            vector = new Vector<TypeCode>();
+				            structTP.setForwarded(true);
 				            vector.add(structTP);
 				            ((Struct_typeContext)_localctx).returnPair =  new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
 				            ((Struct_typeContext)_localctx).fw_name =  null;
@@ -6944,46 +6945,6 @@ public class IDLParser extends Parser {
 				setState(1222);
 				match(RIGHT_BRACE);
 
-				            if (!fw_decl)
-				            {
-				                // Calculate default label.
-				                TemplateUtil.setUnionDefaultLabel(defs, unionTP, ctx.getScopeFile(), line);
-
-				                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-				                {
-				                    if(tmanager != null) {
-				                        unionTemplates = tmanager.createTemplateGroup("union_type");
-				                        unionTemplates.setAttribute("ctx", ctx);
-				                        unionTemplates.setAttribute("union", unionTP);
-				                    }
-				                }
-
-				                // Return the returned data.
-				                vector = new Vector<TypeCode>();
-				                vector.add(unionTP);
-				                ((Union_typeContext)_localctx).returnPair =  new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
-				                ((Union_typeContext)_localctx).fw_name =  null;
-				            }
-				            else
-				            {
-				                ((Union_typeContext)_localctx).returnPair =  null;
-				                ((Union_typeContext)_localctx).fw_name =  name;
-				            }
-				        
-				}
-				break;
-			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(1225);
-				match(KW_UNION);
-				setState(1226);
-				((Union_typeContext)_localctx).identifier = identifier();
-
-				            name=((Union_typeContext)_localctx).identifier.id;
-				            // TODO Check supported types for discriminator: long, enumeration, etc...
-				            unionTP = new UnionTypeCode(ctx.getScope(), name);
-				            line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
 				            // Calculate default label.
 				            TemplateUtil.setUnionDefaultLabel(defs, unionTP, ctx.getScopeFile(), line);
 
@@ -6998,6 +6959,37 @@ public class IDLParser extends Parser {
 
 				            // Return the returned data.
 				            vector = new Vector<TypeCode>();
+				            unionTP.setForwarded(fw_decl);
+				            vector.add(unionTP);
+				            ((Union_typeContext)_localctx).returnPair =  new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
+				            ((Union_typeContext)_localctx).fw_name =  (fw_decl) ? name : null;
+				        
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(1225);
+				match(KW_UNION);
+				setState(1226);
+				((Union_typeContext)_localctx).identifier = identifier();
+
+				            name=((Union_typeContext)_localctx).identifier.id;
+				            // TODO Check supported types for discriminator: long, enumeration, etc...
+				            unionTP = new UnionTypeCode(ctx.getScope(), name);
+
+				            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+				            {
+				                if(tmanager != null) {
+				                    unionTemplates = tmanager.createTemplateGroup("fwd_decl");
+				                    unionTemplates.setAttribute("ctx", ctx);
+				                    unionTemplates.setAttribute("type", unionTP);
+				                }
+				            }
+
+				            // Return the returned data.
+				            vector = new Vector<TypeCode>();
+				            unionTP.setForwarded(true);
 				            vector.add(unionTP);
 				            ((Union_typeContext)_localctx).returnPair =  new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
 				            ((Union_typeContext)_localctx).fw_name =  null;

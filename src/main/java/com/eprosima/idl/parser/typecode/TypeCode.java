@@ -256,10 +256,22 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isForwarded()
+    {
+        return m_forwarded;
+    }
+
+    public void setForwarded(boolean fwd)
+    {
+        m_forwarded = fwd;
+    }
+
     private int m_kind = Kind.KIND_NULL;
 
     // Added parent object to typecode because was needed in DDS with our types (TopicsPlugin_gettypecode)
     private Object m_parent = null;
 
     private HashMap<String, Annotation> m_annotations = null;
+
+    private boolean m_forwarded = false;
 }

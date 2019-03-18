@@ -73,7 +73,7 @@ specification [Context context, TemplateManager templatemanager, TemplateGroup m
         {
             dtg=$definition.dtg;
             if (dtg!=null) {
-                if(maintemplates != null) {
+                if(maintemplates != null && dtg.second() != null) { // Don't add templates for forward decl.
                     maintemplates.setAttribute("definitions", dtg.second());
                 }
                 for(int count = 0; count < dtg.first().size(); ++count)
@@ -112,7 +112,16 @@ definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
 
     if(annotations == null) annotations = new Vector<Annotation>();
 }
-    :   type_decl[annotations, defs] SEMICOLON { tdtg=$type_decl.returnPair; if(tdtg!=null){ for(TypeDeclaration tydl : tdtg.first()) vector.add(tydl); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, tdtg.second());}}  // Type Declaration
+    :   type_decl[annotations, defs] SEMICOLON
+        {
+            tdtg=$type_decl.returnPair;
+            if(tdtg!=null)
+            {
+                for(TypeDeclaration tydl : tdtg.first())
+                    vector.add(tydl);
+                $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, tdtg.second());
+            }
+        }  // Type Declaration
     |   const_decl[null] SEMICOLON { cdtg=$const_decl.returnPair; if(cdtg!=null){ vector.add(cdtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, cdtg.second());}} // Const Declaration
     |   except_decl SEMICOLON { etg=$except_decl.returnPair; if(etg!=null){ vector.add(etg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, etg.second());}} // Exception.
     |   interface_or_forward_decl[annotations] SEMICOLON { itg=$interface_or_forward_decl.itg; if(itg!=null){ vector.add(itg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());}} // Interface
@@ -744,7 +753,16 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
                 else if(ttg.first().get(count) instanceof AliasTypeCode)
                     name = ((AliasTypeCode)ttg.first().get(count)).getName();
 
-                TypeDeclaration typedeclaration = new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, ttg.first().get(count), tk);
+                if (fw_name != null)
+                {
+                    if (ctx.getScope() != null && !ctx.getScope().isEmpty())
+                    {
+                        fw_name = ctx.getScope() + "::" + fw_name;
+                    }
+                }
+
+                TypeDeclaration typedeclaration = (fw_name == null) ? new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, ttg.first().get(count), tk) : ctx.getTypeDeclaration(fw_name);
+                //System.out.println("Type ttg not null: " + name);
 
                 // Add annotations
                 for(Annotation annotation : annotations)
@@ -756,27 +774,14 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
                 }
 
                 // Add type declaration to the map with all typedeclarations.
-                ctx.addTypeDeclaration(typedeclaration);
+                if (fw_name == null)
+                {
+                    ctx.addTypeDeclaration(typedeclaration);
+                }
 
                 vector.add(typedeclaration);
 
                 $returnPair = new Pair<Vector<TypeDeclaration>, TemplateGroup>(vector, ttg.second());
-            }
-        }
-        else if (fw_name != null) // It was a forward declaration
-        {
-            if (ctx.getScope() != null && !ctx.getScope().isEmpty())
-            {
-                fw_name = ctx.getScope() + "::" + fw_name;
-            }
-            TypeDeclaration typedeclaration = ctx.getTypeDeclaration(fw_name);
-            // Add annotations
-            for(Annotation annotation : annotations)
-            {
-                if (annotation != null) // Some annotations may be ignored
-                {
-                    typedeclaration.addAnnotation(ctx, annotation);
-                }
             }
         }
     }
@@ -1421,38 +1426,6 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
         )?
         LEFT_BRACE member_list[structTP] RIGHT_BRACE
         {
-            if (!fw_declaration)
-            {
-                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-                {
-                    if(tmanager != null) {
-                        structTemplates = tmanager.createTemplateGroup("struct_type");
-                        structTemplates.setAttribute("ctx", ctx);
-                        structTemplates.setAttribute("struct", structTP);
-                    }
-                }
-                // Return the returned data.
-                vector = new Vector<TypeCode>();
-                vector.add(structTP);
-                if (parentStruct != null)
-                {
-                    structTP.addInheritance(ctx, parentStruct);
-                }
-                $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
-                $fw_name = null;
-            }
-            else
-            {
-                $returnPair = null;
-                $fw_name = name;
-            }
-        }
-    |
-        KW_STRUCT
-        identifier
-        {
-            name=$identifier.id;
-            structTP = ctx.createStructTypeCode(name);
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
                 if(tmanager != null) {
@@ -1463,6 +1436,35 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
             }
             // Return the returned data.
             vector = new Vector<TypeCode>();
+            structTP.setForwarded(fw_declaration);
+            vector.add(structTP);
+            if (parentStruct != null)
+            {
+                structTP.addInheritance(ctx, parentStruct);
+            }
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
+            $fw_name = (fw_declaration) ? name : null;
+        }
+    |
+        KW_STRUCT
+        identifier
+        {
+            // Forward declaration
+            name=$identifier.id;
+            structTP = ctx.createStructTypeCode(name);
+
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    structTemplates = tmanager.createTemplateGroup("fwd_decl");
+                    structTemplates.setAttribute("ctx", ctx);
+                    structTemplates.setAttribute("type", structTP);
+                }
+            }
+
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            structTP.setForwarded(true);
             vector.add(structTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
             $fw_name = null;
@@ -1582,40 +1584,6 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
         }
         LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
         {
-            if (!fw_decl)
-            {
-                // Calculate default label.
-                TemplateUtil.setUnionDefaultLabel(defs, unionTP, ctx.getScopeFile(), line);
-
-                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-                {
-                    if(tmanager != null) {
-                        unionTemplates = tmanager.createTemplateGroup("union_type");
-                        unionTemplates.setAttribute("ctx", ctx);
-                        unionTemplates.setAttribute("union", unionTP);
-                    }
-                }
-
-                // Return the returned data.
-                vector = new Vector<TypeCode>();
-                vector.add(unionTP);
-                $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
-                $fw_name = null;
-            }
-            else
-            {
-                $returnPair = null;
-                $fw_name = name;
-            }
-        }
-    |
-        KW_UNION
-        identifier
-        {
-            name=$identifier.id;
-            // TODO Check supported types for discriminator: long, enumeration, etc...
-            unionTP = new UnionTypeCode(ctx.getScope(), name);
-            line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
             // Calculate default label.
             TemplateUtil.setUnionDefaultLabel(defs, unionTP, ctx.getScopeFile(), line);
 
@@ -1630,6 +1598,31 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
 
             // Return the returned data.
             vector = new Vector<TypeCode>();
+            unionTP.setForwarded(fw_decl);
+            vector.add(unionTP);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
+            $fw_name = (fw_decl) ? name : null;
+        }
+    |
+        KW_UNION
+        identifier
+        {
+            name=$identifier.id;
+            // TODO Check supported types for discriminator: long, enumeration, etc...
+            unionTP = new UnionTypeCode(ctx.getScope(), name);
+
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    unionTemplates = tmanager.createTemplateGroup("fwd_decl");
+                    unionTemplates.setAttribute("ctx", ctx);
+                    unionTemplates.setAttribute("type", unionTP);
+                }
+            }
+
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            unionTP.setForwarded(true);
             vector.add(unionTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
             $fw_name = null;
