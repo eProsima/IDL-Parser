@@ -82,3 +82,9 @@ module bitmodule
 		long mylong;
 	};
 };
+
+struct Struct_Two
+{
+	Struct_One myStructOne;
+	bitmodule::BM2 myStructBits;
+};

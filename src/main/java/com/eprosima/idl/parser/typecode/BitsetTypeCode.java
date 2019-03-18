@@ -86,6 +86,11 @@ public class BitsetTypeCode extends MemberedTypeCode
         return result;
     }
 
+    public List<Bitfield> getAllBitfields() // Alias for getBitfields(true) for stg
+    {
+        return getBitfields(true);
+    }
+
     public boolean addBitfield(Bitfield bitfield)
     {
         if(!m_bitfields.containsKey(bitfield.getName()))

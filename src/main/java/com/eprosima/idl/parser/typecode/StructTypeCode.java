@@ -118,5 +118,10 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return allMembers;
     }
 
+    public List<Member> getAllMembers() // Alias for getMembers(true) for stg
+    {
+        return getMembers(true);
+    }
+
     private ArrayList<StructTypeCode> superTypes_;
 }
