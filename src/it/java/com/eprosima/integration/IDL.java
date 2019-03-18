@@ -17,7 +17,8 @@ public enum IDL
     BITSET_BITMASK,
     COVERAGE_BASIC,
     COVERAGE_COMPLEX,
-    FORWARD_DECLS;
+    FORWARD_DECLS,
+    NEW_FEATURES_4_2;
 
     private IDL required = null;
 
