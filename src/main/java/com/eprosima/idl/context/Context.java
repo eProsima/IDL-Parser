@@ -154,7 +154,7 @@ public class Context
         optionalann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
 
         AnnotationDeclaration positionann = createAnnotationDeclaration("position", null);
-        positionann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_SHORT), "-1"));
+        positionann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_USHORT), "-1"));
 
         AnnotationDeclaration valueann = createAnnotationDeclaration("value", null);
         valueann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
