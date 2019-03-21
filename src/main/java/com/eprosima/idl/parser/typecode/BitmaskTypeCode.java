@@ -76,12 +76,12 @@ public class BitmaskTypeCode extends MemberedTypeCode
     @Override
     public String getInitialValue()
     {
-        if(getMembers().size() > 0)
-        {
-            return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
-        }
+        //if(getMembers().size() > 0)
+        //{
+        //    return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
+        //}
 
-        return "";
+        return ""; // Don't initialize bitmask
     }
 
     @Override
