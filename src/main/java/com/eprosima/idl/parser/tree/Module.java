@@ -41,14 +41,14 @@ public class Module extends DefinitionContainer implements Definition
      */
     public boolean isThereAreValidDefinitions()
     {
-    	boolean returnedValue = false;
+        boolean returnedValue = false;
 
-		for(int count = 0; !returnedValue && count < getDefinitions().size(); ++count)
+	    for(int count = 0; !returnedValue && count < getDefinitions().size(); ++count)
         {
             returnedValue = getDefinitions().get(count).isIsInterface();
         }
 
-    	return returnedValue;
+        return returnedValue;
     }
 
     /*!
@@ -83,13 +83,13 @@ public class Module extends DefinitionContainer implements Definition
     @Override
     public boolean isIsInterface()
     {
-    	return false;
+        return false;
     }
 
     @Override
     public boolean isIsException()
     {
-    	return false;
+        return false;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class Module extends DefinitionContainer implements Definition
     }
 
 	@Override
-	public boolean isIsAnnotation()
+    public boolean isIsAnnotation()
     {
         return false;
     }

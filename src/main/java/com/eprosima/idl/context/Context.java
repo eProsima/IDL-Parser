@@ -65,7 +65,7 @@ public class Context
         // Remove absolute directory where the application was executed
         if(startsWith(m_file, m_userdir))
         {
-        	m_file = m_file.substring(m_userdir.length());
+            m_file = m_file.substring(m_userdir.length());
 
         	// Remove possible separator
             if(startsWith(m_file, java.io.File.separator))
@@ -74,7 +74,7 @@ public class Context
         /*
         // Remove relative directory if is equal that where the processed IDL is.
         if(m_directoryFile != null && startsWith(m_file, m_directoryFile))
-        	m_file = m_file.substring(m_directoryFile.length());
+            m_file = m_file.substring(m_directoryFile.length());
         */
 
         m_definitions = new ArrayList<Definition>();
@@ -100,17 +100,17 @@ public class Context
         {
             String include = (String)includePaths.get(i);
             if(startsWith(include, includeFlag))
-            	include = include.substring(includeFlag.length());
+                include = include.substring(includeFlag.length());
             if(startsWith(include, m_userdir))
             {
-            	include = include.substring(m_userdir.length());
+                include = include.substring(m_userdir.length());
 
             	// Remove possible separator
                 if(startsWith(include, java.io.File.separator))
                     include = include.substring(1);
             }
             if(m_directoryFile != null && startsWith(include, m_directoryFile))
-            	include = include.substring(m_directoryFile.length());
+                include = include.substring(m_directoryFile.length());
             // Add last separator.
             if(include.charAt(include.length() - 1) != java.io.File.separatorChar)
                 include += java.io.File.separator;
@@ -265,27 +265,27 @@ public class Context
      */
     public boolean isInScopedFile()
     {
-    	return m_scopeFile.equals(m_file);
+        return m_scopeFile.equals(m_file);
     }
 
     public String getScopeFile()
     {
-    	return m_scopeFile;
+        return m_scopeFile;
     }
 
     public boolean isScopeLimitToAll()
     {
-    	return m_scopeLimitToAll;
+        return m_scopeLimitToAll;
     }
 
     public void setScopeLimitToAll(boolean scopeLimitToAll)
     {
-    	m_scopeLimitToAll = scopeLimitToAll;
+        m_scopeLimitToAll = scopeLimitToAll;
     }
 
     public int getCurrentIncludeLine()
     {
-    	return m_currentincludeline;
+        return m_currentincludeline;
     }
 
     public Stack<Pair<String, Integer>> getScopeFilesStack()
@@ -410,11 +410,11 @@ public class Context
      */
     protected void addException(com.eprosima.idl.parser.tree.Exception exception)
     {
-    	com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(exception.getScopedname(), exception);
+        com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(exception.getScopedname(), exception);
 
         // TODO: Exception.
         if(prev != null)
-        	System.out.println("Warning: Redefined exception " + prev.getScopedname());
+            System.out.println("Warning: Redefined exception " + prev.getScopedname());
     }
 
     /*!
@@ -606,7 +606,7 @@ public class Context
      */
     public void addDependency(String dependency)
     {
-    	m_dependencies.add(dependency);
+        m_dependencies.add(dependency);
     }
 
     /*!
@@ -662,8 +662,8 @@ public class Context
         String dep = dependency.substring(0, dependency.length() - 4);
         // Remove directory if it is the same than main IDL file.
         if(m_directoryFile != null && startsWith(dep, m_directoryFile))
-        	dep = dep.substring(m_directoryFile.length());
-    	m_includedependency.add(dep);
+            dep = dep.substring(m_directoryFile.length());
+        m_includedependency.add(dep);
     }
 
     // TODO Quitar porque solo es para tipos (previous c) (usado para las excepciones). Mirar alternativa.
@@ -673,7 +673,7 @@ public class Context
      */
     public ArrayList<String> getIncludeDependencies()
     {
-    	return new ArrayList<String>(m_includedependency);
+        return new ArrayList<String>(m_includedependency);
     }
 
     /*!
@@ -816,12 +816,12 @@ public class Context
 
     protected boolean startsWith(String st, String prefix)
     {
-    	if(m_os.contains("Windows"))
+        if(m_os.contains("Windows"))
     	{
-    		return st.toLowerCase().startsWith(prefix.toLowerCase());
+    	    return st.toLowerCase().startsWith(prefix.toLowerCase());
     	}
 
-    	return st.startsWith(prefix);
+        return st.startsWith(prefix);
     }
 
     /*** Function to generate random loop variables in string templates ***/

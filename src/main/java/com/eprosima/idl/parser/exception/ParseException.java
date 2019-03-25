@@ -20,11 +20,11 @@ import org.antlr.v4.runtime.Token;
 
 public class ParseException extends RecognitionException
 {
-	public ParseException()
+    public ParseException()
     {
         super("", null, null, null);
     }
-    
+
     public ParseException(Token token, String message)
     {
         super(message, null, null, null);

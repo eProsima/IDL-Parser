@@ -99,7 +99,7 @@ public class MapTypeCode extends ContainerTypeCode
         m_keyTypeCode = keyTypeCode;
     }
 
-	public TypeCode getValueTypeCode()
+    public TypeCode getValueTypeCode()
     {
         return m_valueTypeCode;
     }
@@ -119,7 +119,7 @@ public class MapTypeCode extends ContainerTypeCode
         m_keyDefinition = keyDefinition;
     }
 
-	public Definition getValueDefinition()
+    public Definition getValueDefinition()
     {
         return m_valueDefinition;
     }

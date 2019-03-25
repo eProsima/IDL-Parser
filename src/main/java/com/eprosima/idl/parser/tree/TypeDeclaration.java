@@ -73,7 +73,7 @@ public class TypeDeclaration extends TreeNode implements Definition, Export
     @Override
     public boolean isIsInterface()
     {
-    	return false;
+        return false;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class TypeDeclaration extends TreeNode implements Definition, Export
     }
 
 	@Override
-	public boolean isIsAnnotation()
+    public boolean isIsAnnotation()
     {
         return false;
     }
@@ -97,7 +97,7 @@ public class TypeDeclaration extends TreeNode implements Definition, Export
     @Override
     public boolean resolve(Context ctx)
     {
-    	return true;
+        return true;
     }
 
     private TypeCode m_typecode = null;

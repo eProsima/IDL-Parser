@@ -83,7 +83,7 @@ public class AnnotationDeclaration extends TreeNode implements Definition
     @Override
     public boolean isIsInterface()
     {
-    	return false;
+        return false;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class AnnotationDeclaration extends TreeNode implements Definition
     }
 
 	@Override
-	public boolean isIsAnnotation()
+    public boolean isIsAnnotation()
     {
         return true;
     }

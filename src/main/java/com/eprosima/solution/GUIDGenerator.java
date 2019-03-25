@@ -19,45 +19,45 @@ import java.security.NoSuchAlgorithmException;
 
 public class GUIDGenerator
 {
-	static MessageDigest digester = null; 
-	
-	synchronized public static String genGUID(String name)
+    static MessageDigest digester = null;
+
+    synchronized public static String genGUID(String name)
     {
-		if(digester == null)
+	    if(digester == null)
         {
-			try
-            {	
-				digester = MessageDigest.getInstance("SHA-1");
+		    try
+            {
+			    digester = MessageDigest.getInstance("SHA-1");
 			}
             catch (NoSuchAlgorithmException nsae)
             {
-				nsae.printStackTrace();
+			    nsae.printStackTrace();
 			}
 		}
-		
-		assert(digester != null) : "Digester Was null";
-		
-		digester.reset();
-		
-		byte digest[] = digester.digest(name.toLowerCase().getBytes());
-		
-		assert(digest.length >= 16): "Digest too short";
-		
-		StringBuffer buf = new StringBuffer();
-		String hex = null;
-		for(int i = 0; i < 16; i++)
+
+	    assert(digester != null) : "Digester Was null";
+
+	    digester.reset();
+
+	    byte digest[] = digester.digest(name.toLowerCase().getBytes());
+
+	    assert(digest.length >= 16): "Digest too short";
+
+	    StringBuffer buf = new StringBuffer();
+	    String hex = null;
+	    for(int i = 0; i < 16; i++)
         {
-			hex = Integer.toHexString(digest[i]);
-			if(hex.length() == 1){
-				buf.append('0');
+		    hex = Integer.toHexString(digest[i]);
+		    if(hex.length() == 1){
+			    buf.append('0');
 			}else if(hex.length()> 2){
-				hex = hex.substring(hex.length() - 2);
+			    hex = hex.substring(hex.length() - 2);
 			}
-			buf.append(hex.toUpperCase());
-			if(i == 3 || i == 5 || i == 7 || i == 9){
-				buf.append('-');
+		    buf.append(hex.toUpperCase());
+		    if(i == 3 || i == 5 || i == 7 || i == 9){
+			    buf.append('-');
 			}
 		}
-		return buf.toString();
+	    return buf.toString();
 	}
 }

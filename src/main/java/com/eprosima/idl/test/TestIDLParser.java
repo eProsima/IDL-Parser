@@ -41,7 +41,7 @@ public class TestIDLParser {
     private String m_ppPath = null;
     private ArrayList<String> m_includePaths = new ArrayList<String>();
 
-	public TestIDLParser() {
+    public TestIDLParser() {
 		 m_os = System.getProperty("os.name");
     }
 
@@ -60,15 +60,15 @@ public class TestIDLParser {
         m_tempDir = path;
     }
 
-	public void parse(String idlFileName) {
+    public void parse(String idlFileName) {
 
-		System.out.println("Start Parsing IDL File: " + idlFileName + "\n");
+	    System.out.println("Start Parsing IDL File: " + idlFileName + "\n");
 
 		//m_includePaths.add("-Ie:\\data\\idl");
 
-		String onlyFileName = Util.getIDLFileNameOnly(idlFileName);
+	    String onlyFileName = Util.getIDLFileNameOnly(idlFileName);
 
-		String idlParseFileName = callPreprocessor(idlFileName);
+	    String idlParseFileName = callPreprocessor(idlFileName);
 
 	    if (idlParseFileName == null)
 	    {
@@ -76,15 +76,15 @@ public class TestIDLParser {
 	        return;
 	    }
 
-		Context context = new Context(onlyFileName, idlFileName, m_includePaths);
+	    Context context = new Context(onlyFileName, idlFileName, m_includePaths);
 
-		try {
+	    try {
 
             ANTLRFileStream input = new ANTLRFileStream(idlParseFileName);
-			IDLLexer lexer = new IDLLexer(input);
-			lexer.setContext(context);
-			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-			IDLParser parser = new IDLParser(tokenStream);
+		    IDLLexer lexer = new IDLLexer(input);
+		    lexer.setContext(context);
+		    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+		    IDLParser parser = new IDLParser(tokenStream);
             Specification specification  = parser.specification(context, null, null).spec;
 
             if (specification != null)
@@ -123,20 +123,20 @@ public class TestIDLParser {
             }
 
 		} catch (IOException e) {
-    			e.printStackTrace();
+    		    e.printStackTrace();
     	  }
-		System.out.println("\nParsing Completed \n");
+	    System.out.println("\nParsing Completed \n");
 
 	}
 
-	public void parseModule(Module moduleDef) {
-		System.out.println("Start Module: " + moduleDef.getName() + "\n");
+    public void parseModule(Module moduleDef) {
+	    System.out.println("Start Module: " + moduleDef.getName() + "\n");
 
         for( Definition moduleDefinition: moduleDef.getDefinitions())
         {
             if (moduleDefinition.isIsTypeDeclaration())
             {
-				parseTypeDeclaration((TypeDeclaration) moduleDefinition);
+			    parseTypeDeclaration((TypeDeclaration) moduleDefinition);
             }
             else if (moduleDefinition.isIsInterface())
             {
@@ -160,15 +160,15 @@ public class TestIDLParser {
             }
             else
             {
-        		System.out.println("Module Unrecognized Option ");
+        	    System.out.println("Module Unrecognized Option ");
         	}
 		}
-		System.out.println("End Module: " + moduleDef.getName());
+	    System.out.println("End Module: " + moduleDef.getName());
 	}
 
-	public void parseInterface(Interface interfaceDef) {
-   		System.out.println("Start Interface: " + interfaceDef.getName());
-		System.out.println("End Interface: \n");
+    public void parseInterface(Interface interfaceDef) {
+   	    System.out.println("Start Interface: " + interfaceDef.getName());
+	    System.out.println("End Interface: \n");
 	}
 
     public void parseException(com.eprosima.idl.parser.tree.Exception exceptionDef)
@@ -207,27 +207,27 @@ public class TestIDLParser {
         {
             parseAnnotations(typeDeclarationDef.getAnnotations().values(), true , "");
         }
-		switch (typeDeclarationDef.getTypeCode().getKind()) {
-			case Kind.KIND_STRUCT:
-				parseStruct((StructTypeCode)typeDeclarationDef.getTypeCode());
-			break;
-			case Kind.KIND_UNION:
-				parseUnion((UnionTypeCode)typeDeclarationDef.getTypeCode());
-			break;
-			case Kind.KIND_ENUM:
-				parseEnum((EnumTypeCode)typeDeclarationDef.getTypeCode());
-			break;
-			case Kind.KIND_ALIAS:
-				parseAlias((AliasTypeCode)typeDeclarationDef.getTypeCode());
-			break;
-			case Kind.KIND_BITSET:
-				parseBitset((BitsetTypeCode)typeDeclarationDef.getTypeCode());
-			break;
-			case Kind.KIND_BITMASK:
-				parseBitmask((BitmaskTypeCode)typeDeclarationDef.getTypeCode());
-			break;
-			default:
-				System.out.println("Parse Type Declaration: Not Handled ");
+	    switch (typeDeclarationDef.getTypeCode().getKind()) {
+		    case Kind.KIND_STRUCT:
+			    parseStruct((StructTypeCode)typeDeclarationDef.getTypeCode());
+		    break;
+		    case Kind.KIND_UNION:
+			    parseUnion((UnionTypeCode)typeDeclarationDef.getTypeCode());
+		    break;
+		    case Kind.KIND_ENUM:
+			    parseEnum((EnumTypeCode)typeDeclarationDef.getTypeCode());
+		    break;
+		    case Kind.KIND_ALIAS:
+			    parseAlias((AliasTypeCode)typeDeclarationDef.getTypeCode());
+		    break;
+		    case Kind.KIND_BITSET:
+			    parseBitset((BitsetTypeCode)typeDeclarationDef.getTypeCode());
+		    break;
+		    case Kind.KIND_BITMASK:
+			    parseBitmask((BitmaskTypeCode)typeDeclarationDef.getTypeCode());
+		    break;
+		    default:
+			    System.out.println("Parse Type Declaration: Not Handled ");
 		}
 	}
 
@@ -239,7 +239,7 @@ public class TestIDLParser {
         System.out.println("End Annotation: \n");
 	}
 
-	public void parseAnnotation(AnnotationDeclaration annotationDef) {
+    public void parseAnnotation(AnnotationDeclaration annotationDef) {
         System.out.println("Start Annotation: " + annotationDef.getName());
         for (AnnotationMember member : annotationDef.getMembers())
         {
@@ -248,9 +248,9 @@ public class TestIDLParser {
         System.out.println("End Annotation: \n");
 	}
 
-	public void parseAlias(AliasTypeCode aliasType) {
-		System.out.println("Start Alias (TypeDef) ");
-		System.out.println("End Alias: \n");
+    public void parseAlias(AliasTypeCode aliasType) {
+	    System.out.println("Start Alias (TypeDef) ");
+	    System.out.println("End Alias: \n");
     }
 
     public void parseMember(Member member)
@@ -314,89 +314,89 @@ public class TestIDLParser {
         }
     }
 
-	public void parseStruct(StructTypeCode struct) {
-		System.out.println("Start Struct: " + struct.getName());
-     	for (Member member: struct.getMembers(true)) {
+    public void parseStruct(StructTypeCode struct) {
+	    System.out.println("Start Struct: " + struct.getName());
+         for (Member member: struct.getMembers(true)) {
              parseMember(member);
      	}
-		System.out.println("End Struct: \n");
+	    System.out.println("End Struct: \n");
 	}
 
-	public void parseUnion(UnionTypeCode union) {
-		System.out.println("Start Union: " + union.getName() + " (" + union.getDiscriminator().getTypeIdentifier() + ")");
-     	for (Member member: union.getMembers()) {
+    public void parseUnion(UnionTypeCode union) {
+	    System.out.println("Start Union: " + union.getName() + " (" + union.getDiscriminator().getTypeIdentifier() + ")");
+         for (Member member: union.getMembers()) {
              parseUnionMember((UnionMember)member);
      	}
-		System.out.println("End Union: \n");
+	    System.out.println("End Union: \n");
 	}
 
-	public void parseBitset(BitsetTypeCode bitset) {
-		System.out.println("Start Bitset: " + bitset.getName());
-     	for (Bitfield field : bitset.getBitfields(true)) {
+    public void parseBitset(BitsetTypeCode bitset) {
+	    System.out.println("Start Bitset: " + bitset.getName());
+         for (Bitfield field : bitset.getBitfields(true)) {
             parseBitfield(field);
      	}
-		System.out.println("End Bitset: \n");
+	    System.out.println("End Bitset: \n");
 	}
 
-	public void parseBitmask(BitmaskTypeCode bitmask) {
-		System.out.println("Start Bitmask: " + bitmask.getName() + " (" + bitmask.getBitBound() + ")");
-     	for (Bitmask mask : bitmask.getBitmasks()) {
+    public void parseBitmask(BitmaskTypeCode bitmask) {
+	    System.out.println("Start Bitmask: " + bitmask.getName() + " (" + bitmask.getBitBound() + ")");
+         for (Bitmask mask : bitmask.getBitmasks()) {
             parseBitmask(mask);
      	}
-		System.out.println("End Bitset: \n");
+	    System.out.println("End Bitset: \n");
 	}
 
-	public static void parseBitfield(Bitfield field) {
-		System.out.println("	Bitfield: "  +  field.getName() + " (" + field.getSpec().getBitSize() + ")" );
+    public static void parseBitfield(Bitfield field) {
+	    System.out.println("    Bitfield: "  +  field.getName() + " (" + field.getSpec().getBitSize() + ")" );
 	}
 
-	public static void parseBitmask(Bitmask mask) {
-		System.out.println("	Bitmask: "  +  mask.getName() + " (" + mask.getPosition() + ")" );
+    public static void parseBitmask(Bitmask mask) {
+	    System.out.println("    Bitmask: "  +  mask.getName() + " (" + mask.getPosition() + ")" );
 	}
 
-	public static void parsePrimitiveField(Member member) {
-		System.out.println("	Field " + member.getTypecode().getTypeIdentifier() + ": " + member.getName() );
+    public static void parsePrimitiveField(Member member) {
+	    System.out.println("    Field " + member.getTypecode().getTypeIdentifier() + ": " + member.getName() );
 	}
 
-	public static void parseDefaultField(Member member) {
-		System.out.println("	Field " + member.getTypecode().getStType() + ": "  +  member.getName() );
+    public static void parseDefaultField(Member member) {
+	    System.out.println("    Field " + member.getTypecode().getStType() + ": "  +  member.getName() );
 	}
 
-	public static void parseBitsetField(Member member) {
-		System.out.println("	Field bitset: "  +  member.getName() );
+    public static void parseBitsetField(Member member) {
+	    System.out.println("    Field bitset: "  +  member.getName() );
 	}
 
-	public static void parseBitmaskField(Member member) {
-		System.out.println("	Field bitmask: "  +  member.getName() );
+    public static void parseBitmaskField(Member member) {
+	    System.out.println("    Field bitmask: "  +  member.getName() );
 	}
 
-	public void parseEnum(EnumTypeCode enumType) {
-    	System.out.println("Enum: " + enumType.getName());
-    	for (Member member: enumType.getMembers()) {
-         	System.out.println("	Enum Member: " + member.getName());
+    public void parseEnum(EnumTypeCode enumType) {
+        System.out.println("Enum: " + enumType.getName());
+        for (Member member: enumType.getMembers()) {
+             System.out.println("    Enum Member: " + member.getName());
     	}
-    	System.out.println("End Enum: \n");
+        System.out.println("End Enum: \n");
 	}
 
 	// Fields Parse
-	public void parseEnumField(Member member) {
-		EnumTypeCode typeCode = (EnumTypeCode) member.getTypecode();
-		System.out.println("	Field Enum: " + typeCode.getName() + " " + member.getName());
+    public void parseEnumField(Member member) {
+	    EnumTypeCode typeCode = (EnumTypeCode) member.getTypecode();
+	    System.out.println("    Field Enum: " + typeCode.getName() + " " + member.getName());
 	}
 
-	public void parseStructField(Member member) {
-		StructTypeCode typeCode = (StructTypeCode) member.getTypecode();
-		System.out.println("	Field Struct: " + typeCode.getName() + " " + member.getName());
+    public void parseStructField(Member member) {
+	    StructTypeCode typeCode = (StructTypeCode) member.getTypecode();
+	    System.out.println("    Field Struct: " + typeCode.getName() + " " + member.getName());
 	}
 
-	public void parseUnionField(Member member) {
-		UnionTypeCode typeCode = (UnionTypeCode) member.getTypecode();
-		System.out.println("	Field Union: " + typeCode.getName() + " " + member.getName());
+    public void parseUnionField(Member member) {
+	    UnionTypeCode typeCode = (UnionTypeCode) member.getTypecode();
+	    System.out.println("    Field Union: " + typeCode.getName() + " " + member.getName());
 	}
 
-	public void parseAliasField(Member member) {
-		AliasTypeCode typeCode = (AliasTypeCode)member.getTypecode();
-    	System.out.println("	Field Alias: " + typeCode.getName() + " " +  member.getName() );
+    public void parseAliasField(Member member) {
+	    AliasTypeCode typeCode = (AliasTypeCode)member.getTypecode();
+        System.out.println("    Field Alias: " + typeCode.getName() + " " +  member.getName() );
 	}
 
 
@@ -569,7 +569,7 @@ public class TestIDLParser {
 
 
 	//
-	// 	Main for test
+	//     Main for test
 	//
     public static void main(String[] args)
     {

@@ -26,143 +26,143 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class IDLLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
+    static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
 
-	protected static final DFA[] _decisionToDFA;
-	protected static final PredictionContextCache _sharedContextCache =
-		new PredictionContextCache();
-	public static final int
-		T__0=1, T__1=2, INTEGER_LITERAL=3, OCTAL_LITERAL=4, HEX_LITERAL=5, FLOATING_PT_LITERAL=6, 
-		FIXED_PT_LITERAL=7, WIDE_CHARACTER_LITERAL=8, CHARACTER_LITERAL=9, WIDE_STRING_LITERAL=10, 
-		STRING_LITERAL=11, BOOLEAN_LITERAL=12, SEMICOLON=13, COLON=14, COMA=15, 
-		LEFT_BRACE=16, RIGHT_BRACE=17, LEFT_BRACKET=18, RIGHT_BRACKET=19, LEFT_SQUARE_BRACKET=20, 
-		RIGHT_SQUARE_BRACKET=21, TILDE=22, SLASH=23, LEFT_ANG_BRACKET=24, RIGHT_ANG_BRACKET=25, 
-		STAR=26, PLUS=27, MINUS=28, CARET=29, AMPERSAND=30, PIPE=31, EQUAL=32, 
-		PERCENT=33, AT=34, DOUBLE_COLON=35, RIGHT_SHIFT=36, LEFT_SHIFT=37, KW_SETRAISES=38, 
-		KW_OUT=39, KW_EMITS=40, KW_STRING=41, KW_SWITCH=42, KW_PUBLISHES=43, KW_TYPEDEF=44, 
-		KW_USES=45, KW_PRIMARYKEY=46, KW_CUSTOM=47, KW_OCTET=48, KW_SEQUENCE=49, 
-		KW_IMPORT=50, KW_STRUCT=51, KW_NATIVE=52, KW_READONLY=53, KW_FINDER=54, 
-		KW_RAISES=55, KW_VOID=56, KW_PRIVATE=57, KW_EVENTTYPE=58, KW_WCHAR=59, 
-		KW_IN=60, KW_DEFAULT=61, KW_PUBLIC=62, KW_SHORT=63, KW_LONG=64, KW_ENUM=65, 
-		KW_WSTRING=66, KW_CONTEXT=67, KW_HOME=68, KW_FACTORY=69, KW_EXCEPTION=70, 
-		KW_GETRAISES=71, KW_CONST=72, KW_VALUEBASE=73, KW_VALUETYPE=74, KW_SUPPORTS=75, 
-		KW_MODULE=76, KW_OBJECT=77, KW_TRUNCATABLE=78, KW_UNSIGNED=79, KW_FIXED=80, 
-		KW_UNION=81, KW_ONEWAY=82, KW_ANY=83, KW_CHAR=84, KW_CASE=85, KW_FLOAT=86, 
-		KW_BOOLEAN=87, KW_MULTIPLE=88, KW_ABSTRACT=89, KW_INOUT=90, KW_PROVIDES=91, 
-		KW_CONSUMES=92, KW_DOUBLE=93, KW_TYPEPREFIX=94, KW_TYPEID=95, KW_ATTRIBUTE=96, 
-		KW_LOCAL=97, KW_MANAGES=98, KW_INTERFACE=99, KW_COMPONENT=100, KW_SET=101, 
-		KW_MAP=102, KW_BITFIELD=103, KW_BITSET=104, KW_BITMASK=105, KW_INT8=106, 
-		KW_UINT8=107, KW_INT16=108, KW_UINT16=109, KW_INT32=110, KW_UINT32=111, 
-		KW_INT64=112, KW_UINT64=113, KW_AT_ANNOTATION=114, ID=115, WS=116, PREPROC_DIRECTIVE=117, 
-		COMMENT=118, LINE_COMMENT=119;
-	public static String[] channelNames = {
+    protected static final DFA[] _decisionToDFA;
+    protected static final PredictionContextCache _sharedContextCache =
+	    new PredictionContextCache();
+    public static final int
+	    T__0=1, T__1=2, INTEGER_LITERAL=3, OCTAL_LITERAL=4, HEX_LITERAL=5, FLOATING_PT_LITERAL=6,
+	    FIXED_PT_LITERAL=7, WIDE_CHARACTER_LITERAL=8, CHARACTER_LITERAL=9, WIDE_STRING_LITERAL=10,
+	    STRING_LITERAL=11, BOOLEAN_LITERAL=12, SEMICOLON=13, COLON=14, COMA=15,
+	    LEFT_BRACE=16, RIGHT_BRACE=17, LEFT_BRACKET=18, RIGHT_BRACKET=19, LEFT_SQUARE_BRACKET=20,
+	    RIGHT_SQUARE_BRACKET=21, TILDE=22, SLASH=23, LEFT_ANG_BRACKET=24, RIGHT_ANG_BRACKET=25,
+	    STAR=26, PLUS=27, MINUS=28, CARET=29, AMPERSAND=30, PIPE=31, EQUAL=32,
+	    PERCENT=33, AT=34, DOUBLE_COLON=35, RIGHT_SHIFT=36, LEFT_SHIFT=37, KW_SETRAISES=38,
+	    KW_OUT=39, KW_EMITS=40, KW_STRING=41, KW_SWITCH=42, KW_PUBLISHES=43, KW_TYPEDEF=44,
+	    KW_USES=45, KW_PRIMARYKEY=46, KW_CUSTOM=47, KW_OCTET=48, KW_SEQUENCE=49,
+	    KW_IMPORT=50, KW_STRUCT=51, KW_NATIVE=52, KW_READONLY=53, KW_FINDER=54,
+	    KW_RAISES=55, KW_VOID=56, KW_PRIVATE=57, KW_EVENTTYPE=58, KW_WCHAR=59,
+	    KW_IN=60, KW_DEFAULT=61, KW_PUBLIC=62, KW_SHORT=63, KW_LONG=64, KW_ENUM=65,
+	    KW_WSTRING=66, KW_CONTEXT=67, KW_HOME=68, KW_FACTORY=69, KW_EXCEPTION=70,
+	    KW_GETRAISES=71, KW_CONST=72, KW_VALUEBASE=73, KW_VALUETYPE=74, KW_SUPPORTS=75,
+	    KW_MODULE=76, KW_OBJECT=77, KW_TRUNCATABLE=78, KW_UNSIGNED=79, KW_FIXED=80,
+	    KW_UNION=81, KW_ONEWAY=82, KW_ANY=83, KW_CHAR=84, KW_CASE=85, KW_FLOAT=86,
+	    KW_BOOLEAN=87, KW_MULTIPLE=88, KW_ABSTRACT=89, KW_INOUT=90, KW_PROVIDES=91,
+	    KW_CONSUMES=92, KW_DOUBLE=93, KW_TYPEPREFIX=94, KW_TYPEID=95, KW_ATTRIBUTE=96,
+	    KW_LOCAL=97, KW_MANAGES=98, KW_INTERFACE=99, KW_COMPONENT=100, KW_SET=101,
+	    KW_MAP=102, KW_BITFIELD=103, KW_BITSET=104, KW_BITMASK=105, KW_INT8=106,
+	    KW_UINT8=107, KW_INT16=108, KW_UINT16=109, KW_INT32=110, KW_UINT32=111,
+	    KW_INT64=112, KW_UINT64=113, KW_AT_ANNOTATION=114, ID=115, WS=116, PREPROC_DIRECTIVE=117,
+	    COMMENT=118, LINE_COMMENT=119;
+    public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
 
-	public static String[] modeNames = {
+    public static String[] modeNames = {
 		"DEFAULT_MODE"
 	};
 
-	public static final String[] ruleNames = {
-		"T__0", "T__1", "INTEGER_LITERAL", "OCTAL_LITERAL", "HEX_LITERAL", "HEX_DIGIT", 
-		"INTEGER_TYPE_SUFFIX", "FLOATING_PT_LITERAL", "FIXED_PT_LITERAL", "EXPONENT", 
-		"FLOAT_TYPE_SUFFIX", "WIDE_CHARACTER_LITERAL", "CHARACTER_LITERAL", "WIDE_STRING_LITERAL", 
-		"STRING_LITERAL", "BOOLEAN_LITERAL", "ESCAPE_SEQUENCE", "OCTAL_ESCAPE", 
-		"UNICODE_ESCAPE", "LETTER", "ID_DIGIT", "SEMICOLON", "COLON", "COMA", 
-		"LEFT_BRACE", "RIGHT_BRACE", "LEFT_BRACKET", "RIGHT_BRACKET", "LEFT_SQUARE_BRACKET", 
-		"RIGHT_SQUARE_BRACKET", "TILDE", "SLASH", "LEFT_ANG_BRACKET", "RIGHT_ANG_BRACKET", 
-		"STAR", "PLUS", "MINUS", "CARET", "AMPERSAND", "PIPE", "EQUAL", "PERCENT", 
-		"AT", "DOUBLE_COLON", "RIGHT_SHIFT", "LEFT_SHIFT", "KW_SETRAISES", "KW_OUT", 
-		"KW_EMITS", "KW_STRING", "KW_SWITCH", "KW_PUBLISHES", "KW_TYPEDEF", "KW_USES", 
-		"KW_PRIMARYKEY", "KW_CUSTOM", "KW_OCTET", "KW_SEQUENCE", "KW_IMPORT", 
-		"KW_STRUCT", "KW_NATIVE", "KW_READONLY", "KW_FINDER", "KW_RAISES", "KW_VOID", 
-		"KW_PRIVATE", "KW_EVENTTYPE", "KW_WCHAR", "KW_IN", "KW_DEFAULT", "KW_PUBLIC", 
-		"KW_SHORT", "KW_LONG", "KW_ENUM", "KW_WSTRING", "KW_CONTEXT", "KW_HOME", 
-		"KW_FACTORY", "KW_EXCEPTION", "KW_GETRAISES", "KW_CONST", "KW_VALUEBASE", 
-		"KW_VALUETYPE", "KW_SUPPORTS", "KW_MODULE", "KW_OBJECT", "KW_TRUNCATABLE", 
-		"KW_UNSIGNED", "KW_FIXED", "KW_UNION", "KW_ONEWAY", "KW_ANY", "KW_CHAR", 
-		"KW_CASE", "KW_FLOAT", "KW_BOOLEAN", "KW_MULTIPLE", "KW_ABSTRACT", "KW_INOUT", 
-		"KW_PROVIDES", "KW_CONSUMES", "KW_DOUBLE", "KW_TYPEPREFIX", "KW_TYPEID", 
-		"KW_ATTRIBUTE", "KW_LOCAL", "KW_MANAGES", "KW_INTERFACE", "KW_COMPONENT", 
-		"KW_SET", "KW_MAP", "KW_BITFIELD", "KW_BITSET", "KW_BITMASK", "KW_INT8", 
-		"KW_UINT8", "KW_INT16", "KW_UINT16", "KW_INT32", "KW_UINT32", "KW_INT64", 
-		"KW_UINT64", "KW_AT_ANNOTATION", "ID", "WS", "PREPROC_DIRECTIVE", "COMMENT", 
+    public static final String[] ruleNames = {
+		"T__0", "T__1", "INTEGER_LITERAL", "OCTAL_LITERAL", "HEX_LITERAL", "HEX_DIGIT",
+		"INTEGER_TYPE_SUFFIX", "FLOATING_PT_LITERAL", "FIXED_PT_LITERAL", "EXPONENT",
+		"FLOAT_TYPE_SUFFIX", "WIDE_CHARACTER_LITERAL", "CHARACTER_LITERAL", "WIDE_STRING_LITERAL",
+		"STRING_LITERAL", "BOOLEAN_LITERAL", "ESCAPE_SEQUENCE", "OCTAL_ESCAPE",
+		"UNICODE_ESCAPE", "LETTER", "ID_DIGIT", "SEMICOLON", "COLON", "COMA",
+		"LEFT_BRACE", "RIGHT_BRACE", "LEFT_BRACKET", "RIGHT_BRACKET", "LEFT_SQUARE_BRACKET",
+		"RIGHT_SQUARE_BRACKET", "TILDE", "SLASH", "LEFT_ANG_BRACKET", "RIGHT_ANG_BRACKET",
+		"STAR", "PLUS", "MINUS", "CARET", "AMPERSAND", "PIPE", "EQUAL", "PERCENT",
+		"AT", "DOUBLE_COLON", "RIGHT_SHIFT", "LEFT_SHIFT", "KW_SETRAISES", "KW_OUT",
+		"KW_EMITS", "KW_STRING", "KW_SWITCH", "KW_PUBLISHES", "KW_TYPEDEF", "KW_USES",
+		"KW_PRIMARYKEY", "KW_CUSTOM", "KW_OCTET", "KW_SEQUENCE", "KW_IMPORT",
+		"KW_STRUCT", "KW_NATIVE", "KW_READONLY", "KW_FINDER", "KW_RAISES", "KW_VOID",
+		"KW_PRIVATE", "KW_EVENTTYPE", "KW_WCHAR", "KW_IN", "KW_DEFAULT", "KW_PUBLIC",
+		"KW_SHORT", "KW_LONG", "KW_ENUM", "KW_WSTRING", "KW_CONTEXT", "KW_HOME",
+		"KW_FACTORY", "KW_EXCEPTION", "KW_GETRAISES", "KW_CONST", "KW_VALUEBASE",
+		"KW_VALUETYPE", "KW_SUPPORTS", "KW_MODULE", "KW_OBJECT", "KW_TRUNCATABLE",
+		"KW_UNSIGNED", "KW_FIXED", "KW_UNION", "KW_ONEWAY", "KW_ANY", "KW_CHAR",
+		"KW_CASE", "KW_FLOAT", "KW_BOOLEAN", "KW_MULTIPLE", "KW_ABSTRACT", "KW_INOUT",
+		"KW_PROVIDES", "KW_CONSUMES", "KW_DOUBLE", "KW_TYPEPREFIX", "KW_TYPEID",
+		"KW_ATTRIBUTE", "KW_LOCAL", "KW_MANAGES", "KW_INTERFACE", "KW_COMPONENT",
+		"KW_SET", "KW_MAP", "KW_BITFIELD", "KW_BITSET", "KW_BITMASK", "KW_INT8",
+		"KW_UINT8", "KW_INT16", "KW_UINT16", "KW_INT32", "KW_UINT32", "KW_INT64",
+		"KW_UINT64", "KW_AT_ANNOTATION", "ID", "WS", "PREPROC_DIRECTIVE", "COMMENT",
 		"LINE_COMMENT"
 	};
 
-	private static final String[] _LITERAL_NAMES = {
-		null, "'TRUE'", "'FALSE'", null, null, null, null, null, null, null, null, 
-		null, null, "';'", "':'", "','", "'{'", "'}'", "'('", "')'", "'['", "']'", 
-		"'~'", "'/'", "'<'", "'>'", "'*'", "'+'", "'-'", "'^'", "'&'", "'|'", 
-		"'='", "'%'", "'@'", "'::'", "'>>'", "'<<'", "'setraises'", "'out'", "'emits'", 
-		"'string'", "'switch'", "'publishes'", "'typedef'", "'uses'", "'primarykey'", 
-		"'custom'", "'octet'", "'sequence'", "'import'", "'struct'", "'native'", 
-		"'readonly'", "'finder'", "'raises'", "'void'", "'private'", "'eventtype'", 
-		"'wchar'", "'in'", "'default'", "'public'", "'short'", "'long'", "'enum'", 
-		"'wstring'", "'context'", "'home'", "'factory'", "'exception'", "'getraises'", 
-		"'const'", "'ValueBase'", "'valuetype'", "'supports'", "'module'", "'Object'", 
-		"'truncatable'", "'unsigned'", "'fixed'", "'union'", "'oneway'", "'any'", 
-		"'char'", "'case'", "'float'", "'boolean'", "'multiple'", "'abstract'", 
-		"'inout'", "'provides'", "'consumes'", "'double'", "'typeprefix'", "'typeid'", 
-		"'attribute'", "'local'", "'manages'", "'interface'", "'component'", "'set'", 
-		"'map'", "'bitfield'", "'bitset'", "'bitmask'", "'int8'", "'uint8'", "'int16'", 
+    private static final String[] _LITERAL_NAMES = {
+	    null, "'TRUE'", "'FALSE'", null, null, null, null, null, null, null, null,
+	    null, null, "';'", "':'", "','", "'{'", "'}'", "'('", "')'", "'['", "']'",
+		"'~'", "'/'", "'<'", "'>'", "'*'", "'+'", "'-'", "'^'", "'&'", "'|'",
+		"'='", "'%'", "'@'", "'::'", "'>>'", "'<<'", "'setraises'", "'out'", "'emits'",
+		"'string'", "'switch'", "'publishes'", "'typedef'", "'uses'", "'primarykey'",
+		"'custom'", "'octet'", "'sequence'", "'import'", "'struct'", "'native'",
+		"'readonly'", "'finder'", "'raises'", "'void'", "'private'", "'eventtype'",
+		"'wchar'", "'in'", "'default'", "'public'", "'short'", "'long'", "'enum'",
+		"'wstring'", "'context'", "'home'", "'factory'", "'exception'", "'getraises'",
+		"'const'", "'ValueBase'", "'valuetype'", "'supports'", "'module'", "'Object'",
+		"'truncatable'", "'unsigned'", "'fixed'", "'union'", "'oneway'", "'any'",
+		"'char'", "'case'", "'float'", "'boolean'", "'multiple'", "'abstract'",
+		"'inout'", "'provides'", "'consumes'", "'double'", "'typeprefix'", "'typeid'",
+		"'attribute'", "'local'", "'manages'", "'interface'", "'component'", "'set'",
+		"'map'", "'bitfield'", "'bitset'", "'bitmask'", "'int8'", "'uint8'", "'int16'",
 		"'uint16'", "'int32'", "'uint32'", "'int64'", "'uint64'", "'@annotation'"
 	};
-	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, "INTEGER_LITERAL", "OCTAL_LITERAL", "HEX_LITERAL", "FLOATING_PT_LITERAL", 
-		"FIXED_PT_LITERAL", "WIDE_CHARACTER_LITERAL", "CHARACTER_LITERAL", "WIDE_STRING_LITERAL", 
-		"STRING_LITERAL", "BOOLEAN_LITERAL", "SEMICOLON", "COLON", "COMA", "LEFT_BRACE", 
-		"RIGHT_BRACE", "LEFT_BRACKET", "RIGHT_BRACKET", "LEFT_SQUARE_BRACKET", 
-		"RIGHT_SQUARE_BRACKET", "TILDE", "SLASH", "LEFT_ANG_BRACKET", "RIGHT_ANG_BRACKET", 
-		"STAR", "PLUS", "MINUS", "CARET", "AMPERSAND", "PIPE", "EQUAL", "PERCENT", 
-		"AT", "DOUBLE_COLON", "RIGHT_SHIFT", "LEFT_SHIFT", "KW_SETRAISES", "KW_OUT", 
-		"KW_EMITS", "KW_STRING", "KW_SWITCH", "KW_PUBLISHES", "KW_TYPEDEF", "KW_USES", 
-		"KW_PRIMARYKEY", "KW_CUSTOM", "KW_OCTET", "KW_SEQUENCE", "KW_IMPORT", 
-		"KW_STRUCT", "KW_NATIVE", "KW_READONLY", "KW_FINDER", "KW_RAISES", "KW_VOID", 
-		"KW_PRIVATE", "KW_EVENTTYPE", "KW_WCHAR", "KW_IN", "KW_DEFAULT", "KW_PUBLIC", 
-		"KW_SHORT", "KW_LONG", "KW_ENUM", "KW_WSTRING", "KW_CONTEXT", "KW_HOME", 
-		"KW_FACTORY", "KW_EXCEPTION", "KW_GETRAISES", "KW_CONST", "KW_VALUEBASE", 
-		"KW_VALUETYPE", "KW_SUPPORTS", "KW_MODULE", "KW_OBJECT", "KW_TRUNCATABLE", 
-		"KW_UNSIGNED", "KW_FIXED", "KW_UNION", "KW_ONEWAY", "KW_ANY", "KW_CHAR", 
-		"KW_CASE", "KW_FLOAT", "KW_BOOLEAN", "KW_MULTIPLE", "KW_ABSTRACT", "KW_INOUT", 
-		"KW_PROVIDES", "KW_CONSUMES", "KW_DOUBLE", "KW_TYPEPREFIX", "KW_TYPEID", 
-		"KW_ATTRIBUTE", "KW_LOCAL", "KW_MANAGES", "KW_INTERFACE", "KW_COMPONENT", 
-		"KW_SET", "KW_MAP", "KW_BITFIELD", "KW_BITSET", "KW_BITMASK", "KW_INT8", 
-		"KW_UINT8", "KW_INT16", "KW_UINT16", "KW_INT32", "KW_UINT32", "KW_INT64", 
-		"KW_UINT64", "KW_AT_ANNOTATION", "ID", "WS", "PREPROC_DIRECTIVE", "COMMENT", 
+    private static final String[] _SYMBOLIC_NAMES = {
+	    null, null, null, "INTEGER_LITERAL", "OCTAL_LITERAL", "HEX_LITERAL", "FLOATING_PT_LITERAL",
+		"FIXED_PT_LITERAL", "WIDE_CHARACTER_LITERAL", "CHARACTER_LITERAL", "WIDE_STRING_LITERAL",
+		"STRING_LITERAL", "BOOLEAN_LITERAL", "SEMICOLON", "COLON", "COMA", "LEFT_BRACE",
+		"RIGHT_BRACE", "LEFT_BRACKET", "RIGHT_BRACKET", "LEFT_SQUARE_BRACKET",
+		"RIGHT_SQUARE_BRACKET", "TILDE", "SLASH", "LEFT_ANG_BRACKET", "RIGHT_ANG_BRACKET",
+		"STAR", "PLUS", "MINUS", "CARET", "AMPERSAND", "PIPE", "EQUAL", "PERCENT",
+		"AT", "DOUBLE_COLON", "RIGHT_SHIFT", "LEFT_SHIFT", "KW_SETRAISES", "KW_OUT",
+		"KW_EMITS", "KW_STRING", "KW_SWITCH", "KW_PUBLISHES", "KW_TYPEDEF", "KW_USES",
+		"KW_PRIMARYKEY", "KW_CUSTOM", "KW_OCTET", "KW_SEQUENCE", "KW_IMPORT",
+		"KW_STRUCT", "KW_NATIVE", "KW_READONLY", "KW_FINDER", "KW_RAISES", "KW_VOID",
+		"KW_PRIVATE", "KW_EVENTTYPE", "KW_WCHAR", "KW_IN", "KW_DEFAULT", "KW_PUBLIC",
+		"KW_SHORT", "KW_LONG", "KW_ENUM", "KW_WSTRING", "KW_CONTEXT", "KW_HOME",
+		"KW_FACTORY", "KW_EXCEPTION", "KW_GETRAISES", "KW_CONST", "KW_VALUEBASE",
+		"KW_VALUETYPE", "KW_SUPPORTS", "KW_MODULE", "KW_OBJECT", "KW_TRUNCATABLE",
+		"KW_UNSIGNED", "KW_FIXED", "KW_UNION", "KW_ONEWAY", "KW_ANY", "KW_CHAR",
+		"KW_CASE", "KW_FLOAT", "KW_BOOLEAN", "KW_MULTIPLE", "KW_ABSTRACT", "KW_INOUT",
+		"KW_PROVIDES", "KW_CONSUMES", "KW_DOUBLE", "KW_TYPEPREFIX", "KW_TYPEID",
+		"KW_ATTRIBUTE", "KW_LOCAL", "KW_MANAGES", "KW_INTERFACE", "KW_COMPONENT",
+		"KW_SET", "KW_MAP", "KW_BITFIELD", "KW_BITSET", "KW_BITMASK", "KW_INT8",
+		"KW_UINT8", "KW_INT16", "KW_UINT16", "KW_INT32", "KW_UINT32", "KW_INT64",
+		"KW_UINT64", "KW_AT_ANNOTATION", "ID", "WS", "PREPROC_DIRECTIVE", "COMMENT",
 		"LINE_COMMENT"
 	};
-	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+    public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
 	 * @deprecated Use {@link #VOCABULARY} instead.
 	 */
 	@Deprecated
-	public static final String[] tokenNames;
-	static {
-		tokenNames = new String[_SYMBOLIC_NAMES.length];
-		for (int i = 0; i < tokenNames.length; i++) {
-			tokenNames[i] = VOCABULARY.getLiteralName(i);
-			if (tokenNames[i] == null) {
-				tokenNames[i] = VOCABULARY.getSymbolicName(i);
+    public static final String[] tokenNames;
+    static {
+	    tokenNames = new String[_SYMBOLIC_NAMES.length];
+	    for (int i = 0; i < tokenNames.length; i++) {
+		    tokenNames[i] = VOCABULARY.getLiteralName(i);
+		    if (tokenNames[i] == null) {
+			    tokenNames[i] = VOCABULARY.getSymbolicName(i);
 			}
 
-			if (tokenNames[i] == null) {
-				tokenNames[i] = "<INVALID>";
+		    if (tokenNames[i] == null) {
+			    tokenNames[i] = "<INVALID>";
 			}
 		}
 	}
 
 	@Override
 	@Deprecated
-	public String[] getTokenNames() {
-		return tokenNames;
+    public String[] getTokenNames() {
+	    return tokenNames;
 	}
 
 	@Override
 
-	public Vocabulary getVocabulary() {
-		return VOCABULARY;
+    public Vocabulary getVocabulary() {
+	    return VOCABULARY;
 	}
 
 
@@ -174,50 +174,50 @@ public class IDLLexer extends Lexer {
 	    }
 
 
-	public IDLLexer(CharStream input) {
-		super(input);
-		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
+    public IDLLexer(CharStream input) {
+	    super(input);
+	    _interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() { return "IDL.g4"; }
+    public String getGrammarFileName() { return "IDL.g4"; }
 
 	@Override
-	public String[] getRuleNames() { return ruleNames; }
+    public String[] getRuleNames() { return ruleNames; }
 
 	@Override
-	public String getSerializedATN() { return _serializedATN; }
+    public String getSerializedATN() { return _serializedATN; }
 
 	@Override
-	public String[] getChannelNames() { return channelNames; }
+    public String[] getChannelNames() { return channelNames; }
 
 	@Override
-	public String[] getModeNames() { return modeNames; }
+    public String[] getModeNames() { return modeNames; }
 
 	@Override
-	public ATN getATN() { return _ATN; }
+    public ATN getATN() { return _ATN; }
 
 	@Override
-	public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
-		switch (ruleIndex) {
-		case 125:
-			PREPROC_DIRECTIVE_action((RuleContext)_localctx, actionIndex);
-			break;
+    public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
+	    switch (ruleIndex) {
+	    case 125:
+		    PREPROC_DIRECTIVE_action((RuleContext)_localctx, actionIndex);
+		    break;
 		}
 	}
-	private void PREPROC_DIRECTIVE_action(RuleContext _localctx, int actionIndex) {
-		switch (actionIndex) {
-		case 0:
+    private void PREPROC_DIRECTIVE_action(RuleContext _localctx, int actionIndex) {
+	    switch (actionIndex) {
+	    case 0:
 
 			        ctx.processPreprocessorLine(new String(getText()), getLine());
 			        skip();
 			        //newline();
-			    
-			break;
+
+		    break;
 		}
 	}
 
-	public static final String _serializedATN =
+    public static final String _serializedATN =
 		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2y\u0455\b\1\4\2\t"+
 		"\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
@@ -599,12 +599,12 @@ public class IDLLexer extends Lexer {
 		"\u0129\u012c\u0135\u013b\u013f\u0142\u0148\u014b\u014e\u0153\u0157\u015c"+
 		"\u015f\u0162\u0169\u016e\u0178\u0182\u0184\u0192\u0198\u019c\u01a7\u0424"+
 		"\u0426\u0431\u043d\u044b\u044f\4\2\3\2\3\177\2";
-	public static final ATN _ATN =
-		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
-	static {
-		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
-		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {
-			_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);
+    public static final ATN _ATN =
+	    new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+    static {
+	    _decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
+	    for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {
+		    _decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);
 		}
 	}
 }

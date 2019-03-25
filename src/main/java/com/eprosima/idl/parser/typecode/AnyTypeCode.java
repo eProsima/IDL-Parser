@@ -67,7 +67,7 @@ public class AnyTypeCode extends TypeCode
     @Override
     public String getInitialValue()
     {
-    	return "";
+        return "";
     }
 
     @Override

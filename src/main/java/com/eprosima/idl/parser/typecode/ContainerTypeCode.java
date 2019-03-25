@@ -54,17 +54,17 @@ public abstract class ContainerTypeCode extends TypeCode
 
     public int getDepth()
     {
-    	int ret = 1;
+        int ret = 1;
 
-    	if (m_contentTypeCode.isPrimitive()) {
-    		return ret;
+        if (m_contentTypeCode.isPrimitive()) {
+    	    return ret;
     	} else {
-    		if (m_contentTypeCode instanceof ContainerTypeCode) {
-    			ret += ((ContainerTypeCode) m_contentTypeCode).getDepth();
+    	    if (m_contentTypeCode instanceof ContainerTypeCode) {
+    		    ret += ((ContainerTypeCode) m_contentTypeCode).getDepth();
     		}
     	}
 
-    	return ret;
+        return ret;
     }
 
     private TypeCode m_contentTypeCode = null;

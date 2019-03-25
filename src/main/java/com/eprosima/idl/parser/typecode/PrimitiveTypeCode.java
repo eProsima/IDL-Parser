@@ -121,7 +121,7 @@ public class PrimitiveTypeCode extends TypeCode
                 return "false";
         }
 
-    	return "";
+        return "";
     }
 
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)

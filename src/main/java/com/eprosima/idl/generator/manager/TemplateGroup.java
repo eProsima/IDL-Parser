@@ -31,13 +31,13 @@ public class TemplateGroup
 {
     private Map<String, StringTemplate> m_templates = null;
     private Map<String, List<StringTemplate>> m_extensionstemplates = null;
-    
+
     public TemplateGroup()
     {
         m_templates = new HashMap<String, StringTemplate>();
         m_extensionstemplates = new HashMap<String, List<StringTemplate>>();
     }
-    
+
     public void addTemplate(String groupname, StringTemplate template)
     {
         m_templates.put(groupname, template);
@@ -48,7 +48,7 @@ public class TemplateGroup
         addTemplate(groupname, template);
         m_extensionstemplates.put(groupname + "_" + template.getName(), extensionstemplates);
     }
-    
+
     public StringTemplate getTemplate(String groupname)
     {
         StringTemplate template = m_templates.get(groupname);
@@ -69,21 +69,21 @@ public class TemplateGroup
 
         return template;
     }
-    
+
     public void setAttribute(String attribute, TemplateGroup tg)
     {
-    	if(tg != null)
+        if(tg != null)
     	{
 	        Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
 	        Iterator<Entry<String, StringTemplate>> it = set.iterator();
-	        
+
 	        while(it.hasNext())
 	        {
 	            Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
-	            
+
 	            // Call setAttribute
                 StringTemplate template = tg.getTemplate(m.getKey());
-                
+
                 if(template != null)
                 {
                     Log.printDebug("setting attribute (TemplateGroup) to template group " + m.getKey() + " from " + template.getName() + " to " + m.getValue().getName());
@@ -92,16 +92,16 @@ public class TemplateGroup
 	        }
     	}
     }
-    
+
     public void setAttribute(String attribute, Object obj1)
     {
         Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
         Iterator<Entry<String, StringTemplate>> it = set.iterator();
-        
+
         while(it.hasNext())
         {
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
-            
+
             // Call setAttribute
             Log.printDebug("setting attribute (obj1) to template group " + m.getKey() + " to " + m.getValue().getName());
             StringTemplate template = m.getValue();
@@ -117,61 +117,61 @@ public class TemplateGroup
             }
         }
     }
-    
+
     public void setAttribute(String attribute, Object obj1, Object obj2)
     {
         Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
         Iterator<Entry<String, StringTemplate>> it = set.iterator();
-        
+
         while(it.hasNext())
         {
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
-            
+
             // Call setAttribute
             Log.printDebug("setting attribute (obj1,obj2) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2);
         }
     }
-    
+
     public void setAttribute(String attribute, Object obj1, Object obj2, Object obj3)
     {
         Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
         Iterator<Entry<String, StringTemplate>> it = set.iterator();
-        
+
         while(it.hasNext())
         {
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
-            
+
             // Call setAttribute
             Log.printDebug("setting attribute (obj1,obj2,obj3) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2, obj3);
         }
     }
-    
+
     public void setAttribute(String attribute, Object obj1, Object obj2, Object obj3, Object obj4)
     {
         Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
         Iterator<Entry<String, StringTemplate>> it = set.iterator();
-        
+
         while(it.hasNext())
         {
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
-            
+
             // Call setAttribute
             Log.printDebug("setting attribute (obj1,obj2,obj3,obj4) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2, obj3, obj4);
         }
     }
-    
+
     public void setAttribute(String attribute, Object obj1, Object obj2, Object obj3, Object obj4, Object obj5)
     {
         Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
         Iterator<Entry<String, StringTemplate>> it = set.iterator();
-        
+
         while(it.hasNext())
         {
             Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
-            
+
             // Call setAttribute
             Log.printDebug("setting attribute (obj1,obj2,obj3,obj4,obj5) to template group " + m.getKey() + " to " + m.getValue().getName());
             m.getValue().setAttribute(attribute, obj1, obj2, obj3, obj4, obj5);
