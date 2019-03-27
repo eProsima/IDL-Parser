@@ -1202,7 +1202,7 @@ annotation_member [AnnotationDeclaration annotation]
     {
         if(!$annotation.addMember(new AnnotationMember($simple_declarator.ret.first().first(), $const_type.typecode, literalStr)))
         {
-            throw new ParseException($simple_declarator.ret.first().second(), "was defined previously");
+            throw new ParseException($simple_declarator.ret.first().second(), $simple_declarator.ret.first().first() + " was defined previously");
         }
     }
     ;
@@ -1492,7 +1492,7 @@ member_list [StructTypeCode structTP]
                    for(Pair<Pair<String, Token>, Member> pair : $member_def.ret)
                    {
                        if(!$structTP.addMember(pair.second()))
-                           throw new ParseException(pair.first().second(), "was defined previously");
+                           throw new ParseException(pair.first().second(), pair.first().first() + " was defined previously");
                    }
                }
            }
@@ -2501,6 +2501,14 @@ identifier returns [String id]
     $id = _input.LT(1).getText();
 }
     :   ID
+        {
+            String error = ctx.checkIdentifier(ctx.getScope(), $id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            $id = ctx.removeEscapeCharacter($id);
+        }
     ;
 
 
