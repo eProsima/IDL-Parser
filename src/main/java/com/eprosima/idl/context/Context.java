@@ -315,7 +315,6 @@ public class Context
      */
     public void addModule(com.eprosima.idl.parser.tree.Module module)
     {
-        System.out.println("ADDMODULE: " + module.getScopedname());
         if(!m_modules.containsKey(module.getScopedname()))
         {
             m_modules.put(module.getScopedname(), module);
@@ -868,7 +867,6 @@ public class Context
             if (def instanceof TreeNode)
             {
                 TreeNode tn = (TreeNode)def;
-
                 if (tn.getScopedname().equalsIgnoreCase(scopedname))
                 {
                     return scopedname + " is already defined (Definition: " + def + ")";
@@ -888,7 +886,6 @@ public class Context
         // Check interfaces
         for (String type : m_interfaces.keySet())
         {
-            System.out.println("INT COMPARE: " + scopedname + " vs. " + type);
             if (type.equalsIgnoreCase(scopedname))
             {
                 return scopedname + " is already defined (Interface: " + type + ")";

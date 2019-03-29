@@ -168,16 +168,15 @@ module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnP
         // Check if the module already was defined.
         moduleObject = ctx.existsModule(ctx.getScope() + "::" + name);
 
-        if(moduleObject != null)
-        {
-            // Add the module to the context.
-            ctx.addModule(moduleObject);
-        }
-        else
+        if(moduleObject == null)
         {
             // Create the Module object.
             moduleObject = new com.eprosima.idl.parser.tree.Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, tk);
+            //ctx.addPendingModule(moduleObject);
         }
+
+        // Add the module to the context.
+        ctx.addModule(moduleObject);
 
         if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
             if(tmanager != null) {
