@@ -121,19 +121,15 @@ public class TestManager
         {
             printHeader(test.getIDL(), TestLevel.GENERATE);
 
-            // --- REMOVE this when run() for IDL.INCLUDE is supported
-            boolean notRunIncludeIDL = test.getIDL() != IDL.INCLUDE;
-            // ---
-
             if (exampleArch == null)
             {
                 return printlnStatus(
-                    test.generate(generatorName, inputPath, level == TestLevel.RUN && notRunIncludeIDL));
+                    test.generate(generatorName, inputPath, level == TestLevel.RUN));
             }
             else
             {
                 return printlnStatus(
-                    test.generate(generatorName, inputPath, exampleArch, level == TestLevel.RUN && notRunIncludeIDL));
+                    test.generate(generatorName, inputPath, exampleArch, level == TestLevel.RUN));
             }
         }
 
@@ -170,13 +166,6 @@ public class TestManager
         if(precondition && level.getValue() >= TestLevel.RUN.getValue())
         {
             printHeader(test.getIDL(), TestLevel.RUN);
-
-            // --- REMOVE this when run() for IDL.INCLUDE is supported
-            if(test.getIDL() == IDL.INCLUDE)
-            {
-                return printlnStatus(true);
-            }
-            // ---
 
             return printlnStatus(test.run());
         }
