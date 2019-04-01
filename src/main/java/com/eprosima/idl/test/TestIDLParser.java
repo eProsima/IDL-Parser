@@ -663,7 +663,7 @@ public class TestIDLParser {
     public static void usage()
     {
         System.out.println("Usage:");
-        System.out.println("TestIDLParser <file>+ [-I <include_path>+] [-t <temporal_path>] [-p <preprocessor_path>]");
+        System.out.println("idlparser <file>+ [-I <include_path>+] [-t <temporal_path>] [-p <preprocessor_path>]");
     }
 
 }
