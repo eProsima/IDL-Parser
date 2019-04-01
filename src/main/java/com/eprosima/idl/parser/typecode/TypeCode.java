@@ -266,6 +266,16 @@ public abstract class TypeCode implements Notebook
         m_forwarded = fwd;
     }
 
+    public boolean isDefined()
+    {
+        return m_defined;
+    }
+
+    public void setDefined()
+    {
+        m_defined = true;
+    }
+
     private int m_kind = Kind.KIND_NULL;
 
     // Added parent object to typecode because was needed in DDS with our types (TopicsPlugin_gettypecode)
@@ -274,4 +284,6 @@ public abstract class TypeCode implements Notebook
     private HashMap<String, Annotation> m_annotations = null;
 
     private boolean m_forwarded = false;
+
+    private boolean m_defined = false;
 }

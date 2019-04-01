@@ -1390,9 +1390,15 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
         identifier
         {
             name=$identifier.id;
+            String fw_name = name;
 
             // Find typecode in the global map.
-            TypeCode typecode = ctx.getTypeCode(name);
+            if (ctx.getScope() != null && !ctx.getScope().isEmpty())
+            {
+                fw_name = ctx.getScope() + "::" + name;
+            }
+
+            TypeCode typecode = ctx.getTypeCode(fw_name);
 
             if(typecode != null)
             {
@@ -1400,6 +1406,11 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
                 {
                     fw_declaration = true;
                     structTP = (StructTypeCode)typecode;
+                    if (structTP.isDefined())
+                    {
+                        System.out.println("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Redefinition: " + fw_name);
+                        throw new ParseException(_input.LT(1), fw_name + " redefinition");
+                    }
                 }
                 else
                 {
@@ -1410,6 +1421,7 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
             {
                 structTP = ctx.createStructTypeCode(name);
             }
+            structTP.setDefined();
         }
         (COLON scoped_name
             {
@@ -1546,9 +1558,15 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
         identifier
         {
             name=$identifier.id;
+            String fw_name = name;
 
             // Find typecode in the global map.
-            TypeCode typecode = ctx.getTypeCode(name);
+            if (ctx.getScope() != null && !ctx.getScope().isEmpty())
+            {
+                fw_name = ctx.getScope() + "::" + name;
+            }
+
+            TypeCode typecode = ctx.getTypeCode(fw_name);
 
             if(typecode != null)
             {
@@ -1556,6 +1574,11 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
                 {
                     fw_decl = true;
                     unionTP = (UnionTypeCode)typecode;
+                    if (unionTP.isDefined())
+                    {
+                        System.out.println("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Redefinition: " + fw_name);
+                        throw new ParseException(_input.LT(1), fw_name + " redefinition");
+                    }
                 }
                 else
                 {
@@ -1574,6 +1597,7 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
             {
                 unionTP = new UnionTypeCode(ctx.getScope(), name, dist_type);
             }
+            unionTP.setDefined();
             line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
         }
         LEFT_BRACE switch_body[unionTP] RIGHT_BRACE

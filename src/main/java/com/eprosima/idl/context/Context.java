@@ -529,7 +529,7 @@ public class Context
         {
             String scope = m_scope;
 
-            while(typedecl == null && !scope.isEmpty())
+            while(typedecl == null && scope != null && !scope.isEmpty())
             {
                 typedecl = m_types.get(scope + "::" + name);
                 lastIndex = scope.lastIndexOf("::");
