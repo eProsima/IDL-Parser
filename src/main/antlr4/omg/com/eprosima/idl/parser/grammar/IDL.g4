@@ -1507,12 +1507,6 @@ member_def [StructTypeCode structTP] returns [Vector<Pair<Pair<String, Token>, M
 member [StructTypeCode structTP] returns [Vector<Pair<Pair<String, Token>, Member>> ret = new Vector<Pair<Pair<String, Token>, Member>>()]
     :   type_spec[null] declarators SEMICOLON
         {
-            /*
-            if (structTP != null)
-            {
-                System.out.println("Pertenezco a " + structTP.getName());
-            }*/
-
             if($type_spec.typecode!=null)
             {
                 for(int count = 0; count < $declarators.ret.size(); ++count)
