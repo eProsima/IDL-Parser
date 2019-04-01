@@ -85,12 +85,7 @@ version = "1.0.0"
 //general properties
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	 baseName = 'idlparser'
-}
-
-jar {
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    baseName = 'TestIDLParser'
+	baseName = 'idlparser'
     manifest {
         attributes("Created-By": "eProsima", "Main-Class": "com.eprosima.idl.test.TestIDLParser")
     }
