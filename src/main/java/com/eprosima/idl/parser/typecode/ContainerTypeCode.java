@@ -14,46 +14,59 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.tree.Definition;
+
 public abstract class ContainerTypeCode extends TypeCode
 {
     protected ContainerTypeCode(int kind)
     {
         super(kind);
     }
-    
+
     @Override
     public abstract String getCppTypename();
-    
+
     @Override
     public abstract String getCTypename();
-    
+
     @Override
     public abstract String getIdlTypename();
-    
+
     public TypeCode getContentTypeCode()
     {
         return m_contentTypeCode;
     }
-    
+
+    public Definition getContentDefinition()
+    {
+        return m_contentDefinition;
+    }
+
     public void setContentTypeCode(TypeCode contentTypeCode)
     {
         m_contentTypeCode = contentTypeCode;
     }
-    
+
+    public void setContentDefinition(Definition contentDefinition)
+    {
+        m_contentDefinition = contentDefinition;
+    }
+
     public int getDepth()
     {
-    	int ret = 1;
-    	
-    	if (m_contentTypeCode.isPrimitive()) {
-    		return ret;
+        int ret = 1;
+
+        if (m_contentTypeCode.isPrimitive()) {
+    	    return ret;
     	} else {
-    		if (m_contentTypeCode instanceof ContainerTypeCode) {
-    			ret += ((ContainerTypeCode) m_contentTypeCode).getDepth();
+    	    if (m_contentTypeCode instanceof ContainerTypeCode) {
+    		    ret += ((ContainerTypeCode) m_contentTypeCode).getDepth();
     		}
     	}
-    	
-    	return ret;
+
+        return ret;
     }
 
     private TypeCode m_contentTypeCode = null;
+    private Definition m_contentDefinition = null;
 }

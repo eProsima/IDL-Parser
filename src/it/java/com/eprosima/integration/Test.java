@@ -42,6 +42,21 @@ public class Test
         return prepared;
     }
 
+    public boolean generate(String generatorName, String inputPath, String exampleArch, boolean testFlag)
+    {
+        String program = "java -jar " + generatorName + ".jar";
+        String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
+        String output = " -d " + outputPath;
+        String idlPaths = "";
+        for(IDL aux = idl; aux != null; aux = aux.getRequired())
+        {
+            idlPaths += " " + inputPath + "/" + aux.toString().toLowerCase() + ".idl";
+        }
+
+        String command = program + flags + output + idlPaths;
+        return Command.execute(command, null, errorOutputOnly);
+    }
+
     public boolean generate(String generatorName, String inputPath, boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";

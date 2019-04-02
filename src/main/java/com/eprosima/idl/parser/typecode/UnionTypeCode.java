@@ -22,9 +22,20 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class UnionTypeCode extends MemberedTypeCode
 {
+    public UnionTypeCode(String scope, String name)
+    {
+        super(Kind.KIND_UNION, scope, name);
+        m_discriminatorTypeCode = null;
+    }
+
     public UnionTypeCode(String scope, String name, TypeCode discriminatorTypeCode)
     {
         super(Kind.KIND_UNION, scope, name);
+        m_discriminatorTypeCode = discriminatorTypeCode;
+    }
+
+    public void setDiscriminatorType(TypeCode discriminatorTypeCode)
+    {
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
 
@@ -36,6 +47,9 @@ public class UnionTypeCode extends MemberedTypeCode
 
     @Override
     public boolean isObjectType() { return true; }
+
+    @Override
+    public boolean isIsUnionType() {return true; }
 
     /*!
      * @return 0 is ok, -1 the member is repeated, -2 is another default member.

@@ -14,6 +14,9 @@
 
 package com.eprosima.idl.parser.tree;
 
+import com.eprosima.idl.parser.typecode.Member;
+import com.eprosima.idl.parser.typecode.EnumMember;
+import com.eprosima.idl.parser.typecode.EnumTypeCode;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
 public class AnnotationMember
@@ -48,6 +51,29 @@ public class AnnotationMember
 
     public String getValue()
     {
+        if (m_typecode.isIsType_c()) // Enum
+        {
+            EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
+            int idx = 0;
+            for (Member m : enumTC.getMembers())
+            {
+                if (m.getName().equals(m_value))
+                {
+                    return Integer.toString(idx);
+                }
+                idx++;
+            }
+        }
+        if (m_typecode.isIsType_d()) // String
+        {
+            if (m_value != null)
+            {
+                if (m_value.startsWith("\"") && m_value.endsWith("\""))
+                {
+                    return m_value.substring(1, m_value.length() - 1);
+                }
+            }
+        }
         return m_value;
     }
 

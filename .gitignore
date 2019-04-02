@@ -25,6 +25,7 @@ cscope.out
 #### Project files ####
 
 # Generated Java source
+/src/main/generated-java/
 src/com/eprosima/idl/parser/grammar/IDLLexer.java
 src/com/eprosima/idl/parser/grammar/IDLLexer.smap
 src/com/eprosima/idl/parser/grammar/IDLParser.java

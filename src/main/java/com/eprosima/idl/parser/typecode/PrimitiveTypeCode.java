@@ -84,6 +84,10 @@ public class PrimitiveTypeCode extends TypeCode
                 return "TK_FLOAT128";
             case Kind.KIND_WCHAR:
                 return "TK_CHAR16";
+            case Kind.KIND_INT8:
+                return "TK_INT8";
+            case Kind.KIND_UINT8:
+                return "TK_UINT8";
             default:
                 return "TK_None";
         }
@@ -110,12 +114,14 @@ public class PrimitiveTypeCode extends TypeCode
             case Kind.KIND_USHORT:
             case Kind.KIND_CHAR:
             case Kind.KIND_OCTET:
+            case Kind.KIND_INT8:
+            case Kind.KIND_UINT8:
                 return "0";
             case Kind.KIND_BOOLEAN:
                 return "false";
         }
 
-    	return "";
+        return "";
     }
 
     /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
@@ -160,6 +166,8 @@ public class PrimitiveTypeCode extends TypeCode
             case Kind.KIND_BOOLEAN:
             case Kind.KIND_CHAR:
             case Kind.KIND_OCTET:
+            case Kind.KIND_INT8:
+            case Kind.KIND_UINT8:
                 return "1";
         }
 

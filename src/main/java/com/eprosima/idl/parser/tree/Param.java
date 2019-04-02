@@ -34,7 +34,7 @@ public class Param
 
         return false;
     }
-    
+
     public boolean isOutput()
     {
         if(m_kind == Kind.OUT_PARAM || m_kind == Kind.INOUT_PARAM)
@@ -44,9 +44,9 @@ public class Param
 
         return false;
     }
-    
+
     public boolean isOnlyOutput()
-    {        
+    {
         if(m_kind == Kind.OUT_PARAM)
         {
             return true;
@@ -54,7 +54,7 @@ public class Param
 
         return false;
     }
-    
+
     public String getComment()
     {
         if(m_kind == Kind.IN_PARAM)
@@ -66,36 +66,49 @@ public class Param
 
         return "error";
     }
-    
+
     public Param(String name, TypeCode typecode, Kind kind)
     {
         m_name = name;
         m_typecode = typecode;
         m_kind = kind;
     }
-    
+
+    public Param(String name, Definition definition, Kind kind)
+    {
+        m_name = name;
+        m_definition = definition;
+        m_kind = kind;
+    }
+
     public String getName()
     {
         return m_name;
     }
-    
+
     public TypeCode getTypecode()
     {
         return m_typecode;
     }
-    
+
+    public Definition getDefinition()
+    {
+        return m_definition;
+    }
+
     public void setParent(Object obj)
     {
         m_parent = obj;
     }
-    
+
     public Object getParent()
     {
         return m_parent;
     }
-    
+
     private Kind m_kind = Kind.IN_PARAM;
     private String m_name = null;
     private TypeCode m_typecode = null;
+    private Definition m_definition = null;
     private Object m_parent = null;
 }

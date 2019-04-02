@@ -15,7 +15,10 @@
 package com.eprosima.idl.generator.manager;
 
 import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.grammar.IDLParser.DefinitionContext;
 import com.eprosima.idl.parser.typecode.*;
+import com.eprosima.idl.parser.tree.Definition;
+import com.eprosima.idl.parser.tree.ConstDeclaration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,20 +35,24 @@ public class TemplateUtil
             return type;
     }
 
-    public static void setUnionDefaultLabel(UnionTypeCode union_type, String scopeFile, int line)
+    public static void setUnionDefaultLabel(ArrayList<Definition> defs, UnionTypeCode union_type, String scopeFile, int line)
     {
         TypeCode dist_type = union_type.getDiscriminator();
         List<Member> members = union_type.getMembers();
 
         if(dist_type != null && union_type.getDefaultMember() != null)
         {
-            if(dist_type.getKind() == Kind.KIND_SHORT ||
+            if(dist_type.getKind() == Kind.KIND_OCTET ||
+                    dist_type.getKind() == Kind.KIND_INT8 ||
+                    dist_type.getKind() == Kind.KIND_SHORT ||
                     dist_type.getKind() == Kind.KIND_LONG ||
                     dist_type.getKind() == Kind.KIND_LONGLONG ||
+                    dist_type.getKind() == Kind.KIND_UINT8 ||
                     dist_type.getKind() == Kind.KIND_USHORT ||
                     dist_type.getKind() == Kind.KIND_ULONG ||
                     dist_type.getKind() == Kind.KIND_ULONGLONG ||
-                    dist_type.getKind() == Kind.KIND_CHAR)
+                    dist_type.getKind() == Kind.KIND_CHAR ||
+                    dist_type.getKind() == Kind.KIND_WCHAR)
             {
                 long dvalue = -1;
                 boolean found = true;
@@ -64,7 +71,27 @@ public class TemplateUtil
 
                             for(String label : umember.getLabels())
                             {
-                                long value = Long.valueOf(label);
+                                long value = 0;
+                                try
+                                {
+                                    value = Long.decode(label);
+                                }
+                                catch(NumberFormatException nfe)
+                                {
+                                    // It could be a const
+                                    for (Definition def : defs)
+                                    {
+                                        if (def.isIsConstDeclaration())
+                                        {
+                                            ConstDeclaration decl = (ConstDeclaration)def;
+                                            if (decl.getName().equals(label))
+                                            {
+                                                value = Long.decode(decl.getValue());
+                                                //System.out.println("Label " + label + " has value " + value);
+                                            }
+                                        }
+                                    }
+                                }
 
                                 if(dvalue == value)
                                 {

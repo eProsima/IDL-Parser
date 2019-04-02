@@ -14,13 +14,19 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Notebook;
+import com.eprosima.idl.context.Context;
+
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Collection;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 
 
-public abstract class TypeCode
+public abstract class TypeCode implements Notebook
 {
     public static StringTemplateGroup idltypesgr  = null;
     public static StringTemplateGroup cpptypesgr  = null;
@@ -32,11 +38,17 @@ public abstract class TypeCode
     public TypeCode(int kind)
     {
         m_kind = kind;
+        m_annotations = new HashMap<String, Annotation>();
     }
 
     public int getKind()
     {
         return m_kind;
+    }
+
+    public boolean isIsAnyTypeCode()
+    {
+        return m_kind == Kind.KIND_NULL;
     }
 
     /*|
@@ -141,6 +153,8 @@ public abstract class TypeCode
     public boolean isIsType_a(){return false;}
     public boolean isIsType_10(){return false;}
     public boolean isIsType_13(){return false;}
+    public boolean isIsBitmaskType(){return false;}
+    public boolean isIsBitsetType(){return false;}
     public boolean isIsStringType() { return false;}
     public boolean isIsWStringType() { return false;}
     public boolean isIsWCharType() { return false;}
@@ -148,6 +162,8 @@ public abstract class TypeCode
     public boolean isIsMapType() { return false; }
     public boolean isIsSequenceType() { return false; }
     public boolean isIsArrayType() { return false; }
+    public boolean isIsStructType() {return isIsType_a(); }
+    public boolean isIsUnionType() {return m_kind == Kind.KIND_UNION; }
 
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getTypeIdentifier() { return "TK_None"; }
@@ -167,8 +183,107 @@ public abstract class TypeCode
         m_parent = parent;
     }
 
+    @Override
+    public void addAnnotation(Context ctx, Annotation annotation)
+    {
+        if(annotation != null)
+            m_annotations.put(annotation.getName(), annotation);
+    }
+
+    @Override
+    public Map<String, Annotation> getAnnotations()
+    {
+        return m_annotations;
+    }
+
+    public Collection<Annotation> getAnnotationList()
+    {
+        return m_annotations.values();
+    }
+
+    public boolean isAnnotationFinal()
+    {
+        Annotation ann = m_annotations.get("final");
+        if (ann != null)
+        {
+            return true;
+        }
+        ann = m_annotations.get("extensibility");
+        if (ann != null)
+        {
+            return ann.getValue().equals("FINAL");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationAppendable()
+    {
+        Annotation ann = m_annotations.get("appendable");
+        if (ann != null)
+        {
+            return true;
+        }
+        ann = m_annotations.get("extensibility");
+        if (ann != null)
+        {
+            return ann.getValue().equals("APPENDABLE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationMutable()
+    {
+        Annotation ann = m_annotations.get("mutable");
+        if (ann != null)
+        {
+            return true;
+        }
+        ann = m_annotations.get("extensibility");
+        if (ann != null)
+        {
+            return ann.getValue().equals("MUTABLE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationNested()
+    {
+        Annotation ann = m_annotations.get("nested");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
+    }
+
+    public boolean isForwarded()
+    {
+        return m_forwarded;
+    }
+
+    public void setForwarded(boolean fwd)
+    {
+        m_forwarded = fwd;
+    }
+
+    public boolean isDefined()
+    {
+        return m_defined;
+    }
+
+    public void setDefined()
+    {
+        m_defined = true;
+    }
+
     private int m_kind = Kind.KIND_NULL;
 
     // Added parent object to typecode because was needed in DDS with our types (TopicsPlugin_gettypecode)
     private Object m_parent = null;
+
+    private HashMap<String, Annotation> m_annotations = null;
+
+    private boolean m_forwarded = false;
+
+    private boolean m_defined = false;
 }

@@ -85,7 +85,10 @@ version = "1.0.0"
 //general properties
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	 baseName = 'idlparser'
+	baseName = 'idlparser'
+    manifest {
+        attributes("Created-By": "eProsima", "Main-Class": "com.eprosima.idl.test.TestIDLParser")
+    }
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
@@ -121,4 +124,3 @@ publishing {
       }
    }
 }
-

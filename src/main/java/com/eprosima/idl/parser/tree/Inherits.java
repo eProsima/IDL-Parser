@@ -14,19 +14,23 @@
 
 package com.eprosima.idl.parser.tree;
 
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.typecode.TypeCode;
+
 import java.util.ArrayList;
-import java.util.List;
 
-public class Specification
+public interface Inherits
 {
-    public Specification()
-    {
-	    m_definitions = new ArrayList<Definition>();
-    }
+    /*!
+     * @brief This function links all super types to the object.
+     * @param ctx Context used in the IDL parser. Can be useful for developers.
+     * @param parent Super TypeCode to be linked.
+     */
+    public void addInheritance(Context ctx, TypeCode parent);
 
-    public void setDefinitions(List<Definition> children) { m_definitions = children; }
-    public List<Definition> getDefinitions() { return m_definitions; }
-    public void addChild(Definition child) { m_definitions.add(child); }
-
-    private List<Definition> m_definitions;
+    /*!
+     * @brief This function returns all super types linked with the object.
+     * @return Map with the linked super types.
+     */
+    public ArrayList<TypeCode> getInheritances();
 }

@@ -20,6 +20,7 @@ import com.eprosima.idl.context.Context;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collection;
 
 public class Member implements Notebook
 {
@@ -41,15 +42,15 @@ public class Member implements Notebook
     }
 
     public String getJavaName() {
-    	if (m_name != null) {
-	    	Character firstChar =Character.toUpperCase(m_name.charAt(0));
-	    	String javaName = firstChar.toString();
-	    	if (m_name.length() > 1) {
-	    		javaName += m_name.substring(1);
+        if (m_name != null) {
+	        Character firstChar =Character.toUpperCase(m_name.charAt(0));
+	        String javaName = firstChar.toString();
+	        if (m_name.length() > 1) {
+	    	    javaName += m_name.substring(1);
 	    	}
-	    	return javaName;
+	        return javaName;
     	}
-    	return null;
+        return null;
     }
 
     /*
@@ -75,13 +76,134 @@ public class Member implements Notebook
     public void addAnnotation(Context ctx, Annotation annotation)
     {
         if(annotation != null)
-            m_annotations.put(annotation.getName(), annotation);
+        {
+            if (((annotation.getName().equals("key") || annotation.getName().equals("Key") )
+                && isAnnotationNonSerialized())
+                || (annotation.getName().equals("non_serialized") && isAnnotationKey()))
+            {
+                System.err.println("ERROR: Member " + m_name + " has incompatible annotations key and non_serialized.");
+                System.exit(1);
+            }
+            else
+            {
+                m_annotations.put(annotation.getName(), annotation);
+            }
+        }
     }
 
     @Override
     public Map<String, Annotation> getAnnotations()
     {
         return m_annotations;
+    }
+
+    public Collection<Annotation> getAnnotationList()
+    {
+        return m_annotations.values();
+    }
+
+    public boolean isAnnotationOptional()
+    {
+        Annotation ann = m_annotations.get("optional");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationMustUnderstand()
+    {
+        Annotation ann = m_annotations.get("must_understand");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationNonSerialized()
+    {
+        Annotation ann = m_annotations.get("non_serialized");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationKey()
+    {
+        Annotation ann = m_annotations.get("key");
+        if (ann == null)
+        {
+            ann = m_annotations.get("Key"); // Try old way
+        }
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
+    }
+
+    public Short getAnnotationBitBound()
+    {
+        Annotation ann = m_annotations.get("bit_bound");
+        if (ann != null)
+        {
+            String value = ann.getValue();
+            if (value.equals("-1"))
+            {
+                return null;
+            }
+            return Short.parseShort(value);
+        }
+        return null;
+    }
+
+    public boolean isAnnotationDefaultLiteral()
+    {
+        return m_annotations.get("default_literal") != null;
+    }
+
+    public String getAnnotationValue()
+    {
+        Annotation ann = m_annotations.get("value");
+        if (ann != null)
+        {
+            return ann.getValue();
+        }
+        return null;
+    }
+
+    public Short getAnnotationPosition()
+    {
+        Annotation ann = m_annotations.get("position");
+        if (ann != null)
+        {
+            String value = ann.getValue();
+            if (value.equals("-1"))
+            {
+                return null;
+            }
+            return Short.parseShort(value);
+        }
+        return null;
+    }
+
+    public boolean isAnnotationDefault()
+    {
+        return m_annotations.get("default") != null;
+    }
+
+    public String getAnnotationDefaultValue()
+    {
+        Annotation ann = m_annotations.get("default");
+        if (ann != null)
+        {
+            return ann.getValue();
+        }
+        return "";
     }
 
     private String m_name = null;

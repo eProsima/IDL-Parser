@@ -16,6 +16,7 @@ package com.eprosima.idl.context;
 
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.AnnotationDeclaration;
+import com.eprosima.idl.parser.tree.AnnotationMember;
 import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
@@ -23,8 +24,14 @@ import com.eprosima.idl.parser.tree.Param;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
 import com.eprosima.idl.parser.typecode.BitfieldSpec;
 import com.eprosima.idl.parser.typecode.BitsetTypeCode;
+import com.eprosima.idl.parser.typecode.BitmaskTypeCode;
+import com.eprosima.idl.parser.typecode.EnumMember;
+import com.eprosima.idl.parser.typecode.EnumTypeCode;
+import com.eprosima.idl.parser.typecode.Kind;
+import com.eprosima.idl.parser.typecode.PrimitiveTypeCode;
 import com.eprosima.idl.parser.typecode.StructTypeCode;
 import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.parser.typecode.AnyTypeCode;
 import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.util.Util;
 import java.io.File;
@@ -58,7 +65,7 @@ public class Context
         // Remove absolute directory where the application was executed
         if(startsWith(m_file, m_userdir))
         {
-        	m_file = m_file.substring(m_userdir.length());
+            m_file = m_file.substring(m_userdir.length());
 
         	// Remove possible separator
             if(startsWith(m_file, java.io.File.separator))
@@ -67,7 +74,7 @@ public class Context
         /*
         // Remove relative directory if is equal that where the processed IDL is.
         if(m_directoryFile != null && startsWith(m_file, m_directoryFile))
-        	m_file = m_file.substring(m_directoryFile.length());
+            m_file = m_file.substring(m_directoryFile.length());
         */
 
         m_definitions = new ArrayList<Definition>();
@@ -93,17 +100,17 @@ public class Context
         {
             String include = (String)includePaths.get(i);
             if(startsWith(include, includeFlag))
-            	include = include.substring(includeFlag.length());
+                include = include.substring(includeFlag.length());
             if(startsWith(include, m_userdir))
             {
-            	include = include.substring(m_userdir.length());
+                include = include.substring(m_userdir.length());
 
             	// Remove possible separator
                 if(startsWith(include, java.io.File.separator))
                     include = include.substring(1);
             }
             if(m_directoryFile != null && startsWith(include, m_directoryFile))
-            	include = include.substring(m_directoryFile.length());
+                include = include.substring(m_directoryFile.length());
             // Add last separator.
             if(include.charAt(include.length() - 1) != java.io.File.separatorChar)
                 include += java.io.File.separator;
@@ -132,6 +139,100 @@ public class Context
             if(count == m_includePaths.size())
                 ++pointer;
         }
+
+        // Add here builtin annotations? (IDL 4.2 - 8.3.1 section)
+        AnnotationDeclaration idann = createAnnotationDeclaration("id", null);
+        idann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_LONG), "-1"));
+
+        AnnotationDeclaration autoidann = createAnnotationDeclaration("autoid", null);
+        EnumTypeCode autoidannenum = new EnumTypeCode(autoidann.getScopedname(), "autoidannenum");
+        autoidannenum.addMember(new EnumMember("SEQUENTIAL"));
+        autoidannenum.addMember(new EnumMember("HASH"));
+        autoidann.addMember(new AnnotationMember("value", autoidannenum, autoidannenum.getInitialValue()));
+
+        AnnotationDeclaration optionalann = createAnnotationDeclaration("optional", null);
+        optionalann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        AnnotationDeclaration positionann = createAnnotationDeclaration("position", null);
+        positionann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_USHORT), "-1"));
+
+        AnnotationDeclaration valueann = createAnnotationDeclaration("value", null);
+        valueann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
+
+        AnnotationDeclaration extensibilityann = createAnnotationDeclaration("extensibility", null);
+        EnumTypeCode extensibilityannenum = new EnumTypeCode(extensibilityann.getScopedname(), "extensibilityannenum");
+        extensibilityannenum.addMember(new EnumMember("FINAL"));
+        extensibilityannenum.addMember(new EnumMember("APPENDABLE"));
+        extensibilityannenum.addMember(new EnumMember("MUTABLE"));
+        extensibilityann.addMember(new AnnotationMember("value", extensibilityannenum,
+            extensibilityannenum.getInitialValue()));
+
+        createAnnotationDeclaration("final", null);
+        createAnnotationDeclaration("appendable", null);
+        createAnnotationDeclaration("mutable", null);
+
+        // Create default @Key annotation.
+        AnnotationDeclaration keyann = createAnnotationDeclaration("key", null);
+        keyann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        AnnotationDeclaration mustundann = createAnnotationDeclaration("must_understand", null);
+        mustundann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        createAnnotationDeclaration("default_literal", null);
+
+        AnnotationDeclaration rangeann = createAnnotationDeclaration("range", null);
+        rangeann.addMember(new AnnotationMember("min", new AnyTypeCode(), null));
+            //String.valueOf(Integer.MIN_VALUE)));
+        rangeann.addMember(new AnnotationMember("max", new AnyTypeCode(), null));
+            //String.valueOf(Integer.MAX_VALUE)));
+
+        AnnotationDeclaration unitsann = createAnnotationDeclaration("units", null);
+        unitsann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
+
+        AnnotationDeclaration defaultann = createAnnotationDeclaration("default", null);
+        defaultann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
+
+        AnnotationDeclaration minann = createAnnotationDeclaration("min", null);
+        minann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
+
+        AnnotationDeclaration maxann = createAnnotationDeclaration("max", null);
+        maxann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
+
+        AnnotationDeclaration bit_boundann = createAnnotationDeclaration("bit_bound", null);
+        bit_boundann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_USHORT), "-1"));
+
+        AnnotationDeclaration externalann = createAnnotationDeclaration("external", null);
+        externalann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        AnnotationDeclaration nestedann = createAnnotationDeclaration("nested", null);
+        nestedann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        AnnotationDeclaration verbatimann = createAnnotationDeclaration("verbatim", null);
+        EnumTypeCode verbatimannenum = new EnumTypeCode(verbatimann.getScopedname(), "verbatimannenum");
+        verbatimannenum.addMember(new EnumMember("BEGIN_FILE"));
+        verbatimannenum.addMember(new EnumMember("BEFORE_DECLARATION"));
+        verbatimannenum.addMember(new EnumMember("BEGIN_DECLARATION"));
+        verbatimannenum.addMember(new EnumMember("END_DECLARATION"));
+        verbatimannenum.addMember(new EnumMember("AFTER_DECLARATION"));
+        verbatimannenum.addMember(new EnumMember("END_FILE"));
+        verbatimann.addMember(new AnnotationMember("language", new PrimitiveTypeCode(Kind.KIND_STRING), "*"));
+        // c, c++, java, idl, * (any), or custom value
+        verbatimann.addMember(new AnnotationMember("placement", verbatimannenum, "BEFORE_DECLARATION"));
+        verbatimann.addMember(new AnnotationMember("text", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
+
+        AnnotationDeclaration serviceann = createAnnotationDeclaration("service", null);
+        serviceann.addMember(new AnnotationMember("platform", new PrimitiveTypeCode(Kind.KIND_STRING), "*"));
+        // CORBA, DDS, * (any), or custom value
+
+        AnnotationDeclaration onewayann = createAnnotationDeclaration("oneway", null);
+        onewayann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        AnnotationDeclaration amiann = createAnnotationDeclaration("ami", null);
+        amiann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        // Create default @non_serialized annotation.
+        AnnotationDeclaration non_serializedann = createAnnotationDeclaration("non_serialized", null);
+        non_serializedann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
     }
 
     public String getFilename()
@@ -164,27 +265,27 @@ public class Context
      */
     public boolean isInScopedFile()
     {
-    	return m_scopeFile.equals(m_file);
+        return m_scopeFile.equals(m_file);
     }
 
     public String getScopeFile()
     {
-    	return m_scopeFile;
+        return m_scopeFile;
     }
 
     public boolean isScopeLimitToAll()
     {
-    	return m_scopeLimitToAll;
+        return m_scopeLimitToAll;
     }
 
     public void setScopeLimitToAll(boolean scopeLimitToAll)
     {
-    	m_scopeLimitToAll = scopeLimitToAll;
+        m_scopeLimitToAll = scopeLimitToAll;
     }
 
     public int getCurrentIncludeLine()
     {
-    	return m_currentincludeline;
+        return m_currentincludeline;
     }
 
     public Stack<Pair<String, Integer>> getScopeFilesStack()
@@ -309,11 +410,11 @@ public class Context
      */
     protected void addException(com.eprosima.idl.parser.tree.Exception exception)
     {
-    	com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(exception.getScopedname(), exception);
+        com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(exception.getScopedname(), exception);
 
         // TODO: Exception.
         if(prev != null)
-        	System.out.println("Warning: Redefined exception " + prev.getScopedname());
+            System.out.println("Warning: Redefined exception " + prev.getScopedname());
     }
 
     /*!
@@ -360,6 +461,12 @@ public class Context
         return paramObject;
     }
 
+    public Param createParam(String name, Definition definition, Param.Kind kind)
+    {
+        Param paramObject = new Param(name, definition, kind);
+        return paramObject;
+    }
+
     public StructTypeCode createStructTypeCode(String name)
     {
         StructTypeCode structObject = new StructTypeCode(m_scope, name);
@@ -375,6 +482,12 @@ public class Context
     public BitsetTypeCode createBitsetTypeCode(String name)
     {
         BitsetTypeCode object = new BitsetTypeCode(m_scope, name);
+        return object;
+    }
+
+    public BitmaskTypeCode createBitmaskTypeCode(String name)
+    {
+        BitmaskTypeCode object = new BitmaskTypeCode(m_scope, name);
         return object;
     }
 
@@ -395,6 +508,14 @@ public class Context
     }
 
     /*!
+     * @brief This function returns a global typecode of the context.
+     */
+    public TypeDeclaration getTypeDeclaration(String scopedName)
+    {
+        return m_types.get(scopedName);
+    }
+
+    /*!
      * @brief This function tries to retrieve a global typecode.
      */
     public TypeCode getTypeCode(String name)
@@ -408,7 +529,7 @@ public class Context
         {
             String scope = m_scope;
 
-            while(typedecl == null && !scope.isEmpty())
+            while(typedecl == null && scope != null && !scope.isEmpty())
             {
                 typedecl = m_types.get(scope + "::" + name);
                 lastIndex = scope.lastIndexOf("::");
@@ -485,7 +606,7 @@ public class Context
      */
     public void addDependency(String dependency)
     {
-    	m_dependencies.add(dependency);
+        m_dependencies.add(dependency);
     }
 
     /*!
@@ -541,8 +662,8 @@ public class Context
         String dep = dependency.substring(0, dependency.length() - 4);
         // Remove directory if it is the same than main IDL file.
         if(m_directoryFile != null && startsWith(dep, m_directoryFile))
-        	dep = dep.substring(m_directoryFile.length());
-    	m_includedependency.add(dep);
+            dep = dep.substring(m_directoryFile.length());
+        m_includedependency.add(dep);
     }
 
     // TODO Quitar porque solo es para tipos (previous c) (usado para las excepciones). Mirar alternativa.
@@ -552,7 +673,7 @@ public class Context
      */
     public ArrayList<String> getIncludeDependencies()
     {
-    	return new ArrayList<String>(m_includedependency);
+        return new ArrayList<String>(m_includedependency);
     }
 
     /*!
@@ -695,12 +816,12 @@ public class Context
 
     protected boolean startsWith(String st, String prefix)
     {
-    	if(m_os.contains("Windows"))
+        if(m_os.contains("Windows"))
     	{
-    		return st.toLowerCase().startsWith(prefix.toLowerCase());
+    	    return st.toLowerCase().startsWith(prefix.toLowerCase());
     	}
 
-    	return st.startsWith(prefix);
+        return st.startsWith(prefix);
     }
 
     /*** Function to generate random loop variables in string templates ***/

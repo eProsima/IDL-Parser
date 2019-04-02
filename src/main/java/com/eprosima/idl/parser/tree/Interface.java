@@ -49,13 +49,13 @@ public class Interface extends ExportContainer implements Definition
     @Override
     public boolean isIsInterface()
     {
-    	return true;
+        return true;
     }
 
     @Override
     public boolean isIsException()
     {
-    	return false;
+        return false;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class Interface extends ExportContainer implements Definition
     }
 
 	@Override
-	public boolean isIsAnnotation()
+    public boolean isIsAnnotation()
     {
         return false;
     }
@@ -96,33 +96,33 @@ public class Interface extends ExportContainer implements Definition
      */
     public Exception getException(String currentScope, String ename)
     {
-    	com.eprosima.idl.parser.tree.Exception exception = null;
+        com.eprosima.idl.parser.tree.Exception exception = null;
 
-    	for(int count = 0; exception == null && count < getExports().size(); ++count)
+        for(int count = 0; exception == null && count < getExports().size(); ++count)
         {
-    		int lastIndex = -1;
+    	    int lastIndex = -1;
 
-    		if(getExports().get(count).isIsException())
+    	    if(getExports().get(count).isIsException())
     		{
                 String tmpname = ((com.eprosima.idl.parser.tree.Exception)getExports().get(count)).getScopedname();
 
                 if(tmpname.equals(ename))
                 {
-                	exception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
+                    exception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
                 }
                 else
                 {
                 	// Probar si no tiene scope, con el scope actual.
                     if(exception == null && ((lastIndex = ename.lastIndexOf("::")) == -1) &&
-                    		tmpname.equals(currentScope + ename))
+                    	    tmpname.equals(currentScope + ename))
                     {
-                    	exception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
+                        exception = (com.eprosima.idl.parser.tree.Exception)getExports().get(count);
                     }
                 }
     		}
         }
 
-    	return exception;
+        return exception;
     }
 
     /*!

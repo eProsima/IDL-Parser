@@ -13,16 +13,21 @@
 // limitations under the License.
 
 package com.eprosima.idl.parser.typecode;
+import com.eprosima.idl.parser.tree.Inherits;
+import com.eprosima.idl.context.Context;
 
 import org.antlr.stringtemplate.StringTemplate;
 
+import java.util.List;
+import java.util.ArrayList;
 
 
-public class StructTypeCode extends MemberedTypeCode
+public class StructTypeCode extends MemberedTypeCode implements Inherits
 {
     public StructTypeCode(String scope, String name)
     {
         super(Kind.KIND_STRUCT, scope, name);
+        superTypes_ = new ArrayList<StructTypeCode>();
     }
 
     @Override
@@ -71,43 +76,52 @@ public class StructTypeCode extends MemberedTypeCode
         return true;
     }
 
-    /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
-      {
-      List<Member> members = getMembers();
-      int lcurrentSize = currentSize;
-      int llastDataAligned = lastDataAligned;
+    @Override
+    public void addInheritance(Context ctx, TypeCode parent)
+    {
+        if (parent instanceof StructTypeCode)
+        {
+            superTypes_.add((StructTypeCode)parent);
+        }
+    }
 
-      for(int count = 0; count < members.size(); ++count)
-      {
-      Pair<Integer, Integer> pair = members.get(count).getTypecode().getMaxSerializedSize(lcurrentSize, llastDataAligned);
-      lcurrentSize = pair.first();
-      llastDataAligned = pair.second();
-      }
+    @Override
+    public ArrayList<TypeCode> getInheritances()
+    {
+        ArrayList<TypeCode> result = new ArrayList<TypeCode>();
+        for (StructTypeCode parent : superTypes_)
+        {
+            result.add(parent);
+        }
+        return result;
+    }
 
-      return new Pair<Integer, Integer>(lcurrentSize, llastDataAligned);
-      }
+    @Override
+    public List<Member> getMembers()
+    {
+        return getMembers(false);
+    }
 
-      public int getMaxSerializedSizeWithoutAlignment(int currentSize)
-      {
-      List<Member> members = getMembers();
-      int lcurrentSize = currentSize;
+    public List<Member> getMembers(boolean includeParents)
+    {
+        List<Member> allMembers = new ArrayList<Member>();
 
-      for(int count = 0; count < members.size(); ++count)
-      {
-      lcurrentSize = members.get(count).getTypecode().getMaxSerializedSizeWithoutAlignment(lcurrentSize);
-      }
+        if (includeParents)
+        {
+            for (StructTypeCode p : superTypes_)
+            {
+                allMembers.addAll(p.getMembers());
+            }
+        }
 
-      return lcurrentSize;
-      }
+        allMembers.addAll(super.getMembers());
+        return allMembers;
+    }
 
-      public String getMaxSerializedSize()
-      {
-      Pair<Integer, Integer> pair = getMaxSerializedSize(0, 0);
-      return pair.first().toString();
-      }
+    public List<Member> getAllMembers() // Alias for getMembers(true) for stg
+    {
+        return getMembers(true);
+    }
 
-      public String getMaxSerializedSizeWithoutAlignment()
-      {
-      return Integer.toString(getMaxSerializedSizeWithoutAlignment(0));
-      }*/
+    private ArrayList<StructTypeCode> superTypes_;
 }

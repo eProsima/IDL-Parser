@@ -15,6 +15,7 @@
 package com.eprosima.idl.parser.typecode;
 
 import org.antlr.stringtemplate.StringTemplate;
+import com.eprosima.idl.parser.tree.Definition;
 
 
 public class MapTypeCode extends ContainerTypeCode
@@ -98,7 +99,7 @@ public class MapTypeCode extends ContainerTypeCode
         m_keyTypeCode = keyTypeCode;
     }
 
-	public TypeCode getValueTypeCode()
+    public TypeCode getValueTypeCode()
     {
         return m_valueTypeCode;
     }
@@ -108,7 +109,29 @@ public class MapTypeCode extends ContainerTypeCode
         m_valueTypeCode = valueTypeCode;
     }
 
+    public Definition getKeyDefinition()
+    {
+        return m_keyDefinition;
+    }
+
+    public void setKeyDefinition(Definition keyDefinition)
+    {
+        m_keyDefinition = keyDefinition;
+    }
+
+    public Definition getValueDefinition()
+    {
+        return m_valueDefinition;
+    }
+
+    public void setValueDefinition(Definition valueDefinition)
+    {
+        m_valueDefinition = valueDefinition;
+    }
+
     private TypeCode m_keyTypeCode = null;
-	private TypeCode m_valueTypeCode = null;
+    private TypeCode m_valueTypeCode = null;
+    private Definition m_keyDefinition = null;
+    private Definition m_valueDefinition = null;
     private String m_maxsize = null;
 }

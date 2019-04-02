@@ -12,24 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.eprosima.idl.parser.exception;
+package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.log.ColorMessage;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
 
-public class ParseException extends RecognitionException
+
+public class Bitmask extends Member
 {
-    public ParseException()
+    public Bitmask()
     {
-        super("", null, null, null);
+        super();
     }
 
-    public ParseException(Token token, String message)
+    public Bitmask(BitmaskTypeCode typecode, String name)
     {
-        super(message, null, null, null);
-
-        if(token != null)
-            setOffendingToken(token);
+        super(typecode, name);
     }
+
+    public void setPosition(int position)
+    {
+        m_position = position;
+    }
+
+    public int getPosition()
+    {
+        return m_position;
+    }
+
+    private int m_position = -1;
 }
