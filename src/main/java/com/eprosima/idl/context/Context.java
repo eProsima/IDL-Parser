@@ -22,6 +22,7 @@ import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
 import com.eprosima.idl.parser.tree.Param;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
+import com.eprosima.idl.parser.tree.TreeNode;
 import com.eprosima.idl.parser.typecode.BitfieldSpec;
 import com.eprosima.idl.parser.typecode.BitsetTypeCode;
 import com.eprosima.idl.parser.typecode.BitmaskTypeCode;
@@ -83,6 +84,8 @@ public class Context
         m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
         m_types = new HashMap<String, TypeDeclaration>();
         m_annotations = new HashMap<String, AnnotationDeclaration>();
+        m_keywords = new HashSet<String>();
+        fillKeywords();
 
         // TODO Quitar porque solo es para tipos (previous c) (usado para las excepciones). Mirar alternativa.
         m_includedependency = new HashSet<String>();
@@ -836,6 +839,167 @@ public class Context
         return Character.toString(++m_loopVarName);
     }
 
+    public String removeEscapeCharacter(String id)
+    {
+        if (id.startsWith("_")) // Escaped identifier?
+        {
+            id = id.substring(1);
+        }
+        return id;
+    }
+
+    public String checkIdentifier(String scope, String id)
+    {
+        if (checkKeyword(id))
+        {
+            return id + " is a keyword, use escape character if you want to use it as identifier (_" + id + ")";
+        }
+
+        if (id.startsWith("_")) // Escaped identifier?
+        {
+            id = id.substring(1);
+        }
+        String scopedname = (scope == null || scope.isEmpty()) ? id : scope + "::" + id;
+
+        // Check definitions
+        for (Definition def : m_definitions)
+        {
+            if (def instanceof TreeNode)
+            {
+                TreeNode tn = (TreeNode)def;
+                if (tn.getScopedname().equalsIgnoreCase(scopedname))
+                {
+                    return scopedname + " is already defined (Definition: " + def + ")";
+                }
+            }
+        }
+
+        // Check modules
+        for (String type : m_modules.keySet())
+        {
+            if (type.equalsIgnoreCase(scopedname))
+            {
+                return scopedname + " is already defined (Module: " + type + ")";
+            }
+        }
+
+        // Check interfaces
+        for (String type : m_interfaces.keySet())
+        {
+            if (type.equalsIgnoreCase(scopedname))
+            {
+                return scopedname + " is already defined (Interface: " + type + ")";
+            }
+        }
+
+        // Check Exceptions
+        for (String type : m_exceptions.keySet())
+        {
+            if (type.equalsIgnoreCase(scopedname))
+            {
+                return scopedname + " is already defined (Exception: " + type + ")";
+            }
+        }
+
+        // Check TypeDeclarations
+        for (String type : m_types.keySet())
+        {
+            if (type.equalsIgnoreCase(scopedname))
+            {
+                return scopedname + " is already defined (Type: " + type + ")";
+            }
+        }
+
+        // Check TypeDeclarations
+        for (String anno : m_annotations.keySet())
+        {
+            if (anno.equalsIgnoreCase(scopedname))
+            {
+                return scopedname + " is already defined (Annotation: " + anno + ")";
+            }
+        }
+
+        return null;
+    }
+
+    protected void fillKeywords()
+    {
+        m_keywords.add("setraises");
+        m_keywords.add("out");
+        m_keywords.add("emits");
+        m_keywords.add("string");
+        m_keywords.add("switch");
+        m_keywords.add("publishes");
+        m_keywords.add("typedef");
+        m_keywords.add("uses");
+        m_keywords.add("primarykey");
+        m_keywords.add("custom");
+        m_keywords.add("octet");
+        m_keywords.add("sequence");
+        m_keywords.add("import");
+        m_keywords.add("struct");
+        m_keywords.add("native");
+        m_keywords.add("readonly");
+        m_keywords.add("finder");
+        m_keywords.add("raises");
+        m_keywords.add("void");
+        m_keywords.add("private");
+        m_keywords.add("eventtype");
+        m_keywords.add("wchar");
+        m_keywords.add("in");
+        m_keywords.add("default");
+        m_keywords.add("public");
+        m_keywords.add("short");
+        m_keywords.add("long");
+        m_keywords.add("enum");
+        m_keywords.add("wstring");
+        m_keywords.add("context");
+        m_keywords.add("home");
+        m_keywords.add("factory");
+        m_keywords.add("exception");
+        m_keywords.add("getraises");
+        m_keywords.add("const");
+        m_keywords.add("ValueBase");
+        m_keywords.add("valuetype");
+        m_keywords.add("supports");
+        m_keywords.add("module");
+        m_keywords.add("Object");
+        m_keywords.add("truncatable");
+        m_keywords.add("unsigned");
+        m_keywords.add("fixed");
+        m_keywords.add("union");
+        m_keywords.add("oneway");
+        m_keywords.add("any");
+        m_keywords.add("char");
+        m_keywords.add("case");
+        m_keywords.add("float");
+        m_keywords.add("boolean");
+        m_keywords.add("multiple");
+        m_keywords.add("abstract");
+        m_keywords.add("inout");
+        m_keywords.add("provides");
+        m_keywords.add("consumes");
+        m_keywords.add("double");
+        m_keywords.add("typeprefix");
+        m_keywords.add("typeid");
+        m_keywords.add("attribute");
+        m_keywords.add("local");
+        m_keywords.add("manages");
+        m_keywords.add("interface");
+        m_keywords.add("component");
+        m_keywords.add("set");
+        m_keywords.add("map");
+        m_keywords.add("bitfield");
+        m_keywords.add("bitset");
+        m_keywords.add("bitmask");
+        m_keywords.add("annotation");
+    }
+
+    protected boolean checkKeyword(String id)
+    {
+        return m_keywords.contains(id.toLowerCase());
+    }
+
     /*** End ***/
 
     // OS
@@ -883,4 +1047,7 @@ public class Context
     private char m_loopVarName = 'a';
 
     private Stack<Pair<String, Integer>> m_scopeFilesStack;
+
+    // All grammar keywords
+    private HashSet<String> m_keywords = null;
 }
