@@ -1,4 +1,4 @@
-struct String
+struct _String
 {
     string var_string;
     string<16> var_string_16;
