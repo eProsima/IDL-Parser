@@ -1,4 +1,3 @@
-
 bitset MyBitset
 {
 	bitfield<3> a;
@@ -20,8 +19,8 @@ bitmask MyBitMask
 
 struct BitsetBitmask
 {
-	MyBitset mybitset;
-	MyBitMask mybitmask;
+	MyBitset my_bitset;
+	MyBitMask my_bitmask;
 };
 
 struct BM2 : BitsetBitmask
