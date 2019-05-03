@@ -4,7 +4,7 @@ struct Inner
     long var_long;
 };
 
-struct Custom
+struct _Custom
 {
     Inner var_inner;
 };
