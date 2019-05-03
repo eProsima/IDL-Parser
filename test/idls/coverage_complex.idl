@@ -89,6 +89,6 @@ struct CompleteStruct
 
 struct KeyedStruct
 {
-    @Key octet key;
+    @Key octet my_key;
     BasicStruct basic;
 };
