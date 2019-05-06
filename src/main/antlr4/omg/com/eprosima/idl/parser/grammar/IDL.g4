@@ -164,7 +164,12 @@ module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnP
     }
     identifier
     {
-        name=$identifier.id;
+        String error = ctx.checkIdentifier(Definition.Kind.MODULE, ctx.getScope(), $identifier.id);
+        if (error != null)
+        {
+            throw new ParseException(null, "Illegal identifier: " + error);
+        }
+        name = ctx.removeEscapeCharacter($identifier.id);
         // Check if the module already was defined.
         moduleObject = ctx.existsModule(ctx.getScope() + "::" + name);
 
@@ -262,7 +267,12 @@ interface_decl [Vector<Annotation> annotations] returns [Pair<Interface, Templat
         }
         identifier
         {
-            name=$identifier.id;
+            String error = ctx.checkIdentifier(Definition.Kind.INTERFACE, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
             // Retrieve from forward or Create the Interface object.
             interfaceObject = ctx.getInterface(name);
             if (interfaceObject == null)
@@ -517,7 +527,16 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
     }
     Token tk = null;
 }
-    :   KW_CONST const_type[annotation] { typecode=$const_type.typecode; tk = _input.LT(1);} identifier { constName=$identifier.id; } EQUAL const_exp { constValue=$const_exp.literalStr; }
+    :   KW_CONST const_type[annotation] { typecode=$const_type.typecode; tk = _input.LT(1);} identifier
+        {
+            String error = ctx.checkIdentifier(Definition.Kind.CONST_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            constName = ctx.removeEscapeCharacter($identifier.id);
+        }
+        EQUAL const_exp { constValue=$const_exp.literalStr; }
     {
         if(typecode != null)
         {
@@ -955,10 +974,16 @@ simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = nu
     Token tk = _input.LT(1);
 }
     :  identifier
-       {
-           Pair<String, Token> p = new Pair<String, Token>($identifier.id, tk);
-           $ret = new Pair<Pair<String, Token>, ContainerTypeCode>(p, null);
-       }
+        {
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            String name = ctx.removeEscapeCharacter($identifier.id);
+            Pair<String, Token> p = new Pair<String, Token>(name, tk);
+            $ret = new Pair<Pair<String, Token>, ContainerTypeCode>(p, null);
+        }
     ;
 
 complex_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = null]
@@ -1136,7 +1161,16 @@ annotation_header returns [AnnotationDeclaration annotation = null]
     {
         tk = _input.LT(1);
     }
-    identifier { $annotation = ctx.createAnnotationDeclaration($identifier.id, tk); }
+    identifier
+    {
+        String error = ctx.checkIdentifier(Definition.Kind.ANNOTATION, ctx.getScope(), $identifier.id);
+        if (error != null)
+        {
+            throw new ParseException(null, "Illegal identifier: " + error);
+        }
+        String name = ctx.removeEscapeCharacter($identifier.id);
+        $annotation = ctx.createAnnotationDeclaration(name, tk);
+    }
     ( annotation_inheritance_spec[$annotation] )?
     ;
 
@@ -1221,8 +1255,13 @@ bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 } :     KW_BITSET
         identifier
         {
-           name=$identifier.id;
-           typecode = ctx.createBitsetTypeCode(name);
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
+            typecode = ctx.createBitsetTypeCode(name);
         }
         ( COLON scoped_name
             {
@@ -1326,8 +1365,13 @@ bitmask_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 }   :   KW_BITMASK
         identifier
         {
-           name=$identifier.id;
-           typecode = ctx.createBitmaskTypeCode(name);
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
+            typecode = ctx.createBitmaskTypeCode(name);
         }
         LEFT_BRACE bit_values[typecode] RIGHT_BRACE
         {
@@ -1388,7 +1432,12 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
     :   KW_STRUCT
         identifier
         {
-            name=$identifier.id;
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
             String fw_name = name;
 
             // Find typecode in the global map.
@@ -1556,7 +1605,12 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
     :   KW_UNION
         identifier
         {
-            name=$identifier.id;
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
             String fw_name = name;
 
             // Find typecode in the global map.
@@ -1750,7 +1804,16 @@ enum_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
     TemplateGroup enumTemplates = null;
 }
     :   KW_ENUM
-        identifier { name=$identifier.id; enumTP = new EnumTypeCode(ctx.getScope(), name); }
+        identifier
+        {
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
+            enumTP = new EnumTypeCode(ctx.getScope(), name);
+        }
         LEFT_BRACE  enumerator_list[enumTP] RIGHT_BRACE
         {
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
@@ -1778,10 +1841,14 @@ enumerator [EnumTypeCode enumTP]
     String name = null;
     ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 }
-    //:   identifier{ name=$identifier.id; enumTP.addMember(new EnumMember(name));}
     :   (annotation_appl { annotations.add($annotation_appl.annotation); })* identifier
         {
-            name=$identifier.id;
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
             EnumMember new_field = new EnumMember(name);
             for (Annotation ann : annotations)
             {
@@ -1940,7 +2007,15 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
         {
             tk = _input.LT(1);
         }
-        identifier { name=$identifier.id; }
+        identifier
+        {
+            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
+            name = ctx.removeEscapeCharacter($identifier.id);
+        }
         {
             // Create the Exception object.
             exceptionObject = ctx.createException(name, tk);
@@ -2500,14 +2575,6 @@ identifier returns [String id]
     $id = _input.LT(1).getText();
 }
     :   ID
-        {
-            String error = ctx.checkIdentifier(ctx.getScope(), $id);
-            if (error != null)
-            {
-                throw new ParseException(null, "Illegal identifier: " + error);
-            }
-            $id = ctx.removeEscapeCharacter($id);
-        }
     ;
 
 

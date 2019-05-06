@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Stack;
@@ -848,7 +849,7 @@ public class Context
         return id;
     }
 
-    public String checkIdentifier(String scope, String id)
+    public String checkIdentifier(Definition.Kind kind, String scope, String id)
     {
         if (checkKeyword(id))
         {
@@ -869,7 +870,23 @@ public class Context
                 TreeNode tn = (TreeNode)def;
                 if (tn.getScopedname().equalsIgnoreCase(scopedname))
                 {
-                    return scopedname + " is already defined (Definition: " + def + ")";
+                    boolean error = true;
+
+                    if(kind == Definition.Kind.MODULE && tn instanceof com.eprosima.idl.parser.tree.Module)
+                    {
+                        error = false;
+                    }
+                    else if(kind == Definition.Kind.TYPE_DECLARATION &&
+                            tn instanceof com.eprosima.idl.parser.tree.TypeDeclaration &&
+                            !((com.eprosima.idl.parser.tree.TypeDeclaration)tn).getTypeCode().isDefined())
+                    {
+                        error = false;
+                    }
+
+                    if(error)
+                    {
+                        return scopedname + " is already defined (Definition: " + def + ")";
+                    }
                 }
             }
         }
@@ -879,7 +896,10 @@ public class Context
         {
             if (type.equalsIgnoreCase(scopedname))
             {
-                return scopedname + " is already defined (Module: " + type + ")";
+                if(kind != Definition.Kind.MODULE)
+                {
+                    return scopedname + " is already defined (Module: " + type + ")";
+                }
             }
         }
 
@@ -902,15 +922,18 @@ public class Context
         }
 
         // Check TypeDeclarations
-        for (String type : m_types.keySet())
+        for (Map.Entry<String, TypeDeclaration> type : m_types.entrySet())
         {
-            if (type.equalsIgnoreCase(scopedname))
+            if (type.getKey().equalsIgnoreCase(scopedname))
             {
-                return scopedname + " is already defined (Type: " + type + ")";
+                if(type.getValue().getTypeCode().isDefined())
+                {
+                    return scopedname + " is already defined (Type: " + type + ")";
+                }
             }
         }
 
-        // Check TypeDeclarations
+        // Check Annotations
         for (String anno : m_annotations.keySet())
         {
             if (anno.equalsIgnoreCase(scopedname))
