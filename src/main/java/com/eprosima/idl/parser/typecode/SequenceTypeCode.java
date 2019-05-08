@@ -14,6 +14,8 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.typecode.StringTypeCode;
+import com.eprosima.idl.parser.typecode.MapTypeCode;
 import org.antlr.stringtemplate.StringTemplate;
 
 
@@ -45,6 +47,12 @@ public class SequenceTypeCode extends ContainerTypeCode
     {
         StringTemplate st = getCppTypenameFromStringTemplate();
         st.setAttribute("type", getContentTypeCode().getCppTypename());
+        String contenttype = getContentTypeCode().getCppTypename();
+        if(getContentTypeCode() instanceof StringTypeCode)
+        {
+            contenttype = contenttype.replace("*", "_ptr") + ((StringTypeCode)getContentTypeCode()).getMaxsize();
+        }
+        st.setAttribute("contenttype", contenttype);
         st.setAttribute("maxsize", m_maxsize);
         return st.toString();
     }

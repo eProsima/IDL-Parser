@@ -59,7 +59,7 @@ type_c(name) ::= <<$name$>>
 type_10(name) ::= <<$name$>>
 
 // TODO Para que sirve empty en FastBuffers?
-type_e(type, maxsize, empty) ::= <<$type$Seq_t>>
+type_e(type, contenttype, maxsize, empty) ::= <<$contenttype$Seq_$maxsize$_t>>
 
 type_1a(name, type) ::= <<$name$>>
 
