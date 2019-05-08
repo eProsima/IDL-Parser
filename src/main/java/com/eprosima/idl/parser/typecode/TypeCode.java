@@ -32,6 +32,7 @@ public abstract class TypeCode implements Notebook
     public static StringTemplateGroup cpptypesgr  = null;
     public static StringTemplateGroup ctypesgr    = null;
     public static StringTemplateGroup javatypesgr = null;
+    public static Context ctx = null;
     //TODO Revisar si es el mejor sitio.
     public static String javapackage = "";
 

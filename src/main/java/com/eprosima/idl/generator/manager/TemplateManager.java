@@ -17,6 +17,7 @@ package com.eprosima.idl.generator.manager;
 import com.eprosima.idl.generator.manager.TemplateGroup;
 import com.eprosima.log.ColorMessage;
 import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.context.Context;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class TemplateManager
     private Map<String, List<TemplateExtension>> m_extensions = null;
     private StringTemplateGroup strackgr_ = null;
 
-    public TemplateManager(String stackTemplateNames, boolean generate_typesc)
+    public TemplateManager(String stackTemplateNames, Context ctx, boolean generate_typesc)
     {
         StringTemplateGroupLoader loader = new CommonGroupLoader(m_loaderDirectories, new TemplateErrorListener());
         StringTemplateGroup.registerGroupLoader(loader);
@@ -67,6 +68,7 @@ public class TemplateManager
         }
         TypeCode.ctypesgr = StringTemplateGroup.loadGroup("CTypes", DefaultTemplateLexer.class, null);
         TypeCode.javatypesgr = StringTemplateGroup.loadGroup("JavaTypes", DefaultTemplateLexer.class, null);
+        TypeCode.ctx = ctx;
 
         m_groups = new HashMap<String, StringTemplateGroup>();
         m_extensions = new HashMap<String, List<TemplateExtension>>();

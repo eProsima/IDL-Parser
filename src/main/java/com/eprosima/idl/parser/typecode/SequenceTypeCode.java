@@ -46,6 +46,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     public String getCppTypename()
     {
         StringTemplate st = getCppTypenameFromStringTemplate();
+        st.setAttribute("ctx", ctx);
         st.setAttribute("type", getContentTypeCode().getCppTypename());
         String contenttype = getContentTypeCode().getCppTypename();
         if(getContentTypeCode() instanceof StringTypeCode)

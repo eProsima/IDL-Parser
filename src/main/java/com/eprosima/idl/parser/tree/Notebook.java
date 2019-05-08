@@ -18,7 +18,7 @@ import com.eprosima.idl.context.Context;
 
 import java.util.Map;
 
-public interface Notebook 
+public interface Notebook
 {
     /*!
      * @brief This function links all annotations to the object.
@@ -26,7 +26,7 @@ public interface Notebook
      * @param annotations Annotations to be linked.
      */
     public void addAnnotation(Context ctx, Annotation annotation);
-    
+
     /*!
      * @brief This function returns all annotations linked with the object.
      * @return Map with the linked annotations.
