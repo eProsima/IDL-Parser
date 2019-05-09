@@ -48,10 +48,10 @@ public class SequenceTypeCode extends ContainerTypeCode
         StringTemplate st = getCppTypenameFromStringTemplate();
         st.setAttribute("ctx", ctx);
         st.setAttribute("type", getContentTypeCode().getCppTypename());
-        String contenttype = getContentTypeCode().getCppTypename();
+        String contenttype = getContentTypeCode().getCppTypename().replaceAll("::", "_");
         if(getContentTypeCode() instanceof StringTypeCode)
         {
-            contenttype = contenttype.replace("*", "_ptr") + ((StringTypeCode)getContentTypeCode()).getMaxsize();
+            contenttype = contenttype.replace("*", "_ptr_") + ((StringTypeCode)getContentTypeCode()).getMaxsize();
         }
         st.setAttribute("contenttype", contenttype);
         st.setAttribute("maxsize", m_maxsize);
