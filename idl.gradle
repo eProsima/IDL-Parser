@@ -50,8 +50,8 @@ antlr4.extraArgs=['-package', 'com.eprosima.idl.parser.grammar']
 // make the Java compile task depend on the antlr4 task
 compileJava.dependsOn antlr4
 compileJava {
-    sourceCompatibility = 1.6
-    targetCompatibility = 1.6
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
 }
 
 // add the generated source files to the list of java sources
