@@ -99,7 +99,6 @@ public class Context
         m_dependencies = new LinkedHashSet<String>();
         m_directIncludeDependencies = new HashSet<String>();
         m_scopeFilesStack = new Stack<Pair<String, Integer>>();
-
         for(int i = 0; i < includePaths.size(); ++i)
         {
             String include = (String)includePaths.get(i);
@@ -115,8 +114,8 @@ public class Context
             }
             if(m_directoryFile != null && startsWith(include, m_directoryFile))
                 include = include.substring(m_directoryFile.length());
-            // Add last separator.
-            if(include.charAt(include.length() - 1) != java.io.File.separatorChar)
+            // Add last separator (can be empty by now...)
+            if(!include.isEmpty() && include.charAt(include.length() - 1) != java.io.File.separatorChar)
                 include += java.io.File.separator;
             m_includePaths.add(include);
         }

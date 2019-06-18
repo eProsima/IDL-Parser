@@ -122,6 +122,12 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public boolean isIsStringType() { return super.getContentTypeCode().isIsStringType(); }
+
+    @Override
+    public boolean isIsWStringType() { return super.getContentTypeCode().isIsWStringType(); }
+
+    @Override
     public String getInitialValue()
     {
         return super.getContentTypeCode().getInitialValue();

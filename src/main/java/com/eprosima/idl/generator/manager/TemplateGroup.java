@@ -73,15 +73,15 @@ public class TemplateGroup
     public void setAttribute(String attribute, TemplateGroup tg)
     {
         if(tg != null)
-    	{
-	        Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
-	        Iterator<Entry<String, StringTemplate>> it = set.iterator();
+        {
+            Set<Entry<String, StringTemplate>> set = m_templates.entrySet();
+            Iterator<Entry<String, StringTemplate>> it = set.iterator();
 
-	        while(it.hasNext())
-	        {
-	            Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
+            while(it.hasNext())
+            {
+                Map.Entry<String, StringTemplate> m = (Map.Entry<String, StringTemplate>)it.next();
 
-	            // Call setAttribute
+                // Call setAttribute
                 StringTemplate template = tg.getTemplate(m.getKey());
 
                 if(template != null)
@@ -89,8 +89,8 @@ public class TemplateGroup
                     Log.printDebug("setting attribute (TemplateGroup) to template group " + m.getKey() + " from " + template.getName() + " to " + m.getValue().getName());
                     m.getValue().setAttribute(attribute, template.toString());
                 }
-	        }
-    	}
+            }
+        }
     }
 
     public void setAttribute(String attribute, Object obj1)

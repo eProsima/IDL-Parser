@@ -28,3 +28,19 @@ struct SequenceBasic
 	sequence<double, 8> var_sequence_double_8;
 };
 
+module a_module
+{
+    typedef sequence<long> LongSeq;
+
+    struct ModuleStruct
+    {
+        long var_long;
+    };
+
+    struct ModuleSequenceBasic
+    {
+        sequence<unsigned short> var_seq_ushort;
+        LongSeq var_alias_seq;
+        sequence<ModuleStruct> var_seq_struct;
+    };
+};

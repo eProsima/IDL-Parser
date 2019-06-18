@@ -26,10 +26,14 @@ public class Util
         index = idlFilename.lastIndexOf(File.separator);
 
         if(index == -1)
+        {
             index = idlFilename.lastIndexOf('/');
+        }
 
         if(index != -1)
+        {
             auxString = idlFilename.substring(index + 1);
+        }
 
         // Remove '.idl'
         returnedValue = auxString.substring(0, auxString.length() - 4);

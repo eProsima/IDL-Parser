@@ -40,7 +40,7 @@ type_7() ::= <<bool>>
 
 type_9() ::= <<uint8_t>>
 
-type_d() ::= <<std::string>>
+type_d() ::= <<char*>>
 
 type_15() ::= <<std::wstring>>
 
@@ -59,7 +59,7 @@ type_c(name) ::= <<$name$>>
 type_10(name) ::= <<$name$>>
 
 // TODO Para que sirve empty en FastBuffers?
-type_e(ctx, type, contenttype, maxsize, empty) ::= <<std::vector<$type$>$empty$>>
+type_e(ctx, type, contenttype, maxsize, empty) ::= <<$ctx.filename$_$contenttype$Seq_$maxsize$_t>>
 
 type_1a(name, type) ::= <<$name$>>
 
