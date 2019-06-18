@@ -46,6 +46,18 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode();
     }
 
+    public boolean isUnbound()
+    {
+        if(super.getContentTypeCode() instanceof SequenceTypeCode)
+        {
+            return ((SequenceTypeCode)super.getContentTypeCode()).isUnbound();
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     @Override
     public boolean isObjectType() { return true; }
 
@@ -168,6 +180,9 @@ public class AliasTypeCode extends ContainerTypeCode
     {
         return super.getContentTypeCode().isIsType_e();
     }
+
+    @Override
+    public boolean isIsSequenceType() { return super.getContentTypeCode().isIsSequenceType(); }
 
     public boolean isIsType_10()
     {

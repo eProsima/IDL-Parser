@@ -14,5 +14,6 @@ module a_module
     {
         sequence<string> var_seq_string;
         StringSeq var_alias_seq;
+        SequenceString var_seq_string_struct;
     };
 };

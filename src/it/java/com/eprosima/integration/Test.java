@@ -45,7 +45,7 @@ public class Test
     public boolean generate(String generatorName, String inputPath, String exampleArch, boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
+        String flags = " -replace -typesc -example" + " " + exampleArch + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
         String idlPaths = "";
         for(IDL aux = idl; aux != null; aux = aux.getRequired())
@@ -60,7 +60,7 @@ public class Test
     public boolean generate(String generatorName, String inputPath, boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -replace -example" + (testFlag ? " -test" : "");
+        String flags = " -replace -typesc -example" + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
         String idlPaths = "";
         for(IDL aux = idl; aux != null; aux = aux.getRequired())
