@@ -15,11 +15,11 @@
 // In this section you declare the used plugins
 // community plugins
 plugins {
-    id "me.champeau.gradle.antlr4" version "0.1" // antlr4 community plugin.
 }
 
 // internal plugins
 apply plugin: 'java'
+apply plugin: 'antlr'
 apply plugin: 'maven-publish'
 apply plugin: 'eclipse' // Eclipse integration
 
@@ -36,22 +36,34 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.antlr', name: 'antlr4', version:'4.2.2'
+    antlr "org.antlr:antlr4:4.5"
+    compile "org.antlr:antlr4-runtime:4.5"
     compile group: 'org.antlr', name: 'stringtemplate', version:'3.2'
     testCompile group: 'junit', name: 'junit', version:'4.10'
 }
 
-antlr4.source = project.file("src/main/antlr4/omg")
-antlr4.output = project.file("src/main/generated-java")
-antlr4.listener = false
-antlr4.visitor = false
-antlr4.extraArgs=['-package', 'com.eprosima.idl.parser.grammar']
+generateGrammarSource {
+    maxHeapSize = "64m"
+    source project.file("src/main/antlr4/omg")
+    arguments += ['-no-listener', '-package', 'com.eprosima.idl.parser.grammar']
+    
+    // Keep a copy of generated sources
+    doLast {
+        println "Copying generated grammar lexer/parser files to main directory."
+        copy {
+            from "${buildDir}/generated-src/antlr/antlr4/omg"
+            into "src/main/generated-java"
+        }
+    }
+}
 
-// make the Java compile task depend on the antlr4 task
-compileJava.dependsOn antlr4
+// make the Java compile task depend on the antlr task
+compileJava.dependsOn generateGrammarSource
 compileJava {
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.compilerArgs.add('-Xlint:deprecation')
+    options.compilerArgs.add('-Xlint:unchecked')
 }
 
 // add the generated source files to the list of java sources
@@ -61,7 +73,7 @@ sourceSets {
         java {
             srcDir 'src/main/java'
             srcDir 'src/it/java' //integration tests
-            srcDir antlr4.output
+            srcDir 'src/main/generated-java'
         }
         resources {
             srcDir 'src/main/resources'
@@ -74,9 +86,14 @@ sourceSets {
     }
 }
 
-// add antlr4 to classpath
+/**
+ * Without the next section Gradle will add a 'compile' dependency on Antlr3:
+ * https://github.com/gradle/gradle/issues/820
+ */
 configurations {
-   compile.extendsFrom antlr4
+    compile {
+        extendsFrom = extendsFrom.findAll { it != configurations.antlr }
+    }
 }
 
 group = "com.eprosima"
@@ -85,7 +102,7 @@ version = "1.0.0"
 //general properties
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	baseName = 'idlparser'
+    baseName = 'idlparser'
     manifest {
         attributes("Created-By": "eProsima", "Main-Class": "com.eprosima.idl.test.TestIDLParser")
     }
