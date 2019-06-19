@@ -56,7 +56,7 @@ public class TemplateUtil
             {
                 long dvalue = -1;
                 boolean found = true;
-                List<Member> list = new ArrayList(members);
+                List<Member> list = new ArrayList<Member>(members);
 
                 do
                 {
@@ -142,7 +142,7 @@ public class TemplateUtil
             else if(dist_type.getKind() == Kind.KIND_ENUM)
             {
                 EnumTypeCode enume = (EnumTypeCode)dist_type;
-                List<Member> list = new ArrayList(members);
+                List<Member> list = new ArrayList<Member>(members);
                 List<Member> enum_members = new ArrayList<Member>();
                 enum_members.addAll(enume.getMembers());
 
