@@ -37,10 +37,10 @@ description = """"""
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-// temporary fix until we can switch to sourceCompatibility=1.7+
-// (http://stackoverflow.com/a/20779740)
+// additional compile options (linters)
 tasks.withType(JavaCompile) {
-	options.bootClasspath = "$System.env.JAVA_HOME/jre/lib/rt.jar"
+    options.compilerArgs.add('-Xlint:deprecation')
+    options.compilerArgs.add('-Xlint:unchecked')
 }
 
 // maven-plugin properties
