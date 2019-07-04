@@ -15,11 +15,11 @@
 // In this section you declare the used plugins
 // community plugins
 plugins {
+    id "me.champeau.gradle.antlr4" version "0.1" // antlr4 community plugin.
 }
 
 // internal plugins
 apply plugin: 'java'
-apply plugin: 'antlr'
 apply plugin: 'maven-publish'
 apply plugin: 'eclipse' // Eclipse integration
 
@@ -36,29 +36,19 @@ repositories {
 }
 
 dependencies {
-    antlr "org.antlr:antlr4:4.5"
-    compile "org.antlr:antlr4-runtime:4.5"
+    antlr4 'org.antlr:antlr4:4.5'
     compile group: 'org.antlr', name: 'stringtemplate', version:'3.2'
     testCompile group: 'junit', name: 'junit', version:'4.10'
 }
 
-generateGrammarSource {
-    maxHeapSize = "64m"
-    source project.file("src/main/antlr4/omg")
-    arguments += ['-no-listener', '-package', 'com.eprosima.idl.parser.grammar']
-    
-    // Keep a copy of generated sources
-    doLast {
-        println "Copying generated grammar lexer/parser files to main directory."
-        copy {
-            from "${buildDir}/generated-src/antlr/antlr4/omg"
-            into "src/main/generated-java"
-        }
-    }
-}
+antlr4.source = project.file("src/main/antlr4/omg")
+antlr4.output = project.file("src/main/generated-java")
+antlr4.listener = false
+antlr4.visitor = false
+antlr4.extraArgs=['-package', 'com.eprosima.idl.parser.grammar']
 
-// make the Java compile task depend on the antlr task
-compileJava.dependsOn generateGrammarSource
+// make the Java compile task depend on the antlr4 task
+compileJava.dependsOn antlr4
 compileJava {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -73,7 +63,7 @@ sourceSets {
         java {
             srcDir 'src/main/java'
             srcDir 'src/it/java' //integration tests
-            srcDir 'src/main/generated-java'
+            srcDir antlr4.output
         }
         resources {
             srcDir 'src/main/resources'
@@ -86,14 +76,9 @@ sourceSets {
     }
 }
 
-/**
- * Without the next section Gradle will add a 'compile' dependency on Antlr3:
- * https://github.com/gradle/gradle/issues/820
- */
+// add antlr4 to classpath
 configurations {
-    compile {
-        extendsFrom = extendsFrom.findAll { it != configurations.antlr }
-    }
+   compile.extendsFrom antlr4
 }
 
 group = "com.eprosima"
