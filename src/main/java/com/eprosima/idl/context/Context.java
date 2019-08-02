@@ -863,7 +863,10 @@ public class Context
             if (def instanceof TreeNode)
             {
                 TreeNode tn = (TreeNode)def;
-                if (tn.getScopedname().equalsIgnoreCase(scopedname))
+                if (m_ignore_case
+                        ? tn.getScopedname().equalsIgnoreCase(scopedname)
+                        : tn.getScopedname().equals(scopedname)
+                        )
                 {
                     boolean error = true;
 
@@ -889,7 +892,10 @@ public class Context
         // Check modules
         for (String type : m_modules.keySet())
         {
-            if (type.equalsIgnoreCase(scopedname))
+            if (m_ignore_case
+                    ? type.equalsIgnoreCase(scopedname)
+                    : type.equals(scopedname)
+                    )
             {
                 if(kind != Definition.Kind.MODULE)
                 {
@@ -901,7 +907,10 @@ public class Context
         // Check interfaces
         for (String type : m_interfaces.keySet())
         {
-            if (type.equalsIgnoreCase(scopedname))
+            if (m_ignore_case
+                    ? type.equalsIgnoreCase(scopedname)
+                    : type.equals(scopedname)
+                    )
             {
                 return scopedname + " is already defined (Interface: " + type + ")";
             }
@@ -910,7 +919,10 @@ public class Context
         // Check Exceptions
         for (String type : m_exceptions.keySet())
         {
-            if (type.equalsIgnoreCase(scopedname))
+            if (m_ignore_case
+                    ? type.equalsIgnoreCase(scopedname)
+                    : type.equals(scopedname)
+                    )
             {
                 return scopedname + " is already defined (Exception: " + type + ")";
             }
@@ -919,7 +931,10 @@ public class Context
         // Check TypeDeclarations
         for (Map.Entry<String, TypeDeclaration> type : m_types.entrySet())
         {
-            if (type.getKey().equalsIgnoreCase(scopedname))
+            if (m_ignore_case
+                    ? type.getKey().equalsIgnoreCase(scopedname)
+                    : type.getKey().equals(scopedname)
+                    )
             {
                 if(type.getValue().getTypeCode().isDefined())
                 {
@@ -931,7 +946,10 @@ public class Context
         // Check Annotations
         for (String anno : m_annotations.keySet())
         {
-            if (anno.equalsIgnoreCase(scopedname))
+            if (m_ignore_case
+                    ? anno.equalsIgnoreCase(scopedname)
+                    : anno.equals(scopedname)
+                    )
             {
                 return scopedname + " is already defined (Annotation: " + anno + ")";
             }
@@ -943,6 +961,11 @@ public class Context
         }
 
         return null;
+    }
+
+    public void ignore_case(boolean ignore_case)
+    {
+        m_ignore_case = ignore_case;
     }
 
     protected void fillKeywords()
@@ -1020,7 +1043,21 @@ public class Context
 
     protected boolean checkKeyword(String id)
     {
-        return m_keywords.contains(id.toLowerCase());
+        boolean return_value = false;
+
+        for(String keyword : m_keywords)
+        {
+            if (m_ignore_case
+                    ? keyword.equalsIgnoreCase(id)
+                    : keyword.equals(id)
+                    )
+            {
+                return_value = true;
+                break;
+            }
+        }
+
+        return return_value;
     }
 
     /*** End ***/
@@ -1073,4 +1110,6 @@ public class Context
 
     // All grammar keywords
     private HashSet<String> m_keywords = null;
+
+    private boolean m_ignore_case = true;
 }
