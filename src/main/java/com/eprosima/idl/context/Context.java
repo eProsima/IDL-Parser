@@ -1006,12 +1006,10 @@ public class Context
         m_keywords.add("getraises");
         m_keywords.add("const");
         m_keywords.add("ValueBase");
-        m_keywords.add("valuebase");
         m_keywords.add("valuetype");
         m_keywords.add("supports");
         m_keywords.add("module");
         m_keywords.add("Object");
-        m_keywords.add("object");
         m_keywords.add("truncatable");
         m_keywords.add("unsigned");
         m_keywords.add("fixed");
@@ -1045,7 +1043,21 @@ public class Context
 
     protected boolean checkKeyword(String id)
     {
-        return m_keywords.contains(id.toLowerCase());
+        boolean return_value = false;
+
+        for(String keyword : m_keywords)
+        {
+            if (m_ignore_case
+                    ? keyword.equalsIgnoreCase(id)
+                    : keyword.equals(id)
+                    )
+            {
+                return_value = true;
+                break;
+            }
+        }
+
+        return return_value;
     }
 
     /*** End ***/
