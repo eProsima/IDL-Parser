@@ -855,10 +855,6 @@ public class Context
             return id + " is a keyword, use escape character if you want to use it as identifier (_" + id + ")";
         }
 
-        if (id.startsWith("_")) // Escaped identifier?
-        {
-            id = id.substring(1);
-        }
         String scopedname = (scope == null || scope.isEmpty()) ? id : scope + "::" + id;
 
         // Check definitions
@@ -939,6 +935,11 @@ public class Context
             {
                 return scopedname + " is already defined (Annotation: " + anno + ")";
             }
+        }
+
+        if (id.startsWith("_")) // Escaped identifier?
+        {
+            id = id.substring(1);
         }
 
         return null;
