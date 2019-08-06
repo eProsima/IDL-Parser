@@ -99,9 +99,14 @@ public class SequenceTypeCode extends ContainerTypeCode
     public String getMaxsize()
     {
         if(m_maxsize == null)
-            return "100";
+            return "0";
 
         return m_maxsize;
+    }
+
+    public boolean isUnbound()
+    {
+        return getMaxsize().equals("0");
     }
 
     private String m_maxsize = null;
