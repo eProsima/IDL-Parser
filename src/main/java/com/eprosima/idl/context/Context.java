@@ -943,15 +943,18 @@ public class Context
             }
         }
 
-        // Check Annotations
-        for (String anno : m_annotations.keySet())
+        // Check Annotations, only check annotations against other annotations
+        if (kind == Definition.Kind.ANNOTATION)
         {
-            if (m_ignore_case
-                    ? anno.equalsIgnoreCase(scopedname)
-                    : anno.equals(scopedname)
-                    )
+            for (String anno : m_annotations.keySet())
             {
-                return scopedname + " is already defined (Annotation: " + anno + ")";
+                if (m_ignore_case
+                        ? anno.equalsIgnoreCase(scopedname)
+                        : anno.equals(scopedname)
+                        )
+                {
+                    return scopedname + " is already defined (Annotation: " + anno + ")";
+                }
             }
         }
 
