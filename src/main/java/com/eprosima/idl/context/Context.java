@@ -1060,6 +1060,30 @@ public class Context
         return return_value;
     }
 
+    public String concatStringLiterals(String literal)
+    {
+        // Check literals to concatenate
+        int count = 0;
+        int lastIdx = 0;
+
+        while (lastIdx != -1)
+        {
+            lastIdx = literal.indexOf("\"", lastIdx);
+            if (lastIdx != -1)
+            {
+                count++;
+                lastIdx++;
+            }
+        }
+
+        // If <= 2, no literals to concatenate.
+        if (count <= 2) return literal;
+
+        // (' ' | '\r' | '\t' | '\u000C' | '\n')
+        literal = literal.replaceAll("\"([ \r\t\u000C\n])*\"", "");
+        return literal.replaceAll("\"\"", "");
+    }
+
     /*** End ***/
 
     // OS
