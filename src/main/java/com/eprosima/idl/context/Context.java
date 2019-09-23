@@ -36,6 +36,7 @@ import com.eprosima.idl.parser.typecode.AnyTypeCode;
 import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.util.Util;
 import java.io.File;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Stack;
 import org.antlr.v4.runtime.Token;
@@ -1062,26 +1064,26 @@ public class Context
 
     public String concatStringLiterals(String literal)
     {
-        // Check literals to concatenate
-        int count = 0;
-        int lastIdx = 0;
+        // Split into separated strings
+        String[] substrings = literal.split("\"([ \r\t\u000C\n])*\"");
 
-        while (lastIdx != -1)
+        String result = "";
+        boolean escapeHex = false;
+        for (String str : substrings)
         {
-            lastIdx = literal.indexOf("\"", lastIdx);
-            if (lastIdx != -1)
+            if (escapeHex)
             {
-                count++;
-                lastIdx++;
+                str = "\"" + str;
             }
+            escapeHex = false;
+            if (str.matches("\\\\x[a-fA-F0-9]+$"))
+            {
+                escapeHex = true;
+            }
+            result += str + (escapeHex ? "\"" : "");
         }
 
-        // If <= 2, no literals to concatenate.
-        if (count <= 2) return literal;
-
-        // (' ' | '\r' | '\t' | '\u000C' | '\n')
-        literal = literal.replaceAll("\"([ \r\t\u000C\n])*\"", "");
-        return literal.replaceAll("\"\"", "");
+        return result;
     }
 
     /*** End ***/

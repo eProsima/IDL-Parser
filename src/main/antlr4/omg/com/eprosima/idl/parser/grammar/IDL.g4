@@ -2630,8 +2630,9 @@ BOOLEAN_LITERAL
 
 fragment
 ESCAPE_SEQUENCE
-    :   '\\' ('b' | 't' | 'n' | 'f' | 'r' | '\"' | '\'' | '\\')
+    :   '\\' ('b' | 't' | 'n' | 'f' | 'r' | '\"' | '\'' | '\\' | 'v' | 'a' | '?')
     |   UNICODE_ESCAPE
+    |   HEX_ESCAPE
     |   OCTAL_ESCAPE
     ;
 
@@ -2644,7 +2645,12 @@ OCTAL_ESCAPE
 
 fragment
 UNICODE_ESCAPE
-    :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    :   '\\' 'u' HEX_DIGIT? HEX_DIGIT? HEX_DIGIT? HEX_DIGIT
+    ;
+
+fragment
+HEX_ESCAPE
+    :   '\\' 'x' HEX_DIGIT? HEX_DIGIT? HEX_DIGIT
     ;
 
 fragment
