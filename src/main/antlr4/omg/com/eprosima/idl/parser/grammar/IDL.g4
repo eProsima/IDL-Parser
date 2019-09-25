@@ -714,8 +714,8 @@ literal returns [Pair<String, Token> pair = null]
 }
     :   ( HEX_LITERAL
     | INTEGER_LITERAL
-    | STRING_LITERAL
-    | WIDE_STRING_LITERAL
+    | STRING_LITERAL { literalStr = ctx.concatStringLiterals(literalStr); }
+    | WIDE_STRING_LITERAL { literalStr = ctx.concatStringLiterals(literalStr); }
     | CHARACTER_LITERAL
     | WIDE_CHARACTER_LITERAL
     | FIXED_PT_LITERAL
@@ -2616,11 +2616,11 @@ CHARACTER_LITERAL
     ;
 
 WIDE_STRING_LITERAL
-    :   'L' STRING_LITERAL
+    :   ('L' STRING_LITERAL(WS*))+
     ;
 
 STRING_LITERAL
-    :   '"' ( ESCAPE_SEQUENCE | ~('\\' | '"') )* '"'
+    :   ('"' ( ESCAPE_SEQUENCE | ~('\\' | '"') )* '"'(WS*))+
     ;
 
 BOOLEAN_LITERAL
@@ -2630,8 +2630,9 @@ BOOLEAN_LITERAL
 
 fragment
 ESCAPE_SEQUENCE
-    :   '\\' ('b' | 't' | 'n' | 'f' | 'r' | '\"' | '\'' | '\\')
+    :   '\\' ('b' | 't' | 'n' | 'f' | 'r' | '\"' | '\'' | '\\' | 'v' | 'a' | '?')
     |   UNICODE_ESCAPE
+    |   HEX_ESCAPE
     |   OCTAL_ESCAPE
     ;
 
@@ -2644,7 +2645,12 @@ OCTAL_ESCAPE
 
 fragment
 UNICODE_ESCAPE
-    :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    :   '\\' 'u' HEX_DIGIT? HEX_DIGIT? HEX_DIGIT? HEX_DIGIT
+    ;
+
+fragment
+HEX_ESCAPE
+    :   '\\' 'x' HEX_DIGIT? HEX_DIGIT? HEX_DIGIT
     ;
 
 fragment

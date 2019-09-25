@@ -36,6 +36,7 @@ import com.eprosima.idl.parser.typecode.AnyTypeCode;
 import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.util.Util;
 import java.io.File;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Stack;
 import org.antlr.v4.runtime.Token;
@@ -1058,6 +1060,30 @@ public class Context
         }
 
         return return_value;
+    }
+
+    public String concatStringLiterals(String literal)
+    {
+        // Split into separated strings
+        String[] substrings = literal.split("\"([ \r\t\u000C\n])*\"");
+
+        String result = "";
+        boolean escapeHex = false;
+        for (String str : substrings)
+        {
+            if (escapeHex)
+            {
+                str = "\"" + str;
+            }
+            escapeHex = false;
+            if (str.matches("\\\\x[a-fA-F0-9]+$"))
+            {
+                escapeHex = true;
+            }
+            result += str + (escapeHex ? "\"" : "");
+        }
+
+        return result;
     }
 
     /*** End ***/
