@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Command
 {
@@ -22,15 +23,23 @@ public class Command
             processBuilder.redirectErrorStream(true);
 
             Process process = processBuilder.start();
-            process.waitFor();
 
-            boolean status = process.exitValue() == 0;
-
-            if(!status || !errorOutputOnly)
+            ArrayList<String> output = new ArrayList<String>();
             {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line = "";
                 while ((line = reader.readLine()) != null)
+                {
+                    output.add(line);
+                }
+            }
+            process.waitFor();
+
+            boolean status = process.exitValue() == 0;
+
+            if (!status || !errorOutputOnly)
+            {
+                for (String line : output)
                 {
                     System.out.println(line);
                 }
