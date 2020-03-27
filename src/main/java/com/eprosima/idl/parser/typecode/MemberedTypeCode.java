@@ -41,6 +41,14 @@ public abstract class MemberedTypeCode extends TypeCode
         return m_scope + "::" + m_name;
     }
 
+    public String getROS2Scopedname()
+    {
+        if(m_scope.isEmpty())
+            return m_name;
+
+        return m_scope + "::dds_::" + m_name + "_";
+    }
+
     public String getCScopedname()
     {
         if(m_scope.isEmpty())
