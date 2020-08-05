@@ -206,6 +206,16 @@ public class Member implements Notebook
         return "";
     }
 
+    public boolean isIsPlain()
+    {
+        return m_typecode.isIsPlain();
+    }
+
+    public boolean isIsBounded()
+    {
+        return m_typecode.isIsBounded();
+    }
+
     private String m_name = null;
 
     private TypeCode m_typecode = null;

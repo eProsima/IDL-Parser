@@ -129,5 +129,17 @@ public class StringTypeCode extends TypeCode
         }
     }
 
+    @Override
+    public boolean isIsPlain()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isIsBounded()
+    {
+        return (m_maxsize != null);
+    }
+
     private String m_maxsize = null;
 }

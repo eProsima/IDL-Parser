@@ -84,52 +84,22 @@ public class SetTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
-    /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
+    @Override
+    public boolean isIsPlain()
     {
-        int lcontainTypeSize = getContentTypeCode().getSize();
-        int lcontainTypeAlign = 0;
-        int lcurrentSize = currentSize;
-
-        // Length
-        if(4 <= lastDataAligned)
-        {
-            lcurrentSize += 4;
-        }
-        else
-        {
-            int align = (4 - (lcurrentSize % 4)) & (4 - 1);
-            lcurrentSize += 4 + align;
-        }
-
-        // Element contained type.
-        if(lcontainTypeSize > 4)
-        {
-            lcontainTypeAlign = (lcontainTypeSize - (lcurrentSize % lcontainTypeSize)) & (lcontainTypeSize - 1);
-        }
-
-        if(m_maxsize == null)
-        {
-            return new Pair<Integer, Integer>(lcurrentSize + lcontainTypeAlign + (100 * lcontainTypeSize), lcontainTypeSize);
-        }
-        else
-        {
-            return new Pair<Integer, Integer>(lcurrentSize + lcontainTypeAlign + (Integer.parseInt(m_maxsize) *  lcontainTypeSize), lcontainTypeSize);
-        }
+        return false;
     }
 
-    public int getMaxSerializedSizeWithoutAlignment(int currentSize)
+    @Override
+    public boolean isIsBounded()
     {
-        int lcontainTypeSize = getContentTypeCode().getSize();
+        if (m_maxsize == null)
+        {
+            return false;
+        }
 
-        if(m_maxsize == null)
-        {
-            return currentSize + 4 + (100 * lcontainTypeSize);
-        }
-        else
-        {
-            return currentSize + 4 + (Integer.parseInt(m_maxsize) * lcontainTypeSize);
-        }
-    }*/
+        return super.isIsBounded();
+    }
 
     private String m_maxsize = null;
 }

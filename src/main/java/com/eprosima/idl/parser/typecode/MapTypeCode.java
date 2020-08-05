@@ -129,6 +129,23 @@ public class MapTypeCode extends ContainerTypeCode
         m_valueDefinition = valueDefinition;
     }
 
+    @Override
+    public boolean isIsPlain()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isIsBounded()
+    {
+        if (m_maxsize == null)
+        {
+            return false;
+        }
+
+        return m_keyTypeCode.isIsBounded() && m_valueTypeCode.isIsBounded();
+    }
+
     private TypeCode m_keyTypeCode = null;
     private TypeCode m_valueTypeCode = null;
     private Definition m_keyDefinition = null;
