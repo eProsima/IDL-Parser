@@ -70,13 +70,21 @@ public abstract class ContainerTypeCode extends TypeCode
     @Override
     public boolean isIsPlain()
     {
-        return m_contentTypeCode.isIsPlain();
+        if (m_contentTypeCode != null)
+        {
+            return m_contentTypeCode.isIsPlain();
+        }
+        return false;
     }
 
     @Override
     public boolean isIsBounded()
     {
-        return m_contentTypeCode.isIsBounded();
+        if (m_contentTypeCode != null)
+        {
+            return m_contentTypeCode.isIsBounded();
+        }
+        return false;
     }
 
     private TypeCode m_contentTypeCode = null;

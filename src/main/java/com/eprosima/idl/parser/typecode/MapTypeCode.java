@@ -143,7 +143,11 @@ public class MapTypeCode extends ContainerTypeCode
             return false;
         }
 
-        return m_keyTypeCode.isIsBounded() && m_valueTypeCode.isIsBounded();
+        if (m_keyTypeCode != null && m_valueTypeCode != null)
+        {
+            return m_keyTypeCode.isIsBounded() && m_valueTypeCode.isIsBounded();
+        }
+        return false;
     }
 
     private TypeCode m_keyTypeCode = null;
