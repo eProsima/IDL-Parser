@@ -110,6 +110,32 @@ public abstract class MemberedTypeCode extends TypeCode
     @Override
     public abstract String getIdlTypename();
 
+    @Override
+    public boolean isIsPlain()
+    {
+        for (Member member : m_members.values())
+        {
+            if (!member.isIsPlain())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isIsBounded()
+    {
+        for (Member member : m_members.values())
+        {
+            if (!member.isIsBounded())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private String m_name = null;
 
     private String m_scope = null;

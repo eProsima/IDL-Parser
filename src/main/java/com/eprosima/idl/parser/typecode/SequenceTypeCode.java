@@ -109,5 +109,22 @@ public class SequenceTypeCode extends ContainerTypeCode
         return getMaxsize().equals("0");
     }
 
+    @Override
+    public boolean isIsPlain()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isIsBounded()
+    {
+        if (m_maxsize == null)
+        {
+            return false;
+        }
+
+        return super.isIsBounded();
+    }
+
     private String m_maxsize = null;
 }

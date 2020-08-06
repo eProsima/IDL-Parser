@@ -172,6 +172,10 @@ public abstract class TypeCode implements Notebook
     public boolean isPlainType() { return false; }
     public boolean isObjectType() { return false; }
 
+    // Functions to ease full preallocation and zero-copy
+    public boolean isIsPlain() { return true; } // Don't confuse with isPlainType!
+    public boolean isIsBounded() { return true; }
+
     /*** End of functions to know the type in string templates ***/
 
     public Object getParent()

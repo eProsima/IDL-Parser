@@ -123,5 +123,31 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return getMembers(true);
     }
 
+    @Override
+    public boolean isIsPlain()
+    {
+        for (StructTypeCode parent : superTypes_)
+        {
+            if (!parent.isIsPlain())
+            {
+                return false;
+            }
+        }
+        return super.isIsPlain();
+    }
+
+    @Override
+    public boolean isIsBounded()
+    {
+        for (StructTypeCode parent : superTypes_)
+        {
+            if (!parent.isIsBounded())
+            {
+                return false;
+            }
+        }
+        return super.isIsBounded();
+    }
+
     private ArrayList<StructTypeCode> superTypes_;
 }
