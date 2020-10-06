@@ -906,7 +906,7 @@ base_type_spec returns [TypeCode typecode = null]
     |   boolean_type { $typecode=$boolean_type.typecode; }
     |   octet_type { $typecode=$octet_type.typecode; }
     |   any_type
-    |   object_type
+    |   object_type { $typecode=$object_type.typecode; }
     |   value_base_type
     ;
 
@@ -1113,12 +1113,24 @@ any_type returns [TypeCode typecode]
     :   KW_ANY
     ;
 
-object_type
+object_type returns [TypeCode typecode]
 @init{
     Token tk = _input.LT(1);
 }
     :   KW_OBJECT
-    {throw new ParseException(tk, ". Object type is not supported"); }
+    {
+        // Find typecode in the global map.
+        $typecode = ctx.getTypeCode("Object");
+
+        if($typecode == null)
+        {
+            throw new ParseException(tk, ". Object type is not supported");
+        }
+        else
+        {
+            System.out.println("Encontrado un Object...");
+        }
+    }
     ;
 
 annotation_decl returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = null]
