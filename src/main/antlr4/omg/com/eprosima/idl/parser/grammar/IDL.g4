@@ -1126,10 +1126,6 @@ object_type returns [TypeCode typecode]
         {
             throw new ParseException(tk, ". Object type is not supported");
         }
-        else
-        {
-            System.out.println("Encontrado un Object...");
-        }
     }
     ;
 
