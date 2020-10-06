@@ -452,8 +452,12 @@ scoped_name returns [Pair<String, Token> pair = null]
     Token tk = _input.LT(1);
 }
 :   ( {literalStr += _input.LT(1).getText();} DOUBLE_COLON )?
-      {literalStr += _input.LT(1).getText();} ID /* identifier */
-    ( {literalStr += _input.LT(1).getText();} DOUBLE_COLON identifier { literalStr+=$identifier.id; } )*
+      {literalStr += _input.LT(1).getText();} (ID /* identifier */ | KW_OBJECT )
+    (
+        /* An escaped KW may be part of the scoped_name */
+        {literalStr += _input.LT(1).getText();} DOUBLE_COLON
+            (identifier { literalStr+=$identifier.id; } | KW_OBJECT { literalStr+="Object"; } )
+    )*
     {$pair = new Pair<String, Token>(literalStr, tk);}
     ;
 
