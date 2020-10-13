@@ -452,8 +452,12 @@ scoped_name returns [Pair<String, Token> pair = null]
     Token tk = _input.LT(1);
 }
 :   ( {literalStr += _input.LT(1).getText();} DOUBLE_COLON )?
-      {literalStr += _input.LT(1).getText();} ID /* identifier */
-    ( {literalStr += _input.LT(1).getText();} DOUBLE_COLON identifier { literalStr+=$identifier.id; } )*
+      {literalStr += _input.LT(1).getText();} (ID /* identifier */ | KW_OBJECT )
+    (
+        /* An escaped KW may be part of the scoped_name */
+        {literalStr += _input.LT(1).getText();} DOUBLE_COLON
+            (identifier { literalStr+=$identifier.id; } | KW_OBJECT { literalStr+="Object"; } )
+    )*
     {$pair = new Pair<String, Token>(literalStr, tk);}
     ;
 
@@ -906,7 +910,7 @@ base_type_spec returns [TypeCode typecode = null]
     |   boolean_type { $typecode=$boolean_type.typecode; }
     |   octet_type { $typecode=$octet_type.typecode; }
     |   any_type
-    |   object_type
+    |   object_type { $typecode=$object_type.typecode; }
     |   value_base_type
     ;
 
@@ -1113,12 +1117,20 @@ any_type returns [TypeCode typecode]
     :   KW_ANY
     ;
 
-object_type
+object_type returns [TypeCode typecode]
 @init{
     Token tk = _input.LT(1);
 }
     :   KW_OBJECT
-    {throw new ParseException(tk, ". Object type is not supported"); }
+    {
+        // Find typecode in the global map.
+        $typecode = ctx.getTypeCode("Object");
+
+        if($typecode == null)
+        {
+            throw new ParseException(tk, ". Object type is not supported");
+        }
+    }
     ;
 
 annotation_decl returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = null]
