@@ -65,7 +65,7 @@ public class Context
         m_os = System.getProperty("os.name");
         m_userdir = System.getProperty("user.dir");
 
-        m_filename = filename;
+        m_filename = filename.replace('.', '_');
         m_directoryFile = Util.getIDLFileDirectoryOnly(file);
         m_file = file;
 
@@ -875,7 +875,8 @@ public class Context
                                         }
                                     }
 
-                                    m_directIncludeDependencies.add(includeFile.substring(0, includeFile.length() - 4));
+                                    m_directIncludeDependencies.add(includeFile.substring(0,
+                                            includeFile.length() - 4).replace('.', '_'));
                                 }
                             }
                             else
