@@ -56,30 +56,35 @@ import org.antlr.v4.runtime.Token;
 
 public class Context
 {
-    public Context(String filename, String file, ArrayList<String> includePaths)
+    public Context(
+            String filename,
+            String file,
+            ArrayList<String> includePaths)
     {
         // Detect OS
         m_os = System.getProperty("os.name");
         m_userdir = System.getProperty("user.dir");
 
-        m_filename = filename;
+        m_filename = filename.replace('.', '_');
         m_directoryFile = Util.getIDLFileDirectoryOnly(file);
         m_file = file;
 
         // Remove absolute directory where the application was executed
-        if(startsWith(m_file, m_userdir))
+        if (startsWith(m_file, m_userdir))
         {
             m_file = m_file.substring(m_userdir.length());
 
-        	// Remove possible separator
-            if(startsWith(m_file, java.io.File.separator))
+            // Remove possible separator
+            if (startsWith(m_file, java.io.File.separator))
+            {
                 m_file = m_file.substring(1);
+            }
         }
         /*
-        // Remove relative directory if is equal that where the processed IDL is.
-        if(m_directoryFile != null && startsWith(m_file, m_directoryFile))
+           // Remove relative directory if is equal that where the processed IDL is.
+           if(m_directoryFile != null && startsWith(m_file, m_directoryFile))
             m_file = m_file.substring(m_directoryFile.length());
-        */
+         */
 
         m_definitions = new ArrayList<Definition>();
         m_modules = new HashMap<String, com.eprosima.idl.parser.tree.Module>();
@@ -101,36 +106,44 @@ public class Context
         m_dependencies = new LinkedHashSet<String>();
         m_directIncludeDependencies = new HashSet<String>();
         m_scopeFilesStack = new Stack<Pair<String, Integer>>();
-        for(int i = 0; i < includePaths.size(); ++i)
+        for (int i = 0; i < includePaths.size(); ++i)
         {
             String include = (String)includePaths.get(i);
-            if(startsWith(include, includeFlag))
+            if (startsWith(include, includeFlag))
+            {
                 include = include.substring(includeFlag.length());
-            if(startsWith(include, m_userdir))
+            }
+            if (startsWith(include, m_userdir))
             {
                 include = include.substring(m_userdir.length());
 
-            	// Remove possible separator
-                if(startsWith(include, java.io.File.separator))
+                // Remove possible separator
+                if (startsWith(include, java.io.File.separator))
+                {
                     include = include.substring(1);
+                }
             }
-            if(m_directoryFile != null && startsWith(include, m_directoryFile))
+            if (m_directoryFile != null && startsWith(include, m_directoryFile))
+            {
                 include = include.substring(m_directoryFile.length());
+            }
             // Add last separator (can be empty by now...)
-            if(!include.isEmpty() && include.charAt(include.length() - 1) != java.io.File.separatorChar)
+            if (!include.isEmpty() && include.charAt(include.length() - 1) != java.io.File.separatorChar)
+            {
                 include += java.io.File.separator;
+            }
             m_includePaths.add(include);
         }
 
         // Reorder include paths;
         int pointer = 0;
-        while(pointer < m_includePaths.size())
+        while (pointer < m_includePaths.size())
         {
             int count = pointer + 1;
 
-            while(count < m_includePaths.size())
+            while (count < m_includePaths.size())
             {
-                if(startsWith(m_includePaths.get(count), m_includePaths.get(pointer)))
+                if (startsWith(m_includePaths.get(count), m_includePaths.get(pointer)))
                 {
                     String first = m_includePaths.get(pointer);
                     String second = m_includePaths.get(count);
@@ -141,8 +154,10 @@ public class Context
                 ++count;
             }
 
-            if(count == m_includePaths.size())
+            if (count == m_includePaths.size())
+            {
                 ++pointer;
+            }
         }
 
         // Add here builtin annotations? (IDL 4.2 - 8.3.1 section)
@@ -170,7 +185,7 @@ public class Context
         extensibilityannenum.addMember(new EnumMember("APPENDABLE"));
         extensibilityannenum.addMember(new EnumMember("MUTABLE"));
         extensibilityann.addMember(new AnnotationMember("value", extensibilityannenum,
-            extensibilityannenum.getInitialValue()));
+                extensibilityannenum.getInitialValue()));
 
         createAnnotationDeclaration("final", null);
         createAnnotationDeclaration("appendable", null);
@@ -187,9 +202,9 @@ public class Context
 
         AnnotationDeclaration rangeann = createAnnotationDeclaration("range", null);
         rangeann.addMember(new AnnotationMember("min", new AnyTypeCode(), null));
-            //String.valueOf(Integer.MIN_VALUE)));
+        //String.valueOf(Integer.MIN_VALUE)));
         rangeann.addMember(new AnnotationMember("max", new AnyTypeCode(), null));
-            //String.valueOf(Integer.MAX_VALUE)));
+        //String.valueOf(Integer.MAX_VALUE)));
 
         AnnotationDeclaration unitsann = createAnnotationDeclaration("units", null);
         unitsann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
@@ -245,7 +260,8 @@ public class Context
         return m_filename;
     }
 
-    public void setFilename(String filename)
+    public void setFilename(
+            String filename)
     {
         m_filename = filename;
     }
@@ -260,7 +276,8 @@ public class Context
         return m_scope;
     }
 
-    public void setScope(String scope)
+    public void setScope(
+            String scope)
     {
         m_scope = scope;
     }
@@ -283,7 +300,8 @@ public class Context
         return m_scopeLimitToAll;
     }
 
-    public void setScopeLimitToAll(boolean scopeLimitToAll)
+    public void setScopeLimitToAll(
+            boolean scopeLimitToAll)
     {
         m_scopeLimitToAll = scopeLimitToAll;
     }
@@ -301,7 +319,8 @@ public class Context
     /*!
      * @brief This function stores a global definition of the IDL file.
      */
-    public void addDefinition(Definition definition)
+    public void addDefinition(
+            Definition definition)
     {
         m_definitions.add(definition);
     }
@@ -315,17 +334,19 @@ public class Context
      * @brief This function adds a module to the context.
      * This function is used in the parser.
      */
-    public void addModule(com.eprosima.idl.parser.tree.Module module)
+    public void addModule(
+            com.eprosima.idl.parser.tree.Module module)
     {
-        if(!m_modules.containsKey(module.getScopedname()))
+        if (!m_modules.containsKey(module.getScopedname()))
         {
             m_modules.put(module.getScopedname(), module);
         }
     }
 
-    public com.eprosima.idl.parser.tree.Module existsModule(String scopedName)
+    public com.eprosima.idl.parser.tree.Module existsModule(
+            String scopedName)
     {
-        if(m_modules.containsKey(scopedName))
+        if (m_modules.containsKey(scopedName))
         {
             return m_modules.get(scopedName);
         }
@@ -333,7 +354,9 @@ public class Context
         return null;
     }
 
-    public Interface createInterface(String name, Token token)
+    public Interface createInterface(
+            String name,
+            Token token)
     {
         Interface interfaceObject = new Interface(m_scopeFile, isInScopedFile(), m_scope, name, token);
         addInterface(interfaceObject);
@@ -344,30 +367,34 @@ public class Context
      * @brief This function adds a interface to the context.
      * This function is used in the parser.
      */
-    protected void addInterface(Interface interf)
+    protected void addInterface(
+            Interface interf)
     {
         Interface prev = m_interfaces.put(interf.getScopedname(), interf);
 
         // TODO: Excepcion
-        if(prev != null)
+        if (prev != null)
+        {
             System.out.println("Warning: Redefined interface " + prev.getScopedname());
+        }
     }
 
-    public Interface getInterface(String name)
+    public Interface getInterface(
+            String name)
     {
         int lastIndex = -1;
         Interface returnedValue = m_interfaces.get(name);
 
-        if(returnedValue == null)
+        if (returnedValue == null)
         {
             String scope = m_scope;
 
-            while(returnedValue == null && !scope.isEmpty())
+            while (returnedValue == null && !scope.isEmpty())
             {
                 returnedValue = m_interfaces.get(scope + "::" + name);
                 lastIndex = scope.lastIndexOf("::");
 
-                if(lastIndex != -1)
+                if (lastIndex != -1)
                 {
                     scope = scope.substring(0, lastIndex);
                 }
@@ -394,18 +421,23 @@ public class Context
     {
         ArrayList<Interface> ret = new ArrayList<Interface>();
 
-        for(Interface interf : m_interfaces.values())
+        for (Interface interf : m_interfaces.values())
         {
-            if(interf.isInScope())
+            if (interf.isInScope())
+            {
                 ret.add(interf);
+            }
         }
 
         return ret;
     }
 
-    public com.eprosima.idl.parser.tree.Exception createException(String name, Token token)
+    public com.eprosima.idl.parser.tree.Exception createException(
+            String name,
+            Token token)
     {
-        com.eprosima.idl.parser.tree.Exception exceptionObject = new com.eprosima.idl.parser.tree.Exception(m_scopeFile, isInScopedFile(), m_scope, name, token);
+        com.eprosima.idl.parser.tree.Exception exceptionObject = new com.eprosima.idl.parser.tree.Exception(m_scopeFile,
+                        isInScopedFile(), m_scope, name, token);
         addException(exceptionObject);
         return exceptionObject;
     }
@@ -413,34 +445,38 @@ public class Context
     /*!
      * @brief This function adds a global exception to the context.
      */
-    protected void addException(com.eprosima.idl.parser.tree.Exception exception)
+    protected void addException(
+            com.eprosima.idl.parser.tree.Exception exception)
     {
         com.eprosima.idl.parser.tree.Exception prev = m_exceptions.put(exception.getScopedname(), exception);
 
         // TODO: Exception.
-        if(prev != null)
+        if (prev != null)
+        {
             System.out.println("Warning: Redefined exception " + prev.getScopedname());
+        }
     }
 
     /*!
      * @brief This function tries to retrieve a global typecode.
      */
-    public com.eprosima.idl.parser.tree.Exception getException(String name)
+    public com.eprosima.idl.parser.tree.Exception getException(
+            String name)
     {
         int lastIndex = -1;
         com.eprosima.idl.parser.tree.Exception returnedValue = m_exceptions.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null)
+        if (returnedValue == null)
         {
             String scope = m_scope;
 
-            while(returnedValue == null && !scope.isEmpty())
+            while (returnedValue == null && !scope.isEmpty())
             {
                 returnedValue = m_exceptions.get(scope + "::" + name);
                 lastIndex = scope.lastIndexOf("::");
 
-                if(lastIndex != -1)
+                if (lastIndex != -1)
                 {
                     scope = scope.substring(0, lastIndex);
                 }
@@ -454,43 +490,56 @@ public class Context
         return returnedValue;
     }
 
-    public Operation createOperation(String name, Token token)
+    public Operation createOperation(
+            String name,
+            Token token)
     {
         Operation operationObject = new Operation(m_scopeFile, isInScopedFile(), null, name, token);
         return operationObject;
     }
 
-    public Param createParam(String name, TypeCode typecode, Param.Kind kind)
+    public Param createParam(
+            String name,
+            TypeCode typecode,
+            Param.Kind kind)
     {
         Param paramObject = new Param(name, typecode, kind);
         return paramObject;
     }
 
-    public Param createParam(String name, Definition definition, Param.Kind kind)
+    public Param createParam(
+            String name,
+            Definition definition,
+            Param.Kind kind)
     {
         Param paramObject = new Param(name, definition, kind);
         return paramObject;
     }
 
-    public StructTypeCode createStructTypeCode(String name)
+    public StructTypeCode createStructTypeCode(
+            String name)
     {
         StructTypeCode structObject = new StructTypeCode(m_scope, name);
         return structObject;
     }
 
-    public BitfieldSpec createBitfieldSpec(String size, TypeCode type)
+    public BitfieldSpec createBitfieldSpec(
+            String size,
+            TypeCode type)
     {
         BitfieldSpec object = new BitfieldSpec(m_scope, size, type);
         return object;
     }
 
-    public BitsetTypeCode createBitsetTypeCode(String name)
+    public BitsetTypeCode createBitsetTypeCode(
+            String name)
     {
         BitsetTypeCode object = new BitsetTypeCode(m_scope, name);
         return object;
     }
 
-    public BitmaskTypeCode createBitmaskTypeCode(String name)
+    public BitmaskTypeCode createBitmaskTypeCode(
+            String name)
     {
         BitmaskTypeCode object = new BitmaskTypeCode(m_scope, name);
         return object;
@@ -504,18 +553,22 @@ public class Context
     /*!
      * @brief This function adds a global typecode to the context.
      */
-    public void addTypeDeclaration(TypeDeclaration typedecl)
+    public void addTypeDeclaration(
+            TypeDeclaration typedecl)
     {
         TypeDeclaration prev = m_types.put(typedecl.getScopedname(), typedecl);
 
-        if(prev != null)
+        if (prev != null)
+        {
             throw new ParseException(typedecl.getToken(), "was redefined");
+        }
     }
 
     /*!
      * @brief This function returns a global typecode of the context.
      */
-    public TypeDeclaration getTypeDeclaration(String scopedName)
+    public TypeDeclaration getTypeDeclaration(
+            String scopedName)
     {
         return m_types.get(scopedName);
     }
@@ -523,23 +576,24 @@ public class Context
     /*!
      * @brief This function tries to retrieve a global typecode.
      */
-    public TypeCode getTypeCode(String name)
+    public TypeCode getTypeCode(
+            String name)
     {
         int lastIndex = -1;
         TypeCode returnedValue = null;
         TypeDeclaration typedecl = m_types.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(typedecl == null)
+        if (typedecl == null)
         {
             String scope = m_scope;
 
-            while(typedecl == null && scope != null && !scope.isEmpty())
+            while (typedecl == null && scope != null && !scope.isEmpty())
             {
                 typedecl = m_types.get(scope + "::" + name);
                 lastIndex = scope.lastIndexOf("::");
 
-                if(lastIndex != -1)
+                if (lastIndex != -1)
                 {
                     scope = scope.substring(0, lastIndex);
                 }
@@ -550,17 +604,21 @@ public class Context
             }
         }
 
-        if(typedecl != null)
+        if (typedecl != null)
+        {
             returnedValue = typedecl.getTypeCode();
+        }
 
 
         return returnedValue;
     }
 
-
-    public AnnotationDeclaration createAnnotationDeclaration(String name, Token token)
+    public AnnotationDeclaration createAnnotationDeclaration(
+            String name,
+            Token token)
     {
-        AnnotationDeclaration annotationObject = new AnnotationDeclaration(m_scopeFile, isInScopedFile(), m_scope, name, token);
+        AnnotationDeclaration annotationObject = new AnnotationDeclaration(m_scopeFile,
+                        isInScopedFile(), m_scope, name, token);
         addAnnotationDeclaration(annotationObject);
         return annotationObject;
     }
@@ -568,31 +626,35 @@ public class Context
     /*!
      * @brief This function adds an annotation to the context.
      */
-    protected void addAnnotationDeclaration(AnnotationDeclaration annotation)
+    protected void addAnnotationDeclaration(
+            AnnotationDeclaration annotation)
     {
         AnnotationDeclaration prev = m_annotations.put(annotation.getScopedname(), annotation);
 
         // TODO: Exception.
-        if(prev != null)
+        if (prev != null)
+        {
             System.out.println("Warning: Redefined annotation " + prev.getScopedname());
+        }
     }
 
-    public AnnotationDeclaration getAnnotationDeclaration(String name)
+    public AnnotationDeclaration getAnnotationDeclaration(
+            String name)
     {
         int lastIndex = -1;
         AnnotationDeclaration returnedValue = m_annotations.get(name);
 
         // Probar si no tiene scope, con el scope actual.
-        if(returnedValue == null)
+        if (returnedValue == null)
         {
             String scope = m_scope;
 
-            while(returnedValue == null && !scope.isEmpty())
+            while (returnedValue == null && !scope.isEmpty())
             {
                 returnedValue = m_annotations.get(scope + "::" + name);
                 lastIndex = scope.lastIndexOf("::");
 
-                if(lastIndex != -1)
+                if (lastIndex != -1)
                 {
                     scope = scope.substring(0, lastIndex);
                 }
@@ -609,7 +671,8 @@ public class Context
     /*!
      * @brief This function add a new library dependency to the project.
      */
-    public void addDependency(String dependency)
+    public void addDependency(
+            String dependency)
     {
         m_dependencies.add(dependency);
     }
@@ -625,15 +688,15 @@ public class Context
         LinkedList<String> list = new LinkedList<String>(m_dependencies);
         Iterator<String> it = list.descendingIterator();
 
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String dep = it.next();
 
-            if(getOS().contains("Windows"))
+            if (getOS().contains("Windows"))
             {
                 // In windows substitute \\ by /
                 int count = 0;
-                while((count = dep.indexOf("/")) != -1)
+                while ((count = dep.indexOf("/")) != -1)
                 {
                     dep = dep.substring(0, count) + "\\" + dep.substring(count + 1);
                 }
@@ -661,13 +724,16 @@ public class Context
      * the (previous c) DDS middleware doesn't generate (right now only exceptions).
      * The include dependencies are added without the .idl extension.
      */
-    public void addIncludeDependency(String dependency)
+    public void addIncludeDependency(
+            String dependency)
     {
-    	// Remove .idl extension.
+        // Remove .idl extension.
         String dep = dependency.substring(0, dependency.length() - 4);
         // Remove directory if it is the same than main IDL file.
-        if(m_directoryFile != null && startsWith(dep, m_directoryFile))
+        if (m_directoryFile != null && startsWith(dep, m_directoryFile))
+        {
             dep = dep.substring(m_directoryFile.length());
+        }
         m_includedependency.add(dep);
     }
 
@@ -687,10 +753,12 @@ public class Context
      * Also this function saves the scope file in the library dependecy map.
      * In case it is a #include directive, this is saved as direct include dependency.
      */
-    public void processPreprocessorLine(String line, int nline)
+    public void processPreprocessorLine(
+            String line,
+            int nline)
     {
         // If there is a line referring to the content of an included file.
-        if(line.startsWith("# "))
+        if (line.startsWith("# "))
         {
             String line_ = line.substring(2);
 
@@ -716,7 +784,7 @@ public class Context
             // Read flags.
             boolean systemFile = false, enteringFile = false, exitingFile = false;
 
-            if(m_os.contains("Linux"))
+            if (m_os.contains("Linux"))
             {
                 try
                 {
@@ -724,54 +792,64 @@ public class Context
                     scanner = new Scanner(line_);
                     scanner.next();
 
-                    while(true)
+                    while (true)
                     {
                         Integer flag = scanner.nextInt();
 
-                        if(flag == 1)
+                        if (flag == 1)
+                        {
                             enteringFile = true;
-                        else if(flag == 2)
+                        }
+                        else if (flag == 2)
+                        {
                             exitingFile = true;
-                        else if(flag == 3)
+                        }
+                        else if (flag == 3)
+                        {
                             systemFile = true;
+                        }
                     }
                 }
-                catch(NoSuchElementException ex)
+                catch (NoSuchElementException ex)
                 {
                     // The line finishes.
                 }
             }
 
             // Only not system files are processed.
-            if(!systemFile)
+            if (!systemFile)
             {
-                if(!m_scopeFile.equals(file))
+                if (!m_scopeFile.equals(file))
                 {
                     // Remove absolute directory where the application was executed
-                    if(startsWith(file, m_userdir))
+                    if (startsWith(file, m_userdir))
                     {
                         file = file.substring(m_userdir.length());
 
                         // Remove possible separator
-                        if(startsWith(file, java.io.File.separator))
+                        if (startsWith(file, java.io.File.separator))
+                        {
                             file = file.substring(1);
+                        }
                     }
                     // Remove relative ./ directory.
-                    if(startsWith(file, currentDirS))
+                    if (startsWith(file, currentDirS))
                     {
                         file = file.substring(currentDirS.length());
                         // Remove possible separator
-                        if(startsWith(file, java.io.File.separator))
+                        if (startsWith(file, java.io.File.separator))
+                        {
                             file = file.substring(1);
+                        }
                     }
 
 
                     //if it is a idl file.
-                    if(file.substring(file.length() - 4, file.length()).equals(".idl"))
+                    if (file.substring(file.length() - 4, file.length()).equals(".idl"))
                     {
-                        if(!m_scopeFile.equals(file))
+                        if (!m_scopeFile.equals(file))
                         {
-                            if(!m_scopeFilesStack.empty() && m_scopeFilesStack.peek().first().equals(file))
+                            if (!m_scopeFilesStack.empty() && m_scopeFilesStack.peek().first().equals(file))
                             {
                                 m_scopeFilesStack.pop();
 
@@ -779,28 +857,32 @@ public class Context
                                 addDependency(m_scopeFile);
 
                                 // See if it is a direct dependency.
-                                if(file.equals(m_file))
+                                if (file.equals(m_file))
                                 {
                                     String includeFile = m_scopeFile;
                                     // Remove relative directory if is equal that where the processed IDL is.
-                                    if(m_directoryFile != null && startsWith(includeFile, m_directoryFile))
-                                        includeFile = includeFile.substring(m_directoryFile.length());
-                                    // Remove relative directory if is equal to a include path.
-                                    for(int i = 0; i < m_includePaths.size(); ++i)
+                                    if (m_directoryFile != null && startsWith(includeFile, m_directoryFile))
                                     {
-                                        if(startsWith(includeFile, m_includePaths.get(i)))
+                                        includeFile = includeFile.substring(m_directoryFile.length());
+                                    }
+                                    // Remove relative directory if is equal to a include path.
+                                    for (int i = 0; i < m_includePaths.size(); ++i)
+                                    {
+                                        if (startsWith(includeFile, m_includePaths.get(i)))
                                         {
                                             includeFile = includeFile.substring(m_includePaths.get(i).length());
                                             break;
                                         }
                                     }
 
-                                    m_directIncludeDependencies.add(includeFile.substring(0, includeFile.length() - 4));
+                                    m_directIncludeDependencies.add(includeFile.substring(0,
+                                            includeFile.length() - 4).replace('.', '_'));
                                 }
                             }
                             else
                             {
-                                m_scopeFilesStack.push(new Pair<String, Integer>(m_scopeFile, nline - m_currentincludeline - 1));
+                                m_scopeFilesStack.push(new Pair<String, Integer>(m_scopeFile,
+                                        nline - m_currentincludeline - 1));
                             }
 
                             m_scopeFile = file;
@@ -819,12 +901,14 @@ public class Context
         return m_os;
     }
 
-    protected boolean startsWith(String st, String prefix)
+    protected boolean startsWith(
+            String st,
+            String prefix)
     {
-        if(m_os.contains("Windows"))
-    	{
-    	    return st.toLowerCase().startsWith(prefix.toLowerCase());
-    	}
+        if (m_os.contains("Windows"))
+        {
+            return st.toLowerCase().startsWith(prefix.toLowerCase());
+        }
 
         return st.startsWith(prefix);
     }
@@ -841,7 +925,8 @@ public class Context
         return Character.toString(++m_loopVarName);
     }
 
-    public String removeEscapeCharacter(String id)
+    public String removeEscapeCharacter(
+            String id)
     {
         if (id.startsWith("_")) // Escaped identifier?
         {
@@ -850,7 +935,10 @@ public class Context
         return id;
     }
 
-    public String checkIdentifier(Definition.Kind kind, String scope, String id)
+    public String checkIdentifier(
+            Definition.Kind kind,
+            String scope,
+            String id)
     {
         if (checkKeyword(id))
         {
@@ -872,18 +960,18 @@ public class Context
                 {
                     boolean error = true;
 
-                    if(kind == Definition.Kind.MODULE && tn instanceof com.eprosima.idl.parser.tree.Module)
+                    if (kind == Definition.Kind.MODULE && tn instanceof com.eprosima.idl.parser.tree.Module)
                     {
                         error = false;
                     }
-                    else if(kind == Definition.Kind.TYPE_DECLARATION &&
+                    else if (kind == Definition.Kind.TYPE_DECLARATION &&
                             tn instanceof com.eprosima.idl.parser.tree.TypeDeclaration &&
                             !((com.eprosima.idl.parser.tree.TypeDeclaration)tn).getTypeCode().isDefined())
                     {
                         error = false;
                     }
 
-                    if(error)
+                    if (error)
                     {
                         return scopedname + " is already defined (Definition: " + def + ")";
                     }
@@ -899,7 +987,7 @@ public class Context
                     : type.equals(scopedname)
                     )
             {
-                if(kind != Definition.Kind.MODULE)
+                if (kind != Definition.Kind.MODULE)
                 {
                     return scopedname + " is already defined (Module: " + type + ")";
                 }
@@ -938,7 +1026,7 @@ public class Context
                     : type.getKey().equals(scopedname)
                     )
             {
-                if(type.getValue().getTypeCode().isDefined())
+                if (type.getValue().getTypeCode().isDefined())
                 {
                     return scopedname + " is already defined (Type: " + type + ")";
                 }
@@ -968,7 +1056,8 @@ public class Context
         return null;
     }
 
-    public void ignore_case(boolean ignore_case)
+    public void ignore_case(
+            boolean ignore_case)
     {
         m_ignore_case = ignore_case;
     }
@@ -1046,11 +1135,12 @@ public class Context
         m_keywords.add("annotation");
     }
 
-    protected boolean checkKeyword(String id)
+    protected boolean checkKeyword(
+            String id)
     {
         boolean return_value = false;
 
-        for(String keyword : m_keywords)
+        for (String keyword : m_keywords)
         {
             if (m_ignore_case
                     ? keyword.equalsIgnoreCase(id)
@@ -1065,7 +1155,8 @@ public class Context
         return return_value;
     }
 
-    public String concatStringLiterals(String literal)
+    public String concatStringLiterals(
+            String literal)
     {
         // Split into separated strings
         String[] substrings = literal.split("\"([ \r\t\u000C\n])*\"");
