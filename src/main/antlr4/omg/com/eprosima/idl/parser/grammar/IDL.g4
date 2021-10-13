@@ -100,8 +100,6 @@ specification [Context context, TemplateManager templatemanager, TemplateGroup m
  */
 definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [Pair<Vector<Definition>, TemplateGroup> dtg = null]
 @init {
-    // TODO Cambiar esto. No me gusta la forma.
-
     Vector<Definition> vector = new Vector<Definition>();
     Pair<Vector<TypeDeclaration>, TemplateGroup> tdtg = null;
     Pair<ConstDeclaration, TemplateGroup> cdtg = null;
@@ -118,7 +116,9 @@ definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
             if(tdtg!=null)
             {
                 for(TypeDeclaration tydl : tdtg.first())
+                {
                     vector.add(tydl);
+                }
                 $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, tdtg.second());
             }
         }  // Type Declaration
@@ -230,7 +230,10 @@ definition_list [DefinitionContainer dc] returns [TemplateGroup dlTemplates]
             if(dtg!=null)
             {
                 for(int count = 0; count < dtg.first().size(); ++count)
+                {
+                    ctx.addDefinition(dtg.first().get(count));
                     dc.add(dtg.first().get(count));
+                }
 
                 if($dlTemplates != null && dtg.second() != null)
                 {
@@ -916,8 +919,8 @@ base_type_spec returns [TypeCode typecode = null]
 
 template_type_spec returns [TypeCode typecode = null]
     :   sequence_type { $typecode=$sequence_type.typecode; }
-	|   set_type { $typecode=$set_type.typecode; }
-	|   map_type { $typecode=$map_type.typecode; }
+    |   set_type { $typecode=$set_type.typecode; }
+    |   map_type { $typecode=$map_type.typecode; }
     |   string_type { $typecode=$string_type.typecode; }
     |   wide_string_type { $typecode=$wide_string_type.typecode; }
     |   fixed_pt_type
@@ -1900,20 +1903,20 @@ set_type returns [SetTypeCode typecode = null]
     String maxsize = null;
     Definition def = null;
 } : ( KW_SET
-		LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
+        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_SET
-		LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
-		{
-	        $typecode = new SetTypeCode(maxsize);
+        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
+        {
+            $typecode = new SetTypeCode(maxsize);
             if (type != null)
             {
-	            $typecode.setContentTypeCode(type);
+                $typecode.setContentTypeCode(type);
             }
             else if (def != null)
             {
-	            $typecode.setContentDefinition(def);
+                $typecode.setContentDefinition(def);
             }
-	    }
+        }
     ;
 
 map_type returns [MapTypeCode typecode = null]
@@ -1924,7 +1927,7 @@ map_type returns [MapTypeCode typecode = null]
     Definition valueDef = null;
     String maxsize = null;
 }   :   KW_MAP
-		LEFT_ANG_BRACKET simple_type_spec[null]
+        LEFT_ANG_BRACKET simple_type_spec[null]
         {
             keyType=$simple_type_spec.typecode;
             keyDef=$simple_type_spec.def;
@@ -1936,12 +1939,12 @@ map_type returns [MapTypeCode typecode = null]
         }
         (COMA positive_int_const { maxsize=$positive_int_const.literalStr; } )?
         RIGHT_ANG_BRACKET
-		{
-	        $typecode = new MapTypeCode(maxsize);
+        {
+            $typecode = new MapTypeCode(maxsize);
 
             if (keyType != null)
             {
-	            $typecode.setKeyTypeCode(keyType);
+                $typecode.setKeyTypeCode(keyType);
             }
             else if (keyDef != null)
             {
@@ -1950,13 +1953,13 @@ map_type returns [MapTypeCode typecode = null]
 
             if (valueType != null)
             {
-	            $typecode.setValueTypeCode(valueType);
+                $typecode.setValueTypeCode(valueType);
             }
             else if (valueDef != null)
             {
                 $typecode.setValueDefinition(valueDef);
             }
-	    }
+        }
     ;
 
 string_type returns [TypeCode typecode = null]
