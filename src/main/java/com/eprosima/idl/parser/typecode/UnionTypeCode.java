@@ -238,6 +238,12 @@ public class UnionTypeCode extends MemberedTypeCode
         return Integer.toString(getMaxSerializedSizeWithoutAlignment(0));
     }*/
 
+    @Override
+    public boolean isIsPlain()
+    {
+        return false;
+    }
+
     private TypeCode m_discriminatorTypeCode = null;
 
     private int m_defaultindex = -1;
