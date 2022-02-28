@@ -167,6 +167,12 @@ public abstract class TypeCode implements Notebook
     public boolean isIsUnionType() {return m_kind == Kind.KIND_UNION; }
 
     // Functions to ease TypeIdentifier and TypeObject generation.
+    public String getCppTypenameForTypeId()
+    {
+        String s = getCppTypename();
+        return s.equals("long double") ? "longdouble" : s;
+    }
+    
     public String getTypeIdentifier() { return "TK_None"; }
     public boolean isPrimitiveType() { return false; }
     public boolean isPlainType() { return false; }
