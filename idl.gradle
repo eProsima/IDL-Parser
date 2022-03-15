@@ -82,7 +82,7 @@ configurations {
 }
 
 group = "com.eprosima"
-version = "1.1.2"
+version = "1.2.0"
 
 //general properties
 jar {
