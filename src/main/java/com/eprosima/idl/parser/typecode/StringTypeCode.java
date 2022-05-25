@@ -55,7 +55,9 @@ public class StringTypeCode extends TypeCode
     @Override
     public String getCppTypename()
     {
-        return getCppTypenameFromStringTemplate().toString();
+        StringTemplate st = getCppTypenameFromStringTemplate();
+        st.setAttribute("max_size", m_maxsize);
+        return st.toString();
     }
 
     @Override
