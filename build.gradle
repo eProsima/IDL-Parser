@@ -37,7 +37,6 @@ dependencies {
     }
     implementation group: 'org.antlr', name: 'stringtemplate', version:'3.2'
     implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version:'15.4'
-    testImplementation group: 'junit', name: 'junit', version:'4.13.1'
 }
 
 generateGrammarSource {
