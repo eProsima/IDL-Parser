@@ -40,9 +40,9 @@ type_7() ::= <<bool>>
 
 type_9() ::= <<uint8_t>>
 
-type_d() ::= <<std::string>>
+type_d(max_size) ::= <<$if(max_size)$eprosima::fastrtps::fixed_string<$max_size$>$else$std::string$endif$>>
 
-type_15() ::= <<std::wstring>>
+type_15(max_size) ::= <<std::wstring>>
 
 type_19(key, value, maxsize, empty) ::= <<std::map<$key$, $value$>$empty$>>
 
