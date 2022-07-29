@@ -3,16 +3,46 @@ package com.eprosima.integration;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 public class Command
 {
-    private Command() {}
+    private Command()
+    {
+    }
 
-    public static boolean execute(String command, String from, boolean errorOutputOnly)
+    static CompletableFuture<String> readOutStream(
+            InputStream is)
+    {
+        return CompletableFuture.supplyAsync(() -> {
+            try (
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+                ) {
+                StringBuilder res = new StringBuilder();
+                String inputLine;
+                while ((inputLine = br.readLine()) != null)
+                {
+                    res.append(inputLine).append(System.lineSeparator());
+                }
+                return res.toString();
+            }
+            catch (Throwable e)
+            {
+                throw new RuntimeException("problem with executing program", e);
+            }
+        });
+    }
+
+    public static boolean execute(
+            String command,
+            String from,
+            boolean errorOutputOnly)
     {
         try
         {
@@ -20,29 +50,31 @@ public class Command
             List<String> arguments = Arrays.asList(command.split(" "));
             ProcessBuilder processBuilder = new ProcessBuilder(arguments);
             processBuilder.directory(from != null ? new File(from) : null);
-            processBuilder.redirectErrorStream(true);
 
             Process process = processBuilder.start();
 
-            ArrayList<String> output = new ArrayList<String>();
+            CompletableFuture<String> soutFut = readOutStream(process.getInputStream());
+            CompletableFuture<String> serrFut = readOutStream(process.getErrorStream());
+            CompletableFuture<String> resultFut =
+                    soutFut.thenCombine(serrFut, (stdout, stderr) ->
             {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                String line = "";
-                while ((line = reader.readLine()) != null)
+                if (2 < stderr.length())
                 {
-                    output.add(line);
+                    System.err.println("------------------------------ ERROR -------------------------------------");
+                    System.err.println(stderr);
                 }
-            }
-            process.waitFor();
 
-            boolean status = process.exitValue() == 0;
+                return stdout;
+            });
+            // get stdout once ready, blocking
+            String result = resultFut.get();
+            process.waitFor();
+            boolean status = (process.exitValue() == 0) && (2 >=  serrFut.get().length());
 
             if (!status || !errorOutputOnly)
             {
-                for (String line : output)
-                {
-                    System.out.println(line);
-                }
+                System.err.println("------------------------------ OUTPUT -------------------------------------");
+                System.out.println(result);
             }
 
             return status;
@@ -53,11 +85,18 @@ public class Command
             e.printStackTrace();
             return false;
         }
-        catch(InterruptedException e)
+        catch (InterruptedException e)
         {
             System.err.println("Error Interrupted execution: " + command);
             e.printStackTrace();
             return false;
         }
+        catch (Exception e)
+        {
+            System.err.println("Error: " + command);
+            e.printStackTrace();
+            return false;
+        }
     }
+
 }
