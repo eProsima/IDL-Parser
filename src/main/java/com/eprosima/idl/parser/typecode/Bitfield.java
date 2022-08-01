@@ -29,7 +29,8 @@ public class Bitfield extends Member
         m_spec = spec;
     }
 
-    public void setBasePosition(int position)
+    public void setBasePosition(
+            int position)
     {
         m_base = position;
     }
@@ -52,6 +53,18 @@ public class Bitfield extends Member
             return null;
         }
         return super.getName();
+    }
+
+    @Override
+    public boolean isIsPlain()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isIsBounded()
+    {
+        return true;
     }
 
     private int m_base = -1;
