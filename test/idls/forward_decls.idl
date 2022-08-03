@@ -9,13 +9,25 @@ union ForwardUnion;
 module hola
 {
     struct ForwardStruct;
+    struct ForwardRecursive;
+    typedef sequence<hola::ForwardRecursive> ForwardRecursiveUnboundedSeq;
+    typedef sequence<hola::ForwardRecursive, 10> ForwardRecursiveBoundedSeq;
 };
 
 struct Struct_One
 {
     long mylong;
+    string<20> mystring;
     hola::ForwardStruct myfwstruct;
     ForwardUnion myfsunion;
+};
+
+struct Recursive
+{
+    long mylong;
+    string<20> mystring;
+    hola::ForwardRecursiveUnboundedSeq rec_unbounded;
+    hola::ForwardRecursiveBoundedSeq rec_bounded;
 };
 
 module hola
@@ -32,6 +44,21 @@ module hola
         uint32 myuint32;
         int64 myint64;
         uint64 myuint64;
+        string<20> mystring;
+    };
+
+    struct ForwardRecursive
+    {
+        @key int8 myint8;
+        uint8 myuint8;
+        int16 myint16;
+        uint16 myuint16;
+        int32 myint32;
+        uint32 myuint32;
+        int64 myint64;
+        uint64 myuint64;
+        string<20> mystring;
+        Recursive st_recursive;
     };
 };
 
