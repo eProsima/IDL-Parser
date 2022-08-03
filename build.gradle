@@ -36,6 +36,7 @@ dependencies {
         exclude group: 'org.antlr', module:'ST4'
     }
     implementation group: 'org.antlr', name: 'stringtemplate', version:'3.2'
+    implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version:'15.2'
     testImplementation group: 'junit', name: 'junit', version:'4.13.1'
 }
 

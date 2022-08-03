@@ -17,6 +17,7 @@ package com.eprosima.idl.context;
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.tree.AnnotationMember;
+import com.eprosima.idl.parser.tree.ConstDeclaration;
 import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Operation;
@@ -49,6 +50,9 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Stack;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 import org.antlr.v4.runtime.Token;
 
 
@@ -1181,6 +1185,52 @@ public class Context
     }
 
     /*** End ***/
+
+    public static ScriptEngine getJSScriptEngine()
+    {
+        if (Double.parseDouble(System.getProperty("java.specification.version")) < 11)
+        {
+            return new ScriptEngineManager().getEngineByName("js");
+        }
+        else
+        {
+            return new org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory()
+                           .getScriptEngine();
+        }
+    }
+
+    public String evaluate_literal(
+            String str)
+    {
+        String aux_str = "(" + str + ") | 0";
+
+        // Add all constants.
+        for (Definition definition : m_definitions)
+        {
+            if (definition.isIsConstDeclaration())
+            {
+                ConstDeclaration const_decl = (ConstDeclaration)definition;
+
+                if (const_decl.getTypeCode().isPrimitive())
+                {
+                    aux_str = const_decl.getName() + "=" + const_decl.getValue() + ";" + aux_str;
+                }
+            }
+        }
+
+        // Process the math expression
+        try
+        {
+            ScriptEngine engine = getJSScriptEngine();
+            aux_str = engine.eval(aux_str).toString();
+        }
+        catch (ScriptException se)
+        {
+            throw new ParseException(null, "Error evaluating array dimension: " + aux_str);
+        }
+
+        return aux_str;
+    }
 
     // OS
     String m_os = null;
