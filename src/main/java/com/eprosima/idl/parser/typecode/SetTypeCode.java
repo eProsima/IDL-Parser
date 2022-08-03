@@ -19,14 +19,18 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class SetTypeCode extends ContainerTypeCode
 {
-    public SetTypeCode(String maxsize)
+    public SetTypeCode(
+            String maxsize)
     {
         super(Kind.KIND_SET);
         m_maxsize = maxsize;
     }
 
     @Override
-    public boolean isIsType_e(){return true;}
+    public boolean isIsType_e()
+    {
+        return true;
+    }
 
     @Override
     public String getTypeIdentifier()
@@ -35,10 +39,16 @@ public class SetTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isPlainType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsSetType() { return true; }
+    public boolean isIsSetType()
+    {
+        return true;
+    }
 
     @Override
     public String getCppTypename()
@@ -78,8 +88,10 @@ public class SetTypeCode extends ContainerTypeCode
 
     public String getMaxsize()
     {
-        if(m_maxsize == null)
+        if (m_maxsize == null)
+        {
             return "100";
+        }
 
         return m_maxsize;
     }
@@ -99,6 +111,23 @@ public class SetTypeCode extends ContainerTypeCode
         }
 
         return super.isIsBounded();
+    }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        long initial_alignment = current_alignment;
+        long maxsize = (null == m_maxsize ? 100 : Long.parseLong(m_maxsize, 10));
+
+        current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
+
+        for (long count = 0; count < maxsize; ++count)
+        {
+            current_alignment += getContentTypeCode().maxSerializedSize(current_alignment);
+        }
+
+        return current_alignment - initial_alignment;
     }
 
     private String m_maxsize = null;

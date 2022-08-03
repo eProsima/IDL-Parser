@@ -22,7 +22,9 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class AliasTypeCode extends ContainerTypeCode
 {
-    public AliasTypeCode(String scope, String name)
+    public AliasTypeCode(
+            String scope,
+            String name)
     {
         super(Kind.KIND_ALIAS);
         m_scope = scope;
@@ -32,14 +34,14 @@ public class AliasTypeCode extends ContainerTypeCode
     @Override
     public TypeCode getContentTypeCode()
     {
-        if(super.getContentTypeCode() instanceof AliasTypeCode)
+        if (super.getContentTypeCode() instanceof AliasTypeCode)
         {
-            AliasTypeCode alias = (AliasTypeCode)super.getContentTypeCode();
+            AliasTypeCode alias = (AliasTypeCode) super.getContentTypeCode();
             return alias.getContentTypeCode();
         }
-        else if(super.getContentTypeCode() instanceof ContainerTypeCode)
+        else if (super.getContentTypeCode() instanceof ContainerTypeCode)
         {
-            ContainerTypeCode container = (ContainerTypeCode)super.getContentTypeCode();
+            ContainerTypeCode container = (ContainerTypeCode) super.getContentTypeCode();
             return container.getContentTypeCode();
         }
 
@@ -48,9 +50,9 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public boolean isUnbound()
     {
-        if(super.getContentTypeCode() instanceof SequenceTypeCode)
+        if (super.getContentTypeCode() instanceof SequenceTypeCode)
         {
-            return ((SequenceTypeCode)super.getContentTypeCode()).isUnbound();
+            return ((SequenceTypeCode) super.getContentTypeCode()).isUnbound();
         }
         else
         {
@@ -59,7 +61,10 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isObjectType() { return true; }
+    public boolean isObjectType()
+    {
+        return true;
+    }
 
     public TypeCode getTypedefContentTypeCode()
     {
@@ -73,16 +78,20 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public String getScopedname()
     {
-        if(m_scope.isEmpty())
+        if (m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope + "::" + m_name;
     }
 
     public String getROS2Scopedname()
     {
-        if(m_scope.isEmpty())
+        if (m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope + "::dds_::" + m_name + "_";
     }
@@ -142,27 +151,21 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isIsStringType() { return super.getContentTypeCode().isIsStringType(); }
+    public boolean isIsStringType()
+    {
+        return super.getContentTypeCode().isIsStringType();
+    }
 
     @Override
-    public boolean isIsWStringType() { return super.getContentTypeCode().isIsWStringType(); }
+    public boolean isIsWStringType()
+    {
+        return super.getContentTypeCode().isIsWStringType();
+    }
 
     @Override
     public String getInitialValue()
     {
         return super.getContentTypeCode().getInitialValue();
-    }
-
-    public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
-    {
-        // TODO
-        return null;
-    }
-
-    public int getMaxSerializedSizeWithoutAlignment(int currentSize)
-    {
-        // TODO
-        return 0;
     }
 
     /*** Functions to know the type in string templates ***/
@@ -190,7 +193,10 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isIsSequenceType() { return super.getContentTypeCode().isIsSequenceType(); }
+    public boolean isIsSequenceType()
+    {
+        return super.getContentTypeCode().isIsSequenceType();
+    }
 
     public boolean isIsType_10()
     {
@@ -201,6 +207,13 @@ public class AliasTypeCode extends ContainerTypeCode
     public String getTypeIdentifier()
     {
         return "EK_MINIMAL";
+    }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        return super.getContentTypeCode().maxSerializedSize(current_alignment);
     }
 
     /*** End of functions to know the type in string templates ***/
@@ -218,11 +231,14 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public List<String> getDimensions()
     {
-        if(super.getContentTypeCode() instanceof ArrayTypeCode)
-            return ((ArrayTypeCode)super.getContentTypeCode()).getDimensions();
+        if (super.getContentTypeCode() instanceof ArrayTypeCode)
+        {
+            return ((ArrayTypeCode) super.getContentTypeCode()).getDimensions();
+        }
 
         return null;
     }
+
     /*** End of functions that alias has to export because some typecodes have them*/
 
     private String m_name = null;

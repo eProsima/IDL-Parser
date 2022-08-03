@@ -20,14 +20,18 @@ import com.eprosima.idl.parser.tree.Definition;
 
 public class MapTypeCode extends ContainerTypeCode
 {
-    public MapTypeCode(String maxsize)
+    public MapTypeCode(
+            String maxsize)
     {
         super(Kind.KIND_MAP);
         m_maxsize = maxsize;
     }
 
     @Override
-    public boolean isIsType_e(){return true;}
+    public boolean isIsType_e()
+    {
+        return true;
+    }
 
     @Override
     public String getTypeIdentifier()
@@ -36,10 +40,16 @@ public class MapTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isPlainType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsMapType() { return true; }
+    public boolean isIsMapType()
+    {
+        return true;
+    }
 
     @Override
     public String getCppTypename()
@@ -83,8 +93,10 @@ public class MapTypeCode extends ContainerTypeCode
 
     public String getMaxsize()
     {
-        if(m_maxsize == null)
+        if (m_maxsize == null)
+        {
             return "100";
+        }
 
         return m_maxsize;
     }
@@ -94,7 +106,8 @@ public class MapTypeCode extends ContainerTypeCode
         return m_keyTypeCode;
     }
 
-    public void setKeyTypeCode(TypeCode keyTypeCode)
+    public void setKeyTypeCode(
+            TypeCode keyTypeCode)
     {
         m_keyTypeCode = keyTypeCode;
     }
@@ -104,7 +117,8 @@ public class MapTypeCode extends ContainerTypeCode
         return m_valueTypeCode;
     }
 
-    public void setValueTypeCode(TypeCode valueTypeCode)
+    public void setValueTypeCode(
+            TypeCode valueTypeCode)
     {
         m_valueTypeCode = valueTypeCode;
     }
@@ -114,7 +128,8 @@ public class MapTypeCode extends ContainerTypeCode
         return m_keyDefinition;
     }
 
-    public void setKeyDefinition(Definition keyDefinition)
+    public void setKeyDefinition(
+            Definition keyDefinition)
     {
         m_keyDefinition = keyDefinition;
     }
@@ -124,7 +139,8 @@ public class MapTypeCode extends ContainerTypeCode
         return m_valueDefinition;
     }
 
-    public void setValueDefinition(Definition valueDefinition)
+    public void setValueDefinition(
+            Definition valueDefinition)
     {
         m_valueDefinition = valueDefinition;
     }
@@ -148,6 +164,24 @@ public class MapTypeCode extends ContainerTypeCode
             return m_keyTypeCode.isIsBounded() && m_valueTypeCode.isIsBounded();
         }
         return false;
+    }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        long initial_alignment = current_alignment;
+        long maxsize = (null == m_maxsize ? 100 : Long.parseLong(m_maxsize, 10));
+
+        current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
+
+        for (long count = 0; count < maxsize; ++count)
+        {
+            current_alignment += m_keyTypeCode.maxSerializedSize(current_alignment);
+            current_alignment += m_valueTypeCode.maxSerializedSize(current_alignment);
+        }
+
+        return current_alignment - initial_alignment;
     }
 
     private TypeCode m_keyTypeCode = null;

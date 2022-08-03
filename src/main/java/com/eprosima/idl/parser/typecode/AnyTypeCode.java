@@ -62,7 +62,10 @@ public class AnyTypeCode extends TypeCode
     }
 
     @Override
-    public boolean isPrimitiveType() { return false; }
+    public boolean isPrimitiveType()
+    {
+        return false;
+    }
 
     @Override
     public String getInitialValue()
@@ -75,4 +78,12 @@ public class AnyTypeCode extends TypeCode
     {
         return null;
     }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        return 0;
+    }
+
 }

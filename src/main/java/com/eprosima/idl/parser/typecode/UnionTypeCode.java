@@ -22,19 +22,25 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class UnionTypeCode extends MemberedTypeCode
 {
-    public UnionTypeCode(String scope, String name)
+    public UnionTypeCode(
+            String scope,
+            String name)
     {
         super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = null;
     }
 
-    public UnionTypeCode(String scope, String name, TypeCode discriminatorTypeCode)
+    public UnionTypeCode(
+            String scope,
+            String name,
+            TypeCode discriminatorTypeCode)
     {
         super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
 
-    public void setDiscriminatorType(TypeCode discriminatorTypeCode)
+    public void setDiscriminatorType(
+            TypeCode discriminatorTypeCode)
     {
         m_discriminatorTypeCode = discriminatorTypeCode;
     }
@@ -46,22 +52,33 @@ public class UnionTypeCode extends MemberedTypeCode
     }
 
     @Override
-    public boolean isObjectType() { return true; }
+    public boolean isObjectType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsUnionType() {return true; }
+    public boolean isIsUnionType()
+    {
+        return true;
+    }
 
     /*!
      * @return 0 is ok, -1 the member is repeated, -2 is another default member.
      */
-    public int addMember(UnionMember member)
+    public int addMember(
+            UnionMember member)
     {
-        if(member.isDefault())
+        if (member.isDefault())
         {
-            if(m_defaultindex == -1)
+            if (m_defaultindex == -1)
+            {
                 m_defaultindex = getMembers().size();
+            }
             else
+            {
                 return -2;
+            }
         }
 
         // Generate labels
@@ -69,13 +86,13 @@ public class UnionTypeCode extends MemberedTypeCode
         List<String> labels = null;
         List<String> javalabels = null;
 
-        if(m_discriminatorTypeCode.getKind() == Kind.KIND_ENUM)
+        if (m_discriminatorTypeCode.getKind() == Kind.KIND_ENUM)
         {
             EnumTypeCode enum_type = (EnumTypeCode)m_discriminatorTypeCode;
             labels = new ArrayList<String>();
             javalabels = new ArrayList<String>();
 
-            for(int count = 0; count < internal_labels.size(); ++count)
+            for (int count = 0; count < internal_labels.size(); ++count)
             {
                 labels.add(enum_type.getScope() + "::" + internal_labels.get(count));
                 javalabels.add(javapackage + enum_type.getJavaScopedname() + "." + internal_labels.get(count));
@@ -90,16 +107,20 @@ public class UnionTypeCode extends MemberedTypeCode
         member.setLabels(labels);
         member.setJavaLabels(javalabels);
 
-        if(!addMember((Member)member))
+        if (!addMember((Member)member))
+        {
             return -1;
+        }
 
         return 0;
     }
 
     public Member getDefaultMember()
     {
-        if(m_defaultindex != -1)
+        if (m_defaultindex != -1)
+        {
             return getMembers().get(m_defaultindex);
+        }
 
         return null;
     }
@@ -136,12 +157,14 @@ public class UnionTypeCode extends MemberedTypeCode
         return st.toString();
     }
 
-    public void setDefaultvalue(String value)
+    public void setDefaultvalue(
+            String value)
     {
         m_defaultValue = value;
     }
 
-    public void setJavaDefaultvalue(String value)
+    public void setJavaDefaultvalue(
+            String value)
     {
         m_javaDefaultValue = value;
     }
@@ -171,77 +194,48 @@ public class UnionTypeCode extends MemberedTypeCode
         List<Member> mlist = getMembers();
         List<String> labels = null;
 
-        for(int count = 0; count < mlist.size(); ++count)
+        for (int count = 0; count < mlist.size(); ++count)
         {
-            if(count != m_defaultindex)
+            if (count != m_defaultindex)
             {
                 labels = ((UnionMember)mlist.get(count)).getLabels();
-                for(int i = 0; i < labels.size(); ++i)
+                for (int i = 0; i < labels.size(); ++i)
+                {
                     returnList.add(labels.get(i));
+                }
             }
         }
 
         return returnList;
     }
 
-    /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
-    {
-        List<Member> members = getMembers();
-        int lcurrentSize = currentSize, lmaxSize = 0;
-        int llastDataAligned = 0;
-
-        Pair<Integer, Integer> dpair = m_discriminatorTypeCode.getMaxSerializedSize(lcurrentSize, lastDataAligned);
-        lcurrentSize = dpair.first();
-
-        for(int count = 0; count < members.size(); ++count)
-        {
-            Pair<Integer, Integer> pair = members.get(count).getTypecode().getMaxSerializedSize(lcurrentSize, dpair.second());
-
-            if(pair.first() > lmaxSize)
-            {
-                lmaxSize = pair.first();
-                llastDataAligned = pair.second();
-            }
-        }
-
-        return new Pair<Integer, Integer>(lmaxSize, llastDataAligned);
-    }
-
-    public int getMaxSerializedSizeWithoutAlignment(int currentSize)
-    {
-        List<Member> members = getMembers();
-        int lcurrentSize = currentSize, lmaxSize = 0;
-
-        lcurrentSize = m_discriminatorTypeCode.getMaxSerializedSizeWithoutAlignment(lcurrentSize);
-
-        for(int count = 0; count < members.size(); ++count)
-        {
-            int aux = members.get(count).getTypecode().getMaxSerializedSizeWithoutAlignment(lcurrentSize);
-
-            if(aux > lmaxSize)
-            {
-                lmaxSize = aux;
-            }
-        }
-
-        return lmaxSize;
-    }
-
-    public String getMaxSerializedSize()
-    {
-        Pair<Integer, Integer> pair = getMaxSerializedSize(0, 0);
-        return pair.first().toString();
-    }
-
-    public String getMaxSerializedSizeWithoutAlignment()
-    {
-        return Integer.toString(getMaxSerializedSizeWithoutAlignment(0));
-    }*/
-
     @Override
     public boolean isIsPlain()
     {
         return false;
+    }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        long initial_alignment = current_alignment;
+        long reset_alignment = 0;
+        long union_max_size_serialized = 0;
+
+        current_alignment += m_discriminatorTypeCode.maxSerializedSize(current_alignment);
+
+        for (Member member : getMembers())
+        {
+            reset_alignment = current_alignment;
+            reset_alignment += member.getTypecode().maxSerializedSize(reset_alignment);
+            if (union_max_size_serialized < reset_alignment)
+            {
+                union_max_size_serialized = reset_alignment;
+            }
+        }
+
+        return union_max_size_serialized - initial_alignment;
     }
 
     private TypeCode m_discriminatorTypeCode = null;

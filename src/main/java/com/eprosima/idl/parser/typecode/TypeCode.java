@@ -36,7 +36,8 @@ public abstract class TypeCode implements Notebook
     //TODO Revisar si es el mejor sitio.
     public static String javapackage = "";
 
-    public TypeCode(int kind)
+    public TypeCode(
+            int kind)
     {
         m_kind = kind;
         m_annotations = new HashMap<String, Annotation>();
@@ -138,33 +139,127 @@ public abstract class TypeCode implements Notebook
         return null;
     }
 
-    //public abstract Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned);
+    public String getMaxSerializedSize()
+    {
+        return Long.toString(maxSerializedSize(0));
+    }
 
-    //public abstract int getMaxSerializedSizeWithoutAlignment(int currentSize);
+    protected abstract long maxSerializedSize(
+            long current_alignment);
+
+    protected static long cdr_alignment(
+            long current_alignment,
+            long data_size)
+    {
+        return (data_size - (current_alignment % data_size)) & (data_size - 1);
+    }
 
     /*** Functions to know the type in string templates ***/
     // By default a typecode is not string. Function used in stringtemplates
-    public boolean isIsType_5(){return false;}
-    public boolean isIsType_6(){return false;}
-    public boolean isIsType_7(){return false;}
-    public boolean isIsType_d(){return false;}
-    public boolean isIsType_c(){return false;}
-    public boolean isIsType_f(){return false;}
-    public boolean isIsType_e(){return false;}
-    public boolean isIsType_a(){return false;}
-    public boolean isIsType_10(){return false;}
-    public boolean isIsType_13(){return false;}
-    public boolean isIsBitmaskType(){return false;}
-    public boolean isIsBitsetType(){return false;}
-    public boolean isIsStringType() { return false;}
-    public boolean isIsWStringType() { return false;}
-    public boolean isIsWCharType() { return false;}
-    public boolean isIsSetType() { return false; }
-    public boolean isIsMapType() { return false; }
-    public boolean isIsSequenceType() { return false; }
-    public boolean isIsArrayType() { return false; }
-    public boolean isIsStructType() {return isIsType_a(); }
-    public boolean isIsUnionType() {return m_kind == Kind.KIND_UNION; }
+    public boolean isIsType_5()
+    {
+        return false;
+    }
+
+    public boolean isIsType_6()
+    {
+        return false;
+    }
+
+    public boolean isIsType_7()
+    {
+        return false;
+    }
+
+    public boolean isIsType_d()
+    {
+        return false;
+    }
+
+    public boolean isIsType_c()
+    {
+        return false;
+    }
+
+    public boolean isIsType_f()
+    {
+        return false;
+    }
+
+    public boolean isIsType_e()
+    {
+        return false;
+    }
+
+    public boolean isIsType_a()
+    {
+        return false;
+    }
+
+    public boolean isIsType_10()
+    {
+        return false;
+    }
+
+    public boolean isIsType_13()
+    {
+        return false;
+    }
+
+    public boolean isIsBitmaskType()
+    {
+        return false;
+    }
+
+    public boolean isIsBitsetType()
+    {
+        return false;
+    }
+
+    public boolean isIsStringType()
+    {
+        return false;
+    }
+
+    public boolean isIsWStringType()
+    {
+        return false;
+    }
+
+    public boolean isIsWCharType()
+    {
+        return false;
+    }
+
+    public boolean isIsSetType()
+    {
+        return false;
+    }
+
+    public boolean isIsMapType()
+    {
+        return false;
+    }
+
+    public boolean isIsSequenceType()
+    {
+        return false;
+    }
+
+    public boolean isIsArrayType()
+    {
+        return false;
+    }
+
+    public boolean isIsStructType()
+    {
+        return isIsType_a();
+    }
+
+    public boolean isIsUnionType()
+    {
+        return m_kind == Kind.KIND_UNION;
+    }
 
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getCppTypenameForTypeId()
@@ -172,15 +267,37 @@ public abstract class TypeCode implements Notebook
         String s = getCppTypename();
         return s.equals("long double") ? "longdouble" : s;
     }
-    
-    public String getTypeIdentifier() { return "TK_None"; }
-    public boolean isPrimitiveType() { return false; }
-    public boolean isPlainType() { return false; }
-    public boolean isObjectType() { return false; }
+
+    public String getTypeIdentifier()
+    {
+        return "TK_None";
+    }
+
+    public boolean isPrimitiveType()
+    {
+        return false;
+    }
+
+    public boolean isPlainType()
+    {
+        return false;
+    }
+
+    public boolean isObjectType()
+    {
+        return false;
+    }
 
     // Functions to ease full preallocation and zero-copy
-    public boolean isIsPlain() { return true; } // Don't confuse with isPlainType!
-    public boolean isIsBounded() { return true; }
+    public boolean isIsPlain()
+    {
+        return true;
+    }                                           // Don't confuse with isPlainType!
+
+    public boolean isIsBounded()
+    {
+        return true;
+    }
 
     /*** End of functions to know the type in string templates ***/
 
@@ -189,16 +306,21 @@ public abstract class TypeCode implements Notebook
         return m_parent;
     }
 
-    public void setParent(Object parent)
+    public void setParent(
+            Object parent)
     {
         m_parent = parent;
     }
 
     @Override
-    public void addAnnotation(Context ctx, Annotation annotation)
+    public void addAnnotation(
+            Context ctx,
+            Annotation annotation)
     {
-        if(annotation != null)
+        if (annotation != null)
+        {
             m_annotations.put(annotation.getName(), annotation);
+        }
     }
 
     @Override
@@ -272,7 +394,8 @@ public abstract class TypeCode implements Notebook
         return m_forwarded;
     }
 
-    public void setForwarded(boolean fwd)
+    public void setForwarded(
+            boolean fwd)
     {
         m_forwarded = fwd;
     }

@@ -19,16 +19,24 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class EnumTypeCode extends MemberedTypeCode
 {
-    public EnumTypeCode(String scope, String name)
+    public EnumTypeCode(
+            String scope,
+            String name)
     {
         super(Kind.KIND_ENUM, scope, name);
     }
 
     @Override
-    public boolean isPrimitive() {return true;}
+    public boolean isPrimitive()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsType_c(){return true;}
+    public boolean isIsType_c()
+    {
+        return true;
+    }
 
     @Override
     public String getTypeIdentifier()
@@ -37,9 +45,13 @@ public class EnumTypeCode extends MemberedTypeCode
     }
 
     @Override
-    public boolean isObjectType() { return true; }
+    public boolean isObjectType()
+    {
+        return true;
+    }
 
-    public void addMember(EnumMember member)
+    public void addMember(
+            EnumMember member)
     {
         addMember((Member)member);
     }
@@ -79,7 +91,7 @@ public class EnumTypeCode extends MemberedTypeCode
     @Override
     public String getInitialValue()
     {
-        if(getMembers().size() > 0)
+        if (getMembers().size() > 0)
         {
             return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
         }
@@ -90,7 +102,7 @@ public class EnumTypeCode extends MemberedTypeCode
     @Override
     public String getJavaInitialValue()
     {
-        if(getMembers().size() > 0)
+        if (getMembers().size() > 0)
         {
             return javapackage + getJavaScopedname() + "." + getMembers().get(0).getName();
         }
@@ -98,30 +110,21 @@ public class EnumTypeCode extends MemberedTypeCode
         return "";
     }
 
-    /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
-    {
-        int size = getSize();
-
-        if(size <= lastDataAligned)
-        {
-            return new Pair<Integer, Integer>(currentSize + size, size);
-        }
-        else
-        {
-            int align = (size - (currentSize % size)) & (size - 1);
-            return new Pair<Integer, Integer>(currentSize + size + align, size);
-        }
-    }
-
-    public int getMaxSerializedSizeWithoutAlignment(int currentSize)
-    {
-        return currentSize + getSize();
-    }*/
-
     @Override
     public String getSize()
     {
         return "4";
+    }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        long initial_alignment = current_alignment;
+
+        current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
+
+        return current_alignment - initial_alignment;
     }
 
 }

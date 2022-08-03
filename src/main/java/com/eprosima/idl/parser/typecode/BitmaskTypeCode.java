@@ -27,14 +27,19 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class BitmaskTypeCode extends MemberedTypeCode
 {
-    public BitmaskTypeCode(String scope, String name)
+    public BitmaskTypeCode(
+            String scope,
+            String name)
     {
         super(Kind.KIND_BITMASK, scope, name);
         m_bitmasks = new LinkedHashMap<String, Bitmask>();
         m_value_bitmasks = new LinkedHashMap<Integer, Bitmask>();
     }
 
-    public BitmaskTypeCode(String scope, String name, Integer bit_bound)
+    public BitmaskTypeCode(
+            String scope,
+            String name,
+            Integer bit_bound)
     {
         super(Kind.KIND_BITMASK, scope, name);
         m_bit_bound = bit_bound;
@@ -43,13 +48,22 @@ public class BitmaskTypeCode extends MemberedTypeCode
     }
 
     @Override
-    public boolean isPrimitive() {return true;}
+    public boolean isPrimitive()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsBitmaskType(){return true;}
+    public boolean isIsBitmaskType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isObjectType() { return true; }
+    public boolean isObjectType()
+    {
+        return true;
+    }
 
     @Override
     public String getSize()
@@ -121,7 +135,8 @@ public class BitmaskTypeCode extends MemberedTypeCode
         return new ArrayList<Bitmask>(m_bitmasks.values());
     }
 
-    public boolean addBitmask(Bitmask bitmask)
+    public boolean addBitmask(
+            Bitmask bitmask)
     {
         if (bitmask.getPosition() == -1)
         {
@@ -137,14 +152,25 @@ public class BitmaskTypeCode extends MemberedTypeCode
         return addBitmask(bitmask, bitmask.getPosition());
     }
 
-    private boolean addBitmask(Bitmask bitmask, int position)
+    private boolean addBitmask(
+            Bitmask bitmask,
+            int position)
     {
-        if (position < 0 || position >= m_bit_bound) return false; // Out of bounds
+        if (position < 0 || position >= m_bit_bound)
+        {
+            return false;                                          // Out of bounds
 
-        if (m_value_bitmasks.containsKey(position)) return false; // Position already taken
+        }
+        if (m_value_bitmasks.containsKey(position))
+        {
+            return false;                                         // Position already taken
 
-        if(m_bitmasks.containsKey(bitmask.getName())) return false; // Already exists
+        }
+        if (m_bitmasks.containsKey(bitmask.getName()))
+        {
+            return false;                                           // Already exists
 
+        }
         bitmask.setPosition(position);
         m_value_bitmasks.put(position, bitmask);
         m_bitmasks.put(bitmask.getName(), bitmask);
@@ -154,7 +180,8 @@ public class BitmaskTypeCode extends MemberedTypeCode
         return true;
     }
 
-    public void setParent(BitmaskTypeCode parent)
+    public void setParent(
+            BitmaskTypeCode parent)
     {
         m_parent = parent;
     }
@@ -212,13 +239,27 @@ public class BitmaskTypeCode extends MemberedTypeCode
     }
 
     @Override
-    public void addAnnotation(Context ctx, Annotation annotation)
+    public void addAnnotation(
+            Context ctx,
+            Annotation annotation)
     {
         super.addAnnotation(ctx, annotation);
         if (annotation.getName().equals("bit_bound"))
         {
             m_bit_bound = Integer.parseInt(annotation.getValue());
         }
+    }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        long initial_alignment = current_alignment;
+        long size = Long.parseLong(getSize(), 10);
+
+        current_alignment += size + TypeCode.cdr_alignment(current_alignment, size);
+
+        return current_alignment - initial_alignment;
     }
 
     private BitmaskTypeCode m_parent = null;

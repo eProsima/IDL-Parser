@@ -29,7 +29,10 @@ public class ArrayTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isIsType_f(){return true;}
+    public boolean isIsType_f()
+    {
+        return true;
+    }
 
     @Override
     public String getTypeIdentifier()
@@ -38,10 +41,16 @@ public class ArrayTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isPlainType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsArrayType() { return true; }
+    public boolean isIsArrayType()
+    {
+        return true;
+    }
 
     @Override
     public String getCppTypename()
@@ -49,17 +58,17 @@ public class ArrayTypeCode extends ContainerTypeCode
         StringTemplate first = null, second = null, fin = null;
         String prevf = null, prevs = null;
 
-        for(int count = 0; count < m_dimensions.size(); ++count)
+        for (int count = 0; count < m_dimensions.size(); ++count)
         {
             first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
             second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
-            if(prevf != null)
+            if (prevf != null)
             {
                 first.setAttribute("prev", prevf);
             }
-            if(prevs != null)
+            if (prevs != null)
             {
                 second.setAttribute("prev", prevs);
             }
@@ -82,17 +91,17 @@ public class ArrayTypeCode extends ContainerTypeCode
         StringTemplate first = null, second = null, fin = null;
         String prevf = null, prevs = null;
 
-        for(int count = 0; count < m_dimensions.size(); ++count)
+        for (int count = 0; count < m_dimensions.size(); ++count)
         {
             first = ctypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
             second = ctypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
-            if(prevf != null)
+            if (prevf != null)
             {
                 first.setAttribute("prev", prevf);
             }
-            if(prevs != null)
+            if (prevs != null)
             {
                 second.setAttribute("prev", prevs);
             }
@@ -108,11 +117,12 @@ public class ArrayTypeCode extends ContainerTypeCode
 
         return fin.toString();
     }
+
     public String getCTypeDimensions()
     {
         String dimensions = getArrayExtension();
 
-        if(getContentTypeCode() instanceof StringTypeCode)
+        if (getContentTypeCode() instanceof StringTypeCode)
         {
             dimensions += "[" + ((StringTypeCode)getContentTypeCode()).getMaxsize() + "]";
         }
@@ -126,17 +136,17 @@ public class ArrayTypeCode extends ContainerTypeCode
         StringTemplate first = null, second = null, fin = null;
         String prevf = null, prevs = null;
 
-        for(int count = 0; count < m_dimensions.size(); ++count)
+        for (int count = 0; count < m_dimensions.size(); ++count)
         {
             first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
             second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
             second.setAttribute("size", m_dimensions.get(count));
 
-            if(prevf != null)
+            if (prevf != null)
             {
                 first.setAttribute("prev", prevf);
             }
-            if(prevs != null)
+            if (prevs != null)
             {
                 second.setAttribute("prev", prevs);
             }
@@ -158,7 +168,8 @@ public class ArrayTypeCode extends ContainerTypeCode
         return getContentTypeCode().getIdlTypename();
     }
 
-    public void addDimension(String dimension)
+    public void addDimension(
+            String dimension)
     {
         m_dimensions.add(dimension);
     }
@@ -172,18 +183,24 @@ public class ArrayTypeCode extends ContainerTypeCode
     {
         String ret = "";
 
-        for(int count = 0; count < m_dimensions.size(); ++count)
+        for (int count = 0; count < m_dimensions.size(); ++count)
         {
-            if(ret.isEmpty())
+            if (ret.isEmpty())
+            {
                 ret += "(";
+            }
             else
+            {
                 ret += " * ";
+            }
 
             ret += m_dimensions.get(count);
         }
 
-        if(!ret.isEmpty())
+        if (!ret.isEmpty())
+        {
             ret += ")";
+        }
 
         return ret;
     }
@@ -193,7 +210,7 @@ public class ArrayTypeCode extends ContainerTypeCode
     {
         String ret = "";
 
-        for(int count = 0; count < m_dimensions.size(); ++count)
+        for (int count = 0; count < m_dimensions.size(); ++count)
         {
             ret += "[" + m_dimensions.get(count) + "]";
         }
@@ -201,40 +218,24 @@ public class ArrayTypeCode extends ContainerTypeCode
         return ret;
     }
 
-    /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
     {
-        int lcontainTypeSize = getContentTypeCode().getSize();
-        int lcontainTypeAlign = 0;
-        int larraySize = 1;
-
-        // Element contained type.
-        if(lcontainTypeSize > 4)
+        long initial_alignment = current_alignment;
+        long size = 1;
+        for (int count = 0; count < m_dimensions.size(); ++count)
         {
-            lcontainTypeAlign = (lcontainTypeSize - (currentSize % lcontainTypeSize)) & (lcontainTypeSize - 1);
+            size += Long.parseLong(m_dimensions.get(count), 10);
         }
 
-        // Calculate array size.
-        for(int count = 0; count < m_dimensions.size(); ++count)
+        for (long count = 0; count < size; ++count)
         {
-            larraySize *= Integer.parseInt(m_dimensions.get(count));
+            current_alignment += getContentTypeCode().maxSerializedSize(current_alignment);
         }
 
-        return new Pair<Integer, Integer>(currentSize + lcontainTypeAlign + (larraySize *  lcontainTypeSize), lcontainTypeSize);
+        return current_alignment - initial_alignment;
     }
-
-    public int getMaxSerializedSizeWithoutAlignment(int currentSize)
-    {
-        int lcontainTypeSize = getContentTypeCode().getSize();
-        int larraySize = 1;
-
-        // Calculate array size.
-        for(int count = 0; count < m_dimensions.size(); ++count)
-        {
-            larraySize *= Integer.parseInt(m_dimensions.get(count));
-        }
-
-        return currentSize + (larraySize * lcontainTypeSize);
-    }*/
 
     private List<String> m_dimensions;
 }

@@ -21,14 +21,18 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class SequenceTypeCode extends ContainerTypeCode
 {
-    public SequenceTypeCode(String maxsize)
+    public SequenceTypeCode(
+            String maxsize)
     {
         super(Kind.KIND_SEQUENCE);
         m_maxsize = maxsize;
     }
 
     @Override
-    public boolean isIsType_e(){return true;}
+    public boolean isIsType_e()
+    {
+        return true;
+    }
 
     @Override
     public String getTypeIdentifier()
@@ -37,10 +41,16 @@ public class SequenceTypeCode extends ContainerTypeCode
     }
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isPlainType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsSequenceType() { return true; }
+    public boolean isIsSequenceType()
+    {
+        return true;
+    }
 
     @Override
     public String getCppTypename()
@@ -49,7 +59,7 @@ public class SequenceTypeCode extends ContainerTypeCode
         st.setAttribute("ctx", ctx);
         st.setAttribute("type", getContentTypeCode().getCppTypename());
         String contenttype = getContentTypeCode().getCppTypename().replaceAll("::", "_");
-        if(getContentTypeCode() instanceof StringTypeCode)
+        if (getContentTypeCode() instanceof StringTypeCode)
         {
             contenttype = contenttype.replace("*", "_ptr_") + ((StringTypeCode)getContentTypeCode()).getMaxsize();
         }
@@ -70,7 +80,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     public String getCTypeDimensions()
     {
         String dimensions = "[" + getMaxsize()  + "]";
-        if(getContentTypeCode() instanceof StringTypeCode)
+        if (getContentTypeCode() instanceof StringTypeCode)
         {
             dimensions += "[" + ((StringTypeCode)getContentTypeCode()).getMaxsize() + "]";
         }
@@ -96,10 +106,13 @@ public class SequenceTypeCode extends ContainerTypeCode
         return st.toString();
     }
 
+    @Override
     public String getMaxsize()
     {
-        if(m_maxsize == null)
+        if (m_maxsize == null)
+        {
             return "0";
+        }
 
         return m_maxsize;
     }
@@ -126,5 +139,39 @@ public class SequenceTypeCode extends ContainerTypeCode
         return super.isIsBounded();
     }
 
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        long initial_alignment = current_alignment;
+        long maxsize = !(getContentTypeCode().isForwarded() && detect_recursive_)
+            ? (null == m_maxsize ? 100 : Long.parseLong(m_maxsize, 10))
+            : 0;
+
+        boolean should_set_and_unset = getContentTypeCode().isForwarded() && !detect_recursive_;
+
+        if (should_set_and_unset)
+        {
+            detect_recursive_ = true;
+        }
+
+
+        current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
+
+        for (long count = 0; count < maxsize; ++count)
+        {
+            current_alignment += getContentTypeCode().maxSerializedSize(current_alignment);
+        }
+
+        if (should_set_and_unset)
+        {
+            detect_recursive_ = false;
+        }
+
+        return current_alignment - initial_alignment;
+    }
+
     private String m_maxsize = null;
+
+    private boolean detect_recursive_ = false;
 }

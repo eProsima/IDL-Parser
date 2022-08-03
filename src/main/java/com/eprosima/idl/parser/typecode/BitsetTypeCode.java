@@ -23,7 +23,9 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class BitsetTypeCode extends MemberedTypeCode
 {
-    public BitsetTypeCode(String scope, String name)
+    public BitsetTypeCode(
+            String scope,
+            String name)
     {
         super(Kind.KIND_BITSET, scope, name);
         m_bitfields = new LinkedHashMap<String, Bitfield>();
@@ -31,10 +33,16 @@ public class BitsetTypeCode extends MemberedTypeCode
     }
 
     @Override
-    public boolean isIsBitsetType(){return true;}
+    public boolean isIsBitsetType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isObjectType() { return true; }
+    public boolean isObjectType()
+    {
+        return true;
+    }
 
     @Override
     public String getCppTypename()
@@ -73,7 +81,8 @@ public class BitsetTypeCode extends MemberedTypeCode
         return getBitfields(false);
     }
 
-    public List<Bitfield> getBitfields(boolean includeParents)
+    public List<Bitfield> getBitfields(
+            boolean includeParents)
     {
         ArrayList<Bitfield> result = new ArrayList<Bitfield>();
 
@@ -94,9 +103,10 @@ public class BitsetTypeCode extends MemberedTypeCode
         return getBitfields(true);
     }
 
-    public boolean addBitfield(Bitfield bitfield)
+    public boolean addBitfield(
+            Bitfield bitfield)
     {
-        if(!m_bitfields.containsKey(bitfield.getName()))
+        if (!m_bitfields.containsKey(bitfield.getName()))
         {
             m_bitfields.put(bitfield.getName(), bitfield);
             bitfield.setBasePosition(m_current_base);
@@ -106,7 +116,8 @@ public class BitsetTypeCode extends MemberedTypeCode
         return false;
     }
 
-    public void addParent(BitsetTypeCode parent)
+    public void addParent(
+            BitsetTypeCode parent)
     {
         m_parents.add(parent);
     }
@@ -124,6 +135,28 @@ public class BitsetTypeCode extends MemberedTypeCode
             size += bf.getSpec().getBitSize();
         }
         return size;
+    }
+
+    @Override
+    protected long maxSerializedSize(
+            long current_alignment)
+    {
+        long initial_alignment = current_alignment;
+
+        for (BitsetTypeCode parent : m_parents)
+        {
+            current_alignment += parent.maxSerializedSize(current_alignment);
+        }
+
+        for (Bitfield member : m_bitfields.values())
+        {
+            if (!member.isAnnotationNonSerialized())
+            {
+                current_alignment += member.getSpec().getTypecode().maxSerializedSize(current_alignment);
+            }
+        }
+
+        return current_alignment - initial_alignment;
     }
 
     private ArrayList<BitsetTypeCode> m_parents = null;
