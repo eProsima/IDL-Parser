@@ -166,24 +166,6 @@ public class MapTypeCode extends ContainerTypeCode
         return false;
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-        long maxsize = (null == m_maxsize ? 100 : Long.parseLong(m_maxsize, 10));
-
-        current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
-
-        for (long count = 0; count < maxsize; ++count)
-        {
-            current_alignment += m_keyTypeCode.maxSerializedSize(current_alignment);
-            current_alignment += m_valueTypeCode.maxSerializedSize(current_alignment);
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
     private TypeCode m_keyTypeCode = null;
     private TypeCode m_valueTypeCode = null;
     private Definition m_keyDefinition = null;

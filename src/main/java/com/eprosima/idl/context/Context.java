@@ -24,16 +24,24 @@ import com.eprosima.idl.parser.tree.Operation;
 import com.eprosima.idl.parser.tree.Param;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
 import com.eprosima.idl.parser.tree.TreeNode;
+import com.eprosima.idl.parser.typecode.AliasTypeCode;
+import com.eprosima.idl.parser.typecode.AnyTypeCode;
+import com.eprosima.idl.parser.typecode.ArrayTypeCode;
+import com.eprosima.idl.parser.typecode.EnumTypeCode;
 import com.eprosima.idl.parser.typecode.BitfieldSpec;
 import com.eprosima.idl.parser.typecode.BitsetTypeCode;
 import com.eprosima.idl.parser.typecode.BitmaskTypeCode;
 import com.eprosima.idl.parser.typecode.EnumMember;
 import com.eprosima.idl.parser.typecode.EnumTypeCode;
 import com.eprosima.idl.parser.typecode.Kind;
+import com.eprosima.idl.parser.typecode.MapTypeCode;
 import com.eprosima.idl.parser.typecode.PrimitiveTypeCode;
+import com.eprosima.idl.parser.typecode.SequenceTypeCode;
+import com.eprosima.idl.parser.typecode.SetTypeCode;
+import com.eprosima.idl.parser.typecode.StringTypeCode;
 import com.eprosima.idl.parser.typecode.StructTypeCode;
+import com.eprosima.idl.parser.typecode.UnionTypeCode;
 import com.eprosima.idl.parser.typecode.TypeCode;
-import com.eprosima.idl.parser.typecode.AnyTypeCode;
 import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.util.Util;
 import java.io.File;
@@ -520,11 +528,89 @@ public class Context
         return paramObject;
     }
 
+    public AliasTypeCode createAliasTypeCode(
+            String scope,
+            String name)
+    {
+        return new AliasTypeCode(scope, name);
+    }
+
+    public ArrayTypeCode createArrayTypeCode()
+    {
+        return new ArrayTypeCode();
+    }
+
+    public BitmaskTypeCode createBitmaskTypeCode(
+            String scope,
+            String name)
+    {
+        return new BitmaskTypeCode(scope, name);
+    }
+
+    public BitsetTypeCode createBitsetTypeCode(
+            String scope,
+            String name)
+    {
+        return new BitsetTypeCode(scope, name);
+    }
+
+    public EnumTypeCode createEnumTypeCode(
+            String scope,
+            String name)
+    {
+        return new EnumTypeCode(scope, name);
+    }
+
+    public MapTypeCode createMapTypeCode(
+            String maxsize)
+    {
+        return new MapTypeCode(maxsize);
+    }
+
+    public PrimitiveTypeCode createPrimitiveTypeCode(
+            int kind)
+    {
+        return new PrimitiveTypeCode(kind);
+    }
+
+    public SequenceTypeCode createSequenceTypeCode(
+            String maxsize)
+    {
+        return new SequenceTypeCode(maxsize);
+    }
+
+    public SetTypeCode createSetTypeCode(
+            String maxsize)
+    {
+        return new SetTypeCode(maxsize);
+    }
+
+    public StringTypeCode createStringTypeCode(
+            int kind,
+            String maxsize)
+    {
+        return new StringTypeCode(kind, maxsize);
+    }
+
     public StructTypeCode createStructTypeCode(
             String name)
     {
-        StructTypeCode structObject = new StructTypeCode(m_scope, name);
-        return structObject;
+        return new StructTypeCode(m_scope, name);
+    }
+
+    public UnionTypeCode createUnionTypeCode(
+            String scope,
+            String name)
+    {
+        return new UnionTypeCode(m_scope, name);
+    }
+
+    public UnionTypeCode createUnionTypeCode(
+            String scope,
+            String name,
+            TypeCode discriminatorTypeCode)
+    {
+        return new UnionTypeCode(m_scope, name, discriminatorTypeCode);
     }
 
     public BitfieldSpec createBitfieldSpec(
@@ -532,20 +618,6 @@ public class Context
             TypeCode type)
     {
         BitfieldSpec object = new BitfieldSpec(m_scope, size, type);
-        return object;
-    }
-
-    public BitsetTypeCode createBitsetTypeCode(
-            String name)
-    {
-        BitsetTypeCode object = new BitsetTypeCode(m_scope, name);
-        return object;
-    }
-
-    public BitmaskTypeCode createBitmaskTypeCode(
-            String name)
-    {
-        BitmaskTypeCode object = new BitmaskTypeCode(m_scope, name);
         return object;
     }
 

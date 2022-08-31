@@ -829,7 +829,7 @@ type_declarator [AnnotationDeclaration annotation] returns [Pair<Vector<TypeCode
 
            for(int count = 0; count < $declarators.ret.size(); ++count)
            {
-               typedefTypecode = new AliasTypeCode(ctx.getScope(), $declarators.ret.get(count).first().first());
+               typedefTypecode = ctx.createAliasTypeCode(ctx.getScope(), $declarators.ret.get(count).first().first());
 
                if($declarators.ret.get(count).second() != null)
                {
@@ -998,9 +998,9 @@ complex_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = n
     ;
 
 floating_pt_type returns [TypeCode typecode = null]
-    :   ( KW_FLOAT { $typecode = new PrimitiveTypeCode(Kind.KIND_FLOAT);}
-    | KW_DOUBLE { $typecode = new PrimitiveTypeCode(Kind.KIND_DOUBLE);}
-    | KW_LONG KW_DOUBLE { $typecode = new PrimitiveTypeCode(Kind.KIND_LONGDOUBLE);}
+    :   ( KW_FLOAT { $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_FLOAT);}
+    | KW_DOUBLE { $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_DOUBLE);}
+    | KW_LONG KW_DOUBLE { $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_LONGDOUBLE);}
     )
     ;
 
@@ -1018,14 +1018,14 @@ signed_int returns [TypeCode typecode = null]
 
 signed_tiny_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_INT8);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_INT8);
 }
     :   KW_INT8
     ;
 
 signed_short_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_SHORT);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_SHORT);
 }
     :   KW_SHORT
     |   KW_INT16
@@ -1033,7 +1033,7 @@ signed_short_int returns [TypeCode typecode]
 
 signed_long_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_LONG);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_LONG);
 }
     :   KW_LONG
     |   KW_INT32
@@ -1041,7 +1041,7 @@ signed_long_int returns [TypeCode typecode]
 
 signed_longlong_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_LONGLONG);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_LONGLONG);
 }
     :   KW_LONG KW_LONG
     |   KW_INT64
@@ -1056,14 +1056,14 @@ unsigned_int returns [TypeCode typecode = null]
 
 unsigned_tiny_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_UINT8);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_UINT8);
 }
     :   KW_UINT8
     ;
 
 unsigned_short_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_USHORT);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_USHORT);
 }
     :   KW_UNSIGNED KW_SHORT
     |   KW_UINT16
@@ -1071,7 +1071,7 @@ unsigned_short_int returns [TypeCode typecode]
 
 unsigned_long_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_ULONG);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_ULONG);
 }
     :   KW_UNSIGNED KW_LONG
     |   KW_UINT32
@@ -1079,7 +1079,7 @@ unsigned_long_int returns [TypeCode typecode]
 
 unsigned_longlong_int returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_ULONGLONG);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_ULONGLONG);
 }
     :   KW_UNSIGNED KW_LONG KW_LONG
     |   KW_UINT64
@@ -1087,28 +1087,28 @@ unsigned_longlong_int returns [TypeCode typecode]
 
 char_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_CHAR);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_CHAR);
 }
     :   KW_CHAR
     ;
 
 wide_char_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_WCHAR);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_WCHAR);
 }
     :   KW_WCHAR
     ;
 
 boolean_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_BOOLEAN);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_BOOLEAN);
 }
     :   KW_BOOLEAN
     ;
 
 octet_type returns [TypeCode typecode]
 @init{
-    $typecode = new PrimitiveTypeCode(Kind.KIND_OCTET);
+    $typecode = ctx.createPrimitiveTypeCode(Kind.KIND_OCTET);
 }
     :   KW_OCTET
     ;
@@ -1276,7 +1276,7 @@ bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
                 throw new ParseException(null, "Illegal identifier: " + error);
             }
             name = ctx.removeEscapeCharacter($identifier.id);
-            typecode = ctx.createBitsetTypeCode(name);
+            typecode = ctx.createBitsetTypeCode(ctx.getScope(), name);
         }
         ( COLON scoped_name
             {
@@ -1362,7 +1362,7 @@ bitfield_spec returns [BitfieldSpec bitfieldType = null]
     : KW_BITFIELD
         LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
         {
-            $bitfieldType = ctx.createBitfieldSpec(bitsize, null);
+            $bitfieldType = ctx.createBitfieldSpec(bitsize, ctx.createPrimitiveTypeCode(BitfieldSpec.generateKind(bitsize)));
         }
     | KW_BITFIELD
         LEFT_ANG_BRACKET positive_int_const { bitsize=$positive_int_const.literalStr; } COMA bitfield_type_spec { type=$bitfield_type_spec.typecode; } RIGHT_ANG_BRACKET
@@ -1386,7 +1386,7 @@ bitmask_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
                 throw new ParseException(null, "Illegal identifier: " + error);
             }
             name = ctx.removeEscapeCharacter($identifier.id);
-            typecode = ctx.createBitmaskTypeCode(name);
+            typecode = ctx.createBitmaskTypeCode(ctx.getScope(), name);
         }
         LEFT_BRACE bit_values[typecode] RIGHT_BRACE
         {
@@ -1663,7 +1663,7 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
             }
             else
             {
-                unionTP = new UnionTypeCode(ctx.getScope(), name, dist_type);
+                unionTP = ctx.createUnionTypeCode(ctx.getScope(), name, dist_type);
             }
             unionTP.setDefined();
             line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
@@ -1695,7 +1695,7 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
         {
             name=$identifier.id;
             // TODO Check supported types for discriminator: long, enumeration, etc...
-            unionTP = new UnionTypeCode(ctx.getScope(), name);
+            unionTP = ctx.createUnionTypeCode(ctx.getScope(), name);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -1827,7 +1827,7 @@ enum_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
                 throw new ParseException(null, "Illegal identifier: " + error);
             }
             name = ctx.removeEscapeCharacter($identifier.id);
-            enumTP = new EnumTypeCode(ctx.getScope(), name);
+            enumTP = ctx.createEnumTypeCode(ctx.getScope(), name);
         }
         LEFT_BRACE  enumerator_list[enumTP] RIGHT_BRACE
         {
@@ -1886,12 +1886,12 @@ sequence_type returns [SequenceTypeCode typecode = null]
         {
            if(type != null)
            {
-               $typecode = new SequenceTypeCode(maxsize);
+               $typecode = ctx.createSequenceTypeCode(maxsize);
                $typecode.setContentTypeCode(type);
            }
            else if (def != null)
            {
-               $typecode = new SequenceTypeCode(maxsize);
+               $typecode = ctx.createSequenceTypeCode(maxsize);
                $typecode.setContentDefinition(def);
            }
         }
@@ -1907,7 +1907,7 @@ set_type returns [SetTypeCode typecode = null]
     |   KW_SET
         LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
         {
-            $typecode = new SetTypeCode(maxsize);
+            $typecode = ctx.createSetTypeCode(maxsize);
             if (type != null)
             {
                 $typecode.setContentTypeCode(type);
@@ -1940,7 +1940,7 @@ map_type returns [MapTypeCode typecode = null]
         (COMA positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } )?
         RIGHT_ANG_BRACKET
         {
-            $typecode = new MapTypeCode(maxsize);
+            $typecode = ctx.createMapTypeCode(maxsize);
 
             if (keyType != null)
             {
@@ -1968,7 +1968,7 @@ string_type returns [TypeCode typecode = null]
 }
     :   ( KW_STRING LEFT_ANG_BRACKET positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } RIGHT_ANG_BRACKET
     |   KW_STRING )
-       {$typecode = new StringTypeCode(Kind.KIND_STRING, maxsize);}
+       {$typecode = ctx.createStringTypeCode(Kind.KIND_STRING, maxsize);}
     ;
 
 wide_string_type returns [TypeCode typecode = null]
@@ -1978,14 +1978,14 @@ wide_string_type returns [TypeCode typecode = null]
 }
     :   ( KW_WSTRING LEFT_ANG_BRACKET positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } RIGHT_ANG_BRACKET
     |   KW_WSTRING )
-       {$typecode = new StringTypeCode(Kind.KIND_WSTRING, maxsize);}
+       {$typecode = ctx.createStringTypeCode(Kind.KIND_WSTRING, maxsize);}
     ;
 
 array_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> pair = null]
 @init
 {
     Token tk = _input.LT(1);
-    ArrayTypeCode typecode = new ArrayTypeCode();
+    ArrayTypeCode typecode = ctx.createArrayTypeCode();
 }
     :   ID
         (

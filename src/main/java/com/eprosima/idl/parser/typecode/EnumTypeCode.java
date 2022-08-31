@@ -116,15 +116,4 @@ public class EnumTypeCode extends MemberedTypeCode
         return "4";
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-
-        current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
-
-        return current_alignment - initial_alignment;
-    }
-
 }

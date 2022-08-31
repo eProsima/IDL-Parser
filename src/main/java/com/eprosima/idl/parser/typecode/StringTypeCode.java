@@ -122,25 +122,5 @@ public class StringTypeCode extends TypeCode
         return (m_maxsize != null);
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-        long maxsize = (null == m_maxsize ? 255 : Long.parseLong(m_maxsize, 10));
-
-        switch (getKind())
-        {
-            case Kind.KIND_STRING:
-                current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4) + (maxsize * 4);
-                break;
-            case Kind.KIND_WSTRING:
-                current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4) + maxsize + 1;
-                break;
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
     private String m_maxsize = null;
 }

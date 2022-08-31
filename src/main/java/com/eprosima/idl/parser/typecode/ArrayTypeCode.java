@@ -218,24 +218,5 @@ public class ArrayTypeCode extends ContainerTypeCode
         return ret;
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-        long size = 1;
-        for (int count = 0; count < m_dimensions.size(); ++count)
-        {
-            size += Long.parseLong(m_dimensions.get(count), 10);
-        }
-
-        for (long count = 0; count < size; ++count)
-        {
-            current_alignment += getContentTypeCode().maxSerializedSize(current_alignment);
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
     private List<String> m_dimensions;
 }

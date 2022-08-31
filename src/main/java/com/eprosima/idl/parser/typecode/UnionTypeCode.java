@@ -215,29 +215,6 @@ public class UnionTypeCode extends MemberedTypeCode
         return false;
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-        long reset_alignment = 0;
-        long union_max_size_serialized = 0;
-
-        current_alignment += m_discriminatorTypeCode.maxSerializedSize(current_alignment);
-
-        for (Member member : getMembers())
-        {
-            reset_alignment = current_alignment;
-            reset_alignment += member.getTypecode().maxSerializedSize(reset_alignment);
-            if (union_max_size_serialized < reset_alignment)
-            {
-                union_max_size_serialized = reset_alignment;
-            }
-        }
-
-        return union_max_size_serialized - initial_alignment;
-    }
-
     private TypeCode m_discriminatorTypeCode = null;
 
     private int m_defaultindex = -1;

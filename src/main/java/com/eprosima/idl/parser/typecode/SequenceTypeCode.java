@@ -111,7 +111,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     {
         if (m_maxsize == null)
         {
-            return "0";
+            return "100";
         }
 
         return m_maxsize;
@@ -119,7 +119,7 @@ public class SequenceTypeCode extends ContainerTypeCode
 
     public boolean isUnbound()
     {
-        return getMaxsize().equals("0");
+        return null == m_maxsize;
     }
 
     @Override
@@ -160,38 +160,7 @@ public class SequenceTypeCode extends ContainerTypeCode
         return ret_value;
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-        long maxsize = !(getContentTypeCode().isForwarded() && detect_recursive_)
-            ? (null == m_maxsize ? 100 : Long.parseLong(m_maxsize, 10))
-            : 0;
-
-        boolean should_set_and_unset = getContentTypeCode().isForwarded() && !detect_recursive_;
-
-        if (should_set_and_unset)
-        {
-            detect_recursive_ = true;
-        }
-
-        current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
-
-        for (long count = 0; count < maxsize; ++count)
-        {
-            current_alignment += getContentTypeCode().maxSerializedSize(current_alignment);
-        }
-
-        if (should_set_and_unset)
-        {
-            detect_recursive_ = false;
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
     private String m_maxsize = null;
 
-    private boolean detect_recursive_ = false;
+    protected boolean detect_recursive_ = false;
 }

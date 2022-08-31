@@ -79,11 +79,4 @@ public class AnyTypeCode extends TypeCode
         return null;
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        return 0;
-    }
-
 }

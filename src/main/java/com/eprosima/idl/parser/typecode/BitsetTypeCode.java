@@ -137,28 +137,6 @@ public class BitsetTypeCode extends MemberedTypeCode
         return size;
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-
-        for (BitsetTypeCode parent : m_parents)
-        {
-            current_alignment += parent.maxSerializedSize(current_alignment);
-        }
-
-        for (Bitfield member : m_bitfields.values())
-        {
-            if (!member.isAnnotationNonSerialized())
-            {
-                current_alignment += member.getSpec().getTypecode().maxSerializedSize(current_alignment);
-            }
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
     private ArrayList<BitsetTypeCode> m_parents = null;
     private LinkedHashMap<String, Bitfield> m_bitfields = null;
     private int m_current_base = 0;

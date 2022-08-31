@@ -209,13 +209,6 @@ public class AliasTypeCode extends ContainerTypeCode
         return "EK_MINIMAL";
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        return super.getContentTypeCode().maxSerializedSize(current_alignment);
-    }
-
     /*** End of functions to know the type in string templates ***/
 
     /*** Functions that alias has to export because some typecodes have them*/

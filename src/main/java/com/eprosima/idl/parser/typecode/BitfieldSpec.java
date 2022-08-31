@@ -16,38 +16,42 @@ package com.eprosima.idl.parser.typecode;
 
 public class BitfieldSpec
 {
-    public BitfieldSpec(String scope, String bitsize, TypeCode type)
+    public static int generateKind(
+            String bitsize)
+    {
+        int size = Integer.parseInt(bitsize);
+        if (size == 1)
+        {
+            return Kind.KIND_BOOLEAN;
+        }
+        else if (size <= 8)
+        {
+            return Kind.KIND_CHAR;
+        }
+        else if (size <= 16)
+        {
+            return Kind.KIND_USHORT;
+        }
+        else if (size <= 32)
+        {
+            return Kind.KIND_ULONG;
+        }
+        else if (size <= 64)
+        {
+            return Kind.KIND_ULONGLONG;
+        }
+
+        return Kind.KIND_ULONG;
+    }
+
+    public BitfieldSpec(
+            String scope,
+            String bitsize,
+            TypeCode type)
     {
         m_kind = Kind.KIND_BITFIELD;
         m_scope = scope;
-        if (type == null)
-        {
-            int size = Integer.parseInt(bitsize);
-            if (size == 1)
-            {
-                m_type = new PrimitiveTypeCode(Kind.KIND_BOOLEAN);
-            }
-            else if (size <= 8)
-            {
-                m_type = new PrimitiveTypeCode(Kind.KIND_CHAR);
-            }
-            else if (size <= 16)
-            {
-                m_type = new PrimitiveTypeCode(Kind.KIND_USHORT);
-            }
-            else if (size <= 32)
-            {
-                m_type = new PrimitiveTypeCode(Kind.KIND_ULONG);
-            }
-            else if (size <= 64)
-            {
-                m_type = new PrimitiveTypeCode(Kind.KIND_ULONGLONG);
-            }
-        }
-        else
-        {
-            m_type = type;
-        }
+        m_type = type;
         m_bitsize = bitsize;
     }
 
@@ -95,7 +99,10 @@ public class BitfieldSpec
 
     public int getBitSize()
     {
-        if (m_bitsize == null) return 0;
+        if (m_bitsize == null)
+        {
+            return 0;
+        }
         return Integer.parseInt(m_bitsize);
     }
 

@@ -250,18 +250,6 @@ public class BitmaskTypeCode extends MemberedTypeCode
         }
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-        long size = Long.parseLong(getSize(), 10);
-
-        current_alignment += size + TypeCode.cdr_alignment(current_alignment, size);
-
-        return current_alignment - initial_alignment;
-    }
-
     private BitmaskTypeCode m_parent = null;
     private LinkedHashMap<String, Bitmask> m_bitmasks = null;
     private LinkedHashMap<Integer, Bitmask> m_value_bitmasks = null;

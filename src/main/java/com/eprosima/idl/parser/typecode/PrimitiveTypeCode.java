@@ -188,42 +188,4 @@ public class PrimitiveTypeCode extends TypeCode
         return getKind() == Kind.KIND_WCHAR;
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-
-        switch (getKind())
-        {
-            case Kind.KIND_LONGDOUBLE:
-                current_alignment += 16 + TypeCode.cdr_alignment(current_alignment, 8);
-                break;
-            case Kind.KIND_DOUBLE:
-            case Kind.KIND_LONGLONG:
-            case Kind.KIND_ULONGLONG:
-                current_alignment += 8 + TypeCode.cdr_alignment(current_alignment, 8);
-                break;
-            case Kind.KIND_LONG:
-            case Kind.KIND_ULONG:
-            case Kind.KIND_FLOAT:
-            case Kind.KIND_WCHAR:
-                current_alignment += 4 + TypeCode.cdr_alignment(current_alignment, 4);
-                break;
-            case Kind.KIND_SHORT:
-            case Kind.KIND_USHORT:
-                current_alignment += 2 + TypeCode.cdr_alignment(current_alignment, 2);
-                break;
-            case Kind.KIND_BOOLEAN:
-            case Kind.KIND_CHAR:
-            case Kind.KIND_OCTET:
-            case Kind.KIND_INT8:
-            case Kind.KIND_UINT8:
-                current_alignment += 1;
-                break;
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
 }

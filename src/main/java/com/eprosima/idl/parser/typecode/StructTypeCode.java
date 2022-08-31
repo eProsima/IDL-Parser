@@ -158,27 +158,5 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return super.isIsBounded();
     }
 
-    @Override
-    protected long maxSerializedSize(
-            long current_alignment)
-    {
-        long initial_alignment = current_alignment;
-
-        for (StructTypeCode parent : superTypes_)
-        {
-            current_alignment += parent.maxSerializedSize(current_alignment);
-        }
-
-        for (Member member : getMembers())
-        {
-            if (!member.isAnnotationNonSerialized())
-            {
-                current_alignment += member.getTypecode().maxSerializedSize(current_alignment);
-            }
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
     private ArrayList<StructTypeCode> superTypes_;
 }

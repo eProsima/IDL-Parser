@@ -139,21 +139,6 @@ public abstract class TypeCode implements Notebook
         return null;
     }
 
-    public String getMaxSerializedSize()
-    {
-        return Long.toString(maxSerializedSize(0));
-    }
-
-    protected abstract long maxSerializedSize(
-            long current_alignment);
-
-    protected static long cdr_alignment(
-            long current_alignment,
-            long data_size)
-    {
-        return (data_size - (current_alignment % data_size)) & (data_size - 1);
-    }
-
     /*** Functions to know the type in string templates ***/
     // By default a typecode is not string. Function used in stringtemplates
     public boolean isIsType_5()
