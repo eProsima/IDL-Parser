@@ -1511,7 +1511,7 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
             }
             // Return the returned data.
             vector = new Vector<TypeCode>();
-            structTP.setForwarded(fw_declaration);
+            structTP.setForwarded(false);
             vector.add(structTP);
             if (parentStruct != null)
             {
