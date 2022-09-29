@@ -62,7 +62,7 @@ sourceSets {
 }
 
 group = "com.eprosima"
-version = "1.3.0"
+version = "1.4.0"
 
 //general properties
 jar {
