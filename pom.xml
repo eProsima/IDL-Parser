@@ -15,7 +15,7 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.5</version>
                 <configuration>
-                    <sourceDirectory>src/main/antlr4/omg</sourceDirectory>
+                    <sourceDirectory>src/main/antlr</sourceDirectory>
                     <arguments>
                         <argument>-package</argument>
                         <argument>com.eprosima.idl.parser.grammar</argument>
