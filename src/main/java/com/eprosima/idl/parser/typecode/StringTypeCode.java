@@ -20,19 +20,24 @@ import org.antlr.stringtemplate.StringTemplate;
 
 public class StringTypeCode extends TypeCode
 {
-    public StringTypeCode(int kind, String maxsize)
+    public StringTypeCode(
+            int kind,
+            String maxsize)
     {
         super(kind);
         m_maxsize = maxsize;
     }
 
     @Override
-    public boolean isIsType_d(){return true;}
+    public boolean isIsType_d()
+    {
+        return true;
+    }
 
     @Override
     public String getTypeIdentifier()
     {
-        switch(getKind())
+        switch (getKind())
         {
             case Kind.KIND_STRING:
                 return "TI_STRING8_SMALL";
@@ -44,13 +49,22 @@ public class StringTypeCode extends TypeCode
     }
 
     @Override
-    public boolean isPlainType() { return true; }
+    public boolean isPlainType()
+    {
+        return true;
+    }
 
     @Override
-    public boolean isIsStringType() { return getKind() == Kind.KIND_STRING; }
+    public boolean isIsStringType()
+    {
+        return getKind() == Kind.KIND_STRING;
+    }
 
     @Override
-    public boolean isIsWStringType() { return getKind() == Kind.KIND_WSTRING; }
+    public boolean isIsWStringType()
+    {
+        return getKind() == Kind.KIND_WSTRING;
+    }
 
     @Override
     public String getCppTypename()
@@ -88,47 +102,12 @@ public class StringTypeCode extends TypeCode
 
     public String getMaxsize()
     {
-        if(m_maxsize == null)
+        if (m_maxsize == null)
+        {
             return "255";
+        }
 
         return m_maxsize;
-    }
-
-    public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
-    {
-        int lcurrentSize = currentSize;
-
-        // Length
-        if(4 <= lastDataAligned)
-        {
-            lcurrentSize += 4;
-        }
-        else
-        {
-            int align = (4 - (lcurrentSize % 4)) & (4 - 1);
-            lcurrentSize += 4 + align;
-        }
-
-        if(m_maxsize == null)
-        {
-            return new Pair<Integer, Integer>(lcurrentSize + 255 + 1, 1);
-        }
-        else
-        {
-            return new Pair<Integer, Integer>(lcurrentSize + Integer.parseInt(m_maxsize) + 1, 1);
-        }
-    }
-
-    public int getMaxSerializedSizeWithoutAlignment(int currentSize)
-    {
-        if(m_maxsize == null)
-        {
-            return currentSize + 4 + 255 + 1;
-        }
-        else
-        {
-            return currentSize + 4 + Integer.parseInt(m_maxsize) + 1;
-        }
     }
 
     @Override

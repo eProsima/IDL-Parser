@@ -18,7 +18,8 @@ package com.eprosima.idl.parser.typecode;
 
 public class PrimitiveTypeCode extends TypeCode
 {
-    public PrimitiveTypeCode(int kind)
+    public PrimitiveTypeCode(
+            int kind)
     {
         super(kind);
     }
@@ -56,7 +57,7 @@ public class PrimitiveTypeCode extends TypeCode
     @Override
     public String getTypeIdentifier()
     {
-        switch(getKind())
+        switch (getKind())
         {
             case Kind.KIND_SHORT:
                 return "TK_INT16";
@@ -94,12 +95,15 @@ public class PrimitiveTypeCode extends TypeCode
     }
 
     @Override
-    public boolean isPrimitiveType() { return true; }
+    public boolean isPrimitiveType()
+    {
+        return true;
+    }
 
     @Override
     public String getInitialValue()
     {
-        switch(getKind())
+        switch (getKind())
         {
             case Kind.KIND_LONGDOUBLE:
             case Kind.KIND_DOUBLE:
@@ -124,30 +128,10 @@ public class PrimitiveTypeCode extends TypeCode
         return "";
     }
 
-    /*public Pair<Integer, Integer> getMaxSerializedSize(int currentSize, int lastDataAligned)
-    {
-        int size = getSize();
-
-        if(size <= lastDataAligned)
-        {
-            return new Pair<Integer, Integer>(currentSize + size, size);
-        }
-        else
-        {
-            int align = (size - (currentSize % size)) & (size - 1);
-            return new Pair<Integer, Integer>(currentSize + size + align, size);
-        }
-    }
-
-    public int getMaxSerializedSizeWithoutAlignment(int currentSize)
-    {
-        return currentSize + getSize();
-    }*/
-
     @Override
     public String getSize()
     {
-        switch(getKind())
+        switch (getKind())
         {
             case Kind.KIND_LONGDOUBLE:
                 return "16";
@@ -175,17 +159,33 @@ public class PrimitiveTypeCode extends TypeCode
     }
 
     @Override
-    public boolean isIsType_5() { return getKind() == Kind.KIND_FLOAT;}
+    public boolean isIsType_5()
+    {
+        return getKind() == Kind.KIND_FLOAT;
+    }
 
     @Override
-    public boolean isIsType_6() { return getKind() == Kind.KIND_DOUBLE;}
+    public boolean isIsType_6()
+    {
+        return getKind() == Kind.KIND_DOUBLE;
+    }
 
     @Override
-    public boolean isIsType_7() { return getKind() == Kind.KIND_BOOLEAN;}
+    public boolean isIsType_7()
+    {
+        return getKind() == Kind.KIND_BOOLEAN;
+    }
 
     @Override
-    public boolean isIsType_13() { return getKind() == Kind.KIND_LONGDOUBLE;}
+    public boolean isIsType_13()
+    {
+        return getKind() == Kind.KIND_LONGDOUBLE;
+    }
 
     @Override
-    public boolean isIsWCharType() { return getKind() == Kind.KIND_WCHAR; }
+    public boolean isIsWCharType()
+    {
+        return getKind() == Kind.KIND_WCHAR;
+    }
+
 }

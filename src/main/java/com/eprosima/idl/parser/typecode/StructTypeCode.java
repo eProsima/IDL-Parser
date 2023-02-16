@@ -24,7 +24,9 @@ import java.util.ArrayList;
 
 public class StructTypeCode extends MemberedTypeCode implements Inherits
 {
-    public StructTypeCode(String scope, String name)
+    public StructTypeCode(
+            String scope,
+            String name)
     {
         super(Kind.KIND_STRUCT, scope, name);
         superTypes_ = new ArrayList<StructTypeCode>();
@@ -37,7 +39,10 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     }
 
     @Override
-    public boolean isObjectType() { return true; }
+    public boolean isObjectType()
+    {
+        return true;
+    }
 
     @Override
     public String getCppTypename()
@@ -72,12 +77,15 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     }
 
     @Override
-    public boolean isIsType_a(){
+    public boolean isIsType_a()
+    {
         return true;
     }
 
     @Override
-    public void addInheritance(Context ctx, TypeCode parent)
+    public void addInheritance(
+            Context ctx,
+            TypeCode parent)
     {
         if (parent instanceof StructTypeCode)
         {
@@ -102,7 +110,8 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return getMembers(false);
     }
 
-    public List<Member> getMembers(boolean includeParents)
+    public List<Member> getMembers(
+            boolean includeParents)
     {
         List<Member> allMembers = new ArrayList<Member>();
 

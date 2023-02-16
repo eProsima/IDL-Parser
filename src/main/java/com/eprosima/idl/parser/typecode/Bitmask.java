@@ -28,7 +28,8 @@ public class Bitmask extends Member
         super(typecode, name);
     }
 
-    public void setPosition(int position)
+    public void setPosition(
+            int position)
     {
         m_position = position;
     }
@@ -36,6 +37,18 @@ public class Bitmask extends Member
     public int getPosition()
     {
         return m_position;
+    }
+
+    @Override
+    public boolean isIsPlain()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isIsBounded()
+    {
+        return true;
     }
 
     private int m_position = -1;
