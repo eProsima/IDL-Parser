@@ -132,28 +132,19 @@ public class SequenceTypeCode extends ContainerTypeCode
     public boolean isIsBounded()
     {
         boolean ret_value = false;
-        boolean should_set_and_unset = getContentTypeCode().isForwarded() && !detect_recursive_;
 
-        if (should_set_and_unset)
+        if (m_maxsize != null)
         {
-            detect_recursive_ = true;
-
-            if (m_maxsize == null)
+            boolean should_set_and_unset = getContentTypeCode().isForwarded() && !detect_recursive_;
+            if (should_set_and_unset)
             {
-                ret_value =  false;
+                detect_recursive_ = true;
+                ret_value =  super.isIsBounded();
+                detect_recursive_ = false;
             }
             else
             {
                 ret_value =  super.isIsBounded();
-            }
-
-            detect_recursive_ = false;
-        }
-        else
-        {
-            if (m_maxsize == null)
-            {
-                ret_value =  false;
             }
         }
 
