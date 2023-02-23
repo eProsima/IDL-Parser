@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -247,11 +248,11 @@ public class BitmaskTypeCode extends MemberedTypeCode
             // Sanity check
             Set<String> keys = m_bitmasks.keySet();
             for (String key : keys) {
-                if (m_bitmasks.get(key).getPosition() < 0 || m_bitmasks.get(key).getPosition() >= m_bit_bound)
+                int position = m_bitmasks.get(key).getPosition(); 
+                if (position < 0 || position >= m_bit_bound)
                 {
-                    m_value_bitmasks.remove(m_bitmasks.get(key).getPosition());
-                    Member member = (Member)m_bitmasks.remove(key);
-                    removeMember(member);                    
+                    throw new ParseException(null, "Bitmask member "+ key +" out of bounds. Requested position: "
+                    + position + " with @bit_bound value: " + m_bit_bound);
                 }
             }
         }
