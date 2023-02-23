@@ -98,6 +98,17 @@ public abstract class MemberedTypeCode extends TypeCode
         return false;
     }
 
+    public boolean removeMember(Member member)
+    {
+        if(m_members.containsKey(member.getName()))
+        {
+            m_members.remove(member.getName());
+            return true;
+        }
+        return false;
+    }
+
+
     @Override
     public abstract String getCppTypename();
 
