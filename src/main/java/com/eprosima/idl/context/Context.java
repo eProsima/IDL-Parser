@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1276,6 +1277,9 @@ public class Context
         String aux_str = "(" + str + ") | 0";
 
         // Add all constants.
+
+        Collections.reverse(m_definitions);
+        
         for (Definition definition : m_definitions)
         {
             if (definition.isIsConstDeclaration())
