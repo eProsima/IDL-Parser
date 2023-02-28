@@ -18,7 +18,8 @@ public enum IDL
     COVERAGE_BASIC,
     COVERAGE_COMPLEX,
     FORWARD_DECLS,
-    NEW_FEATURES_4_2;
+    NEW_FEATURES_4_2,
+    DECLARATION_ORDER;
 
     private IDL required = null;
 
