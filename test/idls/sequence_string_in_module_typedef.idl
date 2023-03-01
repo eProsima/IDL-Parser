@@ -1,0 +1,13 @@
+#include "sequence_string.idl"
+
+module a_module
+{
+    typedef sequence<string> StringSeq;
+
+    struct ModuleSequenceString
+    {
+        sequence<string> var_seq_string;
+        StringSeq var_alias_seq;
+        SequenceString var_seq_string_struct;
+    };
+};
