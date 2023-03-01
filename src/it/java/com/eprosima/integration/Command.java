@@ -42,7 +42,8 @@ public class Command
     public static boolean execute(
             String command,
             String from,
-            boolean errorOutputOnly)
+            boolean print_only_stderr,
+            boolean fail_if_stderr)
     {
         try
         {
@@ -60,7 +61,7 @@ public class Command
             {
                 if (2 < stderr.length())
                 {
-                    System.err.println("------------------------------ ERROR -------------------------------------");
+                    System.err.println("------------------------------ stderr -------------------------------------");
                     System.err.println(stderr);
                 }
 
@@ -69,11 +70,11 @@ public class Command
             // get stdout once ready, blocking
             String result = resultFut.get();
             process.waitFor();
-            boolean status = (process.exitValue() == 0) && (2 >=  serrFut.get().length());
+            boolean status = (process.exitValue() == 0) && (!fail_if_stderr || 2 >=  serrFut.get().length());
 
-            if (!status || !errorOutputOnly)
+            if (!status || !print_only_stderr)
             {
-                System.err.println("------------------------------ OUTPUT -------------------------------------");
+                System.err.println("------------------------------ stdout -------------------------------------");
                 System.out.println(result);
             }
 

@@ -54,7 +54,7 @@ public class Test
         }
 
         String command = program + flags + output + idlPaths;
-        return Command.execute(command, null, errorOutputOnly);
+        return Command.execute(command, null, errorOutputOnly, true);
     }
 
     public boolean generate(String generatorName, String inputPath, boolean testFlag)
@@ -69,23 +69,23 @@ public class Test
         }
 
         String command = program + flags + output + idlPaths;
-        return Command.execute(command, null, errorOutputOnly);
+        return Command.execute(command, null, errorOutputOnly, true);
     }
 
     public boolean configure(List<String> cMakeArguments)
     {
         String arguments = cMakeArguments.toString().replaceFirst("\\[", " ").replaceAll(",|\\]", "");
-        return Command.execute("cmake .." + arguments, outputPath + "/build", errorOutputOnly);
+        return Command.execute("cmake .." + arguments, outputPath + "/build", errorOutputOnly, false);
     }
 
     public boolean compile()
     {
-        return Command.execute("make", outputPath + "/build", errorOutputOnly);
+        return Command.execute("make", outputPath + "/build", errorOutputOnly, false);
     }
 
     public boolean run()
     {
-        boolean exitStatus = Command.execute("./" + idl.toString().toLowerCase() + "SerializationTest", outputPath + "/build", errorOutputOnly);
+        boolean exitStatus = Command.execute("./" + idl.toString().toLowerCase() + "SerializationTest", outputPath + "/build", errorOutputOnly, false);
         if(!exitStatus)
         {
             return false;
