@@ -1,0 +1,10 @@
+// Regression test for https://github.com/eProsima/Fast-DDS-Gen/issues/153
+
+const uint32 MAX_ITEMS = 6;
+
+const uint32 TEST_VALUE = MAX_ITEMS;
+
+struct test_t
+{
+	sequence<octet, MAX_ITEMS> test;
+};
