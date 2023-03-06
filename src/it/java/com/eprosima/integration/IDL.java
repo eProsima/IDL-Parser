@@ -9,6 +9,7 @@ public enum IDL
     STRING,
     CUSTOM,
     INCLUDE(BASIC),
+    INHERITANCE(BASIC),
     ARRAY_BASIC,
     ARRAY_STRING,
     ARRAY_CUSTOM,

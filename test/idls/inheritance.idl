@@ -1,0 +1,6 @@
+#include "basic.idl"
+
+// Regression test for Redmine #17525.
+struct EmptyDerived : Basic
+{
+};
