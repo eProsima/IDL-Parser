@@ -1275,11 +1275,10 @@ public class Context
             String str)
     {
         String aux_str = "(" + str + ") | 0";
+        String const_str = "";
 
         // Add all constants.
 
-        Collections.reverse(m_definitions);
-        
         for (Definition definition : m_definitions)
         {
             if (definition.isIsConstDeclaration())
@@ -1288,10 +1287,12 @@ public class Context
 
                 if (const_decl.getTypeCode().isPrimitive())
                 {
-                    aux_str = const_decl.getName() + "=" + const_decl.getValue() + ";" + aux_str;
+                    const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getValue();
                 }
             }
         }
+
+        aux_str = const_str + ";" + aux_str;
 
         // Process the math expression
         try
