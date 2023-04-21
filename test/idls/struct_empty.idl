@@ -1,0 +1,38 @@
+struct Base
+{
+    long l;
+};
+
+struct Empty
+{
+};
+
+struct EmptyDeriving : Base
+{
+};
+
+struct DerivingFromEmpty : Empty
+{
+    long l;
+};
+
+module Mod
+{
+    struct Base
+    {
+        long l;
+    };
+
+    struct Empty
+    {
+    };
+
+    struct EmptyDeriving : Base
+    {
+    };
+
+    struct DerivingFromEmpty : Empty
+    {
+        long l;
+    };
+};
