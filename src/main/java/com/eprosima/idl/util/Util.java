@@ -77,7 +77,7 @@ public class Util
 
     public static String stringTrimAll(String str)
     {
-        String trimstr = str.replaceAll("\\s+", "").toUpperCase();
+        String trimstr = str.replaceAll("\\s+", "");
         return trimstr;
     }
 }

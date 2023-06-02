@@ -77,7 +77,7 @@ public class Context
         m_os = System.getProperty("os.name");
         m_userdir = System.getProperty("user.dir");
 
-        m_filename = filename.replace('.', '_');
+        m_filename = filename.replace('.', '_').replace('-', '_');
         m_directoryFile = Util.getIDLFileDirectoryOnly(file);
         m_file = file;
 
