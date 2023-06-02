@@ -100,6 +100,14 @@ public abstract class TypeCode implements Notebook
         return "type_" + Integer.toHexString(m_kind);
     }
 
+    /*!
+     * @brief
+     */
+    public String getFormatedCppTypename()
+    {
+        return getCppTypename().replaceAll("::", "_");
+    }
+
     // By default a typecode is not primitive. Function used in stringtemplates
     // TODO Cambiar a isIsPrimitive
     public boolean isPrimitive()
