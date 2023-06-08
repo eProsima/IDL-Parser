@@ -94,12 +94,6 @@ public class StringTypeCode extends TypeCode
         return getIdlTypenameFromStringTemplate().toString();
     }
 
-    @Override
-    public String getInitialValue()
-    {
-        return getInitialValueFromStringTemplate();
-    }
-
     public String getMaxsize()
     {
         if (m_maxsize == null)

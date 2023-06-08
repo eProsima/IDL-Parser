@@ -92,12 +92,7 @@ public class BitmaskTypeCode extends MemberedTypeCode
     @Override
     public String getInitialValue()
     {
-        //if(getMembers().size() > 0)
-        //{
-        //    return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
-        //}
-
-        return ""; // Don't initialize bitmask
+        return "0";
     }
 
     @Override
@@ -247,7 +242,7 @@ public class BitmaskTypeCode extends MemberedTypeCode
             // Sanity check
             Set<String> keys = m_bitmasks.keySet();
             for (String key : keys) {
-                int position = m_bitmasks.get(key).getPosition(); 
+                int position = m_bitmasks.get(key).getPosition();
                 if (position < 0 || position >= m_bit_bound)
                 {
                     throw new ParseException(null, "Bitmask member "+ key +" out of bounds. Requested position: "

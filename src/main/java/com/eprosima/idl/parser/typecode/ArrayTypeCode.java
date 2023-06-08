@@ -218,5 +218,11 @@ public class ArrayTypeCode extends ContainerTypeCode
         return ret;
     }
 
+    @Override
+    public String getInitialValue()
+    {
+        return getContentTypeCode().getInitialValue();
+    }
+
     private List<String> m_dimensions;
 }

@@ -118,18 +118,12 @@ public abstract class TypeCode implements Notebook
     // By default there is not initial value. Function used in stringtemplates.
     public String getInitialValue()
     {
-        return "";
+        return null;
     }
 
     public String getJavaInitialValue()
     {
         return getInitialValue();
-    }
-
-    protected String getInitialValueFromStringTemplate()
-    {
-        Map initialValues = cpptypesgr.getMap("initialValues");
-        return initialValues.get(getStType()).toString();
     }
 
     // By default a typecode doesn't have a max size limit. Function used in stringtemplates

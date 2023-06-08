@@ -224,9 +224,21 @@ public class Member implements Notebook
         return false;
     }
 
+    public void setId(int id)
+    {
+        id_ = id;
+    }
+
+    public int getId()
+    {
+        return id_;
+    }
+
     private String m_name = null;
 
     private TypeCode m_typecode = null;
 
     private HashMap<String, Annotation> m_annotations = null;
+
+    private int id_ = 0xFFFFFFF; // MEMBER_ID_INVALID
 }
