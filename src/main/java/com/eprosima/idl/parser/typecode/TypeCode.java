@@ -28,6 +28,26 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 
 public abstract class TypeCode implements Notebook
 {
+    public enum ExtensibilityKind
+    {
+        NOT_APPLIED(0),
+        FINAL(1),
+        APPENDABLE(2),
+        MUTABLE(3);
+
+        private int value_ = 0;
+
+        private ExtensibilityKind(int value)
+        {
+            value_ = value;
+        }
+
+        public int get_value()
+        {
+            return value_;
+        }
+    };
+
     public static StringTemplateGroup idltypesgr  = null;
     public static StringTemplateGroup cpptypesgr  = null;
     public static StringTemplateGroup ctypesgr    = null;
@@ -321,49 +341,51 @@ public abstract class TypeCode implements Notebook
         return m_annotations.values();
     }
 
+    void calculate_extensibility()
+    {
+        if (ExtensibilityKind.NOT_APPLIED == extensibility_)
+        {
+            if (null != m_annotations.get("final") ||
+                    (null != m_annotations.get("extensibility") &&
+                     m_annotations.get("extensibility").getValue().equals("FINAL")))
+            {
+                extensibility_ = ExtensibilityKind.FINAL;
+            }
+            else if (null != m_annotations.get("mutable") ||
+                    (null != m_annotations.get("extensibility") &&
+                     m_annotations.get("extensibility").getValue().equals("MUTABLE")))
+            {
+                extensibility_ = ExtensibilityKind.MUTABLE;
+            }
+            else
+            {
+                extensibility_ = ExtensibilityKind.APPENDABLE;
+            }
+        }
+    }
+
+    public ExtensibilityKind get_extensibility()
+    {
+        calculate_extensibility();
+        return extensibility_;
+    }
+
     public boolean isAnnotationFinal()
     {
-        Annotation ann = m_annotations.get("final");
-        if (ann != null)
-        {
-            return true;
-        }
-        ann = m_annotations.get("extensibility");
-        if (ann != null)
-        {
-            return ann.getValue().equals("FINAL");
-        }
-        return false;
+        calculate_extensibility();
+        return ExtensibilityKind.FINAL == extensibility_;
     }
 
     public boolean isAnnotationAppendable()
     {
-        Annotation ann = m_annotations.get("appendable");
-        if (ann != null)
-        {
-            return true;
-        }
-        ann = m_annotations.get("extensibility");
-        if (ann != null)
-        {
-            return ann.getValue().equals("APPENDABLE");
-        }
-        return false;
+        calculate_extensibility();
+        return ExtensibilityKind.APPENDABLE == extensibility_;
     }
 
     public boolean isAnnotationMutable()
     {
-        Annotation ann = m_annotations.get("mutable");
-        if (ann != null)
-        {
-            return true;
-        }
-        ann = m_annotations.get("extensibility");
-        if (ann != null)
-        {
-            return ann.getValue().equals("MUTABLE");
-        }
-        return false;
+        calculate_extensibility();
+        return ExtensibilityKind.MUTABLE == extensibility_;
     }
 
     public boolean isAnnotationNested()
@@ -407,4 +429,6 @@ public abstract class TypeCode implements Notebook
     private boolean m_forwarded = false;
 
     private boolean m_defined = false;
+
+    private ExtensibilityKind extensibility_ = ExtensibilityKind.NOT_APPLIED;
 }
