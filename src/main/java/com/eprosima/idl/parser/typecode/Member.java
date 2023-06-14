@@ -208,7 +208,7 @@ public class Member implements Notebook
 
     public boolean isIsPlain()
     {
-        if (m_typecode != null)
+        if (m_typecode != null && !isAnnotationOptional())
         {
             return m_typecode.isIsPlain();
         }
