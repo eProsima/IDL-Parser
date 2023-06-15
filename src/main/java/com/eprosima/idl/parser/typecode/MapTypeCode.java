@@ -27,8 +27,7 @@ public class MapTypeCode extends ContainerTypeCode
         m_maxsize = maxsize;
     }
 
-    @Override
-    public boolean isIsType_e()
+    public boolean isIsType_19()
     {
         return true;
     }
