@@ -48,6 +48,24 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode();
     }
 
+    public String getCastingType()
+    {
+        if (super.getContentTypeCode() instanceof AliasTypeCode)
+        {
+            AliasTypeCode alias = (AliasTypeCode) super.getContentTypeCode();
+            return alias.getCastingType();
+        }
+        else if (super.getContentTypeCode() instanceof BitmaskTypeCode)
+        {
+            BitmaskTypeCode container = (BitmaskTypeCode) super.getContentTypeCode();
+            return container.getCastingType();
+        }
+        else
+        {
+            throw new RuntimeException("Error with BitmaskTypeCode alias type.");
+        }
+    }
+
     public TypeCode getKeyTypeCode()
     {
         if (super.getContentTypeCode() instanceof AliasTypeCode)
@@ -62,7 +80,7 @@ public class AliasTypeCode extends ContainerTypeCode
         }
         else
         {
-            throw new RuntimeException("Error with map alias type.");
+            throw new RuntimeException("Error with MapTypeCode alias type.");
         }
     }
 
@@ -80,7 +98,7 @@ public class AliasTypeCode extends ContainerTypeCode
         }
         else
         {
-            throw new RuntimeException("Error with map alias type.");
+            throw new RuntimeException("Error with MapTypeCode alias type.");
         }
     }
 
@@ -244,6 +262,12 @@ public class AliasTypeCode extends ContainerTypeCode
     public boolean isIsMapType()
     {
         return super.getContentTypeCode().isIsMapType();
+    }
+       
+    @Override
+    public boolean isIsBitmaskType()
+    {
+        return super.getContentTypeCode().isIsBitmaskType();
     }
 
     public boolean isIsType_10()
