@@ -137,6 +137,18 @@ public abstract class MemberedTypeCode extends TypeCode
         return true;
     }
 
+    public boolean getContainsOptional()
+    {
+        for (Member member : m_members.values())
+        {
+            if (member.isAnnotationOptional())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String m_name = null;
 
     private String m_scope = null;
