@@ -90,7 +90,7 @@ public class BitsetTypeCode extends MemberedTypeCode
         {
             for (BitsetTypeCode m_parent : m_parents)
             {
-                result.addAll(m_parent.getBitfields());
+                result.addAll(m_parent.getAllBitfields());
             }
         }
 
