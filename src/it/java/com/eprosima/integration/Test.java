@@ -6,18 +6,18 @@ import java.util.List;
 public class Test
 {
 
-    private IDL idl;
+    private String idl;
     private String outputPath;
     private boolean errorOutputOnly;
 
-    public Test(IDL idl, String outputPath, boolean errorOutputOnly)
+    public Test(String idl, String outputPath, boolean errorOutputOnly)
     {
         this.idl = idl;
-        this.outputPath = outputPath + "/" + idl.toString().toLowerCase();
+        this.outputPath = outputPath + "/" + idl.toLowerCase();
         this.errorOutputOnly = errorOutputOnly;
     }
 ;
-    public IDL getIDL()
+    public String getIDL()
     {
         return idl;
     }
@@ -47,13 +47,11 @@ public class Test
         String program = "java -jar " + generatorName + ".jar";
         String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
-        String idlPaths = "";
-        for(IDL aux = idl; aux != null; aux = aux.getRequired())
-        {
-            idlPaths += " " + inputPath + "/" + aux.toString().toLowerCase() + ".idl";
-        }
 
-        String command = program + flags + output + idlPaths;
+        String idlPath = " " + inputPath + "/" + idl.toLowerCase() + ".idl";
+
+        String command = program + flags + output + idlPath;
+
         return Command.execute(command, null, errorOutputOnly, true);
     }
 
@@ -62,13 +60,10 @@ public class Test
         String program = "java -jar " + generatorName + ".jar";
         String flags = " -replace -example" + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
-        String idlPaths = "";
-        for(IDL aux = idl; aux != null; aux = aux.getRequired())
-        {
-            idlPaths += " " + inputPath + "/" + aux.toString().toLowerCase() + ".idl";
-        }
 
-        String command = program + flags + output + idlPaths;
+        String idlPath = " " + inputPath + "/" + idl.toLowerCase() + ".idl";
+
+        String command = program + flags + output + idlPath;
         return Command.execute(command, null, errorOutputOnly, true);
     }
 
@@ -85,12 +80,13 @@ public class Test
 
     public boolean run()
     {
-        boolean exitStatus = Command.execute("./" + idl.toString().toLowerCase() + "SerializationTest", outputPath + "/build", errorOutputOnly, false);
-        if(!exitStatus)
-        {
+        String executableName = idl.toLowerCase() + "SerializationTest";
+        boolean exitStatus = Command.execute("./" + executableName, outputPath + "/build", errorOutputOnly, false);
+        if (!exitStatus) {
             return false;
         }
 
         return true;
     }
 }
+
