@@ -295,3 +295,178 @@ struct wchar_align_4_optional
     unsigned long align;
     @optional wchar value;
 };
+
+struct sequence_short_optional
+{
+    @optional sequence<short> value;
+};
+
+struct sequence_short_align_1_optional
+{
+    octet align;
+    @optional sequence<short> value;
+};
+
+struct sequence_short_align_2_optional
+{
+    unsigned short align;
+    @optional sequence<short> value;
+};
+
+struct sequence_short_align_4_optional
+{
+    unsigned long align;
+    @optional sequence<short> value;
+};
+
+struct string_unbounded_optional
+{
+    @optional string value;
+};
+
+struct string_unbounded_align_1_optional
+{
+    octet align;
+    @optional string value;
+};
+
+struct string_unbounded_align_2_optional
+{
+    unsigned short align;
+    @optional string value;
+};
+
+struct string_unbounded_align_4_optional
+{
+    unsigned long align;
+    @optional string value;
+};
+
+
+struct string_bounded_optional
+{
+    @optional string<8> value;
+};
+
+struct string_bounded_align_1_optional
+{
+    octet align;
+    @optional string<8> value;
+};
+
+struct string_bounded_align_2_optional
+{
+    unsigned short align;
+    @optional string<8> value;
+};
+
+struct string_bounded_align_4_optional
+{
+    unsigned long align;
+    @optional string<8> value;
+};
+
+struct map_short_optional
+{
+    @optional map<long, short> value;
+};
+
+struct map_short_align_1_optional
+{
+    octet align;
+    @optional map<long, short> value;
+};
+
+struct map_short_align_2_optional
+{
+    unsigned short align;
+    @optional map<long, short> value;
+};
+
+struct map_short_align_4_optional
+{
+    unsigned long align;
+    @optional map<long, short> value;
+};
+
+
+struct array_short_optional
+{
+    @optional short value[10];
+};
+
+struct array_short_align_1_optional
+{
+    octet align;
+    @optional short value[10];
+};
+
+struct array_short_align_2_optional
+{
+    unsigned short align;
+    @optional short value[10];
+};
+
+struct array_short_align_4_optional
+{
+    unsigned long align;
+    @optional short value[10];
+};
+
+struct InnerStruct //TODO Remove when rebasing
+{
+    short s;
+    long l;
+};
+
+struct struct_optional
+{
+    @optional InnerStruct value;
+};
+
+struct struct_align_1_optional
+{
+    octet align;
+    @optional InnerStruct value;
+};
+
+struct struct_align_2_optional
+{
+    unsigned short align;
+    @optional InnerStruct value;
+};
+
+struct struct_align_4_optional
+{
+    unsigned long align;
+    @optional InnerStruct value;
+};
+
+struct InnerStructOptional
+{
+    short s;
+    @optional long l;
+};
+
+struct opt_struct_optional
+{
+    @optional InnerStructOptional value;
+};
+
+struct opt_struct_align_1_optional
+{
+    octet align;
+    @optional InnerStructOptional value;
+};
+
+struct opt_struct_align_2_optional
+{
+    unsigned short align;
+    @optional InnerStructOptional value;
+};
+
+struct opt_struct_align_4_optional
+{
+    unsigned long align;
+    @optional InnerStructOptional value;
+};

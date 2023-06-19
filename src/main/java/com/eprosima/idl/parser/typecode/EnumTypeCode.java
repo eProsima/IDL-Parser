@@ -44,12 +44,6 @@ public class EnumTypeCode extends MemberedTypeCode
         return "EK_MINIMAL";
     }
 
-    @Override
-    public boolean isObjectType()
-    {
-        return true;
-    }
-
     public void addMember(
             EnumMember member)
     {
