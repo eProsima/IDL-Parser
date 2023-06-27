@@ -18,8 +18,10 @@ import com.eprosima.idl.context.Context;
 
 import org.antlr.stringtemplate.StringTemplate;
 
-import java.util.List;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class StructTypeCode extends MemberedTypeCode implements Inherits
@@ -89,7 +91,8 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     {
         if (parent instanceof StructTypeCode)
         {
-            superTypes_.add((StructTypeCode)parent);
+            StructTypeCode parent_struct = (StructTypeCode)parent;
+            superTypes_.add(parent_struct);
         }
     }
 
@@ -130,6 +133,27 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     public List<Member> getAllMembers() // Alias for getMembers(true) for stg
     {
         return getMembers(true);
+    }
+
+    public List<Map.Entry<Integer, Member>> getAllIdentifiedMembers()
+    {
+        int seq_id = 0;
+        List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
+
+        for (StructTypeCode p : superTypes_)
+        {
+            for (Member m : p.getAllMembers())
+            {
+                ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
+            }
+        }
+
+        for (Member m : getMembers())
+        {
+            ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
+        }
+
+        return ret_members;
     }
 
     @Override

@@ -1,0 +1,77 @@
+@mutable
+struct ShortStructStruct
+{
+    short var_short;
+};
+
+@mutable
+struct UShortStruct
+{
+    unsigned short var_ushort;
+};
+
+@mutable
+struct LongStruct
+{
+    long var_long;
+};
+
+@mutable
+struct ULongStruct
+{
+    unsigned long var_ulong;
+};
+
+@mutable
+struct LongLongStruct
+{
+    long long var_longlong;
+};
+
+@mutable
+struct ULongLongStruct
+{
+    unsigned long long var_ulonglong;
+};
+
+@mutable
+struct FloatStruct
+{
+    float var_float;
+};
+
+@mutable
+struct DoubleStruct
+{
+    double var_double;
+};
+
+@mutable
+struct LongDoubleStruct
+{
+    long double var_longdouble;
+};
+
+@mutable
+struct BooleanStruct
+{
+    boolean var_boolean;
+};
+
+@mutable
+struct OctetStruct
+{
+    octet var_octet;
+};
+
+@mutable
+struct CharStruct
+{
+    char var_char8;
+};
+
+@mutable
+struct WCharStruct
+{
+    wchar var_char16;
+};

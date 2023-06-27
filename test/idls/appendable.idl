@@ -1,0 +1,77 @@
+@appendable
+struct ShortStructStruct
+{
+    short var_short;
+};
+
+@appendable
+struct UShortStruct
+{
+    unsigned short var_ushort;
+};
+
+@appendable
+struct LongStruct
+{
+    long var_long;
+};
+
+@appendable
+struct ULongStruct
+{
+    unsigned long var_ulong;
+};
+
+@appendable
+struct LongLongStruct
+{
+    long long var_longlong;
+};
+
+@appendable
+struct ULongLongStruct
+{
+    unsigned long long var_ulonglong;
+};
+
+@appendable
+struct FloatStruct
+{
+    float var_float;
+};
+
+@appendable
+struct DoubleStruct
+{
+    double var_double;
+};
+
+@appendable
+struct LongDoubleStruct
+{
+    long double var_longdouble;
+};
+
+@appendable
+struct BooleanStruct
+{
+    boolean var_boolean;
+};
+
+@appendable
+struct OctetStruct
+{
+    octet var_octet;
+};
+
+@appendable
+struct CharStruct
+{
+    char var_char8;
+};
+
+@appendable
+struct WCharStruct
+{
+    wchar var_char16;
+};

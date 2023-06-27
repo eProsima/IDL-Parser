@@ -92,7 +92,6 @@ public abstract class MemberedTypeCode extends TypeCode
     {
         if(!m_members.containsKey(member.getName()))
         {
-            member.setId(current_id_to_assign_++);
             m_members.put(member.getName(), member);
             return true;
         }
@@ -154,6 +153,4 @@ public abstract class MemberedTypeCode extends TypeCode
     private String m_scope = null;
 
     private LinkedHashMap<String, Member> m_members = null;
-
-    private int current_id_to_assign_ = 0;
 }

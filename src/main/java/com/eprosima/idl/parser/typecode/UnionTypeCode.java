@@ -14,8 +14,10 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.antlr.stringtemplate.StringTemplate;
 
 
@@ -213,6 +215,33 @@ public class UnionTypeCode extends MemberedTypeCode
     public boolean isIsPlain()
     {
         return false;
+    }
+
+    // Add member and the default one at the end.
+    public List<Map.Entry<Integer, Member>> getIdentifiedMembers()
+    {
+        int position = 0;
+        List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
+        AbstractMap.SimpleEntry<Integer, Member> default_member = null;
+
+        for (Member m : getMembers())
+        {
+            if (position == m_defaultindex)
+            {
+                default_member = new AbstractMap.SimpleEntry<>(++position, m);
+            }
+            else
+            {
+                ret_members.add(new AbstractMap.SimpleEntry<>(++position, m));
+            }
+        }
+
+        if (null != default_member)
+        {
+            ret_members.add(default_member);
+        }
+
+        return ret_members;
     }
 
     private TypeCode m_discriminatorTypeCode = null;
