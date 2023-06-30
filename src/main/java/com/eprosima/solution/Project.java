@@ -29,6 +29,7 @@ public class Project
         m_dependencies = dependencies;
         m_commonsrcfiles = new ArrayList<String>();
         m_commonincludefiles = new ArrayList<String>();
+        m_commontestingfiles = new ArrayList<String>();
     }
 
     public void setParent(Solution sol)
@@ -69,6 +70,16 @@ public class Project
     public ArrayList<String> getCommonIncludeFiles()
     {
         return m_commonincludefiles;
+    }
+
+    public void addCommonTestingFile(String file)
+    {
+        m_commontestingfiles.add(file);
+    }
+
+    public ArrayList<String> getCommonTestingFiles()
+    {
+        return m_commontestingfiles;
     }
 
     /*!
@@ -123,6 +134,7 @@ public class Project
     private String m_file = null;
     private ArrayList<String> m_commonsrcfiles = null;
     private ArrayList<String> m_commonincludefiles = null;
+    private ArrayList<String> m_commontestingfiles = null;
     private LinkedHashSet<String> m_dependencies = null;
     String m_guid = null;
     Solution m_parent = null;
