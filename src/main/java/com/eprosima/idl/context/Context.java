@@ -69,7 +69,6 @@ import org.antlr.v4.runtime.Token;
 public class Context
 {
     public Context(
-            String filename,
             String file,
             ArrayList<String> includePaths)
     {
@@ -77,7 +76,7 @@ public class Context
         m_os = System.getProperty("os.name");
         m_userdir = System.getProperty("user.dir");
 
-        m_filename = filename.replace('.', '_').replace('-', '_');
+        m_filename = Util.getIDLFileNameOnly(file).replace('.', '_').replace('-', '_');
         m_directoryFile = Util.getIDLFileDirectoryOnly(file);
         m_file = file;
 
@@ -292,6 +291,34 @@ public class Context
             String scope)
     {
         m_scope = scope;
+    }
+
+    public String getRelativeDir(String dependant_idl_dir)
+    {
+        String relative_dir = Util.getIDLFileDirectoryOnly(m_file);
+
+        if(null != relative_dir)
+        {
+            File rel_dir = new File(relative_dir);
+
+            if (rel_dir.isAbsolute())
+            {
+                if (null != dependant_idl_dir && relative_dir.startsWith(dependant_idl_dir))
+                {
+                    relative_dir = relative_dir.substring(dependant_idl_dir.length());
+                }
+                else
+                {
+                    relative_dir = "";
+                }
+            }
+        }
+        else
+        {
+            relative_dir = "";
+        }
+
+        return relative_dir;
     }
 
     /*!
