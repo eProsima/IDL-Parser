@@ -13,7 +13,7 @@ public class Test
     public Test(String idl, String outputPath, boolean errorOutputOnly)
     {
         this.idl = idl;
-        this.outputPath = outputPath + "/" + idl.toLowerCase();
+        this.outputPath = outputPath + "/" + idl;
         this.errorOutputOnly = errorOutputOnly;
     }
 ;
@@ -48,7 +48,7 @@ public class Test
         String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
 
-        String idlPath = " " + inputPath + "/" + idl.toLowerCase() + ".idl";
+        String idlPath = " " + inputPath + "/" + idl + ".idl";
 
         String command = program + flags + output + idlPath;
 
@@ -61,7 +61,7 @@ public class Test
         String flags = " -replace -example" + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
 
-        String idlPath = " " + inputPath + "/" + idl.toLowerCase() + ".idl";
+        String idlPath = " " + inputPath + "/" + idl + ".idl";
 
         String command = program + flags + output + idlPath;
         return Command.execute(command, null, errorOutputOnly, true);
@@ -80,7 +80,7 @@ public class Test
 
     public boolean run()
     {
-        String executableName = idl.toLowerCase() + "SerializationTest";
+        String executableName = idl + "SerializationTest";
         boolean exitStatus = Command.execute("./" + executableName, outputPath + "/build", errorOutputOnly, false);
         if (!exitStatus) {
             return false;

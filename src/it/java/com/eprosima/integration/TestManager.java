@@ -75,7 +75,7 @@ public class TestManager
             return;
         }
     
-        File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".idl"));
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(".idl"));
         if (files == null || files.length == 0)
         {
             System.out.println("No IDL files found in the directory");
