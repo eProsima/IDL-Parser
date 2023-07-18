@@ -71,6 +71,6 @@ type_1e(name) ::= <<uint8_t>>
 
 initialValues ::= [
         "type_d":"\"\"",
-        "type_15":"\"\"",
+        "type_15":"L\"\"",
         default: // not basic type.
 ]

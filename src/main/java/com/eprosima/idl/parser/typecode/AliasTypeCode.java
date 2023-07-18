@@ -48,6 +48,60 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode();
     }
 
+    public String getCastingType()
+    {
+        if (super.getContentTypeCode() instanceof AliasTypeCode)
+        {
+            AliasTypeCode alias = (AliasTypeCode) super.getContentTypeCode();
+            return alias.getCastingType();
+        }
+        else if (super.getContentTypeCode() instanceof BitmaskTypeCode)
+        {
+            BitmaskTypeCode container = (BitmaskTypeCode) super.getContentTypeCode();
+            return container.getCastingType();
+        }
+        else
+        {
+            throw new RuntimeException("Error with BitmaskTypeCode alias type.");
+        }
+    }
+
+    public TypeCode getKeyTypeCode()
+    {
+        if (super.getContentTypeCode() instanceof AliasTypeCode)
+        {
+            AliasTypeCode alias = (AliasTypeCode) super.getContentTypeCode();
+            return alias.getKeyTypeCode();
+        }
+        else if (super.getContentTypeCode() instanceof MapTypeCode)
+        {
+            MapTypeCode container = (MapTypeCode) super.getContentTypeCode();
+            return container.getKeyTypeCode();
+        }
+        else
+        {
+            throw new RuntimeException("Error with MapTypeCode alias type.");
+        }
+    }
+
+    public TypeCode getValueTypeCode()
+    {
+        if (super.getContentTypeCode() instanceof AliasTypeCode)
+        {
+            AliasTypeCode alias = (AliasTypeCode) super.getContentTypeCode();
+            return alias.getValueTypeCode();
+        }
+        else if (super.getContentTypeCode() instanceof MapTypeCode)
+        {
+            MapTypeCode container = (MapTypeCode) super.getContentTypeCode();
+            return container.getValueTypeCode();
+        }
+        else
+        {
+            throw new RuntimeException("Error with MapTypeCode alias type.");
+        }
+    }
+
     public boolean isUnbound()
     {
         if (super.getContentTypeCode() instanceof SequenceTypeCode)
@@ -196,6 +250,24 @@ public class AliasTypeCode extends ContainerTypeCode
     public boolean isIsSequenceType()
     {
         return super.getContentTypeCode().isIsSequenceType();
+    }
+
+    @Override
+    public boolean isIsArrayType()
+    {
+        return super.getContentTypeCode().isIsArrayType();
+    }
+   
+    @Override
+    public boolean isIsMapType()
+    {
+        return super.getContentTypeCode().isIsMapType();
+    }
+       
+    @Override
+    public boolean isIsBitmaskType()
+    {
+        return super.getContentTypeCode().isIsBitmaskType();
     }
 
     public boolean isIsType_10()

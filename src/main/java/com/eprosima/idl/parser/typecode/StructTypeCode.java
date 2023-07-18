@@ -119,7 +119,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         {
             for (StructTypeCode p : superTypes_)
             {
-                allMembers.addAll(p.getMembers());
+                allMembers.addAll(p.getAllMembers());
             }
         }
 
