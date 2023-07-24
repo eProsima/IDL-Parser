@@ -183,6 +183,12 @@ public class PrimitiveTypeCode extends TypeCode
     }
 
     @Override
+    public boolean isIsCharType()
+    {
+        return getKind() == Kind.KIND_CHAR;
+    }
+
+    @Override
     public boolean isIsWCharType()
     {
         return getKind() == Kind.KIND_WCHAR;
@@ -192,6 +198,78 @@ public class PrimitiveTypeCode extends TypeCode
     public boolean isIsBooleanType()
     {
         return getKind() == Kind.KIND_BOOLEAN;
+    }
+
+    @Override
+    public boolean isIsByteType()
+    {
+        return getKind() == Kind.KIND_OCTET;
+    }
+
+    @Override
+    public boolean isIsInt8Type()
+    {
+        return getKind() == Kind.KIND_INT8;
+    }
+
+    @Override
+    public boolean isIsUint8Type()
+    {
+        return getKind() == Kind.KIND_UINT8;
+    }
+
+    @Override
+    public boolean isIsInt16Type()
+    {
+        return getKind() == Kind.KIND_SHORT;
+    }
+
+    @Override
+    public boolean isIsUint16Type()
+    {
+        return getKind() == Kind.KIND_USHORT;
+    }
+
+    @Override
+    public boolean isIsInt32Type()
+    {
+        return getKind() == Kind.KIND_LONG;
+    }
+
+    @Override
+    public boolean isIsUint32Type()
+    {
+        return getKind() == Kind.KIND_ULONG;
+    }
+
+    @Override
+    public boolean isIsInt64Type()
+    {
+        return getKind() == Kind.KIND_LONGLONG;
+    }
+
+    @Override
+    public boolean isIsUint64Tpe()
+    {
+        return getKind() == Kind.KIND_ULONGLONG;
+    }
+
+    @Override
+    public boolean isIsFloat32()
+    {
+        return getKind() == Kind.KIND_FLOAT;
+    }
+
+    @Override
+    public boolean isIsFloat64()
+    {
+        return getKind() == Kind.KIND_DOUBLE;
+    }
+
+    @Override
+    public boolean isIsFloat128()
+    {
+        return getKind() == Kind.KIND_LONGDOUBLE;
     }
 
 }

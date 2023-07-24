@@ -227,6 +227,71 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isIsByteType()
+    {
+        return false;
+    }
+
+    public boolean isIsInt8Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint8Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt16Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint16Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt32Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint32Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt64Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint64Tpe()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat32()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat64()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat128()
+    {
+        return false;
+    }
+
+    public boolean isIsEnumType()
+    {
+        return false;
+    }
+
     public boolean isIsBitmaskType()
     {
         return false;
@@ -243,6 +308,11 @@ public abstract class TypeCode implements Notebook
     }
 
     public boolean isIsWStringType()
+    {
+        return false;
+    }
+
+    public boolean isIsCharType()
     {
         return false;
     }
