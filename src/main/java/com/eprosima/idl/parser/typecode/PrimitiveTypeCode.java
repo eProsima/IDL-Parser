@@ -188,4 +188,10 @@ public class PrimitiveTypeCode extends TypeCode
         return getKind() == Kind.KIND_WCHAR;
     }
 
+    @Override
+    public boolean isIsBooleanType()
+    {
+        return getKind() == Kind.KIND_BOOLEAN;
+    }
+
 }
