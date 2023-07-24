@@ -222,6 +222,11 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isIsBooleanType()
+    {
+        return false;
+    }
+
     public boolean isIsBitmaskType()
     {
         return false;
