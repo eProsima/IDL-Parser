@@ -1153,8 +1153,10 @@ annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = 
 @init
 {
     TemplateGroup annotationTemplates = null;
+    String old_scope = ctx.getScope();
+    String name = null;
 }
-    : annotation_header LEFT_BRACE annotation_body[$annotation_header.annotation] RIGHT_BRACE
+    : annotation_header
     {
         if($annotation_header.annotation != null)
         {
@@ -1169,8 +1171,23 @@ annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = 
                 }
             }
 
-            $returnPair = new Pair<AnnotationDeclaration, TemplateGroup>($annotation_header.annotation, annotationTemplates);
+            name = $annotation_header.annotation.getName();
+
+            // Update to a new namespace.
+            if(old_scope.isEmpty())
+                ctx.setScope(name);
+            else
+                ctx.setScope(old_scope + "::" + name);
         }
+    }
+    LEFT_BRACE
+    annotation_body[$annotation_header.annotation]
+    RIGHT_BRACE
+    {
+        // Set the old namespace.
+        ctx.setScope(old_scope);
+        // Create the returned data.
+        $returnPair = new Pair<AnnotationDeclaration, TemplateGroup>($annotation_header.annotation, annotationTemplates);
     }
     ;
 
