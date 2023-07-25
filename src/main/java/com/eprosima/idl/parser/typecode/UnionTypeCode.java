@@ -88,9 +88,10 @@ public class UnionTypeCode extends MemberedTypeCode
         List<String> labels = null;
         List<String> javalabels = null;
 
-        if (m_discriminatorTypeCode.getKind() == Kind.KIND_ENUM)
+        if (Kind.KIND_ENUM == m_discriminatorTypeCode.getKind() ||
+                Kind.KIND_BITMASK == m_discriminatorTypeCode.getKind())
         {
-            EnumTypeCode enum_type = (EnumTypeCode)m_discriminatorTypeCode;
+            MemberedTypeCode enum_type = (MemberedTypeCode)m_discriminatorTypeCode;
             labels = new ArrayList<String>();
             javalabels = new ArrayList<String>();
 
