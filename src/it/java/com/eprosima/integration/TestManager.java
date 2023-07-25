@@ -74,14 +74,14 @@ public class TestManager
             System.err.println("Error: Invalid directory path");
             return;
         }
-    
+
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".idl"));
         if (files == null || files.length == 0)
         {
             System.out.println("No IDL files found in the directory");
             return;
         }
-    
+
         for (File file : files)
         {
             String idlName = file.getName().replaceAll("\\.idl$", "");

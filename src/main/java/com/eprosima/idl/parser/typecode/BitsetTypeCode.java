@@ -130,6 +130,23 @@ public class BitsetTypeCode extends MemberedTypeCode
     public int getBitSize()
     {
         int size = 0;
+
+        for (Bitfield bf : m_bitfields.values())
+        {
+            size += bf.getSpec().getBitSize();
+        }
+        return size;
+    }
+
+    public int getFullBitSize()
+    {
+        int size = 0;
+
+        for (BitsetTypeCode parent : m_parents)
+        {
+            size += parent.getFullBitSize();
+        }
+
         for (Bitfield bf : m_bitfields.values())
         {
             size += bf.getSpec().getBitSize();
