@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Collection;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 
@@ -78,7 +79,7 @@ public class TestIDLParser {
 
         try {
 
-            ANTLRFileStream input = new ANTLRFileStream(idlParseFileName);
+            CharStream input = CharStreams.fromFileName(idlParseFileName);
             IDLLexer lexer = new IDLLexer(input);
             lexer.setContext(context);
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
