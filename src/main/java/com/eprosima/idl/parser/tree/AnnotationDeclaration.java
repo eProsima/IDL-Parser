@@ -49,6 +49,9 @@ public class AnnotationDeclaration extends TreeNode implements Definition
 
     public boolean addMember(AnnotationMember member)
     {
+        // Check that in case of an Enum the given value is in the enumeration.
+        // ParseException is thrown otherwise.
+        member.getEnumStringValue();
         if(!m_members.containsKey(member.getName()))
         {
             m_members.put(member.getName(), member);

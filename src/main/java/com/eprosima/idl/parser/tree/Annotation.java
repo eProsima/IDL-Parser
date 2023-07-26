@@ -67,6 +67,9 @@ public class Annotation
         if(member != null)
         {
             member.setValue(value);
+            // Check that in case of an Enum the set value is in the enumeration.
+            // ParseException is thrown otherwise.
+            member.getEnumStringValue();
         }
         else
             return false;
@@ -94,6 +97,11 @@ public class Annotation
     public Collection<AnnotationMember> getValueList()
     {
         return m_members.values();
+    }
+
+    public boolean isIsVerbatim()
+    {
+        return getName().equals("verbatim");
     }
 
     private HashMap<String, AnnotationMember> m_members = null;
