@@ -104,6 +104,31 @@ public class Annotation
         return getName().equals("verbatim");
     }
 
+    public boolean isIsUnit()
+    {
+        return getName().equals("unit");
+    }
+
+    public boolean isIsMax()
+    {
+        return getName().equals("max");
+    }
+
+    public boolean isIsMin()
+    {
+        return getName().equals("min");
+    }
+
+    public boolean isIsRange()
+    {
+        return getName().equals("range");
+    }
+
+    public boolean isIsHashId()
+    {
+        return getName().equals("hashid");
+    }
+
     private HashMap<String, AnnotationMember> m_members = null;
     private AnnotationDeclaration m_declaration = null;
 }
