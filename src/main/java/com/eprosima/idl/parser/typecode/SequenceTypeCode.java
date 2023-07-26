@@ -16,7 +16,7 @@ package com.eprosima.idl.parser.typecode;
 
 import com.eprosima.idl.parser.typecode.StringTypeCode;
 import com.eprosima.idl.parser.typecode.MapTypeCode;
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 
 
 public class SequenceTypeCode extends ContainerTypeCode
@@ -55,26 +55,26 @@ public class SequenceTypeCode extends ContainerTypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("ctx", ctx);
-        st.setAttribute("type", getContentTypeCode().getCppTypename());
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("ctx", ctx);
+        st.add("type", getContentTypeCode().getCppTypename());
         String contenttype = getContentTypeCode().getCppTypename().replaceAll("::", "_");
         if (getContentTypeCode() instanceof StringTypeCode)
         {
             contenttype = contenttype.replace("*", "_ptr_") + ((StringTypeCode)getContentTypeCode()).getMaxsize();
         }
-        st.setAttribute("contenttype", contenttype);
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        st.add("contenttype", contenttype);
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("type", getContentTypeCode().getCTypename());
-        st.setAttribute("maxsize", getMaxsize());
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("type", getContentTypeCode().getCTypename());
+        st.add("maxsize", getMaxsize());
+        return st.render();
     }
 
     public String getCTypeDimensions()
@@ -91,19 +91,19 @@ public class SequenceTypeCode extends ContainerTypeCode
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("type", getContentTypeCode().getJavaTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("type", getContentTypeCode().getJavaTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("type", getContentTypeCode().getIdlTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("type", getContentTypeCode().getIdlTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override

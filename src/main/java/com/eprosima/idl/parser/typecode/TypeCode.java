@@ -21,8 +21,8 @@ import com.eprosima.idl.context.Context;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 
 
@@ -48,10 +48,10 @@ public abstract class TypeCode implements Notebook
         }
     };
 
-    public static StringTemplateGroup idltypesgr  = null;
-    public static StringTemplateGroup cpptypesgr  = null;
-    public static StringTemplateGroup ctypesgr    = null;
-    public static StringTemplateGroup javatypesgr = null;
+    public static STGroup idltypesgr  = null;
+    public static STGroup cpptypesgr  = null;
+    public static STGroup ctypesgr    = null;
+    public static STGroup javatypesgr = null;
     public static Context ctx = null;
     //TODO Revisar si es el mejor sitio.
     public static String javapackage = "";
@@ -81,22 +81,22 @@ public abstract class TypeCode implements Notebook
 
     public abstract String getCTypename();
 
-    protected StringTemplate getCppTypenameFromStringTemplate()
+    protected ST getCppTypenameFromStringTemplate()
     {
         return cpptypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
 
-    protected StringTemplate getCTypenameFromStringTemplate()
+    protected ST getCTypenameFromStringTemplate()
     {
         return ctypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
 
     public abstract String getJavaTypename();
 
-    protected StringTemplate getJavaTypenameFromStringTemplate()
+    protected ST getJavaTypenameFromStringTemplate()
     {
-        StringTemplate st = javatypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
-        st.setAttribute("package", javapackage);
+        ST st = javatypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
+        st.add("package", javapackage);
         return st;
     }
 
@@ -106,7 +106,7 @@ public abstract class TypeCode implements Notebook
      */
     public abstract String getIdlTypename();
 
-    protected StringTemplate getIdlTypenameFromStringTemplate()
+    protected ST getIdlTypenameFromStringTemplate()
     {
         return idltypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }

@@ -31,11 +31,7 @@ repositories {
 }
 
 dependencies {
-    antlr('org.antlr:antlr4:4.5') {
-        exclude group: 'org.antlr', module:'antlr-runtime'
-        exclude group: 'org.antlr', module:'ST4'
-    }
-    implementation group: 'org.antlr', name: 'stringtemplate', version:'3.2'
+    antlr('org.antlr:antlr4:4.13.0')
     implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version:'15.4'
 }
 

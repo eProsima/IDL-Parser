@@ -17,7 +17,7 @@ package com.eprosima.idl.parser.typecode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 
 
 
@@ -47,33 +47,33 @@ public class BitsetTypeCode extends MemberedTypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("name", getCScopedname());
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("name", getCScopedname());
+        return st.render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("name", getJavaScopedname());
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("name", getJavaScopedname());
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     public List<Bitfield> getBitfields()

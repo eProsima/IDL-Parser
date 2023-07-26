@@ -2645,7 +2645,7 @@ BOOLEAN_LITERAL
 
 fragment
 ESCAPE_SEQUENCE
-    :   '\\' ('b' | 't' | 'n' | 'f' | 'r' | '\"' | '\'' | '\\' | 'v' | 'a' | '?')
+    :   '\\' ('b' | 't' | 'n' | 'f' | 'r' | '\\"' | '\'' | '\\' | 'v' | 'a' | '?')
     |   UNICODE_ESCAPE
     |   HEX_ESCAPE
     |   OCTAL_ESCAPE

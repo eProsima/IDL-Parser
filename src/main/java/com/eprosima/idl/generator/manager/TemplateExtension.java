@@ -14,8 +14,8 @@
 
 package com.eprosima.idl.generator.manager;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 public class TemplateExtension
 {
@@ -35,17 +35,17 @@ public class TemplateExtension
         return extensionName_;
     }
 
-    public void setCommonGroup(StringTemplateGroup cgroup)
+    public void setCommonGroup(STGroup cgroup)
     {
         cgroup_ = cgroup;
     }
 
-    public StringTemplate createStringTemplate()
+    public ST createStringTemplate()
     {
         return cgroup_.getInstanceOf(extensionName_);
     }
 
     private String ruleName_ = null;
     private String extensionName_ = null;
-    private StringTemplateGroup cgroup_ = null;
+    private STGroup cgroup_ = null;
 }

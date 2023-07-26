@@ -14,7 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 
 
 public class SetTypeCode extends ContainerTypeCode
@@ -53,37 +53,37 @@ public class SetTypeCode extends ContainerTypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("type", getContentTypeCode().getCppTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("type", getContentTypeCode().getCppTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("type", getContentTypeCode().getCTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("type", getContentTypeCode().getCTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("type", getContentTypeCode().getJavaTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("type", getContentTypeCode().getJavaTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("type", getContentTypeCode().getIdlTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("type", getContentTypeCode().getIdlTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     public String getMaxsize()

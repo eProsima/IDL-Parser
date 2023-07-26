@@ -27,53 +27,63 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.antlr.stringtemplate.*;
-import org.antlr.stringtemplate.language.DefaultTemplateLexer;
+import org.stringtemplate.v4.*;
+import org.stringtemplate.v4.misc.STMessage;
 
 public class TemplateManager
 {
-    class TemplateErrorListener implements StringTemplateErrorListener
+    class TemplateErrorListener implements STErrorListener
     {
-        public void error(String arg0, Throwable arg1)
+        @Override
+        public void compileTimeError(STMessage msg)
         {
-            System.out.println(ColorMessage.error() + arg0);
-            arg1.printStackTrace();
+            System.out.println(ColorMessage.error() + msg.toString());
         }
 
-        public void warning(String arg0)
+        @Override
+        public void runTimeError(STMessage msg)
         {
-            System.out.println(ColorMessage.warning() + arg0);
+            System.out.println(ColorMessage.error() + msg.toString());
+        }
+
+        @Override
+        public void IOError(STMessage msg)
+        {
+            System.out.println(ColorMessage.error() + msg.toString());
+        }
+
+        @Override
+        public void internalError(STMessage msg)
+        {
+            System.out.println(ColorMessage.error() + msg.toString());
         }
     }
 
-    static private String m_loaderDirectories = "com/eprosima/idl/templates";
-    private Map<String, StringTemplateGroup> m_groups = null;
+    private Map<String, STGroup> m_groups = null;
     private Map<String, List<TemplateExtension>> m_extensions = null;
-    private StringTemplateGroup strackgr_ = null;
+    private STGroup strackgr_ = null;
 
     public TemplateManager(String stackTemplateNames, Context ctx, boolean generate_typesc)
     {
-        StringTemplateGroupLoader loader = new CommonGroupLoader(m_loaderDirectories, new TemplateErrorListener());
-        StringTemplateGroup.registerGroupLoader(loader);
-
         // Load IDL types for stringtemplates
-        TypeCode.idltypesgr = StringTemplateGroup.loadGroup("idlTypes", DefaultTemplateLexer.class, null);
+        TypeCode.idltypesgr = new STGroupFile("com/eprosima/idl/templates/idlTypes.stg", '$', '$');
         if (generate_typesc)
         {
-            TypeCode.cpptypesgr = StringTemplateGroup.loadGroup("TypesCInterface", DefaultTemplateLexer.class, null);
+            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/TypesCInterface.stg", '$', '$');
         }
         else
         {
-            TypeCode.cpptypesgr = StringTemplateGroup.loadGroup("Types", DefaultTemplateLexer.class, null);
+            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/Types.stg", '$', '$');
         }
-        TypeCode.ctypesgr = StringTemplateGroup.loadGroup("CTypes", DefaultTemplateLexer.class, null);
-        TypeCode.javatypesgr = StringTemplateGroup.loadGroup("JavaTypes", DefaultTemplateLexer.class, null);
+        TypeCode.ctypesgr = new STGroupFile("com/eprosima/idl/templates/CTypes.stg", '$', '$');
+        TypeCode.javatypesgr = new STGroupFile("com/eprosima/idl/templates/JavaTypes.stg", '$', '$');
         TypeCode.ctx = ctx;
 
-        m_groups = new HashMap<String, StringTemplateGroup>();
+        m_groups = new HashMap<String, STGroup>();
         m_extensions = new HashMap<String, List<TemplateExtension>>();
 
         // Load specific template rules.
+        /*
         if(stackTemplateNames != null && !stackTemplateNames.isEmpty())
         {
             int index = -1, lastIndex = 0;
@@ -82,28 +92,24 @@ public class TemplateManager
             while((index = stackTemplateNames.indexOf(':', lastIndex)) != -1)
             {
                 templateName = stackTemplateNames.substring(lastIndex, index);
-                strackgr_ = StringTemplateGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_);
+                strackgr_ = STGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_);
                 lastIndex = index + 1;
             }
 
             templateName = stackTemplateNames.substring(lastIndex, stackTemplateNames.length());
-            strackgr_ = StringTemplateGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_);
+            strackgr_ = STGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_);
         }
-    }
-
-    static public void setGroupLoaderDirectories(String paths)
-    {
-        m_loaderDirectories += ":" + paths;
+        */
     }
 
     public void changeCppTypesTemplateGroup(String templateName)
     {
-        TypeCode.cpptypesgr = StringTemplateGroup.loadGroup(templateName, DefaultTemplateLexer.class, null);
+        TypeCode.cpptypesgr = new STGroupFile(templateName, '$', '$');
     }
 
     public void addGroup(String groupname)
     {
-        StringTemplateGroup group = StringTemplateGroup.loadGroup(groupname, DefaultTemplateLexer.class, strackgr_);
+        STGroup group = new STGroupFile(groupname, '$', '$');
         m_groups.put(groupname, group);
     }
 
@@ -135,15 +141,15 @@ public class TemplateManager
     public TemplateGroup createTemplateGroup(String templatename)
     {
         TemplateGroup tg = new TemplateGroup();
-        Set<Entry<String, StringTemplateGroup>> set = m_groups.entrySet();
-        Iterator<Entry<String, StringTemplateGroup>> it = set.iterator();
+        Set<Entry<String, STGroup>> set = m_groups.entrySet();
+        Iterator<Entry<String, STGroup>> it = set.iterator();
 
         while(it.hasNext())
         {
-            Map.Entry<String, StringTemplateGroup> m = (Map.Entry<String, StringTemplateGroup>)it.next();
+            Map.Entry<String, STGroup> m = (Map.Entry<String, STGroup>)it.next();
 
             // Obtain instance
-            StringTemplate template = m.getValue().getInstanceOf(templatename);
+            ST template = m.getValue().getInstanceOf(templatename);
 
             if(!m_extensions.containsKey(m.getKey() + "_" + template.getName()))
             {
@@ -152,7 +158,7 @@ public class TemplateManager
             else
             {
                 List<TemplateExtension> extensions = m_extensions.get(m.getKey() + "_" + template.getName());
-                List<StringTemplate> extensionstemplates = new ArrayList<StringTemplate>();
+                List<ST> extensionstemplates = new ArrayList<ST>();
 
                 for(TemplateExtension extension : extensions)
                 {
@@ -166,13 +172,13 @@ public class TemplateManager
         return tg;
     }
 
-    public StringTemplate createStringTemplate(String templatename)
+    public ST createStringTemplate(String templatename)
     {
         return strackgr_.getInstanceOf(templatename);
     }
 
-    public StringTemplateGroup createStringTemplateGroup(String templateGroupName)
+    public STGroup createStringTemplateGroup(String templateGroupName)
     {
-        return StringTemplateGroup.loadGroup(templateGroupName, DefaultTemplateLexer.class, strackgr_);
+        return new STGroupFile(templateGroupName, '$', '$');
     }
 }
