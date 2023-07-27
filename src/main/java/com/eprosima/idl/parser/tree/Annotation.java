@@ -50,6 +50,26 @@ public class Annotation
         return null;
     }
 
+    public String getScopedname()
+    {
+        if(m_declaration != null)
+        {
+            return m_declaration.getScopedname();
+        }
+
+        return null;
+    }
+
+    public String getROS2Scopedname()
+    {
+        if(m_declaration != null)
+        {
+            return m_declaration.getROS2Scopedname();
+        }
+
+        return null;
+    }
+
     public boolean addValue(String value)
     {
         if(m_members.size() != 1)
