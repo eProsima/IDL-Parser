@@ -122,6 +122,16 @@ public class AnnotationMember
         return getName().equals("text");
     }
 
+    public boolean isIsMax()
+    {
+        return getName().equals("max");
+    }
+
+    public boolean isIsMin()
+    {
+        return getName().equals("min");
+    }
+
     private String m_name = null;
 
     private TypeCode m_typecode = null;
