@@ -77,6 +77,7 @@ public class Member implements Notebook
     {
         if(annotation != null)
         {
+            // TODO: include any other sanity check required between incompatible builtin annotations
             if (((annotation.getName().equals("key") || annotation.getName().equals("Key") )
                 && isAnnotationNonSerialized())
                 || (annotation.getName().equals("non_serialized") && isAnnotationKey()))
