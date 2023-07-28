@@ -1231,7 +1231,7 @@ annotation_inheritance_spec [AnnotationDeclaration annotation]
             }
             else
             {
-                System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + $scoped_name.pair.first() + " not supported. Ignoring...");
+                throw new ParseException($scoped_name.pair.second(), "was not defined previously");
             }
         }
     }
@@ -2751,7 +2751,7 @@ annotation_appl returns [Annotation annotation = null]
         anndecl = ctx.getAnnotationDeclaration(name);
         if(anndecl == null)
         {
-            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + name + " not supported. Ignoring...");
+            throw new ParseException($scoped_name.pair.second(), "was not defined previously");
         }
         else
         {
