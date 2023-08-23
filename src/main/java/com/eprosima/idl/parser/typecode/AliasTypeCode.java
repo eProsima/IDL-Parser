@@ -117,7 +117,7 @@ public class AliasTypeCode extends ContainerTypeCode
     @Override
     public boolean isObjectType()
     {
-        return super.getContentTypeCode().isObjectType();
+        return true;
     }
 
     public TypeCode getTypedefContentTypeCode()
