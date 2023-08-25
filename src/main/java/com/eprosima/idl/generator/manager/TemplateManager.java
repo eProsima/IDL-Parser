@@ -60,8 +60,6 @@ public class TemplateManager
     }
 
     private Map<String, STGroup> m_groups = null;
-    private Map<String, List<TemplateExtension>> m_extensions = null;
-    private STGroup strackgr_ = null;
 
     public TemplateManager(String stackTemplateNames, Context ctx, boolean generate_typesc)
     {
@@ -80,62 +78,12 @@ public class TemplateManager
         TypeCode.ctx = ctx;
 
         m_groups = new HashMap<String, STGroup>();
-        m_extensions = new HashMap<String, List<TemplateExtension>>();
-
-        // Load specific template rules.
-        /*
-        if(stackTemplateNames != null && !stackTemplateNames.isEmpty())
-        {
-            int index = -1, lastIndex = 0;
-            String templateName = null;
-
-            while((index = stackTemplateNames.indexOf(':', lastIndex)) != -1)
-            {
-                templateName = stackTemplateNames.substring(lastIndex, index);
-                strackgr_ = STGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_);
-                lastIndex = index + 1;
-            }
-
-            templateName = stackTemplateNames.substring(lastIndex, stackTemplateNames.length());
-            strackgr_ = STGroup.loadGroup(templateName, DefaultTemplateLexer.class, strackgr_);
-        }
-        */
-    }
-
-    public void changeCppTypesTemplateGroup(String templateName)
-    {
-        TypeCode.cpptypesgr = new STGroupFile(templateName, '$', '$');
     }
 
     public void addGroup(String groupname)
     {
         STGroup group = new STGroupFile(groupname, '$', '$');
         m_groups.put(groupname, group);
-    }
-
-    public void addGroup(String groupname, List<TemplateExtension> extensions)
-    {
-        addGroup(groupname);
-
-        for(TemplateExtension extension : extensions)
-        {
-            String str = groupname + "_" + extension.getRuleName();
-            List<TemplateExtension> list = null;
-
-            if(m_extensions.containsKey(str))
-            {
-                list = m_extensions.get(str);
-            }
-            else
-            {
-                list = new ArrayList<TemplateExtension>();
-            }
-
-            // Set stack groups.
-            extension.setCommonGroup(strackgr_);
-            list.add(extension);
-            m_extensions.put(str, list);
-        }
     }
 
     public TemplateGroup createTemplateGroup(String templatename)
@@ -150,32 +98,12 @@ public class TemplateManager
 
             // Obtain instance
             ST template = m.getValue().getInstanceOf(templatename);
-
-            if(!m_extensions.containsKey(m.getKey() + "_" + template.getName()))
-            {
-                tg.addTemplate(m.getKey(), template);
-            }
-            else
-            {
-                List<TemplateExtension> extensions = m_extensions.get(m.getKey() + "_" + template.getName());
-                List<ST> extensionstemplates = new ArrayList<ST>();
-
-                for(TemplateExtension extension : extensions)
-                {
-                    extensionstemplates.add(extension.createStringTemplate());
-                }
-
-                tg.addTemplate(m.getKey(), template, extensionstemplates);
-            }
+            tg.addTemplate(m.getKey(), template);
         }
 
         return tg;
     }
 
-    public ST createStringTemplate(String templatename)
-    {
-        return strackgr_.getInstanceOf(templatename);
-    }
 
     public STGroup createStringTemplateGroup(String templateGroupName)
     {

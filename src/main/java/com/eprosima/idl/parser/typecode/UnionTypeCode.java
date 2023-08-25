@@ -229,11 +229,11 @@ public class UnionTypeCode extends MemberedTypeCode
         {
             if (position == m_defaultindex)
             {
-                default_member = new AbstractMap.SimpleEntry<>(++position, m);
+                default_member = new AbstractMap.SimpleEntry<>(position++, m);
             }
             else
             {
-                ret_members.add(new AbstractMap.SimpleEntry<>(++position, m));
+                ret_members.add(new AbstractMap.SimpleEntry<>(position++, m));
             }
         }
 
