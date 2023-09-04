@@ -13,15 +13,17 @@
 // limitations under the License.
 
 package com.eprosima.idl.parser.typecode;
-import com.eprosima.idl.parser.tree.Inherits;
-import com.eprosima.idl.context.Context;
-
-import org.stringtemplate.v4.ST;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.stringtemplate.v4.ST;
+
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Inherits;
+
 
 
 public class StructTypeCode extends MemberedTypeCode implements Inherits
@@ -180,6 +182,17 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             }
         }
         return super.isIsBounded();
+    }
+
+    @Override
+    public void addAnnotation(
+            Context ctx,
+            Annotation annotation)
+    {
+        // Checks
+        check_annotation_for_aggregated_types(annotation);
+
+        super.addAnnotation(ctx, annotation);
     }
 
     private ArrayList<StructTypeCode> superTypes_;

@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.tree.Annotation;
+
 public abstract class MemberedTypeCode extends TypeCode
 {
     protected MemberedTypeCode(int kind, String scope, String name)
@@ -146,6 +149,24 @@ public abstract class MemberedTypeCode extends TypeCode
             }
         }
         return false;
+    }
+
+    protected void check_annotation_for_aggregated_types(
+            Annotation annotation)
+    {
+        if (Annotation.extensibility_str == annotation.getName() ||
+                Annotation.final_str == annotation.getName() ||
+                Annotation.appendable_str == annotation.getName() ||
+                Annotation.mutable_str == annotation.getName())
+        {
+            if (getAnnotations().containsKey(Annotation.extensibility_str) ||
+                    getAnnotations().containsKey(Annotation.final_str) ||
+                    getAnnotations().containsKey(Annotation.appendable_str) ||
+                    getAnnotations().containsKey(Annotation.mutable_str))
+            {
+                throw new ParseException(null, "Extensibility was already defined for " + getName());
+            }
+        }
     }
 
     private String m_name = null;

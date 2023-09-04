@@ -345,15 +345,15 @@ public abstract class TypeCode implements Notebook
     {
         if (ExtensibilityKind.NOT_APPLIED == extensibility_)
         {
-            if (null != m_annotations.get("final") ||
-                    (null != m_annotations.get("extensibility") &&
-                     m_annotations.get("extensibility").getValue().equals("FINAL")))
+            if (null != m_annotations.get(Annotation.final_str) ||
+                    (null != m_annotations.get(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_str)))
             {
                 extensibility_ = ExtensibilityKind.FINAL;
             }
-            else if (null != m_annotations.get("mutable") ||
-                    (null != m_annotations.get("extensibility") &&
-                     m_annotations.get("extensibility").getValue().equals("MUTABLE")))
+            else if (null != m_annotations.get(Annotation.mutable_str) ||
+                    (null != m_annotations.get(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_str)))
             {
                 extensibility_ = ExtensibilityKind.MUTABLE;
             }

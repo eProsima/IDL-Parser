@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import org.stringtemplate.v4.ST;
 
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.tree.Annotation;
+
 
 
 public class UnionTypeCode extends MemberedTypeCode
@@ -243,6 +246,17 @@ public class UnionTypeCode extends MemberedTypeCode
         }
 
         return ret_members;
+    }
+
+    @Override
+    public void addAnnotation(
+            Context ctx,
+            Annotation annotation)
+    {
+        // Checks
+        check_annotation_for_aggregated_types(annotation);
+
+        super.addAnnotation(ctx, annotation);
     }
 
     private TypeCode m_discriminatorTypeCode = null;

@@ -20,6 +20,14 @@ import java.util.Collection;
 
 public class Annotation
 {
+    public static final String final_str = "final";
+    public static final String appendable_str = "appendable";
+    public static final String mutable_str = "mutable";
+    public static final String extensibility_str = "extensibility";
+    public static final String ex_final_str = "FINAL";
+    public static final String ex_appendable_str = "APPENDABLE";
+    public static final String ex_mutable_str = "MUTABLE";
+
     public Annotation(AnnotationDeclaration declaration)
     {
         m_declaration = declaration;

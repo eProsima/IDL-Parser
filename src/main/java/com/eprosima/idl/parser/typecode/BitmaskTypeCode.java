@@ -14,12 +14,12 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.parser.exception.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.context.Context;
 
