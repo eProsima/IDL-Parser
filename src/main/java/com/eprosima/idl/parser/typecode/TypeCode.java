@@ -238,6 +238,11 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isIsEnumType()
+    {
+        return false;
+    }
+
     public boolean isIsSetType()
     {
         return false;

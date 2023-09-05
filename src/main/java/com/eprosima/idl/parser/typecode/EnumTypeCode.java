@@ -39,6 +39,12 @@ public class EnumTypeCode extends MemberedTypeCode
     }
 
     @Override
+    public boolean isIsEnumType()
+    {
+        return true;
+    }
+
+    @Override
     public String getTypeIdentifier()
     {
         return "EK_MINIMAL";
