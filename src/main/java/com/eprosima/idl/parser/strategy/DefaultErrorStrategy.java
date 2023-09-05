@@ -22,8 +22,6 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 public class DefaultErrorStrategy extends org.antlr.v4.runtime.DefaultErrorStrategy
 {
@@ -62,7 +60,7 @@ public class DefaultErrorStrategy extends org.antlr.v4.runtime.DefaultErrorStrat
     }
 
     @Override
-    protected void reportUnwantedToken(@NotNull Parser recognizer)
+    protected void reportUnwantedToken(Parser recognizer)
     {
         if (inErrorRecoveryMode(recognizer))
         {

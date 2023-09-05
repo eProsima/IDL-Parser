@@ -15,6 +15,7 @@
 package com.eprosima.idl.context;
 
 import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.tree.AnnotationMember;
 import com.eprosima.idl.parser.tree.ConstDeclaration;
@@ -190,17 +191,17 @@ public class Context
         AnnotationDeclaration valueann = createAnnotationDeclaration("value", null);
         valueann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
 
-        AnnotationDeclaration extensibilityann = createAnnotationDeclaration("extensibility", null);
+        AnnotationDeclaration extensibilityann = createAnnotationDeclaration(Annotation.extensibility_str, null);
         EnumTypeCode extensibilityannenum = new EnumTypeCode(extensibilityann.getScopedname(), "extensibilityannenum");
-        extensibilityannenum.addMember(new EnumMember("FINAL"));
-        extensibilityannenum.addMember(new EnumMember("APPENDABLE"));
-        extensibilityannenum.addMember(new EnumMember("MUTABLE"));
+        extensibilityannenum.addMember(new EnumMember(Annotation.ex_final_str));
+        extensibilityannenum.addMember(new EnumMember(Annotation.ex_appendable_str));
+        extensibilityannenum.addMember(new EnumMember(Annotation.ex_mutable_str));
         extensibilityann.addMember(new AnnotationMember("value", extensibilityannenum,
                 extensibilityannenum.getInitialValue()));
 
-        createAnnotationDeclaration("final", null);
-        createAnnotationDeclaration("appendable", null);
-        createAnnotationDeclaration("mutable", null);
+        createAnnotationDeclaration(Annotation.final_str, null);
+        createAnnotationDeclaration(Annotation.appendable_str, null);
+        createAnnotationDeclaration(Annotation.mutable_str, null);
 
         // Create default @Key annotation.
         AnnotationDeclaration keyann = createAnnotationDeclaration("key", null);

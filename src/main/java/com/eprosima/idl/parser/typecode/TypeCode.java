@@ -21,17 +21,37 @@ import com.eprosima.idl.context.Context;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 
 
 public abstract class TypeCode implements Notebook
 {
-    public static StringTemplateGroup idltypesgr  = null;
-    public static StringTemplateGroup cpptypesgr  = null;
-    public static StringTemplateGroup ctypesgr    = null;
-    public static StringTemplateGroup javatypesgr = null;
+    public enum ExtensibilityKind
+    {
+        NOT_APPLIED(0),
+        FINAL(1),
+        APPENDABLE(2),
+        MUTABLE(3);
+
+        private int value_ = 0;
+
+        private ExtensibilityKind(int value)
+        {
+            value_ = value;
+        }
+
+        public int get_value()
+        {
+            return value_;
+        }
+    };
+
+    public static STGroup idltypesgr  = null;
+    public static STGroup cpptypesgr  = null;
+    public static STGroup ctypesgr    = null;
+    public static STGroup javatypesgr = null;
     public static Context ctx = null;
     //TODO Revisar si es el mejor sitio.
     public static String javapackage = "";
@@ -61,22 +81,22 @@ public abstract class TypeCode implements Notebook
 
     public abstract String getCTypename();
 
-    protected StringTemplate getCppTypenameFromStringTemplate()
+    protected ST getCppTypenameFromStringTemplate()
     {
         return cpptypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
 
-    protected StringTemplate getCTypenameFromStringTemplate()
+    protected ST getCTypenameFromStringTemplate()
     {
         return ctypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
 
     public abstract String getJavaTypename();
 
-    protected StringTemplate getJavaTypenameFromStringTemplate()
+    protected ST getJavaTypenameFromStringTemplate()
     {
-        StringTemplate st = javatypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
-        st.setAttribute("package", javapackage);
+        ST st = javatypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
+        st.add("package", javapackage);
         return st;
     }
 
@@ -86,7 +106,7 @@ public abstract class TypeCode implements Notebook
      */
     public abstract String getIdlTypename();
 
-    protected StringTemplate getIdlTypenameFromStringTemplate()
+    protected ST getIdlTypenameFromStringTemplate()
     {
         return idltypesgr.getInstanceOf("type_" + Integer.toHexString(m_kind));
     }
@@ -118,18 +138,12 @@ public abstract class TypeCode implements Notebook
     // By default there is not initial value. Function used in stringtemplates.
     public String getInitialValue()
     {
-        return "";
+        return null;
     }
 
     public String getJavaInitialValue()
     {
         return getInitialValue();
-    }
-
-    protected String getInitialValueFromStringTemplate()
-    {
-        Map initialValues = cpptypesgr.getMap("initialValues");
-        return initialValues.get(getStType()).toString();
     }
 
     // By default a typecode doesn't have a max size limit. Function used in stringtemplates
@@ -327,49 +341,51 @@ public abstract class TypeCode implements Notebook
         return m_annotations.values();
     }
 
+    void calculate_extensibility()
+    {
+        if (ExtensibilityKind.NOT_APPLIED == extensibility_)
+        {
+            if (null != m_annotations.get(Annotation.final_str) ||
+                    (null != m_annotations.get(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_str)))
+            {
+                extensibility_ = ExtensibilityKind.FINAL;
+            }
+            else if (null != m_annotations.get(Annotation.mutable_str) ||
+                    (null != m_annotations.get(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_str)))
+            {
+                extensibility_ = ExtensibilityKind.MUTABLE;
+            }
+            else
+            {
+                extensibility_ = ExtensibilityKind.APPENDABLE;
+            }
+        }
+    }
+
+    public ExtensibilityKind get_extensibility()
+    {
+        calculate_extensibility();
+        return extensibility_;
+    }
+
     public boolean isAnnotationFinal()
     {
-        Annotation ann = m_annotations.get("final");
-        if (ann != null)
-        {
-            return true;
-        }
-        ann = m_annotations.get("extensibility");
-        if (ann != null)
-        {
-            return ann.getValue().equals("FINAL");
-        }
-        return false;
+        calculate_extensibility();
+        return ExtensibilityKind.FINAL == extensibility_;
     }
 
     public boolean isAnnotationAppendable()
     {
-        Annotation ann = m_annotations.get("appendable");
-        if (ann != null)
-        {
-            return true;
-        }
-        ann = m_annotations.get("extensibility");
-        if (ann != null)
-        {
-            return ann.getValue().equals("APPENDABLE");
-        }
-        return false;
+        calculate_extensibility();
+        return ExtensibilityKind.APPENDABLE == extensibility_;
     }
 
     public boolean isAnnotationMutable()
     {
-        Annotation ann = m_annotations.get("mutable");
-        if (ann != null)
-        {
-            return true;
-        }
-        ann = m_annotations.get("extensibility");
-        if (ann != null)
-        {
-            return ann.getValue().equals("MUTABLE");
-        }
-        return false;
+        calculate_extensibility();
+        return ExtensibilityKind.MUTABLE == extensibility_;
     }
 
     public boolean isAnnotationNested()
@@ -413,4 +429,6 @@ public abstract class TypeCode implements Notebook
     private boolean m_forwarded = false;
 
     private boolean m_defined = false;
+
+    private ExtensibilityKind extensibility_ = ExtensibilityKind.NOT_APPLIED;
 }

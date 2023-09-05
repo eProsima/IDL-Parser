@@ -16,7 +16,7 @@ package com.eprosima.idl.parser.typecode;
 
 import com.eprosima.idl.util.Pair;
 import java.util.List;
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 
 
 
@@ -163,33 +163,33 @@ public class AliasTypeCode extends ContainerTypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("name", getTypedefContentTypeCode().getJavaTypename());
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("name", getTypedefContentTypeCode().getJavaTypename());
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
@@ -257,13 +257,13 @@ public class AliasTypeCode extends ContainerTypeCode
     {
         return super.getContentTypeCode().isIsArrayType();
     }
-   
+
     @Override
     public boolean isIsMapType()
     {
         return super.getContentTypeCode().isIsMapType();
     }
-       
+
     @Override
     public boolean isIsBitmaskType()
     {

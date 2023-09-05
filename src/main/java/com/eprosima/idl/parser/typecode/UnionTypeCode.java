@@ -14,9 +14,14 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import org.antlr.stringtemplate.StringTemplate;
+import java.util.Map;
+import org.stringtemplate.v4.ST;
+
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.tree.Annotation;
 
 
 
@@ -86,9 +91,10 @@ public class UnionTypeCode extends MemberedTypeCode
         List<String> labels = null;
         List<String> javalabels = null;
 
-        if (m_discriminatorTypeCode.getKind() == Kind.KIND_ENUM)
+        if (Kind.KIND_ENUM == m_discriminatorTypeCode.getKind() ||
+                Kind.KIND_BITMASK == m_discriminatorTypeCode.getKind())
         {
-            EnumTypeCode enum_type = (EnumTypeCode)m_discriminatorTypeCode;
+            MemberedTypeCode enum_type = (MemberedTypeCode)m_discriminatorTypeCode;
             labels = new ArrayList<String>();
             javalabels = new ArrayList<String>();
 
@@ -128,33 +134,33 @@ public class UnionTypeCode extends MemberedTypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("name", getCScopedname());
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("name", getCScopedname());
+        return st.render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("name", getJavaScopedname());
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("name", getJavaScopedname());
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     public void setDefaultvalue(
@@ -213,6 +219,44 @@ public class UnionTypeCode extends MemberedTypeCode
     public boolean isIsPlain()
     {
         return false;
+    }
+
+    // Add member and the default one at the end.
+    public List<Map.Entry<Integer, Member>> getIdentifiedMembers()
+    {
+        int position = 0;
+        List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
+        AbstractMap.SimpleEntry<Integer, Member> default_member = null;
+
+        for (Member m : getMembers())
+        {
+            if (position == m_defaultindex)
+            {
+                default_member = new AbstractMap.SimpleEntry<>(position++, m);
+            }
+            else
+            {
+                ret_members.add(new AbstractMap.SimpleEntry<>(position++, m));
+            }
+        }
+
+        if (null != default_member)
+        {
+            ret_members.add(default_member);
+        }
+
+        return ret_members;
+    }
+
+    @Override
+    public void addAnnotation(
+            Context ctx,
+            Annotation annotation)
+    {
+        // Checks
+        check_annotation_for_aggregated_types(annotation);
+
+        super.addAnnotation(ctx, annotation);
     }
 
     private TypeCode m_discriminatorTypeCode = null;

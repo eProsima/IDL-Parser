@@ -24,7 +24,7 @@ public class UnionMember extends Member
         m_internallabels = labels;
         m_default = isDefault;
     }
-    
+
     public List<String> getInternalLabels()
     {
         return m_internallabels;
@@ -49,15 +49,20 @@ public class UnionMember extends Member
     {
         m_javalabels = labels;
     }
-    
+
     public boolean isDefault()
     {
         return m_default;
     }
-    
+
+    public boolean isPrintable()
+    {
+        return m_default || (null != m_labels && 0 < m_labels.size());
+    }
+
     private List<String> m_internallabels = null;
     private List<String> m_labels = null;
     private List<String> m_javalabels = null;
-    
+
     private boolean m_default = false;
 }

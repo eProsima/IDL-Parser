@@ -14,7 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 import com.eprosima.idl.parser.tree.Definition;
 
 
@@ -53,41 +53,41 @@ public class MapTypeCode extends ContainerTypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("key", getKeyTypeCode().getCppTypename());
-        st.setAttribute("value", getValueTypeCode().getCppTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("key", getKeyTypeCode().getCppTypename());
+        st.add("value", getValueTypeCode().getCppTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("key", getKeyTypeCode().getCTypename());
-        st.setAttribute("value", getValueTypeCode().getCTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("key", getKeyTypeCode().getCTypename());
+        st.add("value", getValueTypeCode().getCTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("key", getKeyTypeCode().getJavaTypename());
-        st.setAttribute("value", getValueTypeCode().getJavaTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("key", getKeyTypeCode().getJavaTypename());
+        st.add("value", getValueTypeCode().getJavaTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("key", getKeyTypeCode().getIdlTypename());
-        st.setAttribute("value", getValueTypeCode().getIdlTypename());
-        st.setAttribute("maxsize", m_maxsize);
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("key", getKeyTypeCode().getIdlTypename());
+        st.add("value", getValueTypeCode().getIdlTypename());
+        st.add("maxsize", m_maxsize);
+        return st.render();
     }
 
     public String getMaxsize()

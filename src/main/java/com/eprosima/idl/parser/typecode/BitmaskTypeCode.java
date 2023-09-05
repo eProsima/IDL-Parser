@@ -14,16 +14,16 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.parser.exception.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.context.Context;
 
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 
 
 
@@ -92,44 +92,44 @@ public class BitmaskTypeCode extends MemberedTypeCode
     @Override
     public String getInitialValue()
     {
-        //if(getMembers().size() > 0)
-        //{
-        //    return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
-        //}
+        if (getMembers().size() > 0)
+        {
+            return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
+        }
 
-        return ""; // Don't initialize bitmask
+        return "";
     }
 
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("name", getCScopedname());
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("name", getCScopedname());
+        return st.render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("name", getJavaScopedname());
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("name", getJavaScopedname());
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     public List<Bitmask> getBitmasks()
@@ -247,7 +247,7 @@ public class BitmaskTypeCode extends MemberedTypeCode
             // Sanity check
             Set<String> keys = m_bitmasks.keySet();
             for (String key : keys) {
-                int position = m_bitmasks.get(key).getPosition(); 
+                int position = m_bitmasks.get(key).getPosition();
                 if (position < 0 || position >= m_bit_bound)
                 {
                     throw new ParseException(null, "Bitmask member "+ key +" out of bounds. Requested position: "

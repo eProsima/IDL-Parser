@@ -27,25 +27,25 @@ public class PrimitiveTypeCode extends TypeCode
     @Override
     public String getCppTypename()
     {
-        return getCppTypenameFromStringTemplate().toString();
+        return getCppTypenameFromStringTemplate().render();
     }
 
     @Override
     public String getCTypename()
     {
-        return getCTypenameFromStringTemplate().toString();
+        return getCTypenameFromStringTemplate().render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        return getJavaTypenameFromStringTemplate().toString();
+        return getJavaTypenameFromStringTemplate().render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        return getIdlTypenameFromStringTemplate().toString();
+        return getIdlTypenameFromStringTemplate().render();
     }
 
     @Override

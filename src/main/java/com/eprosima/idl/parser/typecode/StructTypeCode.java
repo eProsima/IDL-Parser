@@ -13,13 +13,17 @@
 // limitations under the License.
 
 package com.eprosima.idl.parser.typecode;
-import com.eprosima.idl.parser.tree.Inherits;
-import com.eprosima.idl.context.Context;
 
-import org.antlr.stringtemplate.StringTemplate;
-
-import java.util.List;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.stringtemplate.v4.ST;
+
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Inherits;
+
 
 
 public class StructTypeCode extends MemberedTypeCode implements Inherits
@@ -47,33 +51,33 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("name", getCScopedname());
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("name", getCScopedname());
+        return st.render();
     }
 
     @Override
     public String getJavaTypename()
     {
-        StringTemplate st = getJavaTypenameFromStringTemplate();
-        st.setAttribute("name", getJavaScopedname());
-        return st.toString();
+        ST st = getJavaTypenameFromStringTemplate();
+        st.add("name", getJavaScopedname());
+        return st.render();
     }
 
     @Override
     public String getIdlTypename()
     {
-        StringTemplate st = getIdlTypenameFromStringTemplate();
-        st.setAttribute("name", getScopedname());
-        return st.toString();
+        ST st = getIdlTypenameFromStringTemplate();
+        st.add("name", getScopedname());
+        return st.render();
     }
 
     @Override
@@ -89,7 +93,8 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     {
         if (parent instanceof StructTypeCode)
         {
-            superTypes_.add((StructTypeCode)parent);
+            StructTypeCode parent_struct = (StructTypeCode)parent;
+            superTypes_.add(parent_struct);
         }
     }
 
@@ -132,6 +137,27 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return getMembers(true);
     }
 
+    public List<Map.Entry<Integer, Member>> getAllIdentifiedMembers()
+    {
+        int seq_id = 0;
+        List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
+
+        for (StructTypeCode p : superTypes_)
+        {
+            for (Member m : p.getAllMembers())
+            {
+                ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
+            }
+        }
+
+        for (Member m : getMembers())
+        {
+            ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
+        }
+
+        return ret_members;
+    }
+
     @Override
     public boolean isIsPlain()
     {
@@ -156,6 +182,17 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             }
         }
         return super.isIsBounded();
+    }
+
+    @Override
+    public void addAnnotation(
+            Context ctx,
+            Annotation annotation)
+    {
+        // Checks
+        check_annotation_for_aggregated_types(annotation);
+
+        super.addAnnotation(ctx, annotation);
     }
 
     private ArrayList<StructTypeCode> superTypes_;

@@ -15,7 +15,7 @@
 package com.eprosima.idl.parser.typecode;
 
 import com.eprosima.idl.util.Pair;
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 
 
 public class StringTypeCode extends TypeCode
@@ -69,17 +69,17 @@ public class StringTypeCode extends TypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate st = getCppTypenameFromStringTemplate();
-        st.setAttribute("max_size", m_maxsize);
-        return st.toString();
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("max_size", m_maxsize);
+        return st.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate st = getCTypenameFromStringTemplate();
-        st.setAttribute("maxsize", getMaxsize());
-        return st.toString();
+        ST st = getCTypenameFromStringTemplate();
+        st.add("maxsize", getMaxsize());
+        return st.render();
     }
 
     @Override
@@ -92,12 +92,6 @@ public class StringTypeCode extends TypeCode
     public String getIdlTypename()
     {
         return getIdlTypenameFromStringTemplate().toString();
-    }
-
-    @Override
-    public String getInitialValue()
-    {
-        return getInitialValueFromStringTemplate();
     }
 
     public String getMaxsize()

@@ -65,10 +65,3 @@ type_e_content_types ::= [
     "int":"Integer",
     default:
 ]
-
-initialValues ::= [
-    "type_d":"\"\"",
-    "type_15":"\"\"",
-    default: // not basic type.
-]
-

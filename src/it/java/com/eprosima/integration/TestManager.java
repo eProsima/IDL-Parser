@@ -40,11 +40,12 @@ public class TestManager
     private List<String> cMakeArgs;
     private boolean errorOutputOnly;
 
-    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath)
+    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath,
+            List<String> list_tests)
     {
         this.level = level;
         this.idlFiles = new ArrayList<>();
-        processIDLsDirectory(inputPath);
+        processIDLsDirectory(inputPath, list_tests);
         this.generatorName = generatorName;
         this.inputPath = inputPath;
         this.outputPath = outputPath;
@@ -53,11 +54,12 @@ public class TestManager
         this.errorOutputOnly = true;
     }
 
-    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath, String exampleArch)
+    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath, String exampleArch,
+            List<String> list_tests)
     {
         this.level = level;
         this.idlFiles = new ArrayList<>();
-        processIDLsDirectory(inputPath);
+        processIDLsDirectory(inputPath, list_tests);
         this.generatorName = generatorName;
         this.inputPath = inputPath;
         this.outputPath = outputPath;
@@ -66,7 +68,7 @@ public class TestManager
         this.errorOutputOnly = true;
     }
 
-    public void processIDLsDirectory(String directoryPath)
+    public void processIDLsDirectory(String directoryPath, List<String> list_tests)
     {
         File directory = new File(directoryPath);
         if (!directory.isDirectory())
@@ -74,18 +76,23 @@ public class TestManager
             System.err.println("Error: Invalid directory path");
             return;
         }
-    
+
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".idl"));
         if (files == null || files.length == 0)
         {
             System.out.println("No IDL files found in the directory");
             return;
         }
-    
+
         for (File file : files)
         {
             String idlName = file.getName().replaceAll("\\.idl$", "");
-            idlFiles.add(idlName);
+
+            if (null == list_tests ||
+                    list_tests.contains(idlName))
+            {
+                idlFiles.add(idlName);
+            }
         }
     }
 

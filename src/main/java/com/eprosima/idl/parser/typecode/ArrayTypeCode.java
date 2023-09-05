@@ -16,7 +16,7 @@ package com.eprosima.idl.parser.typecode;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.antlr.stringtemplate.StringTemplate;
+import org.stringtemplate.v4.ST;
 
 
 
@@ -55,67 +55,67 @@ public class ArrayTypeCode extends ContainerTypeCode
     @Override
     public String getCppTypename()
     {
-        StringTemplate first = null, second = null, fin = null;
+        ST first = null, second = null, fin = null;
         String prevf = null, prevs = null;
 
         for (int count = 0; count < m_dimensions.size(); ++count)
         {
             first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
             second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
-            second.setAttribute("size", m_dimensions.get(count));
+            second.add("size", m_dimensions.get(count));
 
             if (prevf != null)
             {
-                first.setAttribute("prev", prevf);
+                first.add("prev", prevf);
             }
             if (prevs != null)
             {
-                second.setAttribute("prev", prevs);
+                second.add("prev", prevs);
             }
 
-            prevf = first.toString();
-            prevs = second.toString();
+            prevf = first.render();
+            prevs = second.render();
         }
 
         fin = getCppTypenameFromStringTemplate();
-        fin.setAttribute("firs", prevf);
-        fin.setAttribute("secon", prevs);
-        fin.setAttribute("type", getContentTypeCode().getCppTypename());
+        fin.add("firs", prevf);
+        fin.add("secon", prevs);
+        fin.add("type", getContentTypeCode().getCppTypename());
 
-        return fin.toString();
+        return fin.render();
     }
 
     @Override
     public String getCTypename()
     {
-        StringTemplate first = null, second = null, fin = null;
+        ST first = null, second = null, fin = null;
         String prevf = null, prevs = null;
 
         for (int count = 0; count < m_dimensions.size(); ++count)
         {
             first = ctypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
             second = ctypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
-            second.setAttribute("size", m_dimensions.get(count));
+            second.add("size", m_dimensions.get(count));
 
             if (prevf != null)
             {
-                first.setAttribute("prev", prevf);
+                first.add("prev", prevf);
             }
             if (prevs != null)
             {
-                second.setAttribute("prev", prevs);
+                second.add("prev", prevs);
             }
 
-            prevf = first.toString();
-            prevs = second.toString();
+            prevf = first.render();
+            prevs = second.render();
         }
 
         fin = getCTypenameFromStringTemplate();
-        fin.setAttribute("firs", prevf);
-        fin.setAttribute("secon", prevs);
-        fin.setAttribute("type", getContentTypeCode().getCTypename());
+        fin.add("firs", prevf);
+        fin.add("secon", prevs);
+        fin.add("type", getContentTypeCode().getCTypename());
 
-        return fin.toString();
+        return fin.render();
     }
 
     public String getCTypeDimensions()
@@ -133,34 +133,34 @@ public class ArrayTypeCode extends ContainerTypeCode
     @Override
     public String getJavaTypename()
     {
-        StringTemplate first = null, second = null, fin = null;
+        ST first = null, second = null, fin = null;
         String prevf = null, prevs = null;
 
         for (int count = 0; count < m_dimensions.size(); ++count)
         {
             first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
             second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
-            second.setAttribute("size", m_dimensions.get(count));
+            second.add("size", m_dimensions.get(count));
 
             if (prevf != null)
             {
-                first.setAttribute("prev", prevf);
+                first.add("prev", prevf);
             }
             if (prevs != null)
             {
-                second.setAttribute("prev", prevs);
+                second.add("prev", prevs);
             }
 
-            prevf = first.toString();
-            prevs = second.toString();
+            prevf = first.render();
+            prevs = second.render();
         }
 
         fin = getJavaTypenameFromStringTemplate();
-        fin.setAttribute("firs", prevf);
-        fin.setAttribute("secon", prevs);
-        fin.setAttribute("type", getContentTypeCode().getJavaTypename());
+        fin.add("firs", prevf);
+        fin.add("secon", prevs);
+        fin.add("type", getContentTypeCode().getJavaTypename());
 
-        return fin.toString();
+        return fin.render();
     }
 
     public String getIdlTypename()
@@ -216,6 +216,12 @@ public class ArrayTypeCode extends ContainerTypeCode
         }
 
         return ret;
+    }
+
+    @Override
+    public String getInitialValue()
+    {
+        return getContentTypeCode().getInitialValue();
     }
 
     private List<String> m_dimensions;
