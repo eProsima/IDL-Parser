@@ -128,6 +128,14 @@ public abstract class TypeCode implements Notebook
         return getCppTypename().replaceAll("::", "_");
     }
 
+    /*!
+     * @brief
+     */
+    public String getNoScopedCppTypename()
+    {
+        return getCppTypename().substring(getCppTypename().lastIndexOf(":") + 1);
+    }
+
     // By default a typecode is not primitive. Function used in stringtemplates
     // TODO Cambiar a isIsPrimitive
     public boolean isPrimitive()
@@ -266,6 +274,11 @@ public abstract class TypeCode implements Notebook
     public boolean isIsStructType()
     {
         return isIsType_a();
+    }
+
+    public boolean isIsAliasType()
+    {
+        return isIsType_10();
     }
 
     public boolean isIsUnionType()
