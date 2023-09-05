@@ -50,12 +50,6 @@ public class BitmaskTypeCode extends MemberedTypeCode
     }
 
     @Override
-    public boolean isPrimitive()
-    {
-        return true;
-    }
-
-    @Override
     public boolean isIsBitmaskType()
     {
         return true;
@@ -87,17 +81,6 @@ public class BitmaskTypeCode extends MemberedTypeCode
             return "8";
         }
         return "4";
-    }
-
-    @Override
-    public String getInitialValue()
-    {
-        if (getMembers().size() > 0)
-        {
-            return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
-        }
-
-        return "";
     }
 
     @Override
