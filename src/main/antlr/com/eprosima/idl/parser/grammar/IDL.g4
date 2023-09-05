@@ -219,8 +219,10 @@ module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnP
 definition_list [DefinitionContainer dc] returns [TemplateGroup dlTemplates]
 @init{
     Pair<Vector<Definition>, TemplateGroup> dtg = null;
-    if(tmanager != null) {
-        $dlTemplates = tmanager.createTemplateGroup("definition_list");
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if(tmanager != null) {
+            $dlTemplates = tmanager.createTemplateGroup("definition_list");
+        }
     }
 }
     :   (
@@ -529,8 +531,10 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
     TypeCode typecode = null;
     String constName = null, constValue = null;
     TemplateGroup constTemplates = null;
-    if(tmanager != null) {
-        constTemplates = tmanager.createTemplateGroup("const_decl");
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if(tmanager != null) {
+            constTemplates = tmanager.createTemplateGroup("const_decl");
+        }
     }
     Token tk = null;
 }
@@ -817,8 +821,10 @@ type_declarator [AnnotationDeclaration annotation] returns [Pair<Vector<TypeCode
     Vector<TypeCode> vector = null;
     AliasTypeCode typedefTypecode = null;
     TemplateGroup typedefTemplates =  null;
-    if(tmanager != null) {
-        typedefTemplates = tmanager.createTemplateGroup("typedef_decl");
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if(tmanager != null) {
+            typedefTemplates = tmanager.createTemplateGroup("typedef_decl");
+        }
     }
 }
     :   type_spec[annotation] declarators
