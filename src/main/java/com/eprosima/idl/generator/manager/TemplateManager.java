@@ -86,6 +86,12 @@ public class TemplateManager
         m_groups.put(groupname, group);
     }
 
+    public void addGroupFromString(String groupname, String text)
+    {
+        STGroup group = new STGroupString(groupname, text, '$', '$');
+        m_groups.put(groupname, group);
+    }
+
     public TemplateGroup createTemplateGroup(String templatename)
     {
         TemplateGroup tg = new TemplateGroup();
