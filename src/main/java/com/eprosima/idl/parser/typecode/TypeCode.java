@@ -48,6 +48,7 @@ public abstract class TypeCode implements Notebook
         }
     };
 
+    public static ExtensibilityKind default_extensibility = ExtensibilityKind.APPENDABLE;
     public static STGroup idltypesgr  = null;
     public static STGroup cpptypesgr  = null;
     public static STGroup ctypesgr    = null;
@@ -369,6 +370,12 @@ public abstract class TypeCode implements Notebook
             {
                 extensibility_ = ExtensibilityKind.FINAL;
             }
+            else if (null != m_annotations.get(Annotation.appendable_str) ||
+                    (null != m_annotations.get(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_str)))
+            {
+                extensibility_ = ExtensibilityKind.APPENDABLE;
+            }
             else if (null != m_annotations.get(Annotation.mutable_str) ||
                     (null != m_annotations.get(Annotation.extensibility_str) &&
                      m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_str)))
@@ -377,7 +384,7 @@ public abstract class TypeCode implements Notebook
             }
             else
             {
-                extensibility_ = ExtensibilityKind.APPENDABLE;
+                extensibility_ = default_extensibility;
             }
         }
     }
