@@ -1,4 +1,4 @@
-// Copyright 2016 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2023 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,18 @@
 
 package com.eprosima.idl.parser.exception;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
+import java.lang.Exception;
+import com.eprosima.log.ColorMessage;
 
-public class ParseException extends RecognitionException
+public class RuntimeGenerationException extends Exception
 {
-    public ParseException()
+    public RuntimeGenerationException()
     {
-        super("", null, null, null);
+        super("");
     }
 
-    public ParseException(Token token, String message)
+    public RuntimeGenerationException(String message)
     {
-        super(message, null, null, null);
-
-        if(token != null)
-            setOffendingToken(token);
+        super(ColorMessage.error() + message);
     }
 }

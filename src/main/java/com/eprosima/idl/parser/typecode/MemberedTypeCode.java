@@ -116,14 +116,20 @@ public abstract class MemberedTypeCode extends TypeCode
     @Override
     public boolean isIsPlain()
     {
-        for (Member member : m_members.values())
+        if (isAnnotationFinal())
         {
-            if (!member.isIsPlain())
+            for (Member member : m_members.values())
             {
-                return false;
+                if (!member.isIsPlain())
+                {
+                    return false;
+                }
             }
+
+            return true;
         }
-        return true;
+
+        return false;
     }
 
     @Override
