@@ -84,6 +84,12 @@ public class BitmaskTypeCode extends MemberedTypeCode
     }
 
     @Override
+    public String getInitialValue()
+    {
+        return "0";
+    }
+
+    @Override
     public String getCppTypename()
     {
         ST st = getCppTypenameFromStringTemplate();
