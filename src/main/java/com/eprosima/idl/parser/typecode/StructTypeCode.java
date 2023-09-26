@@ -21,6 +21,7 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Inherits;
 
@@ -33,7 +34,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             String name)
     {
         super(Kind.KIND_STRUCT, scope, name);
-        superTypes_ = new ArrayList<StructTypeCode>();
+        superType_ = null;
     }
 
     @Override
@@ -89,24 +90,23 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public void addInheritance(
             Context ctx,
-            TypeCode parent)
+            TypeCode parent) throws RuntimeGenerationException
     {
-        if (parent instanceof StructTypeCode)
+        if (superType_ == null && parent instanceof StructTypeCode)
         {
             StructTypeCode parent_struct = (StructTypeCode)parent;
-            superTypes_.add(parent_struct);
+            superType_ = parent_struct;
+        }
+        else if (superType_ != null)
+        {
+            throw new RuntimeGenerationException("Only single type inheritance is supported");
         }
     }
 
     @Override
-    public ArrayList<TypeCode> getInheritances()
+    public TypeCode getInheritance()
     {
-        ArrayList<TypeCode> result = new ArrayList<TypeCode>();
-        for (StructTypeCode parent : superTypes_)
-        {
-            result.add(parent);
-        }
-        return result;
+        return superType_;
     }
 
     @Override
@@ -122,10 +122,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
 
         if (includeParents)
         {
-            for (StructTypeCode p : superTypes_)
-            {
-                allMembers.addAll(p.getAllMembers());
-            }
+            allMembers.addAll(superType_.getAllMembers());
         }
 
         allMembers.addAll(super.getMembers());
@@ -142,12 +139,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         int seq_id = 0;
         List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
 
-        for (StructTypeCode p : superTypes_)
+        for (Member m : superType_.getAllMembers())
         {
-            for (Member m : p.getAllMembers())
-            {
-                ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
-            }
+            ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
         }
 
         for (Member m : getMembers())
@@ -161,12 +155,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public boolean isIsPlain()
     {
-        for (StructTypeCode parent : superTypes_)
+        if (!superType_.isIsPlain())
         {
-            if (!parent.isIsPlain())
-            {
-                return false;
-            }
+            return false;
         }
         return super.isIsPlain();
     }
@@ -174,12 +165,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public boolean isIsBounded()
     {
-        for (StructTypeCode parent : superTypes_)
+        if (!superType_.isIsBounded())
         {
-            if (!parent.isIsBounded())
-            {
-                return false;
-            }
+            return false;
         }
         return super.isIsBounded();
     }
@@ -195,5 +183,5 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         super.addAnnotation(ctx, annotation);
     }
 
-    private ArrayList<StructTypeCode> superTypes_;
+    private StructTypeCode superType_;
 }
