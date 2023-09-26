@@ -27,6 +27,10 @@ public class Annotation
     public static final String ex_final_str = "FINAL";
     public static final String ex_appendable_str = "APPENDABLE";
     public static final String ex_mutable_str = "MUTABLE";
+    public static final String try_construct_str = "try_construct";
+    public static final String try_construct_discard_str = "DISCARD";
+    public static final String try_construct_use_default_str = "USE_DEFAULT";
+    public static final String try_construct_trim_str = "TRIM";
 
     public Annotation(AnnotationDeclaration declaration)
     {

@@ -158,5 +158,10 @@ public class MemberAppliedAnnotations implements Notebook
         return "";
     }
 
+    public boolean isAnnotationTryConstruct()
+    {
+        return m_annotations.get(Annotation.try_construct_str) != null;
+    }
+
     private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();
 }
