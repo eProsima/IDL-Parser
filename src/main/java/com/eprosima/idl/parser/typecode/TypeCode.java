@@ -14,16 +14,16 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.parser.tree.Annotation;
-import com.eprosima.idl.parser.tree.Notebook;
-import com.eprosima.idl.context.Context;
-
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Notebook;
 
 
 public abstract class TypeCode implements Notebook
@@ -48,7 +48,28 @@ public abstract class TypeCode implements Notebook
         }
     };
 
+    public enum TryConstructFailAction
+    {
+        INVALID(0),
+        DISCARD(1),
+        USE_DEFAULT(2),
+        TRIM(3);
+
+        private int value_ = 0;
+
+        private TryConstructFailAction(int value)
+        {
+            value_ = value;
+        }
+
+        public int get_value()
+        {
+            return value_;
+        }
+    };
+
     public static ExtensibilityKind default_extensibility = ExtensibilityKind.APPENDABLE;
+    public static TryConstructFailAction default_try_construct = TryConstructFailAction.DISCARD;
     public static STGroup idltypesgr  = null;
     public static STGroup cpptypesgr  = null;
     public static STGroup ctypesgr    = null;
@@ -483,6 +504,60 @@ public abstract class TypeCode implements Notebook
         return ExtensibilityKind.MUTABLE == extensibility_;
     }
 
+    void calculate_try_construct() throws RuntimeGenerationException
+    {
+        if (TryConstructFailAction.INVALID == try_construct_)
+        {
+            if (null != m_annotations.get(Annotation.try_construct_str))
+            {
+                if (m_annotations.get(Annotation.try_construct_str).getValue().equals(Annotation.try_construct_discard_str))
+                {
+                    try_construct_ = TryConstructFailAction.DISCARD;
+                }
+                else if (m_annotations.get(Annotation.try_construct_str).getValue().equals(Annotation.try_construct_use_default_str))
+                {
+                    try_construct_ = TryConstructFailAction.USE_DEFAULT;
+                }
+                else if (m_annotations.get(Annotation.try_construct_str).getValue().equals(Annotation.try_construct_trim_str))
+                {
+                    try_construct_ = TryConstructFailAction.TRIM;
+                }
+                else
+                {
+                    throw new RuntimeGenerationException("try_construct annotation does not have a recognized value");
+                }
+            }
+            else
+            {
+                try_construct_ = default_try_construct;
+            }
+        }
+    }
+
+    public TryConstructFailAction get_try_construct() throws RuntimeGenerationException
+    {
+        calculate_try_construct();
+        return try_construct_;
+    }
+
+    public boolean isAnnotationDiscard() throws RuntimeGenerationException
+    {
+        calculate_try_construct();
+        return TryConstructFailAction.DISCARD == try_construct_;
+    }
+
+    public boolean isAnnotationUseDefault() throws RuntimeGenerationException
+    {
+        calculate_try_construct();
+        return TryConstructFailAction.USE_DEFAULT == try_construct_;
+    }
+
+    public boolean isAnnotationTrim() throws RuntimeGenerationException
+    {
+        calculate_try_construct();
+        return TryConstructFailAction.TRIM == try_construct_;
+    }
+
     public boolean isAnnotationNested()
     {
         Annotation ann = m_annotations.get("nested");
@@ -526,4 +601,6 @@ public abstract class TypeCode implements Notebook
     private boolean m_defined = false;
 
     private ExtensibilityKind extensibility_ = ExtensibilityKind.NOT_APPLIED;
+
+    private TryConstructFailAction try_construct_ = TryConstructFailAction.INVALID;
 }

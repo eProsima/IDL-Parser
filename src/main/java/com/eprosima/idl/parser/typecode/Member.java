@@ -207,6 +207,11 @@ public class Member implements Notebook
         return "";
     }
 
+    public boolean isAnnotationTryConstruct()
+    {
+        return m_annotations.get(Annotation.try_construct_str) != null;
+    }
+
     public boolean isIsPlain()
     {
         if (m_typecode != null && !isAnnotationOptional())
