@@ -15,22 +15,23 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.typecode.TypeCode;
-
-import java.util.ArrayList;
 
 public interface Inherits
 {
     /*!
-     * @brief This function links all super types to the object.
+     * @brief This function links the super type to the object.
      * @param ctx Context used in the IDL parser. Can be useful for developers.
      * @param parent Super TypeCode to be linked.
+     * @throw RuntimeGenerationException if the super type has already been defined.
      */
-    public void addInheritance(Context ctx, TypeCode parent);
+    public void addInheritance(Context ctx, TypeCode parent) throws RuntimeGenerationException;
 
     /*!
-     * @brief This function returns all super types linked with the object.
-     * @return Map with the linked super types.
+     * @brief This function returns the super type linked with the object.
+     *        XTypes v1.3 Clause 7.2.2.4.5 The Type System supports single inheritance of Aggregated Types.
+     * @return Linked super type.
      */
-    public ArrayList<TypeCode> getInheritances();
+    public TypeCode getInheritance();
 }
