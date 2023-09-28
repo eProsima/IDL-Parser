@@ -157,6 +157,16 @@ public class Member implements Notebook
         return false;
     }
 
+    public boolean isAnnotationAutoidHash()
+    {
+        Annotation ann = m_annotations.get("autoid");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("HASH");
+        }
+        return false;
+    }
+
     public Short getAnnotationBitBound()
     {
         Annotation ann = m_annotations.get("bit_bound");
