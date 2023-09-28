@@ -163,5 +163,15 @@ public class MemberAppliedAnnotations implements Notebook
         return m_annotations.get(Annotation.try_construct_str) != null;
     }
 
+    public boolean isAnnotationAutoidHash()
+    {
+        Annotation ann = m_annotations.get("autoid");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("HASH");
+        }
+        return false;
+    }
+
     private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();
 }
