@@ -568,6 +568,16 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isAnnotationAutoidHash()
+    {
+        Annotation ann = m_annotations.get("autoid");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("HASH");
+        }
+        return false;
+    }
+
     public boolean isForwarded()
     {
         return m_forwarded;
