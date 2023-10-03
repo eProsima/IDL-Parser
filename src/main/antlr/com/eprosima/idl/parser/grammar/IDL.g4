@@ -388,7 +388,6 @@ interface_body [ExportContainer ec] returns [TemplateGroup elTemplates]
  */
 export [Vector<Annotation> annotations] returns [Pair<Vector<Export>, TemplateGroup> etg = null]
 @init {
-        // TODO Cambiar esto. No me gusta la forma.
         Vector<Export> vector = new Vector<Export>();
         Pair<Vector<TypeDeclaration>, TemplateGroup> tetg = null;
         Pair<ConstDeclaration, TemplateGroup> cetg = null;
@@ -1879,27 +1878,42 @@ enumerator [EnumTypeCode enumTP]
         }
     ;
 
-sequence_type returns [SequenceTypeCode typecode = null]
+sequence_type returns [Pair<SequenceTypeCode, TemplateGroup> returnPair = null]
 @init {
     TypeCode type = null;
     String maxsize = null;
     Definition def = null;
+    SequenceTypeCode typecode = null;
+    TemplateGroup sequenceTemplates = null;
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if (tmanager != null) {
+            sequenceTemplates = tmanager.createTemplateGroup("sequence_type");
+        }
+    }
 }
     :   ( (KW_SEQUENCE)
         LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   (KW_SEQUENCE)
         LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
         {
-           if(type != null)
-           {
-               $typecode = ctx.createSequenceTypeCode(maxsize);
-               $typecode.setContentTypeCode(type);
-           }
-           else if (def != null)
-           {
-               $typecode = ctx.createSequenceTypeCode(maxsize);
-               $typecode.setContentDefinition(def);
-           }
+            if(type != null)
+            {
+                typecode = ctx.createSequenceTypeCode(maxsize);
+                typecode.setContentTypeCode(type);
+            }
+            else if (def != null)
+            {
+                typecode = ctx.createSequenceTypeCode(maxsize);
+                typecode.setContentDefinition(def);
+            }
+
+            if(sequenceTemplates != null)
+            {
+                sequenceTemplates.setAttribute("sequence", typecode);
+                sequenceTemplates.setAttribute("ctx", ctx);
+            }
+
+            $returnPair = new Pair<SequenceTypeCode, TemplateGroup>(typecode, sequenceTemplates);
         }
     ;
 
@@ -1925,13 +1939,20 @@ set_type returns [SetTypeCode typecode = null]
         }
     ;
 
-map_type returns [MapTypeCode typecode = null]
+map_type returns [Pair<MapTypeCode, TemplateGroup> returnPair = null]
 @init {
     TypeCode keyType = null;
     TypeCode valueType = null;
     Definition keyDef = null;
     Definition valueDef = null;
     String maxsize = null;
+    MapTypeCode typecode = null;
+    TemplateGroup mapTemplates = null;
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if(tmanager != null) {
+            mapTemplates = tmanager.createTemplateGroup("map_type");
+        }
+    }
 }   :   KW_MAP
         LEFT_ANG_BRACKET simple_type_spec[null]
         {
@@ -1946,52 +1967,95 @@ map_type returns [MapTypeCode typecode = null]
         (COMA positive_int_const { maxsize=$positive_int_const.literalStr; } )?
         RIGHT_ANG_BRACKET
         {
-            $typecode = ctx.createMapTypeCode(maxsize);
+            typecode = ctx.createMapTypeCode(maxsize);
 
             if (keyType != null)
             {
-                $typecode.setKeyTypeCode(keyType);
+                typecode.setKeyTypeCode(keyType);
             }
             else if (keyDef != null)
             {
-                $typecode.setKeyDefinition(keyDef);
+                typecode.setKeyDefinition(keyDef);
             }
 
             if (valueType != null)
             {
-                $typecode.setValueTypeCode(valueType);
+                typecode.setValueTypeCode(valueType);
             }
             else if (valueDef != null)
             {
-                $typecode.setValueDefinition(valueDef);
+                typecode.setValueDefinition(valueDef);
             }
+
+            if(mapTemplates != null) {
+                mapTemplates.setAttribute("map", typecode);
+                mapTemplates.setAttribute("ctx", ctx);
+            }
+
+            $returnPair = new Pair<MapTypeCode, TemplateGroup>(typecode, mapTemplates);
         }
     ;
 
-string_type returns [TypeCode typecode = null]
+string_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 @init{
     String maxsize = null;
+    TypeCode typecode = null;
+    TemplateGroup stringTemplates = null;
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if(tmanager != null) {
+            stringTemplates = tmanager.createTemplateGroup("string_type");
+        }
+    }
 }
     :   ( KW_STRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_STRING )
-       {$typecode = ctx.createStringTypeCode(Kind.KIND_STRING, maxsize);}
+        {
+            typecode = ctx.createStringTypeCode(Kind.KIND_STRING, maxsize);
+            if (stringTemplates != null) {
+                stringTemplates.setAttribute("string", typecode);
+                stringTemplates.setAttribute("ctx", ctx);
+            }
+
+            $returnPair = new Pair<TypeCode, TemplateGroup>(typecode, stringTemplates);
+        }
     ;
 
-wide_string_type returns [TypeCode typecode = null]
+wide_string_type returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 @init
 {
     String maxsize = null;
+    TypeCode typecode = null;
+    TemplateGroup wstringTemplates = null;
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if(tmanager != null) {
+            wstringTemplates = tmanager.createTemplateGroup("wide_string_type");
+        }
+    }
 }
     :   ( KW_WSTRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_WSTRING )
-       {$typecode = ctx.createStringTypeCode(Kind.KIND_WSTRING, maxsize);}
+        {
+            typecode = ctx.createStringTypeCode(Kind.KIND_WSTRING, maxsize);
+            if (wstringTemplates != null) {
+                wstringTemplates.setAttribute("wstring", typecode);
+                wstringTemplates.setAttribute("ctx", ctx);
+            }
+
+            $returnPair = new Pair<TypeCode, TemplateGroup>(typecode, wstringTemplates);
+        }
     ;
 
-array_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> pair = null]
+array_declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup> pair = null]
 @init
 {
     Token tk = _input.LT(1);
     ArrayTypeCode typecode = ctx.createArrayTypeCode();
+    TemplateGroup arrayTemplates = null;
+    if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
+        if(tmanager != null) {
+            arrayTemplates = tmanager.createTemplateGroup("array_declarator");
+        }
+    }
 }
     :   ID
         (
@@ -2001,8 +2065,14 @@ array_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> pair = nu
             }
         )+
         {
+            if(arrayTemplates != null)
+            {
+                arrayTemplates.setAttribute("array", typecode);
+                arrayTemplates.setAttribute("ctx", ctx);
+            }
             Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
-            $pair = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
+            Pair<Pair<String, Token>, ContainerTypeCode> pp = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
+            $pair = new Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>(pp, arrayTemplates);
         }
     ;
 
