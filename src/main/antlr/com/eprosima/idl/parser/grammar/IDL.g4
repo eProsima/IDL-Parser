@@ -529,6 +529,7 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
 @init {
     ConstDeclaration constDecl = null;
     TypeCode typecode = null;
+    TemplateGroup template = null;
     String constName = null, constValue = null;
     TemplateGroup constTemplates = null;
     if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
@@ -538,7 +539,7 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
     }
     Token tk = null;
 }
-    :   KW_CONST const_type[annotation] { typecode=$const_type.typecode; tk = _input.LT(1);} identifier
+    :   KW_CONST const_type[annotation] { typecode=$const_type.returnPair.first(); template=$const_type.returnPair.second(); tk = _input.LT(1);} identifier
         {
             String error = ctx.checkIdentifier(Definition.Kind.CONST_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
@@ -557,6 +558,10 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
             {
                 constTemplates.setAttribute("ctx", ctx);
                 constTemplates.setAttribute("const", constDecl);
+                if (template !=null)
+                {
+                    constTemplates.setAttribute("const_type", template);
+                }
             }
 
             $returnPair = new Pair<ConstDeclaration, TemplateGroup>(constDecl, constTemplates);
@@ -927,11 +932,11 @@ base_type_spec returns [TypeCode typecode = null]
     ;
 
 template_type_spec returns [TypeCode typecode = null]
-    :   sequence_type { $typecode=$sequence_type.typecode; }
+    :   sequence_type { $typecode=$sequence_type.returnPair.first(); }
     |   set_type { $typecode=$set_type.typecode; }
-    |   map_type { $typecode=$map_type.typecode; }
-    |   string_type { $typecode=$string_type.typecode; }
-    |   wide_string_type { $typecode=$wide_string_type.typecode; }
+    |   map_type { $typecode=$map_type.returnPair.first(); }
+    |   string_type { $typecode=$string_type.returnPair.first(); }
+    |   wide_string_type { $typecode=$wide_string_type.returnPair.first(); }
     |   fixed_pt_type
     ;
 
@@ -1003,7 +1008,7 @@ simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = nu
     ;
 
 complex_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = null]
-    :   array_declarator { $ret=$array_declarator.pair; }
+    :   array_declarator { $ret=$array_declarator.pair.first(); }
     ;
 
 floating_pt_type returns [TypeCode typecode = null]
@@ -1274,7 +1279,7 @@ annotation_member [AnnotationDeclaration annotation]
     :
     const_type[annotation] simple_declarator ( KW_DEFAULT const_exp { literalStr=$const_exp.literalStr; } )? SEMICOLON
     {
-        if(!$annotation.addMember(new AnnotationMember($simple_declarator.ret.first().first(), $const_type.typecode, literalStr)))
+        if(!$annotation.addMember(new AnnotationMember($simple_declarator.ret.first().first(), $const_type.returnPair.first(), literalStr)))
         {
             throw new ParseException($simple_declarator.ret.first().second(), $simple_declarator.ret.first().first() + " was defined previously");
         }
@@ -2367,8 +2372,8 @@ param_type_spec returns [TypeCode typecode = null, Definition def = null]
     Pair<String, Token> pair = null;
 }
     :   base_type_spec { $typecode=$base_type_spec.typecode; }
-    |   string_type { $typecode=$string_type.typecode; }
-    |   wide_string_type { $typecode=$wide_string_type.typecode; }
+    |   string_type { $typecode=$string_type.returnPair.first(); }
+    |   wide_string_type { $typecode=$wide_string_type.returnPair.first(); }
     |   scoped_name
         {
             pair=$scoped_name.pair;
