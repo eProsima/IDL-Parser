@@ -565,18 +565,19 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
     ;
 
 // TODO Not supported fixed types: Show warning
-const_type[AnnotationDeclaration annotation] returns [TypeCode typecode = null]
+const_type[AnnotationDeclaration annotation] returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 @init{
     Pair<String, Token> pair = null;
+    TypeCode typecode = null;
 }
-    :   integer_type { $typecode = $integer_type.typecode; }
-    |   char_type { $typecode = $char_type.typecode; }
-    |   wide_char_type { $typecode = $wide_char_type.typecode; }
-    |   boolean_type { $typecode = $boolean_type.typecode; }
-    |   floating_pt_type { $typecode = $floating_pt_type.typecode; }
-    |   string_type { $typecode = $string_type.typecode; }
-    |   wide_string_type { $typecode = $wide_string_type.typecode; }
-    |   any_type { $typecode = $any_type.typecode; }
+    :   integer_type { $returnPair = new Pair<TypeCode, TemplateGroup>($integer_type.typecode, null); }
+    |   char_type { $returnPair = new Pair<TypeCode, TemplateGroup>($char_type.typecode, null); }
+    |   wide_char_type { $returnPair = new Pair<TypeCode, TemplateGroup>($wide_char_type.typecode, null); }
+    |   boolean_type { $returnPair = new Pair<TypeCode, TemplateGroup>($boolean_type.typecode, null); }
+    |   floating_pt_type { $returnPair = new Pair<TypeCode, TemplateGroup>($floating_pt_type.typecode, null); }
+    |   string_type { $returnPair = $string_type.returnPair; }
+    |   wide_string_type { $returnPair = $wide_string_type.returnPair; }
+    |   any_type { $returnPair = new Pair<TypeCode, TemplateGroup>($any_type.typecode, null); }
     |   fixed_pt_const_type
     |   scoped_name
         {
@@ -585,21 +586,23 @@ const_type[AnnotationDeclaration annotation] returns [TypeCode typecode = null]
             // Find first at annotation scope
             if ($annotation != null)
             {
-                $typecode = $annotation.getTypeCode(pair.first());
+                typecode = $annotation.getTypeCode(pair.first());
             }
 
             // Find typecode in the global map if not found.
-            if ($typecode == null)
+            if (typecode == null)
             {
-                $typecode = ctx.getTypeCode(pair.first());
+                typecode = ctx.getTypeCode(pair.first());
             }
 
-            if($typecode == null)
+            if(typecode == null)
             {
                 throw new ParseException(pair.second(), "was not defined previously");
             }
+
+            $returnPair = new Pair<TypeCode, TemplateGroup>(typecode, null);
         }
-    |   octet_type { $typecode = $octet_type.typecode; }
+    |   octet_type { $returnPair = new Pair<TypeCode, TemplateGroup>($octet_type.typecode, null); }
     ;
 
 /*   EXPRESSIONS   */
