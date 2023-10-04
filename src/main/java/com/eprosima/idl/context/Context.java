@@ -1302,7 +1302,7 @@ public class Context
     public String evaluate_literal(
             String str)
     {
-        String aux_str = "(" + str + ") | 0";
+        String aux_str = "(" + str.replace("::", "_") + ") | 0";
         String const_str = "";
 
         // Add all constants.
@@ -1313,13 +1313,18 @@ public class Context
             {
                 ConstDeclaration const_decl = (ConstDeclaration)definition;
 
-                if (const_decl.getTypeCode().isPrimitive())
+                if (const_decl.getTypeCode().isPrimitive() || const_decl.getTypeCode().isIsStringType() || const_decl.getTypeCode().isIsWStringType())
                 {
-                    const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getValue();
+                    if(str.contains("::")){
+                        const_str = const_str + ";" + const_decl.getFormatedScopedname() + "=" + const_decl.getValue();
+                    }else{
+                        const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getValue();
+                    }
                 }
             }
         }
 
+        const_str = const_str.replace("=L'", "='").replace("=L\"", "=\""); // remove "L" from wchar and wstring declarations
         aux_str = const_str + ";" + aux_str;
 
         // Process the math expression
