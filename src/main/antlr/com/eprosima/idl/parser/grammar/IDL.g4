@@ -2202,6 +2202,7 @@ array_declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, Tem
             {
                 arrayTemplates.setAttribute("array", typecode);
                 arrayTemplates.setAttribute("ctx", ctx);
+                arrayTemplates.setAttribute("array_type",tk.getText());
             }
             Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
             Pair<Pair<String, Token>, ContainerTypeCode> pp = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
