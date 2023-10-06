@@ -75,7 +75,7 @@ public class Test
 
     public boolean compile()
     {
-        return Command.execute("make", outputPath + "/build", errorOutputOnly, false);
+        return Command.execute("make", outputPath + "/build", errorOutputOnly, true);
     }
 
     public boolean run()
