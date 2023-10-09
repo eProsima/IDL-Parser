@@ -1320,9 +1320,10 @@ public class Context
 
                 if (const_decl.getTypeCode().isPrimitive() || const_decl.getTypeCode().isIsStringType() || const_decl.getTypeCode().isIsWStringType())
                 {
-                    if(str.contains("::")){
-                        const_str = const_str + ";" + const_decl.getFormatedScopedname() + "=" + const_decl.getValue();
-                    }else{
+                    const_str = const_str + ";" + const_decl.getFormatedScopedname() + "=" + const_decl.getValue();
+
+                    if (const_decl.getScope() == getScope())
+                    {
                         const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getValue();
                     }
                 }
