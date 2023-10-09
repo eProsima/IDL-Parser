@@ -22,10 +22,12 @@ public class StringTypeCode extends TypeCode
 {
     public StringTypeCode(
             int kind,
-            String maxsize)
+            String maxsize,
+            String evaluated_maxsize)
     {
         super(kind);
         m_maxsize = maxsize;
+        evaluated_maxsize_ = evaluated_maxsize;
     }
 
     @Override
@@ -104,6 +106,16 @@ public class StringTypeCode extends TypeCode
         return m_maxsize;
     }
 
+    public String getEvaluatedMaxsize()
+    {
+        if (evaluated_maxsize_ == null)
+        {
+            return getMaxsize();
+        }
+
+        return evaluated_maxsize_;
+    }
+
     @Override
     public boolean isIsPlain()
     {
@@ -117,4 +129,5 @@ public class StringTypeCode extends TypeCode
     }
 
     private String m_maxsize = null;
+    private String evaluated_maxsize_ = null;
 }

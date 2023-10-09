@@ -1886,7 +1886,7 @@ sequence_type returns [SequenceTypeCode typecode = null]
     Definition def = null;
 }
     :   ( (KW_SEQUENCE)
-        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } RIGHT_ANG_BRACKET
+        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   (KW_SEQUENCE)
         LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
         {
@@ -1909,7 +1909,7 @@ set_type returns [SetTypeCode typecode = null]
     String maxsize = null;
     Definition def = null;
 } : ( KW_SET
-        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } RIGHT_ANG_BRACKET
+        LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } COMA positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_SET
         LEFT_ANG_BRACKET simple_type_spec[null] { type=$simple_type_spec.typecode; def=$simple_type_spec.def; } RIGHT_ANG_BRACKET )
         {
@@ -1943,7 +1943,7 @@ map_type returns [MapTypeCode typecode = null]
             valueType=$simple_type_spec.typecode;
             valueDef=$simple_type_spec.def;
         }
-        (COMA positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } )?
+        (COMA positive_int_const { maxsize=$positive_int_const.literalStr; } )?
         RIGHT_ANG_BRACKET
         {
             $typecode = ctx.createMapTypeCode(maxsize);
@@ -1972,7 +1972,7 @@ string_type returns [TypeCode typecode = null]
 @init{
     String maxsize = null;
 }
-    :   ( KW_STRING LEFT_ANG_BRACKET positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } RIGHT_ANG_BRACKET
+    :   ( KW_STRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_STRING )
        {$typecode = ctx.createStringTypeCode(Kind.KIND_STRING, maxsize);}
     ;
@@ -1982,7 +1982,7 @@ wide_string_type returns [TypeCode typecode = null]
 {
     String maxsize = null;
 }
-    :   ( KW_WSTRING LEFT_ANG_BRACKET positive_int_const { maxsize=ctx.evaluate_literal($positive_int_const.literalStr); } RIGHT_ANG_BRACKET
+    :   ( KW_WSTRING LEFT_ANG_BRACKET positive_int_const { maxsize=$positive_int_const.literalStr; } RIGHT_ANG_BRACKET
     |   KW_WSTRING )
        {$typecode = ctx.createStringTypeCode(Kind.KIND_WSTRING, maxsize);}
     ;
@@ -1997,7 +1997,7 @@ array_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> pair = nu
         (
             fixed_array_size
             {
-               typecode.addDimension(ctx.evaluate_literal($fixed_array_size.literalStr));
+               typecode.addDimension($fixed_array_size.literalStr, ctx.evaluate_literal($fixed_array_size.literalStr));
             }
         )+
         {

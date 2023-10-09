@@ -20,10 +20,12 @@ import org.stringtemplate.v4.ST;
 public class SetTypeCode extends ContainerTypeCode
 {
     public SetTypeCode(
-            String maxsize)
+            String maxsize,
+            String evaluate_maxsize)
     {
         super(Kind.KIND_SET);
         m_maxsize = maxsize;
+        evaluated_maxsize_ = evaluate_maxsize;
     }
 
     @Override
@@ -96,6 +98,16 @@ public class SetTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
+    public String getEvaluatedMaxsize()
+    {
+        if (evaluated_maxsize_ == null)
+        {
+            return getMaxsize();
+        }
+
+        return evaluated_maxsize_;
+    }
+
     @Override
     public boolean isIsPlain()
     {
@@ -114,4 +126,6 @@ public class SetTypeCode extends ContainerTypeCode
     }
 
     private String m_maxsize = null;
+
+    private String evaluated_maxsize_ = null;
 }

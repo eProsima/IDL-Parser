@@ -592,7 +592,7 @@ public class Context
     public MapTypeCode createMapTypeCode(
             String maxsize)
     {
-        return new MapTypeCode(maxsize);
+        return new MapTypeCode(maxsize, evaluate_literal(maxsize));
     }
 
     public PrimitiveTypeCode createPrimitiveTypeCode(
@@ -604,20 +604,20 @@ public class Context
     public SequenceTypeCode createSequenceTypeCode(
             String maxsize)
     {
-        return new SequenceTypeCode(maxsize);
+        return new SequenceTypeCode(maxsize, evaluate_literal(maxsize));
     }
 
     public SetTypeCode createSetTypeCode(
             String maxsize)
     {
-        return new SetTypeCode(maxsize);
+        return new SetTypeCode(maxsize, evaluate_literal(maxsize));
     }
 
     public StringTypeCode createStringTypeCode(
             int kind,
             String maxsize)
     {
-        return new StringTypeCode(kind, maxsize);
+        return new StringTypeCode(kind, maxsize, evaluate_literal(maxsize));
     }
 
     public StructTypeCode createStructTypeCode(
@@ -1302,7 +1302,12 @@ public class Context
     public String evaluate_literal(
             String str)
     {
-        String aux_str = "(" + str + ") | 0";
+        if (null == str)
+        {
+            return null;
+        }
+
+        String aux_str = "(" + str.replace("::", "_") + ") | 0";
         String const_str = "";
 
         // Add all constants.
@@ -1313,13 +1318,19 @@ public class Context
             {
                 ConstDeclaration const_decl = (ConstDeclaration)definition;
 
-                if (const_decl.getTypeCode().isPrimitive())
+                if (const_decl.getTypeCode().isPrimitive() || const_decl.getTypeCode().isIsStringType() || const_decl.getTypeCode().isIsWStringType())
                 {
-                    const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getValue();
+                    const_str = const_str + ";" + const_decl.getFormatedScopedname() + "=" + const_decl.getValue();
+
+                    if (const_decl.getScope() == getScope())
+                    {
+                        const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getValue();
+                    }
                 }
             }
         }
 
+        const_str = const_str.replace("=L'", "='").replace("=L\"", "=\""); // remove "L" from wchar and wstring declarations
         aux_str = const_str + ";" + aux_str;
 
         // Process the math expression

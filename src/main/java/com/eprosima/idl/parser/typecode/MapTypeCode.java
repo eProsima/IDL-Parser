@@ -21,10 +21,12 @@ import com.eprosima.idl.parser.tree.Definition;
 public class MapTypeCode extends ContainerTypeCode
 {
     public MapTypeCode(
-            String maxsize)
+            String maxsize,
+            String evaluated_maxsize)
     {
         super(Kind.KIND_MAP);
         m_maxsize = maxsize;
+        evaluated_maxsize_ = evaluated_maxsize;
     }
 
     public boolean isIsType_19()
@@ -100,6 +102,16 @@ public class MapTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
+    public String getEvaluatedMaxsize()
+    {
+        if (evaluated_maxsize_ == null)
+        {
+            return getMaxsize();
+        }
+
+        return evaluated_maxsize_;
+    }
+
     public TypeCode getKeyTypeCode()
     {
         return m_keyTypeCode;
@@ -170,4 +182,5 @@ public class MapTypeCode extends ContainerTypeCode
     private Definition m_keyDefinition = null;
     private Definition m_valueDefinition = null;
     private String m_maxsize = null;
+    private String evaluated_maxsize_ = null;
 }
