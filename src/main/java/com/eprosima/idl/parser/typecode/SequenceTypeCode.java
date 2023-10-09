@@ -22,10 +22,12 @@ import org.stringtemplate.v4.ST;
 public class SequenceTypeCode extends ContainerTypeCode
 {
     public SequenceTypeCode(
-            String maxsize)
+            String maxsize,
+            String evaluated_maxsize)
     {
         super(Kind.KIND_SEQUENCE);
         m_maxsize = maxsize;
+        evaluated_maxsize_ = evaluated_maxsize;
     }
 
     @Override
@@ -117,6 +119,16 @@ public class SequenceTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
+    public String getEvaluatedMaxsize()
+    {
+        if (evaluated_maxsize_ == null)
+        {
+            return getMaxsize();
+        }
+
+        return evaluated_maxsize_;
+    }
+
     public boolean isUnbound()
     {
         return null == m_maxsize;
@@ -152,6 +164,8 @@ public class SequenceTypeCode extends ContainerTypeCode
     }
 
     private String m_maxsize = null;
+
+    private String evaluated_maxsize_ = null;
 
     protected boolean detect_recursive_ = false;
 }

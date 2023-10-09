@@ -25,7 +25,6 @@ public class ArrayTypeCode extends ContainerTypeCode
     public ArrayTypeCode()
     {
         super(Kind.KIND_ARRAY);
-        m_dimensions = new ArrayList<String>();
     }
 
     @Override
@@ -169,14 +168,21 @@ public class ArrayTypeCode extends ContainerTypeCode
     }
 
     public void addDimension(
-            String dimension)
+            String dimension,
+            String evaluated_dimension)
     {
         m_dimensions.add(dimension);
+        evaluated_dimensions_.add(evaluated_dimension);
     }
 
     public List<String> getDimensions()
     {
         return m_dimensions;
+    }
+
+    public List<String> getEvaluatedDimensions()
+    {
+        return evaluated_dimensions_;
     }
 
     public String getSize()
@@ -242,5 +248,7 @@ public class ArrayTypeCode extends ContainerTypeCode
         return initial_value;
     }
 
-    private List<String> m_dimensions;
+    private List<String> m_dimensions = new ArrayList<String>();
+
+    private List<String> evaluated_dimensions_ = new ArrayList<String>();
 }

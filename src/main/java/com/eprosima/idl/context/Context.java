@@ -592,7 +592,7 @@ public class Context
     public MapTypeCode createMapTypeCode(
             String maxsize)
     {
-        return new MapTypeCode(maxsize);
+        return new MapTypeCode(maxsize, evaluate_literal(maxsize));
     }
 
     public PrimitiveTypeCode createPrimitiveTypeCode(
@@ -604,20 +604,20 @@ public class Context
     public SequenceTypeCode createSequenceTypeCode(
             String maxsize)
     {
-        return new SequenceTypeCode(maxsize);
+        return new SequenceTypeCode(maxsize, evaluate_literal(maxsize));
     }
 
     public SetTypeCode createSetTypeCode(
             String maxsize)
     {
-        return new SetTypeCode(maxsize);
+        return new SetTypeCode(maxsize, evaluate_literal(maxsize));
     }
 
     public StringTypeCode createStringTypeCode(
             int kind,
             String maxsize)
     {
-        return new StringTypeCode(kind, maxsize);
+        return new StringTypeCode(kind, maxsize, evaluate_literal(maxsize));
     }
 
     public StructTypeCode createStructTypeCode(
@@ -1302,6 +1302,11 @@ public class Context
     public String evaluate_literal(
             String str)
     {
+        if (null == str)
+        {
+            return null;
+        }
+
         String aux_str = "(" + str.replace("::", "_") + ") | 0";
         String const_str = "";
 
