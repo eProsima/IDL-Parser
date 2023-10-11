@@ -112,6 +112,16 @@ public class Member implements Notebook
         return false;
     }
 
+    public boolean isAnnotationExternal()
+    {
+        Annotation ann = m_annotations.get("external");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
+    }
+
     public boolean isAnnotationMustUnderstand()
     {
         Annotation ann = m_annotations.get("must_understand");

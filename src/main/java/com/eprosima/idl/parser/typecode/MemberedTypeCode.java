@@ -157,6 +157,18 @@ public abstract class MemberedTypeCode extends TypeCode
         return false;
     }
 
+    public boolean getContainsExternal()
+    {
+        for (Member member : m_members.values())
+        {
+            if (member.isAnnotationExternal())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void check_annotation_for_aggregated_types(
             Annotation annotation)
     {
