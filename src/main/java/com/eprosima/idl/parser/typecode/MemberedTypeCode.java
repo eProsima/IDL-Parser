@@ -91,8 +91,62 @@ public abstract class MemberedTypeCode extends TypeCode
         return new ArrayList<Member>(m_members.values());
     }
 
-    public boolean addMember(Member member)
+    public boolean addMember(Member member) throws ParseException
     {
+        // Check annotations.
+        if (member.isAnnotationOptional() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @optional annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationExternal() && (
+                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @external annotations only supported for structure's members or union's members.");
+        }
+        if (member.isAnnotationMustUnderstand() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @must_understand annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationNonSerialized() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @non_serialized annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationKey() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @key annotations only supported for structure's members.");
+        }
+        if (null != member.getAnnotationBitBound() && (
+                    Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @bit_bound annotations only supported for structure's members or union's members.");
+        }
+        if (member.isAnnotationDefaultLiteral() && Kind.KIND_ENUM != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @default_literal annotations only supported for enumeration's members.");
+        }
+        if (null != member.getAnnotationValue() && Kind.KIND_ENUM != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @value annotations only supported for enumeration's members.");
+        }
+        if (null != member.getAnnotationPosition() && Kind.KIND_BITMASK != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @position annotations only supported for bitmask's members.");
+        }
+        if(member.isAnnotationKey() && member.isAnnotationNonSerialized())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @key and @non_serialized annotations are incompatible.");
+        }
+
         if(!m_members.containsKey(member.getName()))
         {
             m_members.put(member.getName(), member);
