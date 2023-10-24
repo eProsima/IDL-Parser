@@ -1554,7 +1554,7 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
 
 member_list [StructTypeCode structTP]
     :   (
-            member_def[structTP]
+            member_def
            {
                if($member_def.ret != null)
                {
@@ -1568,9 +1568,9 @@ member_list [StructTypeCode structTP]
         )*
     ;
 
-member_def [StructTypeCode structTP] returns [Vector<Pair<Pair<String, Token>, Member>> ret = null]
-    :   member[structTP] { $ret=$member.ret; }
-    |   annotation_appl defret=member_def[structTP]
+member_def returns [Vector<Pair<Pair<String, Token>, Member>> ret = null]
+    :   member { $ret=$member.ret; }
+    |   annotation_appl defret=member_def
         {
             if($defret.ret != null)
             {
@@ -1585,7 +1585,7 @@ member_def [StructTypeCode structTP] returns [Vector<Pair<Pair<String, Token>, M
         }
     ;
 
-member [StructTypeCode structTP] returns [Vector<Pair<Pair<String, Token>, Member>> ret = new Vector<Pair<Pair<String, Token>, Member>>()]
+member returns [Vector<Pair<Pair<String, Token>, Member>> ret = new Vector<Pair<Pair<String, Token>, Member>>()]
     :   type_spec[null] declarators SEMICOLON
         {
             if($type_spec.typecode!=null)
@@ -1771,6 +1771,11 @@ case_stmt [UnionTypeCode unionTP]
         {
             if($element_spec.ret != null)
             {
+                for (Annotation ann : annotations)
+                {
+                    $element_spec.ret.second().addAnnotation(ctx, ann);
+                }
+
                 int ret = unionTP.addMember($element_spec.ret.second());
 
                 if(ret == -1)
@@ -1780,11 +1785,6 @@ case_stmt [UnionTypeCode unionTP]
                 else if(ret == -2)
                 {
                     throw new ParseException($element_spec.ret.first().second(), " is also a default attribute. Another was defined previously.");
-                }
-
-                for (Annotation ann : annotations)
-                {
-                    $element_spec.ret.second().addAnnotation(ctx, ann);
                 }
             }
         }
@@ -2065,7 +2065,7 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
 
 opt_member_list [com.eprosima.idl.parser.tree.Exception exceptionObject]
     :  (
-          member[null]
+          member
           {
               for(int count = 0; count < $member.ret.size(); ++count)
                   $exceptionObject.addMember($member.ret.get(count).second());

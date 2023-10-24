@@ -266,4 +266,6 @@ public class UnionTypeCode extends MemberedTypeCode
     private String m_defaultValue = null;
 
     private String m_javaDefaultValue = null;
+
+    protected boolean detect_recursive_ = false;
 }

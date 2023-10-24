@@ -80,8 +80,7 @@ public class Test
 
     public boolean run()
     {
-        String executableName = idl + "SerializationTest";
-        boolean exitStatus = Command.execute("./" + executableName, outputPath + "/build", errorOutputOnly, false);
+        boolean exitStatus = Command.execute("ctest -V", outputPath + "/build", errorOutputOnly, false);
         if (!exitStatus) {
             return false;
         }
@@ -89,4 +88,3 @@ public class Test
         return true;
     }
 }
-

@@ -196,4 +196,6 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     }
 
     private ArrayList<StructTypeCode> superTypes_;
+
+    protected boolean detect_recursive_ = false;
 }

@@ -77,17 +77,7 @@ public class Member implements Notebook
     {
         if(annotation != null)
         {
-            if (((annotation.getName().equals("key") || annotation.getName().equals("Key") )
-                && isAnnotationNonSerialized())
-                || (annotation.getName().equals("non_serialized") && isAnnotationKey()))
-            {
-                System.err.println("ERROR: Member " + m_name + " has incompatible annotations key and non_serialized.");
-                System.exit(1);
-            }
-            else
-            {
-                m_annotations.put(annotation.getName(), annotation);
-            }
+            m_annotations.put(annotation.getName(), annotation);
         }
     }
 
@@ -105,6 +95,16 @@ public class Member implements Notebook
     public boolean isAnnotationOptional()
     {
         Annotation ann = m_annotations.get("optional");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("TRUE");
+        }
+        return false;
+    }
+
+    public boolean isAnnotationExternal()
+    {
+        Annotation ann = m_annotations.get("external");
         if (ann != null)
         {
             return ann.getValue().toUpperCase().equals("TRUE");
