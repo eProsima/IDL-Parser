@@ -124,7 +124,7 @@ public abstract class MemberedTypeCode extends TypeCode
                     Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @bit_bound annotations only supported for structure's members or union's members.");
+                    ": @bit_bound annotations only supported for enumeration's members or bitmask's members.");
         }
         if (member.isAnnotationDefaultLiteral() && Kind.KIND_ENUM != getKind())
         {
@@ -145,6 +145,11 @@ public abstract class MemberedTypeCode extends TypeCode
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @key and @non_serialized annotations are incompatible.");
+        }
+        if(member.isAnnotationKey() && member.isAnnotationOptional())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @key and @optional annotations are incompatible.");
         }
 
         if(!m_members.containsKey(member.getName()))
