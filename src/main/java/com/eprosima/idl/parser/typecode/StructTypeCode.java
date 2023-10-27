@@ -21,6 +21,7 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Inherits;
 
@@ -33,7 +34,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             String name)
     {
         super(Kind.KIND_STRUCT, scope, name);
-        superTypes_ = new ArrayList<StructTypeCode>();
+        super_type_ = null;
     }
 
     @Override
@@ -89,24 +90,40 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public void addInheritance(
             Context ctx,
-            TypeCode parent)
+            TypeCode parent) throws ParseException
     {
-        if (parent instanceof StructTypeCode)
+        if (super_type_ == null && parent instanceof StructTypeCode)
         {
             StructTypeCode parent_struct = (StructTypeCode)parent;
-            superTypes_.add(parent_struct);
+            super_type_ = parent_struct;
+        }
+        else if (super_type_ == null && parent instanceof AliasTypeCode)
+        {
+            AliasTypeCode alias = (AliasTypeCode)parent;
+            if (alias.getContentTypeCode() instanceof StructTypeCode)
+            {
+                StructTypeCode parent_struct = (StructTypeCode)alias.getContentTypeCode();
+                super_type_ = parent_struct;
+            }
+            else
+            {
+                throw new ParseException(null, "Given alias does not correspond to a structure");
+            }
+        }
+        else if (super_type_ != null)
+        {
+            throw new ParseException(null, "Only single type inheritance is supported");
+        }
+        else
+        {
+            throw new ParseException(null, "Inheritance must correspond to the name of a previously defined structure");
         }
     }
 
     @Override
-    public ArrayList<TypeCode> getInheritances()
+    public TypeCode getInheritance()
     {
-        ArrayList<TypeCode> result = new ArrayList<TypeCode>();
-        for (StructTypeCode parent : superTypes_)
-        {
-            result.add(parent);
-        }
-        return result;
+        return super_type_;
     }
 
     @Override
@@ -120,12 +137,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     {
         List<Member> allMembers = new ArrayList<Member>();
 
-        if (includeParents)
+        if (includeParents && super_type_ != null)
         {
-            for (StructTypeCode p : superTypes_)
-            {
-                allMembers.addAll(p.getAllMembers());
-            }
+            allMembers.addAll(super_type_.getAllMembers());
         }
 
         allMembers.addAll(super.getMembers());
@@ -142,9 +156,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         int seq_id = 0;
         List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
 
-        for (StructTypeCode p : superTypes_)
+        if (super_type_ != null)
         {
-            for (Member m : p.getAllMembers())
+            for (Member m : super_type_.getAllMembers())
             {
                 ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
             }
@@ -166,9 +180,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            for (StructTypeCode parent : superTypes_)
+            if (super_type_ != null)
             {
-                returned_value &= parent.isIsPlain();
+                returned_value &= super_type_.isIsPlain();
             }
             returned_value &= super.isIsPlain();
             detect_recursive_ = false;
@@ -189,9 +203,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            for (StructTypeCode parent : superTypes_)
+            if (super_type_ != null)
             {
-                returned_value &= parent.isIsBounded();
+                returned_value &= super_type_.isIsBounded();
             }
             returned_value &= super.isIsBounded();
             detect_recursive_ = false;
@@ -215,7 +229,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         super.addAnnotation(ctx, annotation);
     }
 
-    private ArrayList<StructTypeCode> superTypes_;
+    private StructTypeCode super_type_;
 
     protected boolean detect_recursive_ = false;
 }
