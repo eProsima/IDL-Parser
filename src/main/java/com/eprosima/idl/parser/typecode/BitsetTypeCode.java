@@ -145,7 +145,7 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
         }
         else
         {
-            throw new ParseException(null, "Inheritance must correspond to the name of a previously defined bit set");
+            throw new ParseException(null, "Inheritance must correspond to the name of a previously defined bitset");
         }
     }
 
