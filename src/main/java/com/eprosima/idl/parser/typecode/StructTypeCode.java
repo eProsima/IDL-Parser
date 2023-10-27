@@ -97,19 +97,26 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             StructTypeCode parent_struct = (StructTypeCode)parent;
             super_type_ = parent_struct;
         }
-        else if (super_type_ == null && parent instanceof AliasTypeCode &&
-            parent.getContentTypeCode() instanceof StructTypeCode)
+        else if (super_type_ == null && parent instanceof AliasTypeCode)
         {
-            StructTypeCode parent_struct = (StructTypeCode)parent.getContentTypeCode();
-            super_type_ = parent_struct;
+            AliasTypeCode alias = (AliasTypeCode)parent;
+            if (alias.getContentTypeCode() instanceof StructTypeCode)
+            {
+                StructTypeCode parent_struct = (StructTypeCode)alias.getContentTypeCode();
+                super_type_ = parent_struct;
+            }
+            else
+            {
+                throw new ParseException(null, "Given alias does not correspond to a structure");
+            }
         }
         else if (super_type_ != null)
         {
-            throw new ParseException("Only single type inheritance is supported");
+            throw new ParseException(null, "Only single type inheritance is supported");
         }
         else
         {
-            throw new ParseException("Inheritance must correspond to the name of a previously defined structure");
+            throw new ParseException(null, "Inheritance must correspond to the name of a previously defined structure");
         }
     }
 

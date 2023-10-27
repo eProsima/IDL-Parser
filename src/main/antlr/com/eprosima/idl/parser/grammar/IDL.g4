@@ -1316,7 +1316,7 @@ bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
         )?
         LEFT_BRACE bitfield[typecode] RIGHT_BRACE
         {
-            if (superType != null) typecode.addParent(superType);
+            if (superType != null) typecode.addInheritance(ctx, superType);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {

@@ -19,9 +19,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import org.stringtemplate.v4.ST;
 
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.tree.Inherits;
 
 
-public class BitsetTypeCode extends MemberedTypeCode
+public class BitsetTypeCode extends MemberedTypeCode implements Inherits
 {
     public BitsetTypeCode(
             String scope,
@@ -29,7 +32,7 @@ public class BitsetTypeCode extends MemberedTypeCode
     {
         super(Kind.KIND_BITSET, scope, name);
         m_bitfields = new LinkedHashMap<String, Bitfield>();
-        m_parents = new ArrayList<BitsetTypeCode>();
+        super_type_ = null;
     }
 
     @Override
@@ -86,12 +89,9 @@ public class BitsetTypeCode extends MemberedTypeCode
     {
         ArrayList<Bitfield> result = new ArrayList<Bitfield>();
 
-        if (includeParents)
+        if (includeParents && super_type_ != null)
         {
-            for (BitsetTypeCode m_parent : m_parents)
-            {
-                result.addAll(m_parent.getAllBitfields());
-            }
+            result.addAll(super_type_.getAllBitfields());
         }
 
         result.addAll(m_bitfields.values());
@@ -116,15 +116,43 @@ public class BitsetTypeCode extends MemberedTypeCode
         return false;
     }
 
-    public void addParent(
-            BitsetTypeCode parent)
+    @Override
+    public void addInheritance(
+            Context ctx,
+            TypeCode parent) throws ParseException
     {
-        m_parents.add(parent);
+        if (super_type_ == null && parent instanceof BitsetTypeCode)
+        {
+            BitsetTypeCode parent_bitset = (BitsetTypeCode)parent;
+            super_type_ = parent_bitset;
+        }
+        else if (super_type_ == null && parent instanceof AliasTypeCode)
+        {
+            AliasTypeCode alias = (AliasTypeCode)parent;
+            if (alias.getContentTypeCode() instanceof BitsetTypeCode)
+            {
+                BitsetTypeCode parent_bitset = (BitsetTypeCode)alias.getContentTypeCode();
+                super_type_ = parent_bitset;
+            }
+            else
+            {
+                throw new ParseException(null, "Given alias does not correspond to a bitset");
+            }
+        }
+        else if (super_type_ != null)
+        {
+            throw new ParseException(null, "Only single type inheritance is supported");
+        }
+        else
+        {
+            throw new ParseException(null, "Inheritance must correspond to the name of a previously defined bit set");
+        }
     }
 
-    public List<BitsetTypeCode> getParents()
+    @Override
+    public TypeCode getInheritance()
     {
-        return m_parents;
+        return super_type_;
     }
 
     public int getBitSize()
@@ -142,9 +170,9 @@ public class BitsetTypeCode extends MemberedTypeCode
     {
         int size = 0;
 
-        for (BitsetTypeCode parent : m_parents)
+        if (super_type_ != null)
         {
-            size += parent.getFullBitSize();
+            size += super_type_.getFullBitSize();
         }
 
         for (Bitfield bf : m_bitfields.values())
@@ -154,7 +182,7 @@ public class BitsetTypeCode extends MemberedTypeCode
         return size;
     }
 
-    private ArrayList<BitsetTypeCode> m_parents = null;
+    private BitsetTypeCode super_type_ = null;
     private LinkedHashMap<String, Bitfield> m_bitfields = null;
     private int m_current_base = 0;
 }
