@@ -15,7 +15,7 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
-import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
 public interface Inherits
@@ -24,9 +24,9 @@ public interface Inherits
      * @brief This function links the super type to the object.
      * @param ctx Context used in the IDL parser. Can be useful for developers.
      * @param parent Super TypeCode to be linked.
-     * @throw RuntimeGenerationException if the super type has already been defined.
+     * @throw ParseException if the super type has already been defined.
      */
-    public void addInheritance(Context ctx, TypeCode parent) throws RuntimeGenerationException;
+    public void addInheritance(Context ctx, TypeCode parent) throws ParseException;
 
     /*!
      * @brief This function returns the super type linked with the object.

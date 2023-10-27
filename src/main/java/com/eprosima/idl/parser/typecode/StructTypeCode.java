@@ -21,7 +21,7 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
-import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Inherits;
 
@@ -90,7 +90,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public void addInheritance(
             Context ctx,
-            TypeCode parent) throws RuntimeGenerationException
+            TypeCode parent) throws ParseException
     {
         if (superType_ == null && parent instanceof StructTypeCode)
         {
@@ -99,7 +99,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         }
         else if (superType_ != null)
         {
-            throw new RuntimeGenerationException("Only single type inheritance is supported");
+            throw new ParseException("Only single type inheritance is supported");
         }
     }
 
