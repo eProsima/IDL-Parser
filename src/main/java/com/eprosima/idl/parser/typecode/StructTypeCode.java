@@ -120,7 +120,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     {
         List<Member> allMembers = new ArrayList<Member>();
 
-        if (includeParents)
+        if (includeParents && superType_ != null)
         {
             allMembers.addAll(superType_.getAllMembers());
         }
@@ -139,9 +139,12 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         int seq_id = 0;
         List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
 
-        for (Member m : superType_.getAllMembers())
+        if (superType_ != null)
         {
-            ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
+            for (Member m : superType_.getAllMembers())
+            {
+                ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
+            }
         }
 
         for (Member m : getMembers())
@@ -160,7 +163,10 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            returned_value &= superType_.isIsPlain();
+            if (superType_ != null)
+            {
+                returned_value &= superType_.isIsPlain();
+            }
             returned_value &= super.isIsPlain();
             detect_recursive_ = false;
         }
@@ -180,7 +186,10 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            returned_value &= superType_.isIsBounded();
+            if (superType_ != null)
+            {
+                returned_value &= superType_.isIsBounded();
+            }
             returned_value &= super.isIsBounded();
             detect_recursive_ = false;
         }
