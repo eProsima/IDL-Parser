@@ -15,7 +15,6 @@
 package com.eprosima.idl.generator.manager;
 
 import com.eprosima.idl.generator.manager.TemplateGroup;
-import com.eprosima.log.ColorMessage;
 import com.eprosima.idl.parser.typecode.TypeCode;
 import com.eprosima.idl.context.Context;
 
@@ -32,34 +31,9 @@ import org.stringtemplate.v4.misc.STMessage;
 
 public class TemplateManager
 {
-    class TemplateErrorListener implements STErrorListener
-    {
-        @Override
-        public void compileTimeError(STMessage msg)
-        {
-            System.out.println(ColorMessage.error() + msg.toString());
-        }
+    private Map<String, STGroup> m_groups = new HashMap<String, STGroup>();
 
-        @Override
-        public void runTimeError(STMessage msg)
-        {
-            System.out.println(ColorMessage.error() + msg.toString());
-        }
-
-        @Override
-        public void IOError(STMessage msg)
-        {
-            System.out.println(ColorMessage.error() + msg.toString());
-        }
-
-        @Override
-        public void internalError(STMessage msg)
-        {
-            System.out.println(ColorMessage.error() + msg.toString());
-        }
-    }
-
-    private Map<String, STGroup> m_groups = null;
+    private boolean st_error_ = false;
 
     public TemplateManager(String stackTemplateNames, Context ctx, boolean generate_typesc)
     {
@@ -76,8 +50,6 @@ public class TemplateManager
         TypeCode.ctypesgr = new STGroupFile("com/eprosima/idl/templates/CTypes.stg", '$', '$');
         TypeCode.javatypesgr = new STGroupFile("com/eprosima/idl/templates/JavaTypes.stg", '$', '$');
         TypeCode.ctx = ctx;
-
-        m_groups = new HashMap<String, STGroup>();
     }
 
     public void addGroup(String groupname)
@@ -94,13 +66,13 @@ public class TemplateManager
 
     public TemplateGroup createTemplateGroup(String templatename)
     {
-        TemplateGroup tg = new TemplateGroup();
+        TemplateGroup tg = new TemplateGroup(this);
         Set<Entry<String, STGroup>> set = m_groups.entrySet();
         Iterator<Entry<String, STGroup>> it = set.iterator();
 
         while(it.hasNext())
         {
-            Map.Entry<String, STGroup> m = (Map.Entry<String, STGroup>)it.next();
+            Map.Entry<String, STGroup> m = it.next();
 
             // Obtain instance
             ST template = m.getValue().getInstanceOf(templatename);
@@ -114,5 +86,15 @@ public class TemplateManager
     public STGroup createStringTemplateGroup(String templateGroupName)
     {
         return new STGroupFile(templateGroupName, '$', '$');
+    }
+
+    public void set_st_error()
+    {
+        st_error_ = true;
+    }
+
+    public boolean get_st_error()
+    {
+        return st_error_;
     }
 }

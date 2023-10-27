@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.generator.manager;
 
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -22,19 +23,21 @@ import java.util.Map.Entry;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STWriter;
 
 import com.eprosima.log.Log;
 
 public class TemplateGroup
 {
-    private Map<String, ST> m_templates = null;
-    private Map<String, List<ST>> m_extensionstemplates = null;
+    private Map<String, ST> m_templates = new HashMap<String, ST>();
+    private Map<String, List<ST>> m_extensionstemplates = new HashMap<String, List<ST>>();
+    private TemplateErrorListener error_listener_ = null;
 
-    public TemplateGroup()
+    public TemplateGroup(TemplateManager manager)
     {
-        m_templates = new HashMap<String, ST>();
-        m_extensionstemplates = new HashMap<String, List<ST>>();
+        error_listener_ = new TemplateErrorListener(manager);
     }
 
     public void addTemplate(String groupname, ST template)
@@ -78,7 +81,7 @@ public class TemplateGroup
 
             while(it.hasNext())
             {
-                Map.Entry<String, ST> m = (Map.Entry<String, ST>)it.next();
+                Map.Entry<String, ST> m = it.next();
 
                 // Call setAttribute
                 ST template = tg.getTemplate(m.getKey());
@@ -86,7 +89,10 @@ public class TemplateGroup
                 if(template != null)
                 {
                     Log.printDebug("setting attribute (TemplateGroup) to template group " + m.getKey() + " from " + template.getName() + " to " + m.getValue().getName());
-                    m.getValue().add(attribute, template.render());
+                    StringWriter out = new StringWriter();
+                    STWriter wr = new AutoIndentWriter(out);
+                    template.write(wr, error_listener_);
+                    m.getValue().add(attribute, out.toString());
                 }
             }
         }
@@ -99,7 +105,7 @@ public class TemplateGroup
 
         while(it.hasNext())
         {
-            Map.Entry<String, ST> m = (Map.Entry<String, ST>)it.next();
+            Map.Entry<String, ST> m = it.next();
 
             // Call setAttribute
             Log.printDebug("setting attribute (obj1) to template group " + m.getKey() + " to " + m.getValue().getName());

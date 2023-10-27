@@ -161,27 +161,47 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public boolean isIsPlain()
     {
-        for (StructTypeCode parent : superTypes_)
+        boolean returned_value = true;
+
+        if (!detect_recursive_)
         {
-            if (!parent.isIsPlain())
+            detect_recursive_ = true;
+            for (StructTypeCode parent : superTypes_)
             {
-                return false;
+                returned_value &= parent.isIsPlain();
             }
+            returned_value &= super.isIsPlain();
+            detect_recursive_ = false;
         }
-        return super.isIsPlain();
+        else
+        {
+            returned_value = false;
+        }
+
+        return returned_value;
     }
 
     @Override
     public boolean isIsBounded()
     {
-        for (StructTypeCode parent : superTypes_)
+        boolean returned_value = true;
+
+        if (!detect_recursive_)
         {
-            if (!parent.isIsBounded())
+            detect_recursive_ = true;
+            for (StructTypeCode parent : superTypes_)
             {
-                return false;
+                returned_value &= parent.isIsBounded();
             }
+            returned_value &= super.isIsBounded();
+            detect_recursive_ = false;
         }
-        return super.isIsBounded();
+        else
+        {
+            returned_value = false;
+        }
+
+        return returned_value;
     }
 
     @Override

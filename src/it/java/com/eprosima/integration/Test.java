@@ -80,11 +80,6 @@ public class Test
 
     public boolean run()
     {
-        boolean exitStatus = Command.execute("ctest -V", outputPath + "/build", errorOutputOnly, false);
-        if (!exitStatus) {
-            return false;
-        }
-
-        return true;
+        return Command.execute("ctest -V", outputPath + "/build", errorOutputOnly, false);
     }
 }
