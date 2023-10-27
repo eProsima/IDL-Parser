@@ -34,7 +34,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             String name)
     {
         super(Kind.KIND_STRUCT, scope, name);
-        superType_ = null;
+        super_type_ = null;
     }
 
     @Override
@@ -92,18 +92,18 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             Context ctx,
             TypeCode parent) throws ParseException
     {
-        if (superType_ == null && parent instanceof StructTypeCode)
+        if (super_type_ == null && parent instanceof StructTypeCode)
         {
             StructTypeCode parent_struct = (StructTypeCode)parent;
-            superType_ = parent_struct;
+            super_type_ = parent_struct;
         }
-        else if (superType_ == null && parent instanceof AliasTypeCode &&
+        else if (super_type_ == null && parent instanceof AliasTypeCode &&
             parent.getContentTypeCode() instanceof StructTypeCode)
         {
             StructTypeCode parent_struct = (StructTypeCode)parent.getContentTypeCode();
-            superType_ = parent_struct;
+            super_type_ = parent_struct;
         }
-        else if (superType_ != null)
+        else if (super_type_ != null)
         {
             throw new ParseException("Only single type inheritance is supported");
         }
@@ -116,7 +116,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public TypeCode getInheritance()
     {
-        return superType_;
+        return super_type_;
     }
 
     @Override
@@ -130,9 +130,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     {
         List<Member> allMembers = new ArrayList<Member>();
 
-        if (includeParents && superType_ != null)
+        if (includeParents && super_type_ != null)
         {
-            allMembers.addAll(superType_.getAllMembers());
+            allMembers.addAll(super_type_.getAllMembers());
         }
 
         allMembers.addAll(super.getMembers());
@@ -149,9 +149,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         int seq_id = 0;
         List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
 
-        if (superType_ != null)
+        if (super_type_ != null)
         {
-            for (Member m : superType_.getAllMembers())
+            for (Member m : super_type_.getAllMembers())
             {
                 ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
             }
@@ -173,9 +173,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            if (superType_ != null)
+            if (super_type_ != null)
             {
-                returned_value &= superType_.isIsPlain();
+                returned_value &= super_type_.isIsPlain();
             }
             returned_value &= super.isIsPlain();
             detect_recursive_ = false;
@@ -196,9 +196,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            if (superType_ != null)
+            if (super_type_ != null)
             {
-                returned_value &= superType_.isIsBounded();
+                returned_value &= super_type_.isIsBounded();
             }
             returned_value &= super.isIsBounded();
             detect_recursive_ = false;
@@ -222,7 +222,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         super.addAnnotation(ctx, annotation);
     }
 
-    private StructTypeCode superType_;
+    private StructTypeCode super_type_;
 
     protected boolean detect_recursive_ = false;
 }
