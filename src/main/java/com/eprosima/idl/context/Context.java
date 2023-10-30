@@ -979,8 +979,10 @@ public class Context
                                         }
                                     }
 
-                                    m_directIncludeDependencies.add(includeFile.substring(0,
-                                            includeFile.length() - 4).replace('.', '_'));
+                                    String dependencie_to_add = includeFile.substring(0, includeFile.length() - 4).replace('.', '_');
+                                    dependencie_to_add = dependencie_to_add.replaceAll("__/", "../");// Change back to "." for relative paths.
+
+                                    m_directIncludeDependencies.add(dependencie_to_add);
                                 }
                             }
                             else
