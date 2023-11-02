@@ -982,9 +982,9 @@ public class Context
                                     String dependency_to_add =
                                     includeFile.substring(0, includeFile.length() - 4).replace('.', '_');
                                     // Change back to "." for relative paths.
-                                    dependencie_to_add = dependencie_to_add.replaceAll("__/", "../");
+                                    dependency_to_add = dependency_to_add.replaceAll("__/", "../");
 
-                                    m_directIncludeDependencies.add(dependencie_to_add);
+                                    m_directIncludeDependencies.add(dependency_to_add);
                                 }
                             }
                             else
