@@ -16,7 +16,7 @@ package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
-import com.eprosima.idl.parser.typecode.EnumTypeCode;;
+import com.eprosima.idl.parser.typecode.EnumTypeCode;
 import com.eprosima.idl.parser.typecode.AliasTypeCode;
 import com.eprosima.idl.parser.tree.ConstDeclaration;
 
