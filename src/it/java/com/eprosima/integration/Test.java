@@ -115,11 +115,10 @@ public class Test
             return false;
         }
 
-        boolean exitStatus = Command.execute("./" + executableName, outputPath + "/build", errorOutputOnly, false);
+        boolean exitStatus = Command.execute("ctest -V" + " ./" + executableName, outputPath + "/build", errorOutputOnly, false);
         if (!exitStatus) {
             return false;
         }
-
-        return Command.execute("ctest -V " + "./" + executableName, outputPath + "/build", errorOutputOnly, false);
+        return exitStatus;
     }
 }
