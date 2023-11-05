@@ -39,9 +39,10 @@ public class TestManager
     private String exampleArch;
     private List<String> cMakeArgs;
     private boolean errorOutputOnly;
+    private String cdr_version_;
 
     public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath,
-            List<String> list_tests)
+            List<String> list_tests, String cdr_version)
     {
         this.level = level;
         this.idlFiles = new ArrayList<>();
@@ -52,10 +53,11 @@ public class TestManager
         this.exampleArch = null;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
+        this.cdr_version_ = cdr_version;
     }
 
     public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath, String exampleArch,
-            List<String> list_tests)
+            List<String> list_tests, String cdr_version)
     {
         this.level = level;
         this.idlFiles = new ArrayList<>();
@@ -66,6 +68,7 @@ public class TestManager
         this.exampleArch = exampleArch;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
+        this.cdr_version_ = cdr_version;
     }
 
     public void processIDLsDirectory(String directoryPath, List<String> list_tests)
@@ -145,9 +148,9 @@ public class TestManager
 
             if (exampleArch == null)
             {
-                return printlnStatus(test.generate(generatorName, inputPath, level == TestLevel.RUN));
+                return printlnStatus(test.generate(generatorName, inputPath, cdr_version_, level == TestLevel.RUN));
             } else {
-                return printlnStatus(test.generate(generatorName, inputPath, exampleArch, level == TestLevel.RUN));
+                return printlnStatus(test.generate(generatorName, inputPath, exampleArch, cdr_version_, level == TestLevel.RUN));
             }
         }
 
