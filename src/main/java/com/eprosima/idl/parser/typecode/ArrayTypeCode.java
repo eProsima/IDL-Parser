@@ -200,7 +200,7 @@ public class ArrayTypeCode extends ContainerTypeCode
                 ret += " * ";
             }
 
-            ret += m_dimensions.get(count);
+            ret += "(" + m_dimensions.get(count) + ")";
         }
 
         if (!ret.isEmpty())

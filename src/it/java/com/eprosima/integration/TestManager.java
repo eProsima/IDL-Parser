@@ -41,12 +41,18 @@ public class TestManager
     private boolean errorOutputOnly;
     private String cdr_version_;
 
-    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath,
-            List<String> list_tests, String cdr_version)
+    public TestManager(
+            TestLevel level,
+            String generatorName,
+            String inputPath,
+            String outputPath,
+            String cdr_version,
+            List<String> list_tests,
+            List<String> blacklist_tests)
     {
         this.level = level;
         this.idlFiles = new ArrayList<>();
-        processIDLsDirectory(inputPath, list_tests);
+        processIDLsDirectory(inputPath, list_tests, blacklist_tests);
         this.generatorName = generatorName;
         this.inputPath = inputPath;
         this.outputPath = outputPath;
@@ -56,12 +62,19 @@ public class TestManager
         this.cdr_version_ = cdr_version;
     }
 
-    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath, String exampleArch,
-            List<String> list_tests, String cdr_version)
+    public TestManager(
+            TestLevel level,
+            String generatorName,
+            String inputPath,
+            String outputPath,
+            String exampleArch,
+            String cdr_version,
+            List<String> list_tests,
+            List<String> blacklist_tests)
     {
         this.level = level;
         this.idlFiles = new ArrayList<>();
-        processIDLsDirectory(inputPath, list_tests);
+        processIDLsDirectory(inputPath, list_tests, blacklist_tests);
         this.generatorName = generatorName;
         this.inputPath = inputPath;
         this.outputPath = outputPath;
@@ -71,7 +84,10 @@ public class TestManager
         this.cdr_version_ = cdr_version;
     }
 
-    public void processIDLsDirectory(String directoryPath, List<String> list_tests)
+    public void processIDLsDirectory(
+            String directoryPath,
+            List<String> list_tests,
+            List<String> blacklist_tests)
     {
         File directory = new File(directoryPath);
         if (!directory.isDirectory())
@@ -91,8 +107,8 @@ public class TestManager
         {
             String idlName = file.getName().replaceAll("\\.idl$", "");
 
-            if (null == list_tests ||
-                    list_tests.contains(idlName))
+            if ((null == list_tests || list_tests.contains(idlName)) &&
+                    (null == blacklist_tests || !blacklist_tests.contains(idlName)))
             {
                 idlFiles.add(idlName);
             }
