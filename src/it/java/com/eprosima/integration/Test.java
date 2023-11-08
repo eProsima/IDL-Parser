@@ -3,18 +3,37 @@ package com.eprosima.integration;
 import java.io.File;
 import java.util.List;
 
+
 public class Test
 {
+    public enum TestType
+    {
+        SERIALIZATION(0),
+        TYPEOBJECTS(1);
 
+        private int value;
+
+        TestType(int value)
+        {
+            this.value = value;
+        }
+
+        public int getValue()
+        {
+            return value;
+        }
+    }
     private String idl;
     private String outputPath;
     private boolean errorOutputOnly;
+    private TestType testType;
 
-    public Test(String idl, String outputPath, boolean errorOutputOnly)
+    public Test(String idl, String outputPath, boolean errorOutputOnly, TestType testType)
     {
         this.idl = idl;
         this.outputPath = outputPath + "/" + idl;
         this.errorOutputOnly = errorOutputOnly;
+        this.testType = testType;
     }
 ;
     public String getIDL()
@@ -87,6 +106,20 @@ public class Test
 
     public boolean run()
     {
-        return Command.execute("ctest -V", outputPath + "/build", errorOutputOnly, false);
+        String executableName;
+        if (testType == TestType.SERIALIZATION) {
+            executableName = idl + "SerializationTest";
+        }else if(testType == TestType.TYPEOBJECTS) {
+            executableName = idl + "TypeObjectTestingTest";
+        }else{
+            return false;
+        }
+
+        boolean exitStatus = Command.execute("./" + executableName, outputPath + "/build", errorOutputOnly, false);
+        if (!exitStatus) {
+            return false;
+        }
+
+        return Command.execute("ctest -V " + "./" + executableName, outputPath + "/build", errorOutputOnly, false);
     }
 }
