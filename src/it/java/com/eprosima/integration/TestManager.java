@@ -82,21 +82,6 @@ public class TestManager
         this.errorOutputOnly = true;
     }
 
-    public TestManager(TestLevel level, String generatorName, String inputPath, String outputPath, String exampleArch, boolean typeobjectFlag,
-            List<String> list_tests)
-    {
-        this.level = level;
-        this.idlFiles = new ArrayList<>();
-        processIDLsDirectory(inputPath, list_tests);
-        this.generatorName = generatorName;
-        this.inputPath = inputPath;
-        this.outputPath = outputPath;
-        this.exampleArch = exampleArch;
-        this.typeobjectFlag = typeobjectFlag;
-        this.cMakeArgs = new ArrayList<String>();
-        this.errorOutputOnly = true;
-    }
-
     public void processIDLsDirectory(
             String directoryPath,
             List<String> list_tests,
