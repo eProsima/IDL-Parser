@@ -37,7 +37,6 @@ public class TestManager
     private String inputPath;
     private String outputPath;
     private String exampleArch;
-    private boolean typeobjectFlag;
     private List<String> cMakeArgs;
     private boolean errorOutputOnly;
 
@@ -56,7 +55,6 @@ public class TestManager
         this.inputPath = inputPath;
         this.outputPath = outputPath;
         this.exampleArch = null;
-        this.typeobjectFlag = false;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
     }
@@ -77,7 +75,6 @@ public class TestManager
         this.inputPath = inputPath;
         this.outputPath = outputPath;
         this.exampleArch = exampleArch;
-        this.typeobjectFlag = false;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
     }
@@ -137,19 +134,10 @@ public class TestManager
     {
         for (String idlFile : idlFiles)
         {
-            Test serialization_test = new Test(idlFile, outputPath, errorOutputOnly, Test.TestType.SERIALIZATION);
-            if (!run(serialization_test))
+            Test test = new Test(idlFile, outputPath, errorOutputOnly);
+            if (!run(test))
             {
                 return false;
-            }
-
-            if(typeobjectFlag)
-            {
-                Test typeobject_test = new Test(idlFile, outputPath, errorOutputOnly, Test.TestType.TYPEOBJECTS);
-                if (!run(typeobject_test))
-                {
-                    return false;
-                }
             }
         }
 
