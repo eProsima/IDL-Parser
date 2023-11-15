@@ -153,6 +153,11 @@ public class Annotation
         return getName().equals("hashid");
     }
 
+    public int getValuesSize()
+    {
+        return m_members.size();
+    }
+
     private HashMap<String, AnnotationMember> m_members = null;
     private AnnotationDeclaration m_declaration = null;
 }
