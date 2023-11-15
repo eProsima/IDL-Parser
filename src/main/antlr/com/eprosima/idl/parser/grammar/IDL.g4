@@ -27,7 +27,6 @@ grammar IDL;
     import com.eprosima.idl.parser.strategy.DefaultErrorStrategy;
     import com.eprosima.idl.parser.listener.DefaultErrorListener;
     import com.eprosima.idl.parser.exception.ParseException;
-    import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 
     import java.util.Vector;
 }
@@ -1544,14 +1543,7 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
             vector.add(structTP);
             if (parentStruct != null)
             {
-                try
-                {
-                    structTP.addInheritance(ctx, parentStruct);
-                }
-                catch (RuntimeGenerationException e)
-                {
-                    throw new ParseException(null, e.getMessage());
-                }
+                structTP.addInheritance(ctx, parentStruct);
             }
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
             $fw_name = (fw_declaration) ? name : null;
