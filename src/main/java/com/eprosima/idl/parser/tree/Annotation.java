@@ -153,6 +153,46 @@ public class Annotation
         return getName().equals("hashid");
     }
 
+    public boolean isIsBuiltin()
+    {
+        if (getName().equals("id") ||
+            getName().equals("autoid") ||
+            getName().equals("optional") ||
+            getName().equals("position") ||
+            getName().equals("value") ||
+            getName().equals("extensibility") ||
+            getName().equals("final") ||
+            getName().equals("appendable") ||
+            getName().equals("mutable") ||
+            getName().equals("key") ||
+            getName().equals("Key") ||
+            getName().equals("must_understand") ||
+            getName().equals("default_literal") ||
+            getName().equals("default") ||
+            getName().equals("range") ||
+            getName().equals("min") ||
+            getName().equals("max") ||
+            getName().equals("unit") ||
+            getName().equals("bit_bound") ||
+            getName().equals("external") ||
+            getName().equals("nested") ||
+            getName().equals("verbatim") ||
+            getName().equals("service") ||
+            getName().equals("oneway") ||
+            getName().equals("ami") ||
+            getName().equals("hashid") ||
+            getName().equals("default_nested") ||
+            getName().equals("ignore_literal_names") ||
+            getName().equals("try_construct") ||
+            getName().equals("non_serialized") ||
+            getName().equals("data_representation") ||
+            getName().equals("topic"))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public int getValuesSize()
     {
         return m_members.size();
