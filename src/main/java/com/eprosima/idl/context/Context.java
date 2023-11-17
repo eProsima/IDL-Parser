@@ -14,6 +14,8 @@
 
 package com.eprosima.idl.context;
 
+import com.eprosima.idl.generator.manager.TemplateGroup;
+import com.eprosima.idl.generator.manager.TemplateManager;
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.AnnotationDeclaration;
@@ -63,6 +65,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import org.antlr.v4.runtime.Token;
+import org.stringtemplate.v4.STGroupFile;
 
 
 
@@ -70,9 +73,15 @@ import org.antlr.v4.runtime.Token;
 public class Context
 {
     public Context(
+            TemplateManager tmanager,
             String file,
-            ArrayList<String> includePaths)
+            ArrayList<String> includePaths,
+            boolean generate_typesc
+            )
     {
+        tmanager_ = tmanager;
+        generate_typesc_ = generate_typesc;
+
         // Detect OS
         m_os = System.getProperty("os.name");
         m_userdir = System.getProperty("user.dir");
@@ -120,7 +129,7 @@ public class Context
         m_scopeFilesStack = new Stack<Pair<String, Integer>>();
         for (int i = 0; i < includePaths.size(); ++i)
         {
-            String include = (String)includePaths.get(i);
+            String include = includePaths.get(i);
             if (startsWith(include, includeFlag))
             {
                 include = include.substring(includeFlag.length());
@@ -171,6 +180,20 @@ public class Context
                 ++pointer;
             }
         }
+
+        // Load IDL types for stringtemplates
+        TypeCode.ctx = this;
+        TypeCode.idltypesgr = new STGroupFile("com/eprosima/idl/templates/idlTypes.stg", '$', '$');
+        if (generate_typesc)
+        {
+            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/TypesCInterface.stg", '$', '$');
+        }
+        else
+        {
+            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/Types.stg", '$', '$');
+        }
+        TypeCode.ctypesgr = new STGroupFile("com/eprosima/idl/templates/CTypes.stg", '$', '$');
+        TypeCode.javatypesgr = new STGroupFile("com/eprosima/idl/templates/JavaTypes.stg", '$', '$');
 
         // Add here builtin annotations? (IDL 4.2 - 8.3.1 section)
         AnnotationDeclaration idann = createAnnotationDeclaration("id", null);
@@ -374,13 +397,29 @@ public class Context
      * @brief This function adds a module to the context.
      * This function is used in the parser.
      */
-    public void addModule(
+    public TemplateGroup addModule(
             com.eprosima.idl.parser.tree.Module module)
     {
+        TemplateGroup moduleTemplates = null;
+
         if (!m_modules.containsKey(module.getScopedname()))
         {
             m_modules.put(module.getScopedname(), module);
         }
+
+        if(isInScopedFile() || isScopeLimitToAll()) {
+            if(tmanager_ != null) {
+                moduleTemplates = tmanager_.createTemplateGroup("module");
+                moduleTemplates.setAttribute("ctx", this);
+                // Set the module object to the TemplateGroup of the module.
+                moduleTemplates.setAttribute("module", module);
+            }
+        }
+
+        // Change context scope.
+        setScope(module.getScopedname());
+
+        return moduleTemplates;
     }
 
     public com.eprosima.idl.parser.tree.Module existsModule(
@@ -528,6 +567,16 @@ public class Context
         }
 
         return returnedValue;
+    }
+
+    public com.eprosima.idl.parser.tree.Module createModule(
+            String scope_file,
+            boolean is_in_scope,
+            String scope,
+            String name,
+            Token token)
+    {
+        return new com.eprosima.idl.parser.tree.Module (scope_file, is_in_scope, scope, name, token);
     }
 
     public Operation createOperation(
@@ -1351,6 +1400,11 @@ public class Context
         return aux_str;
     }
 
+    public boolean isGenerateTypesC()
+    {
+        return generate_typesc_;
+    }
+
     // OS
     String m_os = null;
     String m_userdir = null;
@@ -1401,4 +1455,8 @@ public class Context
     private HashSet<String> m_keywords = null;
 
     private boolean m_ignore_case = true;
+
+    private boolean generate_typesc_ = false;
+
+    protected TemplateManager tmanager_ = null;
 }
