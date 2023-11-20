@@ -176,27 +176,11 @@ module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnP
         if(moduleObject == null)
         {
             // Create the Module object.
-            moduleObject = new com.eprosima.idl.parser.tree.Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, tk);
-            //ctx.addPendingModule(moduleObject);
+            moduleObject = ctx.createModule(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, tk);
         }
 
-        // Add the module to the context.
-        ctx.addModule(moduleObject);
-
-        if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
-            if(tmanager != null) {
-                moduleTemplates = tmanager.createTemplateGroup("module");
-                moduleTemplates.setAttribute("ctx", ctx);
-                // Set the module object to the TemplateGroup of the module.
-                moduleTemplates.setAttribute("module", moduleObject);
-            }
-        }
-
-        // Update to a new namespace.
-        if(old_scope.isEmpty())
-            ctx.setScope(name);
-        else
-            ctx.setScope(old_scope + "::" + name);
+        // Add the module to the context and update to the new namespace (internally call ctx.setScope)
+        moduleTemplates = ctx.addModule(moduleObject);
     }
     // Each definition is stored in the Module and each TemplateGroup is set as attribute in the TemplateGroup of the module.
     LEFT_BRACE
@@ -1587,7 +1571,7 @@ member_list [StructTypeCode structTP] returns [TemplateGroup tg = null]
                         if(pair.first().second() != null)
                         {
                             $tg = pair.first().second();
-                        }                        
+                        }
                     }
                 }
             }
