@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.generator.manager.TemplateManager;
 import com.eprosima.idl.parser.grammar.IDLLexer;
 import com.eprosima.idl.parser.grammar.IDLParser;
 import com.eprosima.idl.parser.tree.Annotation;
@@ -75,7 +76,8 @@ public class TestIDLParser {
             return;
         }
 
-        Context context = new Context(idlFileName, m_includePaths);
+        TemplateManager tmanager = new TemplateManager();
+        Context context = new Context(tmanager, idlFileName, m_includePaths, false);
 
         try {
 
