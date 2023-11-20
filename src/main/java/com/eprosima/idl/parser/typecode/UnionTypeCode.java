@@ -32,7 +32,7 @@ public class UnionTypeCode extends MemberedTypeCode
             String name)
     {
         super(Kind.KIND_UNION, scope, name);
-        m_discriminatorTypeCode = null;
+        m_discriminator = null;
     }
 
     public UnionTypeCode(
@@ -41,13 +41,15 @@ public class UnionTypeCode extends MemberedTypeCode
             TypeCode discriminatorTypeCode)
     {
         super(Kind.KIND_UNION, scope, name);
-        m_discriminatorTypeCode = discriminatorTypeCode;
+        m_discriminator = new UnionMember(discriminatorTypeCode, "discriminator", null, false);
+        m_discriminator.setId(0);
     }
 
     public void setDiscriminatorType(
             TypeCode discriminatorTypeCode)
     {
-        m_discriminatorTypeCode = discriminatorTypeCode;
+        m_discriminator = new UnionMember(discriminatorTypeCode, "discriminator", null, false);
+        m_discriminator.setId(0);
     }
 
     @Override
@@ -91,10 +93,10 @@ public class UnionTypeCode extends MemberedTypeCode
         List<String> labels = null;
         List<String> javalabels = null;
 
-        if (Kind.KIND_ENUM == m_discriminatorTypeCode.getKind() ||
-                Kind.KIND_BITMASK == m_discriminatorTypeCode.getKind())
+        if (Kind.KIND_ENUM == m_discriminator.getTypecode().getKind() ||
+                Kind.KIND_BITMASK == m_discriminator.getTypecode().getKind())
         {
-            MemberedTypeCode enum_type = (MemberedTypeCode)m_discriminatorTypeCode;
+            MemberedTypeCode enum_type = (MemberedTypeCode)m_discriminator.getTypecode();
             labels = new ArrayList<String>();
             javalabels = new ArrayList<String>();
 
@@ -190,7 +192,7 @@ public class UnionTypeCode extends MemberedTypeCode
     // Used in stringtemplates
     public TypeCode getDiscriminator()
     {
-        return m_discriminatorTypeCode;
+        return m_discriminator.getTypecode();
     }
 
     // Used in stringtemplates
@@ -259,7 +261,7 @@ public class UnionTypeCode extends MemberedTypeCode
         super.addAnnotation(ctx, annotation);
     }
 
-    private TypeCode m_discriminatorTypeCode = null;
+    private UnionMember m_discriminator = null;
 
     private int m_defaultindex = -1;
 
