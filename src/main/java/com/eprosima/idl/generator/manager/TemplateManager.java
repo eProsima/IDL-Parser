@@ -15,8 +15,6 @@
 package com.eprosima.idl.generator.manager;
 
 import com.eprosima.idl.generator.manager.TemplateGroup;
-import com.eprosima.idl.parser.typecode.TypeCode;
-import com.eprosima.idl.context.Context;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -34,23 +32,6 @@ public class TemplateManager
     private Map<String, STGroup> m_groups = new HashMap<String, STGroup>();
 
     private boolean st_error_ = false;
-
-    public TemplateManager(String stackTemplateNames, Context ctx, boolean generate_typesc)
-    {
-        // Load IDL types for stringtemplates
-        TypeCode.idltypesgr = new STGroupFile("com/eprosima/idl/templates/idlTypes.stg", '$', '$');
-        if (generate_typesc)
-        {
-            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/TypesCInterface.stg", '$', '$');
-        }
-        else
-        {
-            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/Types.stg", '$', '$');
-        }
-        TypeCode.ctypesgr = new STGroupFile("com/eprosima/idl/templates/CTypes.stg", '$', '$');
-        TypeCode.javatypesgr = new STGroupFile("com/eprosima/idl/templates/JavaTypes.stg", '$', '$');
-        TypeCode.ctx = ctx;
-    }
 
     public void addGroup(String groupname)
     {
