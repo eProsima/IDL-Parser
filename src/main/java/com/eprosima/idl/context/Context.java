@@ -417,7 +417,14 @@ public class Context
         }
 
         // Change context scope.
-        setScope(module.getScopedname());
+        if (m_scope.isEmpty())
+        {
+            setScope(module.getName());
+        }
+        else
+        {
+            setScope(m_scope + "::" + module.getName());
+        }
 
         return moduleTemplates;
     }
@@ -736,7 +743,7 @@ public class Context
         TypeCode returnedValue = null;
         TypeDeclaration typedecl = m_types.get(name);
 
-        // Probar si no tiene scope, con el scope actual.
+        // Wether the name doesn't contain scope, test with the current scope.
         if (typedecl == null)
         {
             String scope = m_scope;
