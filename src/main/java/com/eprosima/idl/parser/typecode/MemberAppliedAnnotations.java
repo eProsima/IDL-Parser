@@ -19,11 +19,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Notebook;
 
 public class MemberAppliedAnnotations implements Notebook
 {
+    public enum TryConstructFailAction
+    {
+        INVALID(0),
+        DISCARD(1),
+        USE_DEFAULT(2),
+        TRIM(3);
+
+        private int value_ = 0;
+
+        private TryConstructFailAction(int value)
+        {
+            value_ = value;
+        }
+
+        public int get_value()
+        {
+            return value_;
+        }
+    };
+
+    public static TryConstructFailAction default_try_construct = TryConstructFailAction.DISCARD;
+
     @Override
     public void addAnnotation(Context ctx, Annotation annotation)
     {
@@ -248,4 +271,6 @@ public class MemberAppliedAnnotations implements Notebook
     }
 
     private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();
+
+    private TryConstructFailAction try_construct_ = TryConstructFailAction.INVALID;
 }
