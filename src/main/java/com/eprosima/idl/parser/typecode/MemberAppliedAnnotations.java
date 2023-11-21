@@ -24,11 +24,6 @@ import com.eprosima.idl.parser.tree.Notebook;
 
 public class MemberAppliedAnnotations implements Notebook
 {
-    public MemberAppliedAnnotations()
-    {
-        m_annotations = new HashMap<String, Annotation>();
-    }
-
     @Override
     public void addAnnotation(Context ctx, Annotation annotation)
     {
@@ -163,5 +158,5 @@ public class MemberAppliedAnnotations implements Notebook
         return "";
     }
 
-    private HashMap<String, Annotation> m_annotations = null;
+    private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();
 }

@@ -21,7 +21,6 @@ public abstract class ContainerTypeCode extends TypeCode
     protected ContainerTypeCode(int kind)
     {
         super(kind);
-        collection_element_ = new CollectionElement();
     }
 
     @Override
@@ -88,6 +87,6 @@ public abstract class ContainerTypeCode extends TypeCode
         return false;
     }
 
-    private CollectionElement collection_element_ = null;
+    private CollectionElement collection_element_ = new CollectionElement();
     private Definition m_contentDefinition = null;
 }
