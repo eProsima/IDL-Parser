@@ -46,11 +46,10 @@ public class Test
             String generatorName,
             String inputPath,
             String exampleArch,
-            String cdr_version,
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -cdr " + cdr_version + " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
+        String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
@@ -63,11 +62,10 @@ public class Test
     public boolean generate(
             String generatorName,
             String inputPath,
-            String cdr_version,
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -cdr " + cdr_version + " -replace -example" + (testFlag ? " -test" : "");
+        String flags = " -replace -example" + (testFlag ? " -test" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
