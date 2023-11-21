@@ -34,7 +34,7 @@ public abstract class ContainerTypeCode extends TypeCode
 
     public TypeCode getContentTypeCode()
     {
-        return m_contentTypeCode;
+        return collection_element_.getTypecode();
     }
 
     public Definition getContentDefinition()
@@ -44,7 +44,7 @@ public abstract class ContainerTypeCode extends TypeCode
 
     public void setContentTypeCode(TypeCode contentTypeCode)
     {
-        m_contentTypeCode = contentTypeCode;
+        collection_element_.setTypecode(contentTypeCode);
     }
 
     public void setContentDefinition(Definition contentDefinition)
@@ -56,11 +56,11 @@ public abstract class ContainerTypeCode extends TypeCode
     {
         int ret = 1;
 
-        if (m_contentTypeCode.isPrimitive()) {
+        if (collection_element_.getTypecode().isPrimitive()) {
     	    return ret;
     	} else {
-    	    if (m_contentTypeCode instanceof ContainerTypeCode) {
-    		    ret += ((ContainerTypeCode) m_contentTypeCode).getDepth();
+    	    if (collection_element_.getTypecode() instanceof ContainerTypeCode) {
+    		    ret += ((ContainerTypeCode) collection_element_.getTypecode()).getDepth();
     		}
     	}
 
@@ -70,9 +70,9 @@ public abstract class ContainerTypeCode extends TypeCode
     @Override
     public boolean isIsPlain()
     {
-        if (m_contentTypeCode != null)
+        if (collection_element_.getTypecode() != null)
         {
-            return m_contentTypeCode.isIsPlain();
+            return collection_element_.getTypecode().isIsPlain();
         }
         return false;
     }
@@ -80,13 +80,13 @@ public abstract class ContainerTypeCode extends TypeCode
     @Override
     public boolean isIsBounded()
     {
-        if (m_contentTypeCode != null)
+        if (collection_element_.getTypecode() != null)
         {
-            return m_contentTypeCode.isIsBounded();
+            return collection_element_.getTypecode().isIsBounded();
         }
         return false;
     }
 
-    private TypeCode m_contentTypeCode = null;
+    private CollectionElement collection_element_ = new CollectionElement();
     private Definition m_contentDefinition = null;
 }
