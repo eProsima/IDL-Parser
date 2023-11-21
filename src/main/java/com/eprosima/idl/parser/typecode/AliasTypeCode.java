@@ -132,7 +132,27 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public String getScopedname()
     {
-        if (m_scope.isEmpty())
+        String scoped_name = getFullScopedname();
+
+        if (!ctx.get_template_manager().get_current_template_stgroup().is_enabled_using_explicitly_modules())
+        {
+            return scoped_name;
+        }
+
+        String current_scope = ctx.getScope();
+
+        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+            return scoped_name;
+
+        return scoped_name.replace(current_scope + "::", "");
+    }
+
+    /*!
+     * @brief Return the scoped name of the type.
+     */
+    public String getFullScopedname()
+    {
+        if(m_scope.isEmpty())
         {
             return m_name;
         }

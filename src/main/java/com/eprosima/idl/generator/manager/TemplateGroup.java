@@ -31,42 +31,44 @@ import com.eprosima.log.Log;
 
 public class TemplateGroup
 {
-    private Map<String, ST> m_templates = new HashMap<String, ST>();
+    private Map<String, TemplateST> m_templates = new HashMap<String, TemplateST>();
     private Map<String, List<ST>> m_extensionstemplates = new HashMap<String, List<ST>>();
     private TemplateErrorListener error_listener_ = null;
+    private TemplateManager manager_ = null;
 
     public TemplateGroup(TemplateManager manager)
     {
+        manager_ = manager;
         error_listener_ = new TemplateErrorListener(manager);
     }
 
-    public void addTemplate(String groupname, ST template)
+    public void addTemplate(String groupname, TemplateST template)
     {
         m_templates.put(groupname, template);
     }
 
-    public void addTemplate(String groupname, ST template, List<ST> extensionstemplates)
+    public void addTemplate(String groupname, TemplateST template, List<ST> extensionstemplates)
     {
         addTemplate(groupname, template);
-        m_extensionstemplates.put(groupname + "_" + template.getName(), extensionstemplates);
+        m_extensionstemplates.put(groupname + "_" + template.getST().getName(), extensionstemplates);
     }
 
-    public ST getTemplate(String groupname)
+    public TemplateST getTemplate(String groupname)
     {
-        ST template = m_templates.get(groupname);
+        TemplateST template = m_templates.get(groupname);
 
         //If there is extensiones, add them before return the template.
-        if(m_extensionstemplates.containsKey(groupname + "_" + template.getName()))
+        if(m_extensionstemplates.containsKey(groupname + "_" + template.getST().getName()))
         {
             List<ST> extemplates = new ArrayList<ST>();
-            List<ST> extensions = m_extensionstemplates.get(groupname + "_" + template.getName());
+            List<ST> extensions = m_extensionstemplates.get(groupname + "_" + template.getST().getName());
 
             for(ST extension : extensions)
             {
                 extemplates.add(extension);
             }
 
-            template.add("extensions", extemplates);
+            template.getST().add("extensions", extemplates);
         }
 
         return template;
@@ -76,23 +78,30 @@ public class TemplateGroup
     {
         if(tg != null)
         {
-            Set<Entry<String, ST>> set = m_templates.entrySet();
-            Iterator<Entry<String, ST>> it = set.iterator();
+            Set<Entry<String, TemplateST>> set = m_templates.entrySet();
+            Iterator<Entry<String, TemplateST>> it = set.iterator();
 
             while(it.hasNext())
             {
-                Map.Entry<String, ST> m = it.next();
+                Map.Entry<String, TemplateST> m = it.next();
 
                 // Call setAttribute
-                ST template = tg.getTemplate(m.getKey());
+                TemplateST template = tg.getTemplate(m.getKey());
 
                 if(template != null)
                 {
-                    Log.printDebug("setting attribute (TemplateGroup) to template group " + m.getKey() + " from " + template.getName() + " to " + m.getValue().getName());
+                    // Before render, set the current TemplateSTGroup in TemplateManager.
+                    manager_.set_current_template_stgroup(m.getValue().getTemplateSTGroup());
+
+                    Log.printDebug("setting attribute (TemplateGroup) to template group " + m.getKey() + " from " +
+                            template.getST().getName() + " to " + m.getValue().getST().getName());
                     StringWriter out = new StringWriter();
                     STWriter wr = new AutoIndentWriter(out);
-                    template.write(wr, error_listener_);
-                    m.getValue().add(attribute, out.toString());
+                    template.getST().write(wr, error_listener_);
+                    m.getValue().getST().add(attribute, out.toString());
+
+                    // Unset the current TemplateSTGroup in TemplateManager.
+                    manager_.set_current_template_stgroup(null);
                 }
             }
         }
@@ -100,19 +109,20 @@ public class TemplateGroup
 
     public void setAttribute(String attribute, Object obj1)
     {
-        Set<Entry<String, ST>> set = m_templates.entrySet();
-        Iterator<Entry<String, ST>> it = set.iterator();
+        Set<Entry<String, TemplateST>> set = m_templates.entrySet();
+        Iterator<Entry<String, TemplateST>> it = set.iterator();
 
         while(it.hasNext())
         {
-            Map.Entry<String, ST> m = it.next();
+            Map.Entry<String, TemplateST> m = it.next();
 
             // Call setAttribute
-            Log.printDebug("setting attribute (obj1) to template group " + m.getKey() + " to " + m.getValue().getName());
-            ST template = m.getValue();
-            template.add(attribute, obj1);
+            Log.printDebug("setting attribute (obj1) to template group " + m.getKey() + " to " +
+                    m.getValue().getST().getName());
+            TemplateST template = m.getValue();
+            template.getST().add(attribute, obj1);
             // Update extensions
-            List<ST> extensions = m_extensionstemplates.get(m.getKey() + "_" + template.getName());
+            List<ST> extensions = m_extensionstemplates.get(m.getKey() + "_" + template.getST().getName());
             if(extensions != null)
             {
                 for(ST extension : extensions)
