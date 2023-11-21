@@ -37,7 +37,7 @@ public class TemplateUtil
 
     public static void setUnionDefaultLabel(ArrayList<Definition> defs, UnionTypeCode union_type, String scopeFile, int line)
     {
-        TypeCode dist_type = union_type.getDiscriminator();
+        TypeCode dist_type = union_type.getDiscriminator().getTypecode();
         List<Member> members = union_type.getMembers();
 
         if(dist_type != null && union_type.getDefaultMember() != null)
