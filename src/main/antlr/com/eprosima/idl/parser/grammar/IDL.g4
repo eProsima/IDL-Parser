@@ -1643,6 +1643,7 @@ member returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Member>> r
                     {
                         // Array declaration
                         $declarators.ret.get(count).first().second().setContentTypeCode($type_spec.returnPair.first());
+                        $declarators.ret.get(count).second().setAttribute("array_type", $type_spec.returnPair.first());
                         member = new Member($declarators.ret.get(count).first().second(), $declarators.ret.get(count).first().first().first());
 
                     }
@@ -2178,7 +2179,6 @@ array_declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, Tem
             {
                 arrayTemplates.setAttribute("array", typecode);
                 arrayTemplates.setAttribute("ctx", ctx);
-                arrayTemplates.setAttribute("array_type",tk.getText());
             }
             Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
             Pair<Pair<String, Token>, ContainerTypeCode> pp = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
