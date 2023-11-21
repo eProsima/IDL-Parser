@@ -324,7 +324,7 @@ public class TestIDLParser {
     }
 
     public void parseUnion(UnionTypeCode union) {
-        System.out.println("Start Union: " + union.getName() + " (" + union.getDiscriminator().getTypeIdentifier() + ")");
+        System.out.println("Start Union: " + union.getName() + " (" + union.getDiscriminator().getTypecode().getTypeIdentifier() + ")");
         for (Member member: union.getMembers()) {
             parseUnionMember((UnionMember)member);
         }
