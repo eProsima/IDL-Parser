@@ -50,7 +50,7 @@ public class TemplateGroup
     public void addTemplate(String groupname, TemplateST template, List<ST> extensionstemplates)
     {
         addTemplate(groupname, template);
-        m_extensionstemplates.put(groupname + "_" + template.getST().getName(), extensionstemplates);
+        m_extensionstemplates.put(groupname + "_" + template.get_st().getName(), extensionstemplates);
     }
 
     public TemplateST getTemplate(String groupname)
@@ -58,17 +58,17 @@ public class TemplateGroup
         TemplateST template = m_templates.get(groupname);
 
         //If there is extensiones, add them before return the template.
-        if(m_extensionstemplates.containsKey(groupname + "_" + template.getST().getName()))
+        if(m_extensionstemplates.containsKey(groupname + "_" + template.get_st().getName()))
         {
             List<ST> extemplates = new ArrayList<ST>();
-            List<ST> extensions = m_extensionstemplates.get(groupname + "_" + template.getST().getName());
+            List<ST> extensions = m_extensionstemplates.get(groupname + "_" + template.get_st().getName());
 
             for(ST extension : extensions)
             {
                 extemplates.add(extension);
             }
 
-            template.getST().add("extensions", extemplates);
+            template.get_st().add("extensions", extemplates);
         }
 
         return template;
@@ -91,14 +91,14 @@ public class TemplateGroup
                 if(template != null)
                 {
                     // Before render, set the current TemplateSTGroup in TemplateManager.
-                    manager_.set_current_template_stgroup(m.getValue().getTemplateSTGroup());
+                    manager_.set_current_template_stgroup(m.getValue().get_template_stgroup());
 
                     Log.printDebug("setting attribute (TemplateGroup) to template group " + m.getKey() + " from " +
-                            template.getST().getName() + " to " + m.getValue().getST().getName());
+                            template.get_st().getName() + " to " + m.getValue().get_st().getName());
                     StringWriter out = new StringWriter();
                     STWriter wr = new AutoIndentWriter(out);
-                    template.getST().write(wr, error_listener_);
-                    m.getValue().getST().add(attribute, out.toString());
+                    template.get_st().write(wr, error_listener_);
+                    m.getValue().get_st().add(attribute, out.toString());
 
                     // Unset the current TemplateSTGroup in TemplateManager.
                     manager_.set_current_template_stgroup(null);
@@ -118,11 +118,11 @@ public class TemplateGroup
 
             // Call setAttribute
             Log.printDebug("setting attribute (obj1) to template group " + m.getKey() + " to " +
-                    m.getValue().getST().getName());
+                    m.getValue().get_st().getName());
             TemplateST template = m.getValue();
-            template.getST().add(attribute, obj1);
+            template.get_st().add(attribute, obj1);
             // Update extensions
-            List<ST> extensions = m_extensionstemplates.get(m.getKey() + "_" + template.getST().getName());
+            List<ST> extensions = m_extensionstemplates.get(m.getKey() + "_" + template.get_st().getName());
             if(extensions != null)
             {
                 for(ST extension : extensions)

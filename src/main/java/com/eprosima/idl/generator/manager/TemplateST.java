@@ -21,15 +21,15 @@ public class TemplateST
     public TemplateST(TemplateSTGroup parent_group, String template_name)
     {
         parent_group_ = parent_group;
-        st_ = parent_group_.getSTGroup().getInstanceOf(template_name);
+        st_ = parent_group_.get_stgroup().getInstanceOf(template_name);
     }
 
-    public ST getST()
+    public ST get_st()
     {
         return st_;
     }
 
-    public TemplateSTGroup getTemplateSTGroup()
+    public TemplateSTGroup get_template_stgroup()
     {
         return parent_group_;
     }

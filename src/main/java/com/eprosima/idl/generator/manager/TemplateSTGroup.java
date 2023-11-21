@@ -28,7 +28,7 @@ public class TemplateSTGroup
         st_group_ = new STGroupString(groupname, text, '$', '$');
     }
 
-    public STGroup getSTGroup()
+    public STGroup get_stgroup()
     {
         return st_group_;
     }
