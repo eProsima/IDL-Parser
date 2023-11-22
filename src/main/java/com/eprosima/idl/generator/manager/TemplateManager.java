@@ -29,34 +29,38 @@ import org.stringtemplate.v4.misc.STMessage;
 
 public class TemplateManager
 {
-    private Map<String, STGroup> m_groups = new HashMap<String, STGroup>();
+    private Map<String, TemplateSTGroup> m_groups = new HashMap<String, TemplateSTGroup>();
 
     private boolean st_error_ = false;
 
-    public void addGroup(String groupname)
+    private TemplateSTGroup current_template_stgroup_ = null;
+
+    public TemplateSTGroup addGroup(String groupname)
     {
-        STGroup group = new STGroupFile(groupname, '$', '$');
+        TemplateSTGroup group = new TemplateSTGroup(groupname);
         m_groups.put(groupname, group);
+        return group;
     }
 
-    public void addGroupFromString(String groupname, String text)
+    public TemplateSTGroup addGroupFromString(String groupname, String text)
     {
-        STGroup group = new STGroupString(groupname, text, '$', '$');
+        TemplateSTGroup group = new TemplateSTGroup(groupname, text);
         m_groups.put(groupname, group);
+        return group;
     }
 
     public TemplateGroup createTemplateGroup(String templatename)
     {
         TemplateGroup tg = new TemplateGroup(this);
-        Set<Entry<String, STGroup>> set = m_groups.entrySet();
-        Iterator<Entry<String, STGroup>> it = set.iterator();
+        Set<Entry<String, TemplateSTGroup>> set = m_groups.entrySet();
+        Iterator<Entry<String, TemplateSTGroup>> it = set.iterator();
 
         while(it.hasNext())
         {
-            Map.Entry<String, STGroup> m = it.next();
+            Map.Entry<String, TemplateSTGroup> m = it.next();
 
             // Obtain instance
-            ST template = m.getValue().getInstanceOf(templatename);
+            TemplateST template = new TemplateST(m.getValue(), templatename);
             tg.addTemplate(m.getKey(), template);
         }
 
@@ -77,5 +81,15 @@ public class TemplateManager
     public boolean get_st_error()
     {
         return st_error_;
+    }
+
+    public void set_current_template_stgroup(TemplateSTGroup template_stgroup)
+    {
+        current_template_stgroup_ = template_stgroup;
+    }
+
+    public TemplateSTGroup get_current_template_stgroup()
+    {
+        return current_template_stgroup_;
     }
 }
