@@ -185,6 +185,11 @@ public class ArrayTypeCode extends ContainerTypeCode
         return evaluated_dimensions_;
     }
 
+    public int getEvaluatedDimensionsSize()
+    {
+        return evaluated_dimensions_.size();
+    }
+
     public String getSize()
     {
         String ret = "";
