@@ -130,7 +130,7 @@ public abstract class TypeCode implements Notebook
     }
 
     /*!
-     * @brief
+     * @brief Return the `getCppTypename()` without the scope.
      */
     public String getNoScopedCppTypename()
     {

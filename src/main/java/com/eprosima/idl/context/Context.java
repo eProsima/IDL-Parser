@@ -1415,6 +1415,11 @@ public class Context
         return generate_typesc_;
     }
 
+    public TemplateManager get_template_manager()
+    {
+        return tmanager_;
+    }
+
     // OS
     String m_os = null;
     String m_userdir = null;
