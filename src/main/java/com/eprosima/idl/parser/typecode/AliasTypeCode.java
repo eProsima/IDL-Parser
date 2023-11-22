@@ -142,7 +142,9 @@ public class AliasTypeCode extends ContainerTypeCode
         String current_scope = ctx.getScope();
 
         if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+        {
             return scoped_name;
+        }
 
         return scoped_name.replace(current_scope + "::", "");
     }
