@@ -77,7 +77,6 @@ public class TestManager
         this.exampleArch = exampleArch;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
-        this.cdr_version_ = cdr_version;
     }
 
     public void processIDLsDirectory(
