@@ -42,6 +42,11 @@ public class AnnotationDeclaration extends TreeNode implements Definition
         return new ArrayList<AnnotationMember>(m_members.values());
     }
 
+    public int getMembersSize()
+    {
+        return m_members.values().size();
+    }
+
     public void addMembers(AnnotationDeclaration annotation)
     {
         m_members.putAll(annotation.m_members);
