@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
 
+import com.eprosima.idl.parser.typecode.TypeCode;
+
 public class Annotation
 {
     public static final String final_str = "final";
@@ -54,7 +56,34 @@ public class Annotation
         return null;
     }
 
+    /*!
+     * @brief Returns the full scoped name of the type, unless the developer uses
+     * `TemplateSTGroup.enable_using_explicitly_modules()`, by removing from the full scoped name the current
+     * `Context` scope.
+     */
     public String getScopedname()
+    {
+        String scoped_name = getFullScopedname();
+
+        if (!com.eprosima.idl.parser.typecode.TypeCode.ctx.get_template_manager().get_current_template_stgroup().is_enabled_using_explicitly_modules())
+        {
+            return scoped_name;
+        }
+
+        String current_scope = com.eprosima.idl.parser.typecode.TypeCode.ctx.getScope();
+
+        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+        {
+            return scoped_name;
+        }
+
+        return scoped_name.replace(current_scope + "::", "");
+    }
+
+    /*!
+     * @brief Return the scoped name of the type.
+     */
+    public String getFullScopedname()
     {
         if(m_declaration != null)
         {
