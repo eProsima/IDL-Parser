@@ -1643,7 +1643,6 @@ member returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Member>> r
                     {
                         // Array declaration
                         $declarators.ret.get(count).first().second().setContentTypeCode($type_spec.returnPair.first());
-                        $declarators.ret.get(count).second().setAttribute("array_type", $type_spec.returnPair.first());
                         member = new Member($declarators.ret.get(count).first().second(), $declarators.ret.get(count).first().first().first());
 
                     }
