@@ -14,16 +14,16 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.parser.tree.Annotation;
-import com.eprosima.idl.parser.tree.Notebook;
-import com.eprosima.idl.context.Context;
-
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Notebook;
 
 
 public abstract class TypeCode implements Notebook
@@ -222,6 +222,76 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isIsBooleanType()
+    {
+        return false;
+    }
+
+    public boolean isIsByteType()
+    {
+        return false;
+    }
+
+    public boolean isIsInt8Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint8Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt16Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint16Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt32Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint32Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt64Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint64Tpe()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat32()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat64()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat128()
+    {
+        return false;
+    }
+
+    public boolean isIsEnumType()
+    {
+        return false;
+    }
+
     public boolean isIsBitmaskType()
     {
         return false;
@@ -242,12 +312,12 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
-    public boolean isIsWCharType()
+    public boolean isIsCharType()
     {
         return false;
     }
 
-    public boolean isIsEnumType()
+    public boolean isIsWCharType()
     {
         return false;
     }
@@ -423,6 +493,16 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isAnnotationAutoidHash()
+    {
+        Annotation ann = m_annotations.get("autoid");
+        if (ann != null)
+        {
+            return ann.getValue().toUpperCase().equals("HASH");
+        }
+        return false;
+    }
+
     public boolean isForwarded()
     {
         return m_forwarded;
@@ -456,4 +536,5 @@ public abstract class TypeCode implements Notebook
     private boolean m_defined = false;
 
     private ExtensibilityKind extensibility_ = ExtensibilityKind.NOT_APPLIED;
+
 }

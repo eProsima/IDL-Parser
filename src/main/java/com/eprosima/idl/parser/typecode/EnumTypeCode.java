@@ -99,7 +99,7 @@ public class EnumTypeCode extends MemberedTypeCode
     {
         if (getMembers().size() > 0)
         {
-            return (getScope() != null ? getScope() + "::" : "") + getMembers().get(0).getName();
+            return getMembers().get(0).getName();
         }
 
         return "";
@@ -120,6 +120,12 @@ public class EnumTypeCode extends MemberedTypeCode
     public String getSize()
     {
         return "4";
+    }
+
+    public int getBitBound()
+    {
+        // TODO: pending @bit_bound annotation application to enum types
+        return 32;
     }
 
 }

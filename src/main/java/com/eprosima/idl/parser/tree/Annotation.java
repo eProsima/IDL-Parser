@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
 
+import com.eprosima.idl.parser.typecode.TypeCode;
+
 public class Annotation
 {
     public static final String final_str = "final";
@@ -27,6 +29,10 @@ public class Annotation
     public static final String ex_final_str = "FINAL";
     public static final String ex_appendable_str = "APPENDABLE";
     public static final String ex_mutable_str = "MUTABLE";
+    public static final String try_construct_str = "try_construct";
+    public static final String try_construct_discard_str = "DISCARD";
+    public static final String try_construct_use_default_str = "USE_DEFAULT";
+    public static final String try_construct_trim_str = "TRIM";
 
     public Annotation(AnnotationDeclaration declaration)
     {
@@ -50,6 +56,53 @@ public class Annotation
         return null;
     }
 
+    /*!
+     * @brief Returns the full scoped name of the type, unless the developer uses
+     * `TemplateSTGroup.enable_using_explicitly_modules()`, by removing from the full scoped name the current
+     * `Context` scope.
+     */
+    public String getScopedname()
+    {
+        String scoped_name = getFullScopedname();
+
+        if (!com.eprosima.idl.parser.typecode.TypeCode.ctx.get_template_manager().get_current_template_stgroup().is_enabled_using_explicitly_modules())
+        {
+            return scoped_name;
+        }
+
+        String current_scope = com.eprosima.idl.parser.typecode.TypeCode.ctx.getScope();
+
+        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+        {
+            return scoped_name;
+        }
+
+        return scoped_name.replace(current_scope + "::", "");
+    }
+
+    /*!
+     * @brief Return the scoped name of the type.
+     */
+    public String getFullScopedname()
+    {
+        if(m_declaration != null)
+        {
+            return m_declaration.getScopedname();
+        }
+
+        return null;
+    }
+
+    public String getROS2Scopedname()
+    {
+        if(m_declaration != null)
+        {
+            return m_declaration.getROS2Scopedname();
+        }
+
+        return null;
+    }
+
     public boolean addValue(String value)
     {
         if(m_members.size() != 1)
@@ -67,6 +120,9 @@ public class Annotation
         if(member != null)
         {
             member.setValue(value);
+            // Check that in case of an Enum the set value is in the enumeration.
+            // ParseException is thrown otherwise.
+            member.getEnumStringValue();
         }
         else
             return false;
@@ -94,6 +150,81 @@ public class Annotation
     public Collection<AnnotationMember> getValueList()
     {
         return m_members.values();
+    }
+
+    public boolean isIsVerbatim()
+    {
+        return getName().equals("verbatim");
+    }
+
+    public boolean isIsUnit()
+    {
+        return getName().equals("unit");
+    }
+
+    public boolean isIsMax()
+    {
+        return getName().equals("max");
+    }
+
+    public boolean isIsMin()
+    {
+        return getName().equals("min");
+    }
+
+    public boolean isIsRange()
+    {
+        return getName().equals("range");
+    }
+
+    public boolean isIsHashId()
+    {
+        return getName().equals("hashid");
+    }
+
+    public boolean isIsBuiltin()
+    {
+        if (getName().equals("id") ||
+            getName().equals("autoid") ||
+            getName().equals("optional") ||
+            getName().equals("position") ||
+            getName().equals("value") ||
+            getName().equals("extensibility") ||
+            getName().equals("final") ||
+            getName().equals("appendable") ||
+            getName().equals("mutable") ||
+            getName().equals("key") ||
+            getName().equals("Key") ||
+            getName().equals("must_understand") ||
+            getName().equals("default_literal") ||
+            getName().equals("default") ||
+            getName().equals("range") ||
+            getName().equals("min") ||
+            getName().equals("max") ||
+            getName().equals("unit") ||
+            getName().equals("bit_bound") ||
+            getName().equals("external") ||
+            getName().equals("nested") ||
+            getName().equals("verbatim") ||
+            getName().equals("service") ||
+            getName().equals("oneway") ||
+            getName().equals("ami") ||
+            getName().equals("hashid") ||
+            getName().equals("default_nested") ||
+            getName().equals("ignore_literal_names") ||
+            getName().equals("try_construct") ||
+            getName().equals("non_serialized") ||
+            getName().equals("data_representation") ||
+            getName().equals("topic"))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public int getValuesSize()
+    {
+        return m_members.size();
     }
 
     private HashMap<String, AnnotationMember> m_members = null;

@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.parser.tree;
 
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.typecode.Member;
 import com.eprosima.idl.parser.typecode.EnumMember;
 import com.eprosima.idl.parser.typecode.EnumTypeCode;
@@ -77,9 +78,58 @@ public class AnnotationMember
         return m_value;
     }
 
+    public String getEnumStringValue()
+    {
+        if (m_value != null && m_typecode.isIsEnumType())
+        {
+            EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
+            for (Member m : enumTC.getMembers())
+            {
+                String value = m_value;
+                if (value.startsWith("\"") && value.endsWith("\""))
+                {
+                    value = value.substring(1, value.length() - 1);
+                }
+                String[] value_with_scopes = value.split("::");
+                value = value_with_scopes[value_with_scopes.length - 1];
+                if (m.getName().equals(value))
+                {
+                    return value;
+                }
+            }
+            throw new ParseException(null, m_value + " is not a valid label for " + m_name);
+        }
+        return m_value;
+    }
+
     public void setValue(String value)
     {
         m_value = value;
+    }
+
+    public boolean isIsVerbatimPlacement()
+    {
+        return getName().equals("placement");
+    }
+
+    public boolean isIsVerbatimLanguage()
+    {
+        return getName().equals("language");
+    }
+
+    public boolean isIsVerbatimText()
+    {
+        return getName().equals("text");
+    }
+
+    public boolean isIsMax()
+    {
+        return getName().equals("max");
+    }
+
+    public boolean isIsMin()
+    {
+        return getName().equals("min");
     }
 
     private String m_name = null;
