@@ -294,11 +294,11 @@ public class Context
         ignore_literal_names_annotation.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
 
         EnumTypeCode try_construct_fail_action_enum = new EnumTypeCode(null, "TryConstructFailAction");
-        try_construct_fail_action_enum.addMember(new EnumMember("DISCARD"));
-        try_construct_fail_action_enum.addMember(new EnumMember("USE_DEFAULT"));
-        try_construct_fail_action_enum.addMember(new EnumMember("TRIM"));
+        try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_discard_str));
+        try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_use_default_str));
+        try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_trim_str));
 
-        AnnotationDeclaration try_construct_annotation = createAnnotationDeclaration("try_construct", null);
+        AnnotationDeclaration try_construct_annotation = createAnnotationDeclaration(Annotation.try_construct_str, null);
         try_construct_annotation.addMember(new AnnotationMember("value", try_construct_fail_action_enum, "USE_DEFAULT"));
 
         // Create default @non_serialized annotation.
