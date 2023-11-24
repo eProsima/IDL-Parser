@@ -30,6 +30,7 @@ public class Project
         m_commonsrcfiles = new ArrayList<String>();
         m_commonincludefiles = new ArrayList<String>();
         m_commontestingfiles = new ArrayList<String>();
+        m_typeobjecttestingfiles = new ArrayList<String>();
     }
 
     public void setParent(Solution sol)
@@ -80,6 +81,16 @@ public class Project
     public ArrayList<String> getCommonTestingFiles()
     {
         return m_commontestingfiles;
+    }
+
+    public void addTypeObjectTestingFile(String file)
+    {
+        m_typeobjecttestingfiles.add(file);
+    }
+
+    public ArrayList<String> getTypeObjectTestingFiles()
+    {
+        return m_typeobjecttestingfiles;
     }
 
     /*!
@@ -135,6 +146,7 @@ public class Project
     private ArrayList<String> m_commonsrcfiles = null;
     private ArrayList<String> m_commonincludefiles = null;
     private ArrayList<String> m_commontestingfiles = null;
+    private ArrayList<String> m_typeobjecttestingfiles = null;
     private LinkedHashSet<String> m_dependencies = null;
     String m_guid = null;
     Solution m_parent = null;

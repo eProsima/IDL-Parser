@@ -131,6 +131,11 @@ public abstract class MemberedTypeCode extends TypeCode
         return new ArrayList<Member>(m_members.values());
     }
 
+    public int getMembersSize()
+    {
+        return m_members.size();
+    }
+
     public boolean addMember(
             Member member) throws ParseException
     {
