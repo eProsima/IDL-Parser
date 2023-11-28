@@ -249,25 +249,25 @@ public class PrimitiveTypeCode extends TypeCode
     }
 
     @Override
-    public boolean isIsUint64Tpe()
+    public boolean isIsUint64Type()
     {
         return getKind() == Kind.KIND_ULONGLONG;
     }
 
     @Override
-    public boolean isIsFloat32()
+    public boolean isIsFloat32Type()
     {
         return getKind() == Kind.KIND_FLOAT;
     }
 
     @Override
-    public boolean isIsFloat64()
+    public boolean isIsFloat64Type()
     {
         return getKind() == Kind.KIND_DOUBLE;
     }
 
     @Override
-    public boolean isIsFloat128()
+    public boolean isIsFloat128Type()
     {
         return getKind() == Kind.KIND_LONGDOUBLE;
     }
