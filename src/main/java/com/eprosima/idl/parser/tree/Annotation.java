@@ -126,7 +126,9 @@ public class Annotation
     public boolean addValue(String value)
     {
         if(m_members.size() != 1)
+        {
             return false;
+        }
 
         ((AnnotationMember)m_members.values().toArray()[0]).setValue(value);
 
@@ -145,14 +147,19 @@ public class Annotation
             member.getEnumStringValue();
         }
         else
+        {
             return false;
+        }
 
         return true;
     }
 
     public String getValue()
     {
-        if(m_members.size() != 1) return null;
+        if(m_members.size() != 1)
+        {
+            return null;
+        }
 
         return ((AnnotationMember)m_members.values().toArray()[0]).getValue();
     }

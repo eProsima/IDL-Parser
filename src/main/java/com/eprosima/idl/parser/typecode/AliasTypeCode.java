@@ -327,11 +327,26 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().getSize();
     }
 
+    public String getEvaluatedMaxsize()
+    {
+        return super.getContentTypeCode().getEvaluatedMaxsize();
+    }
+
     public List<String> getDimensions()
     {
         if (super.getContentTypeCode() instanceof ArrayTypeCode)
         {
             return ((ArrayTypeCode) super.getContentTypeCode()).getDimensions();
+        }
+
+        return null;
+    }
+
+    public List<String> getEvaluatedDimensions()
+    {
+        if (super.getContentTypeCode() instanceof ArrayTypeCode)
+        {
+            return ((ArrayTypeCode) super.getContentTypeCode()).getEvaluatedDimensions();
         }
 
         return null;

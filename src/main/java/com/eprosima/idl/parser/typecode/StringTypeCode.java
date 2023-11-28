@@ -96,6 +96,7 @@ public class StringTypeCode extends TypeCode
         return getIdlTypenameFromStringTemplate().toString();
     }
 
+    @Override
     public String getMaxsize()
     {
         if (m_maxsize == null)
@@ -106,6 +107,7 @@ public class StringTypeCode extends TypeCode
         return m_maxsize;
     }
 
+    @Override
     public String getEvaluatedMaxsize()
     {
         if (evaluated_maxsize_ == null)

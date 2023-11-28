@@ -119,6 +119,7 @@ public class SequenceTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
+    @Override
     public String getEvaluatedMaxsize()
     {
         if (evaluated_maxsize_ == null)

@@ -92,6 +92,7 @@ public class MapTypeCode extends ContainerTypeCode
         return st.render();
     }
 
+    @Override
     public String getMaxsize()
     {
         if (m_maxsize == null)
@@ -102,6 +103,7 @@ public class MapTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
+    @Override
     public String getEvaluatedMaxsize()
     {
         if (evaluated_maxsize_ == null)

@@ -161,6 +161,11 @@ public abstract class TypeCode implements Notebook
         return null;
     }
 
+    public String getEvaluatedMaxsize()
+    {
+        return null;
+    }
+
     /*!
      * @brief This function returns the size of the datatype. By default is null string.
      * @return The size of the datatype.
@@ -267,22 +272,22 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
-    public boolean isIsUint64Tpe()
+    public boolean isIsUint64Type()
     {
         return false;
     }
 
-    public boolean isIsFloat32()
+    public boolean isIsFloat32Type()
     {
         return false;
     }
 
-    public boolean isIsFloat64()
+    public boolean isIsFloat64Type()
     {
         return false;
     }
 
-    public boolean isIsFloat128()
+    public boolean isIsFloat128Type()
     {
         return false;
     }
