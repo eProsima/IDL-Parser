@@ -18,6 +18,8 @@ import com.eprosima.idl.parser.tree.Definition;
 
 public abstract class ContainerTypeCode extends TypeCode
 {
+    public static String default_unbounded_max_size = "0";
+
     protected ContainerTypeCode(int kind)
     {
         super(kind);
@@ -56,13 +58,17 @@ public abstract class ContainerTypeCode extends TypeCode
     {
         int ret = 1;
 
-        if (collection_element_.getTypecode().isPrimitive()) {
-    	    return ret;
-    	} else {
-    	    if (collection_element_.getTypecode() instanceof ContainerTypeCode) {
-    		    ret += ((ContainerTypeCode) collection_element_.getTypecode()).getDepth();
-    		}
-    	}
+        if (collection_element_.getTypecode().isPrimitive())
+        {
+            return ret;
+        }
+        else
+        {
+            if (collection_element_.getTypecode() instanceof ContainerTypeCode)
+            {
+                ret += ((ContainerTypeCode) collection_element_.getTypecode()).getDepth();
+            }
+        }
 
         return ret;
     }
