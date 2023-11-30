@@ -14,8 +14,6 @@
 
 package com.eprosima.idl.generator.manager;
 
-import com.eprosima.idl.generator.manager.TemplateGroup;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -88,8 +86,13 @@ public class TemplateManager
         current_template_stgroup_ = template_stgroup;
     }
 
-    public TemplateSTGroup get_current_template_stgroup()
+    public boolean is_enabled_custom_property_in_current_group(String custom_property)
     {
-        return current_template_stgroup_;
+        if (null != current_template_stgroup_)
+        {
+            return current_template_stgroup_.is_enabled_custom_property(custom_property);
+        }
+
+        return false;
     }
 }

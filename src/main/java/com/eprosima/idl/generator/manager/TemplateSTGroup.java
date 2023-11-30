@@ -15,6 +15,7 @@
 package com.eprosima.idl.generator.manager;
 
 import org.stringtemplate.v4.*;
+import java.util.ArrayList;
 
 public class TemplateSTGroup
 {
@@ -34,24 +35,23 @@ public class TemplateSTGroup
     }
 
     /*!
-     * @brief Returns if the current `Context` scope will be remove from the scoped name of types (returned by
-     * `getScopedname()`).
+     * @brief Checks a custom property was added in this template group.
      */
-    public boolean is_enabled_using_explicitly_modules()
+    public boolean is_enabled_custom_property(String custom_property)
     {
-        return using_explicitly_modules_;
+        return custom_properties.contains(custom_property);
     }
 
     /*!
-     * @brief Enable removing the current `Context` scope from the scoped name of types (returned by `getScopedname()`).
+     * @brief Enables a custom property.
      */
-    public void enable_using_explicitly_modules()
+    public void enable_custom_property(String custom_property)
     {
-        using_explicitly_modules_ = true;
+        custom_properties.add(custom_property);
     }
 
     private STGroup st_group_ = null;
 
-    //! If set, the scoped name of types (returned by `getScopedname()`) will remove the current `Context` scope.
-    private boolean using_explicitly_modules_ = false;
+    //! List of custom properties added by the user.
+    ArrayList<String> custom_properties = new ArrayList<String>();
 };
