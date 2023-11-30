@@ -49,7 +49,7 @@ public class Test
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
+        String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test -default-container-prealloc-size 50" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
@@ -65,7 +65,7 @@ public class Test
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -replace -example" + (testFlag ? " -test" : "");
+        String flags = " -replace -example" + (testFlag ? " -test -default-container-prealloc-size 50" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
