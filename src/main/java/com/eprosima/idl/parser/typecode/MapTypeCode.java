@@ -96,7 +96,7 @@ public class MapTypeCode extends ContainerTypeCode
     {
         if (m_maxsize == null)
         {
-            return "100";
+            return default_unbounded_max_size;
         }
 
         return m_maxsize;
@@ -154,6 +154,11 @@ public class MapTypeCode extends ContainerTypeCode
             Definition valueDefinition)
     {
         m_valueDefinition = valueDefinition;
+    }
+
+    public boolean isUnbound()
+    {
+        return null == m_maxsize;
     }
 
     @Override
