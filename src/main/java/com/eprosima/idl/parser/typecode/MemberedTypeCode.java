@@ -45,7 +45,7 @@ public abstract class MemberedTypeCode extends TypeCode
     {
         String scoped_name = getFullScopedname();
 
-        if (!ctx.get_template_manager().is_enabled_custom_property_in_current_group("using_explicitly_modules"))
+        if (!ctx.is_enabled_custom_property_in_current_group(ctx.using_explicitly_modules_custom_property))
         {
             return scoped_name;
         }
