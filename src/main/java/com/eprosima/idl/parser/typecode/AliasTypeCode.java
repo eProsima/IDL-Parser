@@ -297,6 +297,12 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().isIsBitmaskType();
     }
 
+    @Override
+    public boolean isIsEnumType()
+    {
+        return super.getContentTypeCode().isIsEnumType();
+    }
+
     public boolean isIsType_10()
     {
         return true;
