@@ -72,6 +72,12 @@ import org.stringtemplate.v4.STGroupFile;
 
 public class Context
 {
+    /*!
+     * Built-in custom property to specify a TemplateGroup is using explicitly modules (in C++ when opening the
+     * namespace "namespace module {")
+     */
+    public static final String using_explicitly_modules_custom_property = "using_explicitly_modules";
+
     public Context(
             TemplateManager tmanager,
             String file,
@@ -1412,9 +1418,20 @@ public class Context
         return generate_typesc_;
     }
 
-    public TemplateManager get_template_manager()
+    /*!
+     * @brief Checks a custom property was enables for a TemplateGroup.
+     *
+     * There are built-in custom properties:
+     * - Context.using_explicitly_modules_custom_property: specifies a TemplateGroup is using explicitly modules.
+     */
+    public boolean is_enabled_custom_property_in_current_group(String custom_property)
     {
-        return tmanager_;
+        if (null != tmanager_)
+        {
+            return tmanager_.is_enabled_custom_property_in_current_group(custom_property);
+        }
+
+        return false;
     }
 
     // OS

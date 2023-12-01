@@ -102,7 +102,8 @@ public class UnionTypeCode extends MemberedTypeCode
 
             for (int count = 0; count < internal_labels.size(); ++count)
             {
-                labels.add(enum_type.getScope() + "::" + internal_labels.get(count));
+                labels.add((Kind.KIND_ENUM == discriminator_.getTypecode().getKind() ?
+                            enum_type.getScopedname() + "::" : "")+ internal_labels.get(count));
                 javalabels.add(javapackage + enum_type.getJavaScopedname() + "." + internal_labels.get(count));
             }
         }
