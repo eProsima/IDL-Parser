@@ -130,11 +130,16 @@ public class AliasTypeCode extends ContainerTypeCode
         return m_name;
     }
 
+    /*!
+     * @brief Returns the full scoped name of the type, unless the developer uses
+     * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, by removing from the full scoped name the
+     * current `Context` scope.
+     */
     public String getScopedname()
     {
         String scoped_name = getFullScopedname();
 
-        if (!ctx.get_template_manager().get_current_template_stgroup().is_enabled_using_explicitly_modules())
+        if (!ctx.is_enabled_custom_property_in_current_group(ctx.using_explicitly_modules_custom_property))
         {
             return scoped_name;
         }

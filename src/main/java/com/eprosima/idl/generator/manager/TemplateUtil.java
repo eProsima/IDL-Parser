@@ -167,7 +167,7 @@ public class TemplateUtil
 
                 if(enum_members.size() > 0)
                 {
-                    union_type.setDefaultvalue(enume.getScope() + "::" + enum_members.get(0).getName());
+                    union_type.setDefaultvalue(enume.getScopedname() + "::" + enum_members.get(0).getName());
                     union_type.setJavaDefaultvalue(enume.javapackage + enume.getJavaScopedname() + "." + enum_members.get(0).getName());
                 }
                 else
