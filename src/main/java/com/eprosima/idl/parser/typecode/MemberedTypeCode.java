@@ -134,13 +134,13 @@ public abstract class MemberedTypeCode extends TypeCode
         if (member.isAnnotationOptional() && Kind.KIND_STRUCT != getKind())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @optional annotations only supported for structure's members.");
+                    ": @" + Annotation.optional_str +" annotations only supported for structure's members.");
         }
         if (member.isAnnotationExternal() && (
                     Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @external annotations only supported for structure's members or union's members.");
+                    ": @" + Annotation.external_str + " annotations only supported for structure's members or union's members.");
         }
         if (member.isAnnotationMustUnderstand() && Kind.KIND_STRUCT != getKind())
         {
@@ -186,7 +186,7 @@ public abstract class MemberedTypeCode extends TypeCode
         if(member.isAnnotationKey() && member.isAnnotationOptional())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @key and @optional annotations are incompatible.");
+                    ": @key and @" + Annotation.optional_str + " annotations are incompatible.");
         }
 
         if(!m_members.containsKey(member.getName()))

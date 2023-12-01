@@ -28,6 +28,9 @@ public class Annotation
     public static final String ex_appendable_str = "APPENDABLE";
     public static final String ex_mutable_str = "MUTABLE";
 
+    public static final String optional_str = "optional";
+    public static final String external_str = "external";
+
     public Annotation(AnnotationDeclaration declaration)
     {
         m_declaration = declaration;
