@@ -153,27 +153,6 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return getMembers(true);
     }
 
-    public List<Map.Entry<Integer, Member>> getAllIdentifiedMembers()
-    {
-        int seq_id = 0;
-        List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
-
-        if (super_type_ != null)
-        {
-            for (Member m : super_type_.getAllMembers())
-            {
-                ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
-            }
-        }
-
-        for (Member m : getMembers())
-        {
-            ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
-        }
-
-        return ret_members;
-    }
-
     @Override
     public boolean isIsPlain()
     {
