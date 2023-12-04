@@ -517,7 +517,7 @@ public abstract class TypeCode implements Notebook
         Annotation ann = m_annotations.get("autoid");
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("HASH");
+            return (ann.getValue().toUpperCase().equals("HASH") || null == ann.getValue());
         }
         return false;
     }
