@@ -118,6 +118,8 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         {
             throw new ParseException(null, "Inheritance must correspond to the name of a previously defined structure");
         }
+
+        last_id_ = super_type_.last_id_;
     }
 
     @Override
@@ -235,6 +237,32 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     {
         calculate_member_id_(member);
         return super.addMember(member);
+    }
+
+    @Override
+    protected boolean check_unique_member_id(
+            Member member)
+    {
+        if (super_type_ != null)
+        {
+            for (Member m : super_type_.getAllMembers())
+            {
+                if (m.getId() == member.getId())
+                {
+                    return false;
+                }
+            }
+        }
+
+        for (Member m : getMembers())
+        {
+            if (m.getId() == member.getId())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private StructTypeCode super_type_;

@@ -173,17 +173,15 @@ public abstract class MemberedTypeCode extends TypeCode
 
         if(!m_members.containsKey(member.getName()))
         {
-            if (Member.MEMBER_ID_INVALID != member.getId())
+            if (Member.MEMBER_ID_INVALID != member.getId() && !check_unique_member_id(member))
             {
-                for(Member m : m_members.values())
-                {
-                    if (m.getId() == member.getId())
-                    {
-                        return false;
-                    }
-                }
+                return false;
             }
-            member.set_index(last_index++);
+            member.set_index(last_index_++);
+            if (last_id_ < member.getId())
+            {
+                last_id_ = member.getId();
+            }
             m_members.put(member.getName(), member);
             return true;
         }
@@ -195,7 +193,8 @@ public abstract class MemberedTypeCode extends TypeCode
      * This function calculates the MemberId for the given member.
      * Derived classes can use this function but it must be called from a override addMember().
      */
-    protected void calculate_member_id_(Member member)
+    protected void calculate_member_id_(
+            Member member)
     {
         if (member.isAnnotationId())
         {
@@ -208,6 +207,23 @@ public abstract class MemberedTypeCode extends TypeCode
                 // Should be never called because was previously called isAnnotationId();
             }
         }
+    }
+
+    /*!
+     * This function check there is no other member with same id.
+     */
+    protected boolean check_unique_member_id(
+            Member member)
+    {
+        for(Member m : m_members.values())
+        {
+            if (m.getId() == member.getId())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -302,5 +318,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     private LinkedHashMap<String, Member> m_members = null;
 
-    private int last_index = 0;
+    private int last_index_ = 0;
+
+    protected int last_id_ = 0;
 }
