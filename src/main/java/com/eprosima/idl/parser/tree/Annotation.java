@@ -44,6 +44,9 @@ public class Annotation
 
     public static final String value_str = "value";
 
+    public static final String optional_str = "optional";
+    public static final String external_str = "external";
+
     public Annotation(AnnotationDeclaration declaration)
     {
         m_declaration = declaration;
