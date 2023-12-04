@@ -234,11 +234,30 @@ public class Member implements Notebook
         return id_;
     }
 
+    /*!
+     * Sets the order of definition of the member.
+     *
+     * This function is intended to be called by MemberTypeCode.java.
+     */
+    public void set_index(int index)
+    {
+        index_ = index;
+    }
+
+    public int getIndex()
+    {
+        return index_;
+    }
+
     private String m_name = null;
 
     private TypeCode m_typecode = null;
 
     private HashMap<String, Annotation> m_annotations = null;
 
-    private int id_ = 0xFFFFFFF; // MEMBER_ID_INVALID
+    private final int MEMBER_ID_INVALID = 0x0FFFFFFF;
+
+    private int id_ = MEMBER_ID_INVALID;
+
+    private int index_ = 0;
 }

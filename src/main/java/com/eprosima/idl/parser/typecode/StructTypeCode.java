@@ -229,6 +229,11 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         super.addAnnotation(ctx, annotation);
     }
 
+    @Override
+    protected void calculate_member_id_(Member member)
+    {
+    }
+
     private StructTypeCode super_type_;
 
     protected boolean detect_recursive_ = false;

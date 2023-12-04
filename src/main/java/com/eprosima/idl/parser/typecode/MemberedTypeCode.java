@@ -154,10 +154,22 @@ public abstract class MemberedTypeCode extends TypeCode
 
         if(!m_members.containsKey(member.getName()))
         {
+            member.set_index(last_index++);
+            calculate_member_id_(member);
             m_members.put(member.getName(), member);
             return true;
         }
+
         return false;
+    }
+
+    /*!
+     * Derived classes can implement this function. By default do nothing.
+     *
+     * If implemented, this function should calculate the MemberId for the given member.
+     */
+    protected void calculate_member_id_(Member member)
+    {
     }
 
     @Override
@@ -251,4 +263,6 @@ public abstract class MemberedTypeCode extends TypeCode
     private String m_scope = null;
 
     private LinkedHashMap<String, Member> m_members = null;
+
+    private int last_index = 0;
 }
