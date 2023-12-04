@@ -47,7 +47,7 @@ public class MemberAppliedAnnotations implements Notebook
 
     public boolean isAnnotationOptional()
     {
-        Annotation ann = m_annotations.get("optional");
+        Annotation ann = m_annotations.get(Annotation.optional_str);
         if (ann != null)
         {
             return ann.getValue().toUpperCase().equals("TRUE");
@@ -57,7 +57,7 @@ public class MemberAppliedAnnotations implements Notebook
 
     public boolean isAnnotationExternal()
     {
-        Annotation ann = m_annotations.get("external");
+        Annotation ann = m_annotations.get(Annotation.external_str);
         if (ann != null)
         {
             return ann.getValue().toUpperCase().equals("TRUE");

@@ -211,7 +211,7 @@ public class Context
         autoidannenum.addMember(new EnumMember(Annotation.autoid_hash_str));
         autoidann.addMember(new AnnotationMember(Annotation.value_str, autoidannenum, Annotation.autoid_hash_str));
 
-        AnnotationDeclaration optionalann = createAnnotationDeclaration("optional", null);
+        AnnotationDeclaration optionalann = createAnnotationDeclaration(Annotation.optional_str, null);
         optionalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
 
         AnnotationDeclaration positionann = createAnnotationDeclaration("position", null);
@@ -262,7 +262,7 @@ public class Context
         AnnotationDeclaration bit_boundann = createAnnotationDeclaration("bit_bound", null);
         bit_boundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), "-1"));
 
-        AnnotationDeclaration externalann = createAnnotationDeclaration("external", null);
+        AnnotationDeclaration externalann = createAnnotationDeclaration(Annotation.external_str, null);
         externalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
 
         AnnotationDeclaration nestedann = createAnnotationDeclaration("nested", null);
