@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Notebook;
 import com.eprosima.idl.context.Context;
@@ -224,7 +225,33 @@ public class Member implements Notebook
         return false;
     }
 
-    public void setId(int id)
+    public boolean isAnnotationId()
+    {
+        return null != m_annotations.get(Annotation.id_str);
+    }
+
+    public String getAnnotationIdValue() throws RuntimeGenerationException
+    {
+        Annotation ann = m_annotations.get(Annotation.id_str);
+        if (ann == null)
+        {
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @id annotation not found.");
+        }
+
+        return ann.getValue();
+    }
+
+    public boolean isAnnotationHashid()
+    {
+        return null != m_annotations.get(Annotation.hashid_str);
+    }
+
+    /*!
+     * Sets the member's id.
+     *
+     * This function is intended to be called by MemberTypeCode.
+     */
+    public void set_id(int id)
     {
         id_ = id;
     }
@@ -237,7 +264,7 @@ public class Member implements Notebook
     /*!
      * Sets the order of definition of the member.
      *
-     * This function is intended to be called by MemberTypeCode.java.
+     * This function is intended to be called by MemberTypeCode.
      */
     public void set_index(int index)
     {
@@ -255,7 +282,7 @@ public class Member implements Notebook
 
     private HashMap<String, Annotation> m_annotations = null;
 
-    private final int MEMBER_ID_INVALID = 0x0FFFFFFF;
+    public static final int MEMBER_ID_INVALID = 0x0FFFFFFF;
 
     private int id_ = MEMBER_ID_INVALID;
 

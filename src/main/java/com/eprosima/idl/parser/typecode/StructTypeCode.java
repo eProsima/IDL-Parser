@@ -230,8 +230,11 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     }
 
     @Override
-    protected void calculate_member_id_(Member member)
+    public boolean addMember(
+            Member member) throws ParseException
     {
+        calculate_member_id_(member);
+        return super.addMember(member);
     }
 
     private StructTypeCode super_type_;

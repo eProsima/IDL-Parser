@@ -21,6 +21,7 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 
 
@@ -72,7 +73,7 @@ public class UnionTypeCode extends MemberedTypeCode
      * @return 0 is ok, -1 the member is repeated, -2 is another default member.
      */
     public int addMember(
-            UnionMember member)
+            UnionMember member) throws ParseException
     {
         if (member.isDefault())
         {
@@ -113,7 +114,8 @@ public class UnionTypeCode extends MemberedTypeCode
         member.setLabels(labels);
         member.setJavaLabels(javalabels);
 
-        if (!addMember((Member)member))
+        calculate_member_id_(member);
+        if (!super.addMember(member))
         {
             return -1;
         }

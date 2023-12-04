@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 
 public abstract class MemberedTypeCode extends TypeCode
@@ -91,7 +92,8 @@ public abstract class MemberedTypeCode extends TypeCode
         return new ArrayList<Member>(m_members.values());
     }
 
-    public boolean addMember(Member member) throws ParseException
+    public boolean addMember(
+            Member member) throws ParseException
     {
         // Check annotations.
         if (member.isAnnotationOptional() && Kind.KIND_STRUCT != getKind())
@@ -151,11 +153,37 @@ public abstract class MemberedTypeCode extends TypeCode
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @key and @optional annotations are incompatible.");
         }
+        if (member.isAnnotationId() && (
+                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @id annotations only supported for structure's members or union's members.");
+        }
+        if (member.isAnnotationHashid() && (
+                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @id annotations only supported for structure's members or union's members.");
+        }
+        if (member.isAnnotationId() && member.isAnnotationHashid())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @id and @hashid annotations cannot be together.");
+        }
 
         if(!m_members.containsKey(member.getName()))
         {
+            if (Member.MEMBER_ID_INVALID != member.getId())
+            {
+                for(Member m : m_members.values())
+                {
+                    if (m.getId() == member.getId())
+                    {
+                        return false;
+                    }
+                }
+            }
             member.set_index(last_index++);
-            calculate_member_id_(member);
             m_members.put(member.getName(), member);
             return true;
         }
@@ -164,12 +192,22 @@ public abstract class MemberedTypeCode extends TypeCode
     }
 
     /*!
-     * Derived classes can implement this function. By default do nothing.
-     *
-     * If implemented, this function should calculate the MemberId for the given member.
+     * This function calculates the MemberId for the given member.
+     * Derived classes can use this function but it must be called from a override addMember().
      */
     protected void calculate_member_id_(Member member)
     {
+        if (member.isAnnotationId())
+        {
+            try
+            {
+                member.set_id(Integer.parseInt(member.getAnnotationIdValue()));
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should be never called because was previously called isAnnotationId();
+            }
+        }
     }
 
     @Override

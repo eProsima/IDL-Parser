@@ -20,6 +20,9 @@ import java.util.Collection;
 
 public class Annotation
 {
+    public static final String hashid_str = "hashid";
+    public static final String id_str = "id";
+
     public static final String final_str = "final";
     public static final String appendable_str = "appendable";
     public static final String mutable_str = "mutable";
