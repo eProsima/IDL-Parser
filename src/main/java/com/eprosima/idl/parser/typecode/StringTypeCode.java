@@ -42,9 +42,23 @@ public class StringTypeCode extends TypeCode
         switch (getKind())
         {
             case Kind.KIND_STRING:
-                return "TI_STRING8_SMALL";
+                if (!isIsBounded() || (evaluated_maxsize_.compareTo(Integer.toString(256)) > 0))
+                {
+                    return "TI_STRING8_LARGE";
+                }
+                else
+                {
+                    return "TI_STRING8_SMALL";
+                }
             case Kind.KIND_WSTRING:
-                return "TI_STRING16_SMALL";
+                if (!isIsBounded() || (evaluated_maxsize_.compareTo(Integer.toString(256)) > 0))
+                {
+                    return "TI_STRING16_LARGE";
+                }
+                else
+                {
+                    return "TI_STRING16_SMALL";
+                }
             default:
                 return "TK_None";
         }
