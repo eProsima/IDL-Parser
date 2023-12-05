@@ -226,7 +226,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         {
             for (Member m : super_type_.getAllMembers())
             {
-                if (m.getId() == member.getId())
+                if (m.get_id() == member.get_id())
                 {
                     return false;
                 }
@@ -235,7 +235,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
 
         for (Member m : getMembers())
         {
-            if (m.getId() == member.getId())
+            if (m.get_id() == member.get_id())
             {
                 return false;
             }

@@ -14,9 +14,11 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import java.util.List;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.function.Function;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.exception.RuntimeGenerationException;
@@ -175,15 +177,12 @@ public abstract class MemberedTypeCode extends TypeCode
 
         if(!m_members.containsKey(member.getName()))
         {
-            if (Member.MEMBER_ID_INVALID != member.getId() && !check_unique_member_id(member))
+            if (Member.MEMBER_ID_INVALID != member.get_id() && !check_unique_member_id(member))
             {
                 throw new ParseException(null, member.getName() + " has a MemberId already in use.");
             }
             member.set_index(last_index_++);
-            if (last_id_ < member.getId())
-            {
-                last_id_ = member.getId();
-            }
+            last_id_ = member.get_id();
             m_members.put(member.getName(), member);
             return true;
         }
@@ -198,15 +197,41 @@ public abstract class MemberedTypeCode extends TypeCode
     protected void calculate_member_id_(
             Member member)
     {
+        Function<String, Integer> calculate_hash = (String member_name) ->
+        {
+            int hash_id = 0;
+            try {
+                byte[] bytes = member_name.getBytes("UTF-8");
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte[] md5 = md.digest(bytes);
+                hash_id = ((md5[3] & 0xFF) << 24) + ((md5[2] & 0xFF) << 16) + ((md5[1] & 0xFF) << 8) + (md5[0] & 0xFF);
+                hash_id &= 0x0FFFFFFF;
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+            return hash_id;
+        };
+
         try
         {
             if (member.isAnnotationId())
             {
                 member.set_id(Integer.parseInt(member.getAnnotationIdValue()));
             }
-            else if (!isAnnotationAutoid() || getAnnotationAutoidValue().equals(Annotation.autoid_sequential_str))
+            else if (member.isAnnotationHashid())
+            {
+                String value = member.getAnnotationHashidValue();
+                member.set_id(calculate_hash.apply(value.isEmpty() ? member.getName() : value));
+            }
+            else if (!isAnnotationAutoid() || getAnnotationAutoidValue().equals(Annotation.autoid_sequential_value_str))
             {
                 member.set_id(++last_id_);
+            }
+            else
+            {
+                member.set_id(calculate_hash.apply(member.getName()));
             }
         }
         catch (RuntimeGenerationException ex)
@@ -223,7 +248,7 @@ public abstract class MemberedTypeCode extends TypeCode
     {
         for(Member m : m_members.values())
         {
-            if (m.getId() == member.getId())
+            if (m.get_id() == member.get_id())
             {
                 return false;
             }

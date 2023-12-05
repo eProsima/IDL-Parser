@@ -247,6 +247,18 @@ public class Member implements Notebook
         return null != m_annotations.get(Annotation.hashid_str);
     }
 
+    public String getAnnotationHashidValue() throws RuntimeGenerationException
+    {
+        Annotation ann = m_annotations.get(Annotation.hashid_str);
+        if (ann == null)
+        {
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.hashid_str +
+                    " annotation not found.");
+        }
+
+        return ann.getValue();
+    }
+
     /*!
      * Sets the member's id.
      *
@@ -257,9 +269,20 @@ public class Member implements Notebook
         id_ = id;
     }
 
-    public int getId()
+    /*!
+     * Return the MemberId as Integer.
+     */
+    public int get_id()
     {
         return id_;
+    }
+
+    /*!
+     * Return the MemberId as String in hexadecimal format.
+     */
+    public String getId()
+    {
+        return String.format("0x%08x", id_);
     }
 
     /*!

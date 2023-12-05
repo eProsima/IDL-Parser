@@ -263,7 +263,7 @@ public class Context
         amiann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
 
         AnnotationDeclaration hashid_annotation = createAnnotationDeclaration(Annotation.hashid_str, null);
-        hashid_annotation.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
+        hashid_annotation.addMember(new AnnotationMember("value", new StringTypeCode(Kind.KIND_STRING, null, null), ""));
 
         // Create default @non_serialized annotation.
         AnnotationDeclaration non_serializedann = createAnnotationDeclaration("non_serialized", null);

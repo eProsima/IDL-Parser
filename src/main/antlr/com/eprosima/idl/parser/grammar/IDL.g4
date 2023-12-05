@@ -769,8 +769,8 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     String fw_name = null;
 }
     :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator[null] { ttg=$type_declarator.returnPair; }
-    |   struct_type { ttg=$struct_type.returnPair; fw_name = $struct_type.fw_name; }
-    |   union_type[defs] { ttg=$union_type.returnPair; fw_name = $union_type.fw_name; }
+    |   struct_type[annotations] { ttg=$struct_type.returnPair; fw_name = $struct_type.fw_name; }
+    |   union_type[annotations, defs] { ttg=$union_type.returnPair; fw_name = $union_type.fw_name; }
     |   enum_type { ttg=$enum_type.returnPair; }
     |   bitset_type { ttg=$bitset_type.returnPair; }
     |   bitmask_type { ttg=$bitmask_type.returnPair; }
@@ -950,8 +950,8 @@ template_type_spec returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     ;
 
 constr_type_spec returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
-    :   struct_type
-    |   union_type[null]
+    :   struct_type[null]
+    |   union_type[null, null]
     |   enum_type
     |   bitset_type
     |   bitmask_type
@@ -1458,7 +1458,7 @@ bit_values [BitmaskTypeCode owner]
         )*
     ;
 
-struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
+struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
 @init{
     String name = null;
     Vector<TypeCode> vector = null;
@@ -1508,6 +1508,18 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
                 structTP = ctx.createStructTypeCode(name);
             }
             structTP.setDefined();
+
+            // Apply annotations to the TypeCode
+            if (null != annotations)
+            {
+                for(Annotation annotation : annotations)
+                {
+                    if (annotation != null) // Some annotations may be ignored
+                    {
+                        structTP.addAnnotation(ctx, annotation);
+                    }
+                }
+            }
         }
         (COLON scoped_name
             {
@@ -1663,7 +1675,7 @@ member returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Member>> r
         }
     ;
 
-union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
+union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
 @init {
     String name = null;
     int line = 0;
@@ -1722,6 +1734,19 @@ union_type [ArrayList<Definition> defs] returns [Pair<Vector<TypeCode>, Template
                 unionTP = ctx.createUnionTypeCode(ctx.getScope(), name, dist_type);
             }
             unionTP.setDefined();
+
+            // Apply annotations to the TypeCode
+            if (null != annotations)
+            {
+                for(Annotation annotation : annotations)
+                {
+                    if (annotation != null) // Some annotations may be ignored
+                    {
+                        unionTP.addAnnotation(ctx, annotation);
+                    }
+                }
+            }
+
             line= _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1;
         }
         LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
