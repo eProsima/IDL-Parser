@@ -222,7 +222,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     protected boolean check_unique_member_id(
             Member member)
     {
-        if (super_type_ != null)
+        if (null != super_type_)
         {
             for (Member m : super_type_.getAllMembers())
             {

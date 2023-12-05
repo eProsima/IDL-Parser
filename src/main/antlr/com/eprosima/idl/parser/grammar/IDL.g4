@@ -1514,7 +1514,7 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
                 TypeCode scopedType = ctx.getTypeCode($scoped_name.pair.first());
                 if (scopedType instanceof StructTypeCode)
                 {
-                    parentStruct = (StructTypeCode)scopedType;
+                    structTP.addInheritance(ctx, scopedType);
                 }
                 else
                 {
@@ -1540,10 +1540,6 @@ struct_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, St
             vector = new Vector<TypeCode>();
             structTP.setForwarded(false);
             vector.add(structTP);
-            if (parentStruct != null)
-            {
-                structTP.addInheritance(ctx, parentStruct);
-            }
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
             $fw_name = (fw_declaration) ? name : null;
         }
@@ -1587,7 +1583,7 @@ member_list [StructTypeCode structTP] returns [TemplateGroup tg = null]
                         if(pair.first().second() != null)
                         {
                             $tg = pair.first().second();
-                        }                        
+                        }
                     }
                 }
             }

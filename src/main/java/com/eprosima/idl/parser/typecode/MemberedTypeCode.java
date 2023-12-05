@@ -157,25 +157,27 @@ public abstract class MemberedTypeCode extends TypeCode
                     Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @id annotations only supported for structure's members or union's members.");
+                    ": @" + Annotation.id_str +
+                    " annotations only supported for structure's members or union's members.");
         }
         if (member.isAnnotationHashid() && (
                     Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @id annotations only supported for structure's members or union's members.");
+                    ": @" + Annotation.hashid_str +
+                     "annotations only supported for structure's members or union's members.");
         }
         if (member.isAnnotationId() && member.isAnnotationHashid())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @id and @hashid annotations cannot be together.");
+                    ": @" + Annotation.id_str + " and @" + Annotation.hashid_str + " annotations cannot be together.");
         }
 
         if(!m_members.containsKey(member.getName()))
         {
             if (Member.MEMBER_ID_INVALID != member.getId() && !check_unique_member_id(member))
             {
-                return false;
+                throw new ParseException(null, member.getName() + " has a MemberId already in use.");
             }
             member.set_index(last_index_++);
             if (last_id_ < member.getId())
@@ -196,16 +198,20 @@ public abstract class MemberedTypeCode extends TypeCode
     protected void calculate_member_id_(
             Member member)
     {
-        if (member.isAnnotationId())
+        try
         {
-            try
+            if (member.isAnnotationId())
             {
                 member.set_id(Integer.parseInt(member.getAnnotationIdValue()));
             }
-            catch (RuntimeGenerationException ex)
+            else if (!isAnnotationAutoid() || getAnnotationAutoidValue().equals(Annotation.autoid_sequential_str))
             {
-                // Should be never called because was previously called isAnnotationId();
+                member.set_id(++last_id_);
             }
+        }
+        catch (RuntimeGenerationException ex)
+        {
+            // Should be never called because was previously called isAnnotationId() or similar.
         }
     }
 
@@ -310,6 +316,23 @@ public abstract class MemberedTypeCode extends TypeCode
                 throw new ParseException(null, "Extensibility was already defined for " + getName());
             }
         }
+    }
+
+    public boolean isAnnotationAutoid()
+    {
+        return null != getAnnotations().get(Annotation.autoid_str);
+    }
+
+    public String getAnnotationAutoidValue() throws RuntimeGenerationException
+    {
+        Annotation ann = getAnnotations().get(Annotation.autoid_str);
+        if (ann == null)
+        {
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.autoid_str +
+                    " annotation not found.");
+        }
+
+        return ann.getValue();
     }
 
     private String m_name = null;

@@ -173,14 +173,14 @@ public class Context
         }
 
         // Add here builtin annotations? (IDL 4.2 - 8.3.1 section)
-        AnnotationDeclaration idann = createAnnotationDeclaration("id", null);
+        AnnotationDeclaration idann = createAnnotationDeclaration(Annotation.id_str, null);
         idann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_LONG), "-1"));
 
-        AnnotationDeclaration autoidann = createAnnotationDeclaration("autoid", null);
-        EnumTypeCode autoidannenum = new EnumTypeCode(autoidann.getScopedname(), "autoidannenum");
-        autoidannenum.addMember(new EnumMember("SEQUENTIAL"));
-        autoidannenum.addMember(new EnumMember("HASH"));
-        autoidann.addMember(new AnnotationMember("value", autoidannenum, autoidannenum.getInitialValue()));
+        AnnotationDeclaration autoidann = createAnnotationDeclaration(Annotation.autoid_str, null);
+        EnumTypeCode autoidannenum = new EnumTypeCode(autoidann.getScopedname(), Annotation.autoid_enum_str);
+        autoidannenum.addMember(new EnumMember(Annotation.autoid_sequential_str));
+        autoidannenum.addMember(new EnumMember(Annotation.autoid_hash_str));
+        autoidann.addMember(new AnnotationMember("value", autoidannenum, Annotation.autoid_hash_str));
 
         AnnotationDeclaration optionalann = createAnnotationDeclaration("optional", null);
         optionalann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
@@ -192,7 +192,7 @@ public class Context
         valueann.addMember(new AnnotationMember("value", new AnyTypeCode(), null));
 
         AnnotationDeclaration extensibilityann = createAnnotationDeclaration(Annotation.extensibility_str, null);
-        EnumTypeCode extensibilityannenum = new EnumTypeCode(extensibilityann.getScopedname(), "extensibilityannenum");
+        EnumTypeCode extensibilityannenum = new EnumTypeCode(extensibilityann.getScopedname(), Annotation.extensibility_enum_str);
         extensibilityannenum.addMember(new EnumMember(Annotation.ex_final_str));
         extensibilityannenum.addMember(new EnumMember(Annotation.ex_appendable_str));
         extensibilityannenum.addMember(new EnumMember(Annotation.ex_mutable_str));
@@ -261,6 +261,9 @@ public class Context
 
         AnnotationDeclaration amiann = createAnnotationDeclaration("ami", null);
         amiann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+
+        AnnotationDeclaration hashid_annotation = createAnnotationDeclaration(Annotation.hashid_str, null);
+        hashid_annotation.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
 
         // Create default @non_serialized annotation.
         AnnotationDeclaration non_serializedann = createAnnotationDeclaration("non_serialized", null);

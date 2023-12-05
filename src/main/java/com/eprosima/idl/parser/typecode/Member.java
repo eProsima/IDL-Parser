@@ -235,7 +235,8 @@ public class Member implements Notebook
         Annotation ann = m_annotations.get(Annotation.id_str);
         if (ann == null)
         {
-            throw new RuntimeGenerationException("Error in member " + m_name + ": @id annotation not found.");
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.id_str +
+                    " annotation not found.");
         }
 
         return ann.getValue();
