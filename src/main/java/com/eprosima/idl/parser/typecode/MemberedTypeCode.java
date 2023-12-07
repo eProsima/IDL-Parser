@@ -122,7 +122,7 @@ public abstract class MemberedTypeCode extends TypeCode
         if (member.isAnnotationKey() && Kind.KIND_STRUCT != getKind())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @key annotations only supported for structure's members.");
+                    ": @" + Annotation.key_str + " annotations only supported for structure's members.");
         }
         if (null != member.getAnnotationBitBound() && (
                     Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
@@ -148,12 +148,12 @@ public abstract class MemberedTypeCode extends TypeCode
         if(member.isAnnotationKey() && member.isAnnotationNonSerialized())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @key and @non_serialized annotations are incompatible.");
+                    ": @" + Annotation.key_str + " and @non_serialized annotations are incompatible.");
         }
         if(member.isAnnotationKey() && member.isAnnotationOptional())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @key and @optional annotations are incompatible.");
+                    ": @" + Annotation.key_str + " and @optional annotations are incompatible.");
         }
         if (member.isAnnotationId() && (
                     Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
@@ -366,7 +366,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     private LinkedHashMap<String, Member> m_members = null;
 
-    private int last_index_ = 0;
+    protected int last_index_ = 0;
 
     protected int last_id_ = 0;
 }

@@ -768,12 +768,12 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     Token tk = null;
     String fw_name = null;
 }
-    :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator[null] { ttg=$type_declarator.returnPair; }
+    :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator[null, annotations] { ttg=$type_declarator.returnPair; }
     |   struct_type[annotations] { ttg=$struct_type.returnPair; fw_name = $struct_type.fw_name; }
     |   union_type[annotations, defs] { ttg=$union_type.returnPair; fw_name = $union_type.fw_name; }
-    |   enum_type { ttg=$enum_type.returnPair; }
-    |   bitset_type { ttg=$bitset_type.returnPair; }
-    |   bitmask_type { ttg=$bitmask_type.returnPair; }
+    |   enum_type[annotations] { ttg=$enum_type.returnPair; }
+    |   bitset_type[annotations] { ttg=$bitset_type.returnPair; }
+    |   bitmask_type[annotations] { ttg=$bitmask_type.returnPair; }
     |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
     |   constr_forward_decl )
     {
@@ -798,16 +798,6 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
                 }
 
                 TypeDeclaration typedeclaration = (fw_name == null) ? new TypeDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, ttg.first().get(count), tk) : ctx.getTypeDeclaration(fw_name);
-                //System.out.println("Type ttg not null: " + name);
-
-                // Add annotations
-                for(Annotation annotation : annotations)
-                {
-                    if (annotation != null) // Some annotations may be ignored
-                    {
-                        typedeclaration.addAnnotation(ctx, annotation);
-                    }
-                }
 
                 // Add type declaration to the map with all typedeclarations.
                 if (fw_name == null)
@@ -823,7 +813,7 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     }
     ;
 
-type_declarator [AnnotationDeclaration annotation] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+type_declarator [AnnotationDeclaration annotation, Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 @init {
     Vector<TypeCode> vector = null;
     AliasTypeCode typedefTypecode = null;
@@ -855,6 +845,18 @@ type_declarator [AnnotationDeclaration annotation] returns [Pair<Vector<TypeCode
                    // Simple declaration
                    typedefTypecode.setContentTypeCode($type_spec.returnPair.first());
                }
+
+                // Apply annotations to the TypeCode
+                if (null != annotations)
+                {
+                    for(Annotation ann : annotations)
+                    {
+                        if (ann != null) // Some annotations may be ignored
+                        {
+                            typedefTypecode.addAnnotation(ctx, ann);
+                        }
+                    }
+                }
 
                if(typedefTemplates != null) {
                     typedefTemplates.setAttribute("typedefs", typedefTypecode);
@@ -952,9 +954,9 @@ template_type_spec returns [Pair<TypeCode, TemplateGroup> returnPair = null]
 constr_type_spec returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
     :   struct_type[null]
     |   union_type[null, null]
-    |   enum_type
-    |   bitset_type
-    |   bitmask_type
+    |   enum_type[null]
+    |   bitset_type[null]
+    |   bitmask_type[null]
     ;
 
 declarators returns [Vector<Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>> ret = new Vector<Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>>()]
@@ -1245,7 +1247,7 @@ annotation_body [AnnotationDeclaration annotation]
 :
     (
       annotation_member[annotation]
-    | enum_type SEMICOLON
+    | enum_type[null] SEMICOLON
         {
             pairtype = $enum_type.returnPair;
             $annotation.addEnums(pairtype.first());
@@ -1255,7 +1257,7 @@ annotation_body [AnnotationDeclaration annotation]
             pairconst = $const_decl.returnPair;
             $annotation.addConstDecl(pairconst.first());
         }
-    | KW_TYPEDEF type_declarator[annotation] SEMICOLON
+    | KW_TYPEDEF type_declarator[annotation, null] SEMICOLON
         {
             pairtype = $type_declarator.returnPair;
             $annotation.addTypeDefs(pairtype.first());
@@ -1283,7 +1285,7 @@ annotation_forward_dcl
     KW_AT_ANNOTATION scoped_name
     ;
 
-bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+bitset_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 @init {
     String name = null;
     Vector<TypeCode> vector = null;
@@ -1300,6 +1302,18 @@ bitset_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
             }
             name = ctx.removeEscapeCharacter($identifier.id);
             typecode = ctx.createBitsetTypeCode(ctx.getScope(), name);
+
+            // Apply annotations to the TypeCode
+            if (null != annotations)
+            {
+                for(Annotation annotation : annotations)
+                {
+                    if (annotation != null) // Some annotations may be ignored
+                    {
+                        typecode.addAnnotation(ctx, annotation);
+                    }
+                }
+            }
         }
         ( COLON scoped_name
             {
@@ -1394,7 +1408,7 @@ bitfield_spec returns [BitfieldSpec bitfieldType = null]
         }
     ;
 
-bitmask_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+bitmask_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 @init {
     String name = null;
     Vector<TypeCode> vector = null;
@@ -1410,6 +1424,18 @@ bitmask_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
             }
             name = ctx.removeEscapeCharacter($identifier.id);
             typecode = ctx.createBitmaskTypeCode(ctx.getScope(), name);
+
+            // Apply annotations to the TypeCode
+            if (null != annotations)
+            {
+                for(Annotation annotation : annotations)
+                {
+                    if (annotation != null) // Some annotations may be ignored
+                    {
+                        typecode.addAnnotation(ctx, annotation);
+                    }
+                }
+            }
         }
         LEFT_BRACE bit_values[typecode] RIGHT_BRACE
         {
@@ -1810,7 +1836,6 @@ switch_type_spec returns [TypeCode typecode = null]
     |   wide_char_type { $typecode = $wide_char_type.typecode; }
     |   octet_type { $typecode=$octet_type.typecode; }
     |   boolean_type { $typecode=$boolean_type.typecode; }
-    |   enum_type
     |   scoped_name
         {
            pair=$scoped_name.pair;
@@ -1926,7 +1951,7 @@ element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<Pair<St
         }
     ;
 
-enum_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
+enum_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
 @init{
     String name = null;
     Vector<TypeCode> vector = null;
@@ -1943,6 +1968,18 @@ enum_type returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
             }
             name = ctx.removeEscapeCharacter($identifier.id);
             enumTP = ctx.createEnumTypeCode(ctx.getScope(), name);
+
+            // Apply annotations to the TypeCode
+            if (null != annotations)
+            {
+                for(Annotation annotation : annotations)
+                {
+                    if (annotation != null) // Some annotations may be ignored
+                    {
+                        enumTP.addAnnotation(ctx, annotation);
+                    }
+                }
+            }
         }
         LEFT_BRACE  enumerator_list[enumTP] RIGHT_BRACE
         {

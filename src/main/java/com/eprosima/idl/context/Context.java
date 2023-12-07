@@ -204,7 +204,7 @@ public class Context
         createAnnotationDeclaration(Annotation.mutable_str, null);
 
         // Create default @Key annotation.
-        AnnotationDeclaration keyann = createAnnotationDeclaration("key", null);
+        AnnotationDeclaration keyann = createAnnotationDeclaration("" + Annotation.key_str + "", null);
         keyann.addMember(new AnnotationMember("value", new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
 
         AnnotationDeclaration mustundann = createAnnotationDeclaration("must_understand", null);

@@ -43,12 +43,14 @@ public class UnionTypeCode extends MemberedTypeCode
     {
         super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = discriminatorTypeCode;
+        ++last_index_;
     }
 
     public void setDiscriminatorType(
             TypeCode discriminatorTypeCode)
     {
         m_discriminatorTypeCode = discriminatorTypeCode;
+        ++last_index_;
     }
 
     @Override

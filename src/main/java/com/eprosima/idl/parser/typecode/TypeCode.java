@@ -360,56 +360,70 @@ public abstract class TypeCode implements Notebook
         return m_annotations.values();
     }
 
-    void calculate_extensibility()
+    void calculate_extensibility(
+            ExtensibilityKind base_ext)
     {
         if (ExtensibilityKind.NOT_APPLIED == extensibility_)
         {
-            if (null != m_annotations.get(Annotation.final_str) ||
-                    (null != m_annotations.get(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_str)))
+            if (m_annotations.containsKey(Annotation.final_str) ||
+                    (m_annotations.containsKey(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_val)))
             {
                 extensibility_ = ExtensibilityKind.FINAL;
             }
-            else if (null != m_annotations.get(Annotation.appendable_str) ||
-                    (null != m_annotations.get(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_str)))
+            else if (m_annotations.containsKey(Annotation.appendable_str) ||
+                    (m_annotations.containsKey(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_val)))
             {
                 extensibility_ = ExtensibilityKind.APPENDABLE;
             }
-            else if (null != m_annotations.get(Annotation.mutable_str) ||
-                    (null != m_annotations.get(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_str)))
+            else if (m_annotations.containsKey(Annotation.mutable_str) ||
+                    (m_annotations.containsKey(Annotation.extensibility_str) &&
+                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_val)))
             {
                 extensibility_ = ExtensibilityKind.MUTABLE;
             }
             else
             {
-                extensibility_ = default_extensibility;
+                if (ExtensibilityKind.NOT_APPLIED != base_ext)
+                {
+                    extensibility_ = base_ext;
+                }
+                else
+                {
+                    extensibility_ = default_extensibility;
+                }
             }
         }
     }
 
     public ExtensibilityKind get_extensibility()
     {
-        calculate_extensibility();
+        return get_extensibility(ExtensibilityKind.NOT_APPLIED);
+    }
+
+    public ExtensibilityKind get_extensibility(
+            ExtensibilityKind base_ext)
+    {
+        calculate_extensibility(base_ext);
         return extensibility_;
     }
 
     public boolean isAnnotationFinal()
     {
-        calculate_extensibility();
+        calculate_extensibility(ExtensibilityKind.NOT_APPLIED);
         return ExtensibilityKind.FINAL == extensibility_;
     }
 
     public boolean isAnnotationAppendable()
     {
-        calculate_extensibility();
+        calculate_extensibility(ExtensibilityKind.NOT_APPLIED);
         return ExtensibilityKind.APPENDABLE == extensibility_;
     }
 
     public boolean isAnnotationMutable()
     {
-        calculate_extensibility();
+        calculate_extensibility(ExtensibilityKind.NOT_APPLIED);
         return ExtensibilityKind.MUTABLE == extensibility_;
     }
 

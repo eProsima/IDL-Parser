@@ -119,7 +119,14 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             throw new ParseException(null, "Inheritance must correspond to the name of a previously defined structure");
         }
 
+
         last_id_ = super_type_.last_id_;
+        last_index_ = super_type_.last_index_;
+        if (get_extensibility(super_type_.get_extensibility()) != super_type_.get_extensibility())
+        {
+            throw new ParseException(null, "Base structure and derived structure must have same " +
+                    Annotation.extensibility_enum_str);
+        }
     }
 
     @Override
@@ -214,6 +221,11 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     public boolean addMember(
             Member member) throws ParseException
     {
+        if (member.isAnnotationKey() && null != super_type_)
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.key_str + " cannot be used in a derived structure.");
+        }
         calculate_member_id_(member);
         return super.addMember(member);
     }

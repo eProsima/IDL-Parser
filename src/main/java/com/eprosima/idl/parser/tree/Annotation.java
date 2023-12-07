@@ -28,6 +28,7 @@ public class Annotation
 
     public static final String hashid_str = "hashid";
     public static final String id_str = "id";
+    public static final String key_str = "key";
 
     public static final String extensibility_str = "extensibility";
     public static final String extensibility_enum_str = "ExtensibilityKind";
@@ -35,8 +36,11 @@ public class Annotation
     public static final String appendable_str = "appendable";
     public static final String mutable_str = "mutable";
     public static final String ex_final_str = "FINAL";
+    public static final String ex_final_val = "0";
     public static final String ex_appendable_str = "APPENDABLE";
+    public static final String ex_appendable_val = "1";
     public static final String ex_mutable_str = "MUTABLE";
+    public static final String ex_mutable_val = "2";
 
     public Annotation(AnnotationDeclaration declaration)
     {
