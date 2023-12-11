@@ -122,7 +122,7 @@ public abstract class MemberedTypeCode extends TypeCode
         if (member.isAnnotationKey() && Kind.KIND_STRUCT != getKind())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.key_str + " annotations only supported for structure's members.");
+                    ": @" + Annotation.key_str + " annotations only supported for structure's members (Union discriminator still pending implementation).");
         }
         if (null != member.getAnnotationBitBound() && (
                     Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
@@ -192,7 +192,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     /*!
      * This function calculates the MemberId for the given member.
-     * Derived classes can use this function but it must be called from a override addMember().
+     * Derived classes can use this function but it must be called from an override addMember().
      */
     protected void calculate_member_id_(
             Member member)
@@ -241,7 +241,7 @@ public abstract class MemberedTypeCode extends TypeCode
     }
 
     /*!
-     * This function check there is no other member with same id.
+     * This function checks there is no other member with same id.
      */
     protected boolean check_unique_member_id(
             Member member)

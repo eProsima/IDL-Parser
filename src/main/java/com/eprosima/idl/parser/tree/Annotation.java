@@ -42,6 +42,8 @@ public class Annotation
     public static final String ex_mutable_str = "MUTABLE";
     public static final String ex_mutable_val = "2";
 
+    public static final String value_str = "value";
+
     public Annotation(AnnotationDeclaration declaration)
     {
         m_declaration = declaration;
