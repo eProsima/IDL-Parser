@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.eprosima.idl.context.Context;
-import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Notebook;
 
@@ -157,40 +156,6 @@ public class MemberAppliedAnnotations implements Notebook
             return ann.getValue();
         }
         return "";
-    }
-
-    public boolean isAnnotationId()
-    {
-        return null != m_annotations.get(Annotation.id_str);
-    }
-
-    public String getAnnotationIdValue() throws RuntimeGenerationException
-    {
-        Annotation ann = m_annotations.get(Annotation.id_str);
-        if (ann == null)
-        {
-            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.id_str +
-                    " annotation not found.");
-        }
-
-        return ann.getValue();
-    }
-
-    public boolean isAnnotationHashid()
-    {
-        return null != m_annotations.get(Annotation.hashid_str);
-    }
-
-    public String getAnnotationHashidValue() throws RuntimeGenerationException
-    {
-        Annotation ann = m_annotations.get(Annotation.hashid_str);
-        if (ann == null)
-        {
-            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.hashid_str +
-                    " annotation not found.");
-        }
-
-        return ann.getValue();
     }
 
     private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();
