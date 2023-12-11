@@ -28,13 +28,10 @@ public class TypeDeclaration extends TreeNode implements Definition, Export
         m_typecode = typecode;
         // Set as parent to the Typecode.
         m_typecode.setParent(this);
-    }
-
-    @Override
-    public void addAnnotation(Context ctx, Annotation annotation)
-    {
-        super.addAnnotation(ctx, annotation);
-        m_typecode.addAnnotation(ctx, annotation); // The TypeObject may interpret the annotation directly
+        for(Annotation annotation : typecode.getAnnotationList())
+        {
+            addAnnotation(null, annotation);
+        }
     }
 
     public TypeCode getTypeCode()

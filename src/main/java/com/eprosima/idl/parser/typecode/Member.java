@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Notebook;
 import com.eprosima.idl.context.Context;
@@ -224,14 +225,79 @@ public class Member implements Notebook
         return false;
     }
 
-    public void setId(int id)
+    public boolean isAnnotationId()
+    {
+        return null != m_annotations.get(Annotation.id_str);
+    }
+
+    public String getAnnotationIdValue() throws RuntimeGenerationException
+    {
+        Annotation ann = m_annotations.get(Annotation.id_str);
+        if (ann == null)
+        {
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.id_str +
+                    " annotation not found.");
+        }
+
+        return ann.getValue();
+    }
+
+    public boolean isAnnotationHashid()
+    {
+        return null != m_annotations.get(Annotation.hashid_str);
+    }
+
+    public String getAnnotationHashidValue() throws RuntimeGenerationException
+    {
+        Annotation ann = m_annotations.get(Annotation.hashid_str);
+        if (ann == null)
+        {
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.hashid_str +
+                    " annotation not found.");
+        }
+
+        return ann.getValue();
+    }
+
+    /*!
+     * Sets the member's id.
+     *
+     * This function is intended to be called by MemberTypeCode.
+     */
+    public void set_id(int id)
     {
         id_ = id;
     }
 
-    public int getId()
+    /*!
+     * Return the MemberId as Integer.
+     */
+    public int get_id()
     {
         return id_;
+    }
+
+    /*!
+     * Return the MemberId as String in hexadecimal format.
+     */
+    public String getId()
+    {
+        return String.format("0x%08x", id_);
+    }
+
+    /*!
+     * Sets the order of definition of the member.
+     *
+     * This function is intended to be called by MemberTypeCode.
+     */
+    public void set_index(int index)
+    {
+        index_ = index;
+    }
+
+    public int getIndex()
+    {
+        return index_;
     }
 
     private String m_name = null;
@@ -240,5 +306,9 @@ public class Member implements Notebook
 
     private HashMap<String, Annotation> m_annotations = null;
 
-    private int id_ = 0xFFFFFFF; // MEMBER_ID_INVALID
+    public static final int MEMBER_ID_INVALID = 0x0FFFFFFF;
+
+    private int id_ = MEMBER_ID_INVALID;
+
+    private int index_ = 0;
 }

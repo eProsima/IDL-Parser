@@ -118,6 +118,15 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         {
             throw new ParseException(null, "Inheritance must correspond to the name of a previously defined structure");
         }
+
+
+        last_id_ = super_type_.last_id_;
+        last_index_ = super_type_.last_index_;
+        if (get_extensibility(super_type_.get_extensibility()) != super_type_.get_extensibility())
+        {
+            throw new ParseException(null, "Base structure and derived structure must have same " +
+                    Annotation.extensibility_enum_str);
+        }
     }
 
     @Override
@@ -149,27 +158,6 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     public List<Member> getAllMembers() // Alias for getMembers(true) for stg
     {
         return getMembers(true);
-    }
-
-    public List<Map.Entry<Integer, Member>> getAllIdentifiedMembers()
-    {
-        int seq_id = 0;
-        List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
-
-        if (super_type_ != null)
-        {
-            for (Member m : super_type_.getAllMembers())
-            {
-                ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
-            }
-        }
-
-        for (Member m : getMembers())
-        {
-            ret_members.add(new AbstractMap.SimpleEntry<>(seq_id++, m));
-        }
-
-        return ret_members;
     }
 
     @Override
@@ -227,6 +215,45 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         check_annotation_for_aggregated_types(annotation);
 
         super.addAnnotation(ctx, annotation);
+    }
+
+    @Override
+    public boolean addMember(
+            Member member) throws ParseException
+    {
+        if (member.isAnnotationKey() && null != super_type_)
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.key_str + " cannot be used in a derived structure.");
+        }
+        calculate_member_id_(member);
+        return super.addMember(member);
+    }
+
+    @Override
+    protected boolean check_unique_member_id(
+            Member member)
+    {
+        if (null != super_type_)
+        {
+            for (Member m : super_type_.getAllMembers())
+            {
+                if (m.get_id() == member.get_id())
+                {
+                    return false;
+                }
+            }
+        }
+
+        for (Member m : getMembers())
+        {
+            if (m.get_id() == member.get_id())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private StructTypeCode super_type_;

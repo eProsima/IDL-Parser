@@ -20,13 +20,29 @@ import java.util.Collection;
 
 public class Annotation
 {
+    public static final String autoid_str = "autoid";
+    public static final String autoid_enum_str = "AutoidKind";
+    public static final String autoid_sequential_str = "SEQUENTIAL";
+    public static final String autoid_sequential_value_str = "0";
+    public static final String autoid_hash_str = "HASH";
+
+    public static final String hashid_str = "hashid";
+    public static final String id_str = "id";
+    public static final String key_str = "key";
+
+    public static final String extensibility_str = "extensibility";
+    public static final String extensibility_enum_str = "ExtensibilityKind";
     public static final String final_str = "final";
     public static final String appendable_str = "appendable";
     public static final String mutable_str = "mutable";
-    public static final String extensibility_str = "extensibility";
     public static final String ex_final_str = "FINAL";
+    public static final String ex_final_val = "0";
     public static final String ex_appendable_str = "APPENDABLE";
+    public static final String ex_appendable_val = "1";
     public static final String ex_mutable_str = "MUTABLE";
+    public static final String ex_mutable_val = "2";
+
+    public static final String value_str = "value";
 
     public Annotation(AnnotationDeclaration declaration)
     {

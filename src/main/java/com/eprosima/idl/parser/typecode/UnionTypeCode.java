@@ -21,6 +21,7 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 
 
@@ -42,12 +43,14 @@ public class UnionTypeCode extends MemberedTypeCode
     {
         super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = discriminatorTypeCode;
+        ++last_index_;
     }
 
     public void setDiscriminatorType(
             TypeCode discriminatorTypeCode)
     {
         m_discriminatorTypeCode = discriminatorTypeCode;
+        ++last_index_;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class UnionTypeCode extends MemberedTypeCode
      * @return 0 is ok, -1 the member is repeated, -2 is another default member.
      */
     public int addMember(
-            UnionMember member)
+            UnionMember member) throws ParseException
     {
         if (member.isDefault())
         {
@@ -113,7 +116,8 @@ public class UnionTypeCode extends MemberedTypeCode
         member.setLabels(labels);
         member.setJavaLabels(javalabels);
 
-        if (!addMember((Member)member))
+        calculate_member_id_(member);
+        if (!super.addMember(member))
         {
             return -1;
         }
@@ -222,21 +226,21 @@ public class UnionTypeCode extends MemberedTypeCode
     }
 
     // Add member and the default one at the end.
-    public List<Map.Entry<Integer, Member>> getIdentifiedMembers()
+    public List<Member> getMembersDefaultAtEnd()
     {
         int position = 0;
-        List<Map.Entry<Integer, Member>> ret_members = new ArrayList<Map.Entry<Integer,Member>>();
-        AbstractMap.SimpleEntry<Integer, Member> default_member = null;
+        List<Member> ret_members = new ArrayList<Member>();
+        Member default_member = null;
 
         for (Member m : getMembers())
         {
             if (position == m_defaultindex)
             {
-                default_member = new AbstractMap.SimpleEntry<>(position++, m);
+                default_member = m;
             }
             else
             {
-                ret_members.add(new AbstractMap.SimpleEntry<>(position++, m));
+                ret_members.add(m);
             }
         }
 
