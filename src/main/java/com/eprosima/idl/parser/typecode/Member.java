@@ -14,6 +14,9 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+import com.eprosima.idl.parser.tree.Annotation;
+
 public class Member extends MemberAppliedAnnotations
 {
     public Member()
@@ -121,6 +124,40 @@ public class Member extends MemberAppliedAnnotations
     public int getIndex()
     {
         return index_;
+    }
+
+    public boolean isAnnotationId()
+    {
+        return null != getAnnotations().get(Annotation.id_str);
+    }
+
+    public String getAnnotationIdValue() throws RuntimeGenerationException
+    {
+        Annotation ann = getAnnotations().get(Annotation.id_str);
+        if (ann == null)
+        {
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.id_str +
+                    " annotation not found.");
+        }
+
+        return ann.getValue();
+    }
+
+    public boolean isAnnotationHashid()
+    {
+        return null != getAnnotations().get(Annotation.hashid_str);
+    }
+
+    public String getAnnotationHashidValue() throws RuntimeGenerationException
+    {
+        Annotation ann = getAnnotations().get(Annotation.hashid_str);
+        if (ann == null)
+        {
+            throw new RuntimeGenerationException("Error in member " + m_name + ": @" + Annotation.hashid_str +
+                    " annotation not found.");
+        }
+
+        return ann.getValue();
     }
 
     private String m_name = null;
