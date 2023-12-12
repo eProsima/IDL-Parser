@@ -245,29 +245,9 @@ public class MemberAppliedAnnotations implements Notebook
         return m_annotations.get("id") != null;
     }
 
-    public String getAnnotationIdValue()
-    {
-        Annotation ann = m_annotations.get("id");
-        if (ann != null)
-        {
-            return ann.getValue();
-        }
-        return "";
-    }
-
     public boolean isAnnotationHashid()
     {
         return m_annotations.get("hashid") != null;
-    }
-
-    public String getAnnotationHashidValue()
-    {
-        Annotation ann = m_annotations.get("hashid");
-        if (ann != null)
-        {
-            return ann.getValue();
-        }
-        return "";
     }
 
     private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();

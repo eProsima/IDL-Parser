@@ -85,7 +85,7 @@ public class Annotation
     {
         String scoped_name = getFullScopedname();
 
-        if (!com.eprosima.idl.parser.typecode.TypeCode.ctx.get_template_manager().get_current_template_stgroup().is_enabled_using_explicitly_modules())
+        if (!com.eprosima.idl.parser.typecode.TypeCode.ctx.is_enabled_custom_property_in_current_group(com.eprosima.idl.parser.typecode.TypeCode.ctx.using_explicitly_modules_custom_property))
         {
             return scoped_name;
         }
