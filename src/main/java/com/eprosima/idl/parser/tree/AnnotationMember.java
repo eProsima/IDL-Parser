@@ -74,6 +74,19 @@ public class AnnotationMember
                 }
             }
         }
+        if (m_typecode.isPrimitiveType())
+        {
+            if (m_value != null)
+            {
+                // Check if the string starts with "0x" to determine if it's hexadecimal
+                if (m_value.startsWith("0x")) {
+                    // If it's hexadecimal, parse it using parseInt with radix 16
+                    return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
+                } else {
+                    return m_value;
+                }
+            }
+        }
         return m_value;
     }
 
