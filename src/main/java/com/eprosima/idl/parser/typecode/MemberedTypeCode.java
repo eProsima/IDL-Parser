@@ -218,7 +218,14 @@ public abstract class MemberedTypeCode extends TypeCode
         {
             if (member.isAnnotationId())
             {
-                member.set_id(Integer.parseInt(member.getAnnotationIdValue()));
+                // Check if the string starts with "0x" to determine if it's hexadecimal
+                if (member.getAnnotationIdValue().startsWith("0x")) {
+                    // If it's hexadecimal, parse it using parseInt with radix 16
+                    member.set_id(Integer.parseInt(member.getAnnotationIdValue().substring(2), 16));
+                } else {
+                    // If it's decimal, parse it normally
+                    member.set_id(Integer.parseInt(member.getAnnotationIdValue()));
+                }
             }
             else if (member.isAnnotationHashid())
             {
