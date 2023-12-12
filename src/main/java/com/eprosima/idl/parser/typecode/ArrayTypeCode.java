@@ -36,7 +36,15 @@ public class ArrayTypeCode extends ContainerTypeCode
     @Override
     public String getTypeIdentifier()
     {
-        return "TI_PLAIN_ARRAY_SMALL";
+        String type_id = "TI_PLAIN_ARRAY_SMALL";
+        for (int count = 0; count < evaluated_dimensions_.size(); ++count)
+        {
+            if (evaluated_dimensions_.get(count).compareTo(Integer.toString(256)) > 0)
+            {
+                return "TI_PLAIN_ARRAY_LARGE";
+            }
+        }
+        return type_id;
     }
 
     @Override
