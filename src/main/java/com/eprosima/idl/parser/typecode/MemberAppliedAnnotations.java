@@ -183,7 +183,7 @@ public class MemberAppliedAnnotations implements Notebook
 
     public boolean isAnnotationTryConstruct()
     {
-        return m_annotations.get(Annotation.try_construct_str) != null;
+        return m_annotations.containsKey(Annotation.try_construct_str);
     }
 
     void calculate_try_construct() throws RuntimeGenerationException
