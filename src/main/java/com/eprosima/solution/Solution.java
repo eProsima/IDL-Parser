@@ -105,6 +105,19 @@ public class Solution
 	    return m_cacheprojects;
 	}
 
+	/*!
+	 * @brief Only valid if one IDL is passed to Fast DDS-Gen. Used only in testing environment.
+	 */
+	public Project getMainProject()
+	{
+		ArrayList projects = getProjects();
+		if (!projects.isEmpty())
+		{
+			return (Project)projects.get(projects.size() - 1);
+		}
+		return null;
+	}
+
     public boolean existsProject(String name)
 	{
 	    boolean ret = false;
