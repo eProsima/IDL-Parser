@@ -368,5 +368,5 @@ public abstract class MemberedTypeCode extends TypeCode
 
     protected int last_index_ = 0;
 
-    protected int last_id_ = 0;
+    protected int last_id_ = -1;
 }
