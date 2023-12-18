@@ -27,6 +27,7 @@ public class Annotation
     public static final String autoid_sequential_str = "SEQUENTIAL";
     public static final String autoid_sequential_value_str = "0";
     public static final String autoid_hash_str = "HASH";
+    public static final String autoid_hash_value_str = "1";
 
     public static final String hashid_str = "hashid";
     public static final String id_str = "id";
