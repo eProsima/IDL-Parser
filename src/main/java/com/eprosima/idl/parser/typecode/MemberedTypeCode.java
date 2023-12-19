@@ -402,6 +402,18 @@ public abstract class MemberedTypeCode extends TypeCode
         return ann.getValue();
     }
 
+    public boolean isNonForwardedContent()
+    {
+        for (Member member : m_members.values())
+        {
+            if (member.getTypecode().isForwarded())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private String m_name = null;
 
     private String m_scope = null;
