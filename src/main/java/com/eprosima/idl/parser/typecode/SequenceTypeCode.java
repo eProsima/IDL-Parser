@@ -39,7 +39,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     @Override
     public String getTypeIdentifier()
     {
-        if (isIsBounded() && evaluated_maxsize_.compareTo(Integer.toString(256)) > 0)
+        if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) > 256)
         {
             return "TI_PLAIN_SEQUENCE_LARGE";
         }
