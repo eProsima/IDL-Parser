@@ -54,6 +54,11 @@ public class Test
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
 
+        if (idl.equals("external") || idl.equals("declarations"))
+        {
+            flags = flags + " -no-typeobjectsupport";
+        }
+
         String command = program + flags + output + idlPath;
 
         return Command.execute(command, null, errorOutputOnly, true);
@@ -69,6 +74,11 @@ public class Test
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
+
+        if (idl.equals("external") || idl.equals("declarations"))
+        {
+            flags = flags + " -no-typeobjectsupport";
+        }
 
         String command = program + flags + output + idlPath;
         return Command.execute(command, null, errorOutputOnly, true);
