@@ -516,17 +516,17 @@ public abstract class TypeCode implements Notebook
 
     public boolean isAnnotationNested()
     {
-        Annotation ann = m_annotations.get("nested");
+        Annotation ann = m_annotations.get(Annotation.nested_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("TRUE");
+            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
         }
         return false;
     }
 
     public boolean isAnnotationAutoidHash()
     {
-        Annotation ann = m_annotations.get("autoid");
+        Annotation ann = m_annotations.get(Annotation.autoid_str);
         if (ann != null)
         {
             return (ann.getValue().toUpperCase().equals(Annotation.autoid_hash_value_str) ||

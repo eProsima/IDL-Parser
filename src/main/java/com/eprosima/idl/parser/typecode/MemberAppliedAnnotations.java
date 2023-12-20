@@ -72,7 +72,7 @@ public class MemberAppliedAnnotations implements Notebook
         Annotation ann = m_annotations.get(Annotation.optional_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("TRUE");
+            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
         }
         return false;
     }
@@ -82,48 +82,48 @@ public class MemberAppliedAnnotations implements Notebook
         Annotation ann = m_annotations.get(Annotation.external_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("TRUE");
+            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
         }
         return false;
     }
 
     public boolean isAnnotationMustUnderstand()
     {
-        Annotation ann = m_annotations.get("must_understand");
+        Annotation ann = m_annotations.get(Annotation.must_understand_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("TRUE");
+            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
         }
         return false;
     }
 
     public boolean isAnnotationNonSerialized()
     {
-        Annotation ann = m_annotations.get("non_serialized");
+        Annotation ann = m_annotations.get(Annotation.non_serialized_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("TRUE");
+            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
         }
         return false;
     }
 
     public boolean isAnnotationKey()
     {
-        Annotation ann = m_annotations.get("key");
+        Annotation ann = m_annotations.get(Annotation.key_str);
         if (ann == null)
         {
-            ann = m_annotations.get("Key"); // Try old way
+            ann = m_annotations.get(Annotation.eprosima_key_str); // Try old way
         }
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("TRUE");
+            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
         }
         return false;
     }
 
     public Short getAnnotationBitBound()
     {
-        Annotation ann = m_annotations.get("bit_bound");
+        Annotation ann = m_annotations.get(Annotation.bit_bound_str);
         if (ann != null)
         {
             String value = ann.getValue();
@@ -138,12 +138,12 @@ public class MemberAppliedAnnotations implements Notebook
 
     public boolean isAnnotationDefaultLiteral()
     {
-        return m_annotations.get("default_literal") != null;
+        return m_annotations.get(Annotation.default_literal_str) != null;
     }
 
     public String getAnnotationValue()
     {
-        Annotation ann = m_annotations.get("value");
+        Annotation ann = m_annotations.get(Annotation.value_str);
         if (ann != null)
         {
             return ann.getValue();
@@ -153,7 +153,7 @@ public class MemberAppliedAnnotations implements Notebook
 
     public Short getAnnotationPosition()
     {
-        Annotation ann = m_annotations.get("position");
+        Annotation ann = m_annotations.get(Annotation.position_str);
         if (ann != null)
         {
             String value = ann.getValue();
@@ -168,12 +168,12 @@ public class MemberAppliedAnnotations implements Notebook
 
     public boolean isAnnotationDefault()
     {
-        return m_annotations.get("default") != null;
+        return m_annotations.get(Annotation.default_str) != null;
     }
 
     public String getAnnotationDefaultValue()
     {
-        Annotation ann = m_annotations.get("default");
+        Annotation ann = m_annotations.get(Annotation.default_str);
         if (ann != null)
         {
             return ann.getValue();
@@ -242,12 +242,12 @@ public class MemberAppliedAnnotations implements Notebook
 
     public boolean isAnnotationId()
     {
-        return m_annotations.get("id") != null;
+        return m_annotations.get(Annotation.id_str) != null;
     }
 
     public boolean isAnnotationHashid()
     {
-        return m_annotations.get("hashid") != null;
+        return m_annotations.get(Annotation.hashid_str) != null;
     }
 
     private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();

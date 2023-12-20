@@ -22,6 +22,12 @@ import com.eprosima.idl.parser.typecode.TypeCode;
 
 public class Annotation
 {
+    public static final String null_default_value = "0";
+    public static final String true_str = "true";
+    public static final String capitalized_true_str = "TRUE";
+    public static final String empty_str = "";
+    public static final String any_str = "*";
+
     public static final String autoid_str = "autoid";
     public static final String autoid_enum_str = "AutoidKind";
     public static final String autoid_sequential_str = "SEQUENTIAL";
@@ -32,6 +38,7 @@ public class Annotation
     public static final String hashid_str = "hashid";
     public static final String id_str = "id";
     public static final String key_str = "key";
+    public static final String eprosima_key_str = "Key";
 
     public static final String extensibility_str = "extensibility";
     public static final String extensibility_enum_str = "ExtensibilityKind";
@@ -49,10 +56,52 @@ public class Annotation
 
     public static final String optional_str = "optional";
     public static final String external_str = "external";
-    
+    public static final String position_str = "position";
+    public static final String must_understand_str = "must_understand";
+    public static final String default_literal_str = "default_literal";
+    public static final String default_str = "default";
+    public static final String range_str = "range";
+    public static final String min_str = "min";
+    public static final String max_str = "max";
+    public static final String unit_str = "unit";
+    public static final String bit_bound_str = "bit_bound";
+    public static final String nested_str = "nested";
+    public static final String default_nested_str = "default_nested";
+    public static final String ignore_literal_names_str = "ignore_literal_names";
+
+    public static final String verbatim_str = "verbatim";
+    public static final String placement_enum_str = "PlacementKind";
+    public static final String begin_file_str = "BEGIN_FILE";
+    public static final String before_declaration_str = "BEFORE_DECLARATION";
+    public static final String begin_declaration_str = "BEGIN_DECLARATION";
+    public static final String end_declaration_str = "END_DECLARATION";
+    public static final String after_declaration_str = "AFTER_DECLARATION";
+    public static final String end_file_str = "END_FILE";
+    public static final String language_str = "language";
+    public static final String placement_str = "placement";
+    public static final String before_declaration_value_str = "1";
+    public static final String text_str = "text";
+
+    public static final String service_str = "service";
+    public static final String platform_str = "platform";
+    public static final String oneway_str = "oneway";
+    public static final String ami_str = "ami";
+
+    public static final String non_serialized_str = "non_serialized";
+    public static final String data_representation_mask_str = "DataRepresentationMask";
+    public static final String xcdr1_bitflag_str = "XCDR1";
+    public static final String xml_bitflag_str = "XML";
+    public static final String xcdr2_bitflag_str = "XCDR2";
+    public static final String data_representation_str = "data_representation";
+    public static final String allowed_kinds_str = "allowed_kinds";
+    public static final String topic_str = "topic";
+    public static final String name_str = "name";
+
     public static final String try_construct_str = "try_construct";
+    public static final String try_construct_enum_str = "TryConstructFailAction";
     public static final String try_construct_discard_str = "DISCARD";
     public static final String try_construct_use_default_str = "USE_DEFAULT";
+    public static final String try_construct_use_default_value_str = "1";
     public static final String try_construct_trim_str = "TRIM";
 
     public Annotation(AnnotationDeclaration declaration)
@@ -182,68 +231,68 @@ public class Annotation
 
     public boolean isIsVerbatim()
     {
-        return getName().equals("verbatim");
+        return getName().equals(Annotation.verbatim_str);
     }
 
     public boolean isIsUnit()
     {
-        return getName().equals("unit");
+        return getName().equals(Annotation.unit_str);
     }
 
     public boolean isIsMax()
     {
-        return getName().equals("max");
+        return getName().equals(Annotation.max_str);
     }
 
     public boolean isIsMin()
     {
-        return getName().equals("min");
+        return getName().equals(Annotation.min_str);
     }
 
     public boolean isIsRange()
     {
-        return getName().equals("range");
+        return getName().equals(Annotation.range_str);
     }
 
     public boolean isIsHashId()
     {
-        return getName().equals("hashid");
+        return getName().equals(Annotation.hashid_str);
     }
 
     public boolean isIsBuiltin()
     {
-        if (getName().equals("id") ||
-            getName().equals("autoid") ||
-            getName().equals("optional") ||
-            getName().equals("position") ||
-            getName().equals("value") ||
-            getName().equals("extensibility") ||
-            getName().equals("final") ||
-            getName().equals("appendable") ||
-            getName().equals("mutable") ||
-            getName().equals("key") ||
-            getName().equals("Key") ||
-            getName().equals("must_understand") ||
-            getName().equals("default_literal") ||
-            getName().equals("default") ||
-            getName().equals("range") ||
-            getName().equals("min") ||
-            getName().equals("max") ||
-            getName().equals("unit") ||
-            getName().equals("bit_bound") ||
-            getName().equals("external") ||
-            getName().equals("nested") ||
-            getName().equals("verbatim") ||
-            getName().equals("service") ||
-            getName().equals("oneway") ||
-            getName().equals("ami") ||
-            getName().equals("hashid") ||
-            getName().equals("default_nested") ||
-            getName().equals("ignore_literal_names") ||
-            getName().equals("try_construct") ||
-            getName().equals("non_serialized") ||
-            getName().equals("data_representation") ||
-            getName().equals("topic"))
+        if (getName().equals(Annotation.id_str) ||
+            getName().equals(Annotation.autoid_str) ||
+            getName().equals(Annotation.optional_str) ||
+            getName().equals(Annotation.position_str) ||
+            getName().equals(Annotation.value_str) ||
+            getName().equals(Annotation.extensibility_str) ||
+            getName().equals(Annotation.final_str) ||
+            getName().equals(Annotation.appendable_str) ||
+            getName().equals(Annotation.mutable_str) ||
+            getName().equals(Annotation.key_str) ||
+            getName().equals(Annotation.eprosima_key_str) ||
+            getName().equals(Annotation.must_understand_str) ||
+            getName().equals(Annotation.default_literal_str) ||
+            getName().equals(Annotation.default_str) ||
+            getName().equals(Annotation.range_str) ||
+            getName().equals(Annotation.min_str) ||
+            getName().equals(Annotation.max_str) ||
+            getName().equals(Annotation.unit_str) ||
+            getName().equals(Annotation.bit_bound_str) ||
+            getName().equals(Annotation.external_str) ||
+            getName().equals(Annotation.nested_str) ||
+            getName().equals(Annotation.verbatim_str) ||
+            getName().equals(Annotation.service_str) ||
+            getName().equals(Annotation.oneway_str) ||
+            getName().equals(Annotation.ami_str) ||
+            getName().equals(Annotation.hashid_str) ||
+            getName().equals(Annotation.default_nested_str) ||
+            getName().equals(Annotation.ignore_literal_names_str) ||
+            getName().equals(Annotation.try_construct_str) ||
+            getName().equals(Annotation.non_serialized_str) ||
+            getName().equals(Annotation.data_representation_str) ||
+            getName().equals(Annotation.topic_str))
         {
             return true;
         }

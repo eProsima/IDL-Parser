@@ -204,7 +204,7 @@ public class Context
 
         // Builtin annotations (IDL 4.2 - 8.3 section & XTypes 1.3 - 7.3.1.2.1 section)
         AnnotationDeclaration idann = createAnnotationDeclaration(Annotation.id_str, null);
-        idann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_ULONG), "0"));
+        idann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_ULONG), Annotation.null_default_value));
 
         AnnotationDeclaration autoidann = createAnnotationDeclaration(Annotation.autoid_str, null);
         EnumTypeCode autoidannenum = new EnumTypeCode(autoidann.getScopedname(), Annotation.autoid_enum_str);
@@ -213,10 +213,10 @@ public class Context
         autoidann.addMember(new AnnotationMember(Annotation.value_str, autoidannenum, Annotation.autoid_hash_str));
 
         AnnotationDeclaration optionalann = createAnnotationDeclaration(Annotation.optional_str, null);
-        optionalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        optionalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        AnnotationDeclaration positionann = createAnnotationDeclaration("position", null);
-        positionann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), "0"));
+        AnnotationDeclaration positionann = createAnnotationDeclaration(Annotation.position_str, null);
+        positionann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), Annotation.null_default_value));
 
         AnnotationDeclaration valueann = createAnnotationDeclaration(Annotation.value_str, null);
         valueann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
@@ -235,99 +235,99 @@ public class Context
 
         // Create default @key annotation (@Key annotation also supported and registered in parseIDL)
         AnnotationDeclaration keyann = createAnnotationDeclaration(Annotation.key_str, null);
-        keyann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        keyann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        AnnotationDeclaration mustundann = createAnnotationDeclaration("must_understand", null);
-        mustundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        AnnotationDeclaration mustundann = createAnnotationDeclaration(Annotation.must_understand_str, null);
+        mustundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        createAnnotationDeclaration("default_literal", null);
+        createAnnotationDeclaration(Annotation.default_literal_str, null);
 
-        AnnotationDeclaration defaultann = createAnnotationDeclaration("default", null);
+        AnnotationDeclaration defaultann = createAnnotationDeclaration(Annotation.default_str, null);
         defaultann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
 
-        AnnotationDeclaration rangeann = createAnnotationDeclaration("range", null);
-        rangeann.addMember(new AnnotationMember("min", new AnyTypeCode(), null));
-        rangeann.addMember(new AnnotationMember("max", new AnyTypeCode(), null));
+        AnnotationDeclaration rangeann = createAnnotationDeclaration(Annotation.range_str, null);
+        rangeann.addMember(new AnnotationMember(Annotation.min_str, new AnyTypeCode(), null));
+        rangeann.addMember(new AnnotationMember(Annotation.max_str, new AnyTypeCode(), null));
 
-        AnnotationDeclaration minann = createAnnotationDeclaration("min", null);
+        AnnotationDeclaration minann = createAnnotationDeclaration(Annotation.min_str, null);
         minann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
 
-        AnnotationDeclaration maxann = createAnnotationDeclaration("max", null);
+        AnnotationDeclaration maxann = createAnnotationDeclaration(Annotation.max_str, null);
         maxann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
 
-        AnnotationDeclaration unitsann = createAnnotationDeclaration("unit", null);
-        unitsann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_STRING), ""));
+        AnnotationDeclaration unitsann = createAnnotationDeclaration(Annotation.unit_str, null);
+        unitsann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
 
-        AnnotationDeclaration bit_boundann = createAnnotationDeclaration("bit_bound", null);
-        bit_boundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), "0"));
+        AnnotationDeclaration bit_boundann = createAnnotationDeclaration(Annotation.bit_bound_str, null);
+        bit_boundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), Annotation.null_default_value));
 
         AnnotationDeclaration externalann = createAnnotationDeclaration(Annotation.external_str, null);
-        externalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        externalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        AnnotationDeclaration nestedann = createAnnotationDeclaration("nested", null);
-        nestedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        AnnotationDeclaration nestedann = createAnnotationDeclaration(Annotation.nested_str, null);
+        nestedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        AnnotationDeclaration verbatimann = createAnnotationDeclaration("verbatim", null);
-        EnumTypeCode verbatimannenum = new EnumTypeCode(verbatimann.getScopedname(), "PlacementKind");
-        verbatimannenum.addMember(new EnumMember("BEGIN_FILE"));
-        verbatimannenum.addMember(new EnumMember("BEFORE_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("BEGIN_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("END_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("AFTER_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("END_FILE"));
-        verbatimann.addMember(new AnnotationMember("language", new PrimitiveTypeCode(Kind.KIND_STRING), "*"));
+        AnnotationDeclaration verbatimann = createAnnotationDeclaration(Annotation.verbatim_str, null);
+        EnumTypeCode verbatimannenum = new EnumTypeCode(verbatimann.getScopedname(), Annotation.placement_enum_str);
+        verbatimannenum.addMember(new EnumMember(Annotation.begin_file_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.before_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.begin_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.end_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.after_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.end_file_str));
+        verbatimann.addMember(new AnnotationMember(Annotation.language_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
         // c, c++, java, idl, * (any), or custom value
-        verbatimann.addMember(new AnnotationMember("placement", verbatimannenum, "BEFORE_DECLARATION"));
-        verbatimann.addMember(new AnnotationMember("text", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
+        verbatimann.addMember(new AnnotationMember(Annotation.placement_str, verbatimannenum, Annotation.before_declaration_value_str));
+        verbatimann.addMember(new AnnotationMember(Annotation.text_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
 
-        AnnotationDeclaration serviceann = createAnnotationDeclaration("service", null);
-        serviceann.addMember(new AnnotationMember("platform", new PrimitiveTypeCode(Kind.KIND_STRING), "*"));
+        AnnotationDeclaration serviceann = createAnnotationDeclaration(Annotation.service_str, null);
+        serviceann.addMember(new AnnotationMember(Annotation.platform_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
         // CORBA, DDS, * (any), or custom value
 
-        AnnotationDeclaration onewayann = createAnnotationDeclaration("oneway", null);
-        onewayann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        AnnotationDeclaration onewayann = createAnnotationDeclaration(Annotation.oneway_str, null);
+        onewayann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        AnnotationDeclaration amiann = createAnnotationDeclaration("ami", null);
-        amiann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        AnnotationDeclaration amiann = createAnnotationDeclaration(Annotation.ami_str, null);
+        amiann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
         AnnotationDeclaration hashid_annotation = createAnnotationDeclaration(Annotation.hashid_str, null);
-        hashid_annotation.addMember(new AnnotationMember(Annotation.value_str, new StringTypeCode(Kind.KIND_STRING, null, null), ""));
+        hashid_annotation.addMember(new AnnotationMember(Annotation.value_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.empty_str));
 
-        AnnotationDeclaration default_nested_annotation = createAnnotationDeclaration("default_nested", null);
-        default_nested_annotation.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        AnnotationDeclaration default_nested_annotation = createAnnotationDeclaration(Annotation.default_nested_str, null);
+        default_nested_annotation.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        AnnotationDeclaration ignore_literal_names_annotation = createAnnotationDeclaration("ignore_literal_names", null);
-        ignore_literal_names_annotation.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        AnnotationDeclaration ignore_literal_names_annotation = createAnnotationDeclaration(Annotation.ignore_literal_names_str, null);
+        ignore_literal_names_annotation.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        EnumTypeCode try_construct_fail_action_enum = new EnumTypeCode(null, "TryConstructFailAction");
+        EnumTypeCode try_construct_fail_action_enum = new EnumTypeCode(null, Annotation.try_construct_enum_str);
         try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_discard_str));
         try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_use_default_str));
         try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_trim_str));
 
         AnnotationDeclaration try_construct_annotation = createAnnotationDeclaration(Annotation.try_construct_str, null);
-        try_construct_annotation.addMember(new AnnotationMember(Annotation.value_str, try_construct_fail_action_enum, "USE_DEFAULT"));
+        try_construct_annotation.addMember(new AnnotationMember(Annotation.value_str, try_construct_fail_action_enum, Annotation.try_construct_use_default_value_str));
 
         // Create default @non_serialized annotation.
-        AnnotationDeclaration non_serializedann = createAnnotationDeclaration("non_serialized", null);
-        non_serializedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        AnnotationDeclaration non_serializedann = createAnnotationDeclaration(Annotation.non_serialized_str, null);
+        non_serializedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
-        BitmaskTypeCode data_representation_mask_bitmask = new BitmaskTypeCode(null, "DataRepresentationMask");
-        Bitmask xcdr1_bitmask = new Bitmask(data_representation_mask_bitmask, "XCDR1");
+        BitmaskTypeCode data_representation_mask_bitmask = new BitmaskTypeCode(null, Annotation.data_representation_mask_str);
+        Bitmask xcdr1_bitmask = new Bitmask(data_representation_mask_bitmask, Annotation.xcdr1_bitflag_str);
         xcdr1_bitmask.setPosition(0);
         data_representation_mask_bitmask.addBitmask(xcdr1_bitmask);
-        Bitmask xml_bitmask = new Bitmask(data_representation_mask_bitmask, "XML");
+        Bitmask xml_bitmask = new Bitmask(data_representation_mask_bitmask, Annotation.xml_bitflag_str);
         xml_bitmask.setPosition(1);
         data_representation_mask_bitmask.addBitmask(xml_bitmask);
-        Bitmask xcdr2_bitmask = new Bitmask(data_representation_mask_bitmask, "XCDR2");
+        Bitmask xcdr2_bitmask = new Bitmask(data_representation_mask_bitmask, Annotation.xcdr2_bitflag_str);
         xcdr2_bitmask.setPosition(2);
         data_representation_mask_bitmask.addBitmask(xcdr2_bitmask);
 
-        AnnotationDeclaration data_representation_annotation = createAnnotationDeclaration("data_representation", null);
-        data_representation_annotation.addMember(new AnnotationMember("allowed_kinds", data_representation_mask_bitmask, ""));
+        AnnotationDeclaration data_representation_annotation = createAnnotationDeclaration(Annotation.data_representation_str, null);
+        data_representation_annotation.addMember(new AnnotationMember(Annotation.allowed_kinds_str, data_representation_mask_bitmask, Annotation.empty_str));
 
-        AnnotationDeclaration topic_annotation = createAnnotationDeclaration("topic", null);
-        topic_annotation.addMember(new AnnotationMember("name", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
-        topic_annotation.addMember(new AnnotationMember("platform", new PrimitiveTypeCode(Kind.KIND_STRING), "*"));
+        AnnotationDeclaration topic_annotation = createAnnotationDeclaration(Annotation.topic_str, null);
+        topic_annotation.addMember(new AnnotationMember(Annotation.name_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
+        topic_annotation.addMember(new AnnotationMember(Annotation.platform_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
     }
 
     public String getFilename()

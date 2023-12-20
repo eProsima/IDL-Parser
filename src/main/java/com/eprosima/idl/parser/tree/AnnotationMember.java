@@ -141,27 +141,27 @@ public class AnnotationMember
 
     public boolean isIsVerbatimPlacement()
     {
-        return getName().equals("placement");
+        return getName().equals(Annotation.placement_str);
     }
 
     public boolean isIsVerbatimLanguage()
     {
-        return getName().equals("language");
+        return getName().equals(Annotation.language_str);
     }
 
     public boolean isIsVerbatimText()
     {
-        return getName().equals("text");
+        return getName().equals(Annotation.text_str);
     }
 
     public boolean isIsMax()
     {
-        return getName().equals("max");
+        return getName().equals(Annotation.max_str);
     }
 
     public boolean isIsMin()
     {
-        return getName().equals("min");
+        return getName().equals(Annotation.min_str);
     }
 
     private String m_name = null;
