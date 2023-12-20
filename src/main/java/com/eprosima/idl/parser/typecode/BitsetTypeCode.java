@@ -106,7 +106,12 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
     public boolean addBitfield(
             Bitfield bitfield)
     {
-        if (!m_bitfields.containsKey(bitfield.getName()))
+        if (null == bitfield.getName())
+        {
+            m_current_base += bitfield.getSpec().getBitSize();
+            return true;
+        }
+        if (!m_bitfields.containsKey(bitfield.getName()) )
         {
             m_bitfields.put(bitfield.getName(), bitfield);
             bitfield.setBasePosition(m_current_base);
@@ -157,13 +162,7 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
 
     public int getBitSize()
     {
-        int size = 0;
-
-        for (Bitfield bf : m_bitfields.values())
-        {
-            size += bf.getSpec().getBitSize();
-        }
-        return size;
+        return m_current_base;
     }
 
     public int getFullBitSize()
@@ -175,11 +174,7 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
             size += super_type_.getFullBitSize();
         }
 
-        for (Bitfield bf : m_bitfields.values())
-        {
-            size += bf.getSpec().getBitSize();
-        }
-        return size;
+        return m_current_base + size;
     }
 
     private BitsetTypeCode super_type_ = null;
