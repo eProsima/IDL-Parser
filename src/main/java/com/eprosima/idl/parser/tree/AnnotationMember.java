@@ -86,15 +86,7 @@ public class AnnotationMember
             }
             return "";
         }
-        else if (m_typecode.isPrimitive())
-        {
-            if (m_value != null)
-            {
-                return m_value;
-            }
-            return m_typecode.getInitialValue();
-        }
-        if (m_typecode.isPrimitiveType())
+        else if (m_typecode.isPrimitiveType())
         {
             if (m_value != null)
             {
@@ -106,6 +98,7 @@ public class AnnotationMember
                     return m_value;
                 }
             }
+            return m_typecode.getInitialValue();
         }
         return m_value;
     }

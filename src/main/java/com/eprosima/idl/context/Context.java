@@ -277,7 +277,7 @@ public class Context
         verbatimannenum.addMember(new EnumMember(Annotation.end_file_str));
         verbatimann.addMember(new AnnotationMember(Annotation.language_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
         // c, c++, java, idl, * (any), or custom value
-        verbatimann.addMember(new AnnotationMember(Annotation.placement_str, verbatimannenum, Annotation.before_declaration_value_str));
+        verbatimann.addMember(new AnnotationMember(Annotation.placement_str, verbatimannenum, Annotation.before_declaration_str));
         verbatimann.addMember(new AnnotationMember(Annotation.text_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
 
         AnnotationDeclaration serviceann = createAnnotationDeclaration(Annotation.service_str, null);
@@ -305,7 +305,7 @@ public class Context
         try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_trim_str));
 
         AnnotationDeclaration try_construct_annotation = createAnnotationDeclaration(Annotation.try_construct_str, null);
-        try_construct_annotation.addMember(new AnnotationMember(Annotation.value_str, try_construct_fail_action_enum, Annotation.try_construct_use_default_value_str));
+        try_construct_annotation.addMember(new AnnotationMember(Annotation.value_str, try_construct_fail_action_enum, Annotation.try_construct_use_default_str));
 
         // Create default @non_serialized annotation.
         AnnotationDeclaration non_serializedann = createAnnotationDeclaration(Annotation.non_serialized_str, null);

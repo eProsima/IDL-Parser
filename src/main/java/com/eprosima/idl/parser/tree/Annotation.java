@@ -79,7 +79,6 @@ public class Annotation
     public static final String end_file_str = "END_FILE";
     public static final String language_str = "language";
     public static final String placement_str = "placement";
-    public static final String before_declaration_value_str = "1";
     public static final String text_str = "text";
 
     public static final String service_str = "service";
@@ -101,7 +100,6 @@ public class Annotation
     public static final String try_construct_enum_str = "TryConstructFailAction";
     public static final String try_construct_discard_str = "DISCARD";
     public static final String try_construct_use_default_str = "USE_DEFAULT";
-    public static final String try_construct_use_default_value_str = "1";
     public static final String try_construct_trim_str = "TRIM";
 
     public Annotation(AnnotationDeclaration declaration)
