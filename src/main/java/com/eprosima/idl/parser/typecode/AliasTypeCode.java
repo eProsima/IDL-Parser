@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.util.Pair;
 import java.util.List;
 import org.stringtemplate.v4.ST;
@@ -327,29 +328,31 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().getSize();
     }
 
-    public String getEvaluatedMaxsize()
+    public String getEvaluatedMaxsize() throws RuntimeGenerationException
     {
         return super.getContentTypeCode().getEvaluatedMaxsize();
     }
 
-    public List<String> getDimensions()
+    public List<String> getDimensions() throws RuntimeGenerationException
     {
         if (super.getContentTypeCode() instanceof ArrayTypeCode)
         {
             return ((ArrayTypeCode) super.getContentTypeCode()).getDimensions();
         }
 
-        return null;
+        throw new RuntimeGenerationException("Error in alias " + m_name +
+                ": trying accessing dimensions for a non-array type");
     }
 
-    public List<String> getEvaluatedDimensions()
+    public List<String> getEvaluatedDimensions() throws RuntimeGenerationException
     {
         if (super.getContentTypeCode() instanceof ArrayTypeCode)
         {
             return ((ArrayTypeCode) super.getContentTypeCode()).getEvaluatedDimensions();
         }
 
-        return null;
+        throw new RuntimeGenerationException("Error in alias " + m_name +
+                ": trying accessing dimensions for a non-array type");
     }
 
     /*** End of functions that alias has to export because some typecodes have them*/

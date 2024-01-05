@@ -37,7 +37,7 @@ public class MapTypeCode extends ContainerTypeCode
     @Override
     public String getTypeIdentifier()
     {
-        if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) > 256)
+        if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
         {
             return "TI_PLAIN_MAP_LARGE";
         }

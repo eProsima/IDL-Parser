@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
 public class Annotation
@@ -129,7 +130,7 @@ public class Annotation
      * `TemplateSTGroup.enable_using_explicitly_modules()`, by removing from the full scoped name the current
      * `Context` scope.
      */
-    public String getScopedname()
+    public String getScopedname() throws RuntimeGenerationException
     {
         String scoped_name = getFullScopedname();
 
@@ -151,24 +152,22 @@ public class Annotation
     /*!
      * @brief Return the scoped name of the type.
      */
-    public String getFullScopedname()
+    public String getFullScopedname() throws RuntimeGenerationException
     {
-        if(m_declaration != null)
+        if(m_declaration == null)
         {
-            return m_declaration.getScopedname();
+            throw new RuntimeGenerationException("Annotation declaration not initialized");
         }
-
-        return null;
+        return m_declaration.getScopedname();
     }
 
-    public String getROS2Scopedname()
+    public String getROS2Scopedname() throws RuntimeGenerationException
     {
-        if(m_declaration != null)
+        if(m_declaration == null)
         {
-            return m_declaration.getROS2Scopedname();
+            throw new RuntimeGenerationException("Annotation declaration not initialized");
         }
-
-        return null;
+        return m_declaration.getROS2Scopedname();
     }
 
     public boolean addValue(String value)
@@ -202,11 +201,12 @@ public class Annotation
         return true;
     }
 
-    public String getValue()
+    public String getValue() throws RuntimeGenerationException
     {
         if(m_members.size() != 1)
         {
-            return null;
+            throw new RuntimeGenerationException("Error in annotation " + getName() +
+                    ": accessing value of a multiple parameter exception");
         }
 
         return ((AnnotationMember)m_members.values().toArray()[0]).getValue();

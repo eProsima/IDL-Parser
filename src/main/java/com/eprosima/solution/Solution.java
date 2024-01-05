@@ -14,6 +14,7 @@
 
 package com.eprosima.solution;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.log.ColorMessage;
 import java.util.ArrayList;
 
@@ -108,14 +109,14 @@ public class Solution
 	/*!
 	 * @brief Only valid if one IDL is passed to Fast DDS-Gen. Used only in testing environment.
 	 */
-	public Project getMainProject()
+	public Project getMainProject() throws RuntimeGenerationException
 	{
 		ArrayList projects = getProjects();
-		if (!projects.isEmpty())
+		if (projects.isEmpty())
 		{
-			return (Project)projects.get(projects.size() - 1);
+			throw new RuntimeGenerationException("Error: no projects have been defined");
 		}
-		return null;
+		return (Project)projects.get(projects.size() - 1);
 	}
 
     public boolean existsProject(String name)

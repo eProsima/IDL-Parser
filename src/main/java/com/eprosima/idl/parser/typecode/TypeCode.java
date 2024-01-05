@@ -161,9 +161,9 @@ public abstract class TypeCode implements Notebook
         return null;
     }
 
-    public String getEvaluatedMaxsize()
+    public String getEvaluatedMaxsize() throws RuntimeGenerationException
     {
-        return null;
+        throw new RuntimeGenerationException("Non-collection types does not have an evaluated max size");
     }
 
     /*!
@@ -440,34 +440,41 @@ public abstract class TypeCode implements Notebook
     {
         if (ExtensibilityKind.NOT_APPLIED == extensibility_)
         {
-            if (m_annotations.containsKey(Annotation.final_str) ||
-                    (m_annotations.containsKey(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_val)))
+            try
             {
-                extensibility_ = ExtensibilityKind.FINAL;
-            }
-            else if (m_annotations.containsKey(Annotation.appendable_str) ||
-                    (m_annotations.containsKey(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_val)))
-            {
-                extensibility_ = ExtensibilityKind.APPENDABLE;
-            }
-            else if (m_annotations.containsKey(Annotation.mutable_str) ||
-                    (m_annotations.containsKey(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_val)))
-            {
-                extensibility_ = ExtensibilityKind.MUTABLE;
-            }
-            else
-            {
-                if (ExtensibilityKind.NOT_APPLIED != base_ext)
+                if (m_annotations.containsKey(Annotation.final_str) ||
+                        (m_annotations.containsKey(Annotation.extensibility_str) &&
+                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_val)))
                 {
-                    extensibility_ = base_ext;
+                    extensibility_ = ExtensibilityKind.FINAL;
+                }
+                else if (m_annotations.containsKey(Annotation.appendable_str) ||
+                        (m_annotations.containsKey(Annotation.extensibility_str) &&
+                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_val)))
+                {
+                    extensibility_ = ExtensibilityKind.APPENDABLE;
+                }
+                else if (m_annotations.containsKey(Annotation.mutable_str) ||
+                        (m_annotations.containsKey(Annotation.extensibility_str) &&
+                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_val)))
+                {
+                    extensibility_ = ExtensibilityKind.MUTABLE;
                 }
                 else
                 {
-                    extensibility_ = default_extensibility;
+                    if (ExtensibilityKind.NOT_APPLIED != base_ext)
+                    {
+                        extensibility_ = base_ext;
+                    }
+                    else
+                    {
+                        extensibility_ = default_extensibility;
+                    }
                 }
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @extensibility annotation has only one parameter
             }
         }
     }
@@ -519,7 +526,14 @@ public abstract class TypeCode implements Notebook
         Annotation ann = m_annotations.get(Annotation.nested_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @nested annotation has only one parameter
+            }
         }
         return false;
     }
@@ -529,8 +543,15 @@ public abstract class TypeCode implements Notebook
         Annotation ann = m_annotations.get(Annotation.autoid_str);
         if (ann != null)
         {
-            return (ann.getValue().toUpperCase().equals(Annotation.autoid_hash_value_str) ||
-                    ann.getValue().isEmpty());
+            try
+            {
+                return (ann.getValue().toUpperCase().equals(Annotation.autoid_hash_value_str) ||
+                        ann.getValue().isEmpty());
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @autoid annotation has only one parameter
+            }
         }
         return false;
     }

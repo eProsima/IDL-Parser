@@ -39,7 +39,7 @@ public class ArrayTypeCode extends ContainerTypeCode
         String type_id = "TI_PLAIN_ARRAY_SMALL";
         for (int count = 0; count < evaluated_dimensions_.size(); ++count)
         {
-            if (Integer.parseInt(evaluated_dimensions_.get(count)) > 256)
+            if (Integer.parseInt(evaluated_dimensions_.get(count)) >= 256)
             {
                 return "TI_PLAIN_ARRAY_LARGE";
             }

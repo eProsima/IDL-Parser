@@ -72,7 +72,14 @@ public class MemberAppliedAnnotations implements Notebook
         Annotation ann = m_annotations.get(Annotation.optional_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @optional annotation only has one parameter
+            }
         }
         return false;
     }
@@ -82,7 +89,14 @@ public class MemberAppliedAnnotations implements Notebook
         Annotation ann = m_annotations.get(Annotation.external_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @external annotation has only one parameter
+            }
         }
         return false;
     }
@@ -92,7 +106,14 @@ public class MemberAppliedAnnotations implements Notebook
         Annotation ann = m_annotations.get(Annotation.must_understand_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @must_understand annotation has only one parameter
+            }
         }
         return false;
     }
@@ -102,7 +123,14 @@ public class MemberAppliedAnnotations implements Notebook
         Annotation ann = m_annotations.get(Annotation.non_serialized_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @non_serialized annotation has only one parameter
+            }
         }
         return false;
     }
@@ -116,24 +144,37 @@ public class MemberAppliedAnnotations implements Notebook
         }
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @key annotation has only one parameter
+            }
         }
         return false;
     }
 
-    public Short getAnnotationBitBound()
+    public boolean isAnnotationBitBound()
     {
-        Annotation ann = m_annotations.get(Annotation.bit_bound_str);
-        if (ann != null)
+        return m_annotations.get(Annotation.bit_bound_str) != null;
+    }
+
+    public Short getAnnotationBitBoundValue() throws RuntimeGenerationException
+    {
+        try
         {
-            String value = ann.getValue();
-            if (value.equals("-1"))
+            if (isAnnotationBitBound())
             {
-                return null;
+                return Short.parseShort(m_annotations.get(Annotation.bit_bound_str).getValue());
             }
-            return Short.parseShort(value);
         }
-        return null;
+        catch (RuntimeGenerationException ex)
+        {
+            // Should never be called because isAnnotationBitBound() was previously called.
+        }
+        return 0;
     }
 
     public boolean isAnnotationDefaultLiteral()
@@ -141,29 +182,46 @@ public class MemberAppliedAnnotations implements Notebook
         return m_annotations.get(Annotation.default_literal_str) != null;
     }
 
-    public String getAnnotationValue()
+    public boolean isAnnotationValue()
     {
-        Annotation ann = m_annotations.get(Annotation.value_str);
-        if (ann != null)
-        {
-            return ann.getValue();
-        }
-        return null;
+        return m_annotations.get(Annotation.value_str) != null;
     }
 
-    public Short getAnnotationPosition()
+    public String getAnnotationValueValue()
     {
-        Annotation ann = m_annotations.get(Annotation.position_str);
-        if (ann != null)
+        try
         {
-            String value = ann.getValue();
-            if (value.equals("-1"))
+            if (isAnnotationValue())
             {
-                return null;
+                return m_annotations.get(Annotation.value_str).getValue();
             }
-            return Short.parseShort(value);
         }
-        return null;
+        catch (RuntimeGenerationException ex)
+        {
+            // Should never be called because isAnnotationValue() was previously called.
+        }
+        return "";
+    }
+
+    public boolean isAnnotationPosition()
+    {
+        return m_annotations.get(Annotation.position_str) != null;
+    }
+
+    public Short getAnnotationPositionValue()
+    {
+        try
+        {
+            if (isAnnotationPosition())
+            {
+                return Short.parseShort(m_annotations.get(Annotation.position_str).getValue());
+            }
+        }
+        catch (RuntimeGenerationException ex)
+        {
+            // Should never be called because isAnnotationPosition() was previously called.
+        }
+        return 0;
     }
 
     public boolean isAnnotationDefault()
@@ -171,14 +229,14 @@ public class MemberAppliedAnnotations implements Notebook
         return m_annotations.get(Annotation.default_str) != null;
     }
 
-    public String getAnnotationDefaultValue()
+    public String getAnnotationDefaultValue() throws RuntimeGenerationException
     {
         Annotation ann = m_annotations.get(Annotation.default_str);
         if (ann != null)
         {
             return ann.getValue();
         }
-        return "";
+        throw new RuntimeGenerationException("Error getting @default annotation value: annotation not found");
     }
 
     public boolean isAnnotationTryConstruct()

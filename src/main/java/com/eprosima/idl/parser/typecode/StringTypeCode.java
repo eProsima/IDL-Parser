@@ -42,7 +42,7 @@ public class StringTypeCode extends TypeCode
         switch (getKind())
         {
             case Kind.KIND_STRING:
-                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) > 256)
+                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
                 {
                     return "TI_STRING8_LARGE";
                 }
@@ -51,7 +51,7 @@ public class StringTypeCode extends TypeCode
                     return "TI_STRING8_SMALL";
                 }
             case Kind.KIND_WSTRING:
-                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) > 256)
+                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
                 {
                     return "TI_STRING16_LARGE";
                 }

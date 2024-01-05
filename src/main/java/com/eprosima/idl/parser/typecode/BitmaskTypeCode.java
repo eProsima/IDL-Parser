@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.context.Context;
 
@@ -133,8 +134,15 @@ public class BitmaskTypeCode extends MemberedTypeCode
         {
             if (bitmask.getAnnotations().get("position") != null)
             {
-                // Position from attribute
-                return addBitmask(bitmask, Integer.parseInt(bitmask.getAnnotations().get("position").getValue()));
+                try
+                {
+                    // Position from attribute
+                    return addBitmask(bitmask, Integer.parseInt(bitmask.getAnnotations().get("position").getValue()));
+                }
+                catch (RuntimeGenerationException ex)
+                {
+                    // Should not be called as @position annotation has only one parameter
+                }
             }
             // Position autoassigned
             return addBitmask(bitmask, m_current_base);
@@ -232,16 +240,23 @@ public class BitmaskTypeCode extends MemberedTypeCode
         super.addAnnotation(ctx, annotation);
         if (annotation.getName().equals("bit_bound"))
         {
-            m_bit_bound = Integer.parseInt(annotation.getValue());
-            // Sanity check
-            Set<String> keys = m_bitmasks.keySet();
-            for (String key : keys) {
-                int position = m_bitmasks.get(key).getPosition();
-                if (position < 0 || position >= m_bit_bound)
-                {
-                    throw new ParseException(null, "Bitmask member "+ key +" out of bounds. Requested position: "
-                    + position + " with @bit_bound value: " + m_bit_bound);
+            try
+            {
+                m_bit_bound = Integer.parseInt(annotation.getValue());
+                // Sanity check
+                Set<String> keys = m_bitmasks.keySet();
+                for (String key : keys) {
+                    int position = m_bitmasks.get(key).getPosition();
+                    if (position < 0 || position >= m_bit_bound)
+                    {
+                        throw new ParseException(null, "Bitmask member "+ key +" out of bounds. Requested position: "
+                        + position + " with @bit_bound value: " + m_bit_bound);
+                    }
                 }
+            }
+            catch (RuntimeGenerationException ex)
+            {
+               // Should not be called as @bit_bound annotation only has one parameter
             }
         }
     }

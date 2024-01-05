@@ -166,7 +166,7 @@ public abstract class MemberedTypeCode extends TypeCode
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @" + Annotation.key_str + " annotations only supported for structure's members (Union discriminator still pending implementation).");
         }
-        if (null != member.getAnnotationBitBound() && (
+        if (member.isAnnotationBitBound() && (
                     Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
@@ -177,12 +177,12 @@ public abstract class MemberedTypeCode extends TypeCode
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @default_literal annotations only supported for enumeration's members.");
         }
-        if (null != member.getAnnotationValue() && Kind.KIND_ENUM != getKind())
+        if (member.isAnnotationValue() && Kind.KIND_ENUM != getKind())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @value annotations only supported for enumeration's members.");
         }
-        if (null != member.getAnnotationPosition() && Kind.KIND_BITMASK != getKind())
+        if (member.isAnnotationPosition() && Kind.KIND_BITMASK != getKind())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @position annotations only supported for bitmask's members.");
@@ -209,7 +209,7 @@ public abstract class MemberedTypeCode extends TypeCode
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @" + Annotation.hashid_str +
-                     "annotations only supported for structure's members or union's members.");
+                    "annotations only supported for structure's members or union's members.");
         }
         if (member.isAnnotationId() && member.isAnnotationHashid())
         {
@@ -278,7 +278,7 @@ public abstract class MemberedTypeCode extends TypeCode
         }
         catch (RuntimeGenerationException ex)
         {
-            // Should be never called because was previously called isAnnotationId() or similar.
+            // Should never be called because isAnnotationId() or similar was previously called.
         }
     }
 

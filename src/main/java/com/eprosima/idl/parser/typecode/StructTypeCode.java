@@ -22,6 +22,7 @@ import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Inherits;
 
@@ -155,9 +156,15 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return allMembers;
     }
 
-    public Member getFirstMember()
+    public Member getFirstMember() throws RuntimeGenerationException
     {
-        return getMembers().get(0);
+        List<Member> members = getMembers();
+        if (members.size() == 0)
+        {
+            throw new RuntimeGenerationException("Error in structure " + super.getName() +
+                    ": trying accesing first member of an empty structure");
+        }
+        return members.get(0);
     }
 
     public List<Member> getAllMembers() // Alias for getMembers(true) for stg
@@ -233,6 +240,17 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         }
         calculate_member_id_(member);
         return super.addMember(member);
+    }
+
+    @Override
+    public boolean isNonForwardedContent()
+    {
+        boolean ret_code = true;
+        if (super_type_ != null)
+        {
+            ret_code &= super_type_.isNonForwardedContent(); 
+        }
+        return ret_code &= super.isNonForwardedContent();
     }
 
     @Override
