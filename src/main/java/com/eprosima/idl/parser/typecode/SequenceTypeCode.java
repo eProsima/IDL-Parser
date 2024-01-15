@@ -39,6 +39,10 @@ public class SequenceTypeCode extends ContainerTypeCode
     @Override
     public String getTypeIdentifier()
     {
+        if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+        {
+            return "TI_PLAIN_SEQUENCE_LARGE";
+        }
         return "TI_PLAIN_SEQUENCE_SMALL";
     }
 
@@ -119,6 +123,7 @@ public class SequenceTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
+    @Override
     public String getEvaluatedMaxsize()
     {
         if (evaluated_maxsize_ == null)

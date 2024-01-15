@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.parser.tree;
 
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.typecode.Member;
 import com.eprosima.idl.parser.typecode.EnumMember;
 import com.eprosima.idl.parser.typecode.EnumTypeCode;
@@ -51,20 +52,26 @@ public class AnnotationMember
 
     public String getValue()
     {
-        if (m_typecode.isIsType_c()) // Enum
+        if (m_typecode.isIsEnumType())
         {
             EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
             int idx = 0;
+            int default_idx = 0;
             for (Member m : enumTC.getMembers())
             {
                 if (m.getName().equals(m_value))
                 {
                     return Integer.toString(idx);
                 }
+                else if (m.isAnnotationDefaultLiteral())
+                {
+                    default_idx = idx;
+                }
                 idx++;
             }
+            return Integer.toString(default_idx);
         }
-        if (m_typecode.isIsType_d()) // String
+        else if (m_typecode.isIsStringType() || m_typecode.isIsWStringType())
         {
             if (m_value != null)
             {
@@ -73,8 +80,13 @@ public class AnnotationMember
                     return m_value.substring(1, m_value.length() - 1);
                 }
             }
+            if (m_typecode.isIsWStringType())
+            {
+                return "L\"\"";
+            }
+            return "";
         }
-        if (m_typecode.isPrimitiveType())
+        else if (m_typecode.isPrimitiveType())
         {
             if (m_value != null)
             {
@@ -86,6 +98,31 @@ public class AnnotationMember
                     return m_value;
                 }
             }
+            return m_typecode.getInitialValue();
+        }
+        return m_value;
+    }
+
+    public String getEnumStringValue()
+    {
+        if (m_value != null && m_typecode.isIsEnumType())
+        {
+            EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
+            for (Member m : enumTC.getMembers())
+            {
+                String value = m_value;
+                if (value.startsWith("\"") && value.endsWith("\""))
+                {
+                    value = value.substring(1, value.length() - 1);
+                }
+                String[] value_with_scopes = value.split("::");
+                value = value_with_scopes[value_with_scopes.length - 1];
+                if (m.getName().equals(value))
+                {
+                    return value;
+                }
+            }
+            throw new ParseException(null, m_value + " is not a valid label for " + m_name);
         }
         return m_value;
     }
@@ -93,6 +130,31 @@ public class AnnotationMember
     public void setValue(String value)
     {
         m_value = value;
+    }
+
+    public boolean isIsVerbatimPlacement()
+    {
+        return getName().equals(Annotation.placement_str);
+    }
+
+    public boolean isIsVerbatimLanguage()
+    {
+        return getName().equals(Annotation.language_str);
+    }
+
+    public boolean isIsVerbatimText()
+    {
+        return getName().equals(Annotation.text_str);
+    }
+
+    public boolean isIsMax()
+    {
+        return getName().equals(Annotation.max_str);
+    }
+
+    public boolean isIsMin()
+    {
+        return getName().equals(Annotation.min_str);
     }
 
     private String m_name = null;

@@ -133,5 +133,11 @@ public class EnumTypeCode extends MemberedTypeCode
     {
         return true;
     }
+    
+    public int getBitBound()
+    {
+        // TODO: pending @bit_bound annotation application to enum types
+        return 32;
+    }
 
 }

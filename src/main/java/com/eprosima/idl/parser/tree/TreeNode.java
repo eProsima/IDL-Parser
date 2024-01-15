@@ -51,7 +51,9 @@ public class TreeNode implements Notebook
     public String getScopedname()
     {
         if(m_scope == null || m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope + "::" + m_name;
     }
@@ -59,7 +61,9 @@ public class TreeNode implements Notebook
     public String getROS2Scopedname()
     {
         if(m_scope == null || m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope + "::dds_::" + m_name + "_";
     }
@@ -67,7 +71,9 @@ public class TreeNode implements Notebook
     public String getCScopedname()
     {
         if(m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope.replace("::", "_") + "_" + m_name;
     }
@@ -75,7 +81,9 @@ public class TreeNode implements Notebook
     public String getJavaScopedname()
     {
         if(m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope.replace("::", ".") + "." + m_name;
     }
@@ -94,9 +102,13 @@ public class TreeNode implements Notebook
         String ret = null;
 
         if(m_scope == null || m_scope.isEmpty())
+        {
             ret = m_name;
+        }
         else
+        {
             ret = m_scope + "::" + m_name;
+        }
 
         return ret.replaceAll("::", "_");
     }
@@ -110,7 +122,9 @@ public class TreeNode implements Notebook
     public void addAnnotation(Context ctx, Annotation annotation)
     {
         if(annotation != null)
+        {
             m_annotations.put(annotation.getName(), annotation);
+        }
     }
 
     @Override

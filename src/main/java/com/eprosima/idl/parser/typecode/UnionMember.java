@@ -35,6 +35,11 @@ public class UnionMember extends Member
         return m_labels;
     }
 
+    public int getLabelsSize()
+    {
+        return m_labels.size();
+    }
+
     public void setLabels(List<String> labels)
     {
         m_labels = labels;
