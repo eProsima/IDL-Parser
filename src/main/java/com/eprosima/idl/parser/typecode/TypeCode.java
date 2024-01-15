@@ -14,16 +14,16 @@
 
 package com.eprosima.idl.parser.typecode;
 
-import com.eprosima.idl.parser.tree.Annotation;
-import com.eprosima.idl.parser.tree.Notebook;
-import com.eprosima.idl.context.Context;
-
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Notebook;
 
 
 public abstract class TypeCode implements Notebook
@@ -161,6 +161,11 @@ public abstract class TypeCode implements Notebook
         return null;
     }
 
+    public String getEvaluatedMaxsize() throws RuntimeGenerationException
+    {
+        throw new RuntimeGenerationException("Non-collection types does not have an evaluated max size");
+    }
+
     /*!
      * @brief This function returns the size of the datatype. By default is null string.
      * @return The size of the datatype.
@@ -222,6 +227,76 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isIsBooleanType()
+    {
+        return false;
+    }
+
+    public boolean isIsByteType()
+    {
+        return false;
+    }
+
+    public boolean isIsInt8Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint8Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt16Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint16Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt32Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint32Type()
+    {
+        return false;
+    }
+
+    public boolean isIsInt64Type()
+    {
+        return false;
+    }
+
+    public boolean isIsUint64Type()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat32Type()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat64Type()
+    {
+        return false;
+    }
+
+    public boolean isIsFloat128Type()
+    {
+        return false;
+    }
+
+    public boolean isIsEnumType()
+    {
+        return false;
+    }
+
     public boolean isIsBitmaskType()
     {
         return false;
@@ -242,12 +317,12 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
-    public boolean isIsWCharType()
+    public boolean isIsCharType()
     {
         return false;
     }
 
-    public boolean isIsEnumType()
+    public boolean isIsWCharType()
     {
         return false;
     }
@@ -365,34 +440,41 @@ public abstract class TypeCode implements Notebook
     {
         if (ExtensibilityKind.NOT_APPLIED == extensibility_)
         {
-            if (m_annotations.containsKey(Annotation.final_str) ||
-                    (m_annotations.containsKey(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_val)))
+            try
             {
-                extensibility_ = ExtensibilityKind.FINAL;
-            }
-            else if (m_annotations.containsKey(Annotation.appendable_str) ||
-                    (m_annotations.containsKey(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_val)))
-            {
-                extensibility_ = ExtensibilityKind.APPENDABLE;
-            }
-            else if (m_annotations.containsKey(Annotation.mutable_str) ||
-                    (m_annotations.containsKey(Annotation.extensibility_str) &&
-                     m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_val)))
-            {
-                extensibility_ = ExtensibilityKind.MUTABLE;
-            }
-            else
-            {
-                if (ExtensibilityKind.NOT_APPLIED != base_ext)
+                if (m_annotations.containsKey(Annotation.final_str) ||
+                        (m_annotations.containsKey(Annotation.extensibility_str) &&
+                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_val)))
                 {
-                    extensibility_ = base_ext;
+                    extensibility_ = ExtensibilityKind.FINAL;
+                }
+                else if (m_annotations.containsKey(Annotation.appendable_str) ||
+                        (m_annotations.containsKey(Annotation.extensibility_str) &&
+                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_val)))
+                {
+                    extensibility_ = ExtensibilityKind.APPENDABLE;
+                }
+                else if (m_annotations.containsKey(Annotation.mutable_str) ||
+                        (m_annotations.containsKey(Annotation.extensibility_str) &&
+                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_val)))
+                {
+                    extensibility_ = ExtensibilityKind.MUTABLE;
                 }
                 else
                 {
-                    extensibility_ = default_extensibility;
+                    if (ExtensibilityKind.NOT_APPLIED != base_ext)
+                    {
+                        extensibility_ = base_ext;
+                    }
+                    else
+                    {
+                        extensibility_ = default_extensibility;
+                    }
                 }
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @extensibility annotation has only one parameter
             }
         }
     }
@@ -427,12 +509,49 @@ public abstract class TypeCode implements Notebook
         return ExtensibilityKind.MUTABLE == extensibility_;
     }
 
+    public boolean isAnnotationExtensibilityNotApplied()
+    {
+        if (!m_annotations.containsKey(Annotation.final_str) &&
+                !m_annotations.containsKey(Annotation.appendable_str) &&
+                !m_annotations.containsKey(Annotation.mutable_str) &&
+                !m_annotations.containsKey(Annotation.extensibility_str))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isAnnotationNested()
     {
-        Annotation ann = m_annotations.get("nested");
+        Annotation ann = m_annotations.get(Annotation.nested_str);
         if (ann != null)
         {
-            return ann.getValue().toUpperCase().equals("TRUE");
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @nested annotation has only one parameter
+            }
+        }
+        return false;
+    }
+
+    public boolean isAnnotationAutoidHash()
+    {
+        Annotation ann = m_annotations.get(Annotation.autoid_str);
+        if (ann != null)
+        {
+            try
+            {
+                return (ann.getValue().toUpperCase().equals(Annotation.autoid_hash_value_str) ||
+                        ann.getValue().isEmpty());
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @autoid annotation has only one parameter
+            }
         }
         return false;
     }
@@ -470,4 +589,5 @@ public abstract class TypeCode implements Notebook
     private boolean m_defined = false;
 
     private ExtensibilityKind extensibility_ = ExtensibilityKind.NOT_APPLIED;
+
 }

@@ -37,6 +37,10 @@ public class MapTypeCode extends ContainerTypeCode
     @Override
     public String getTypeIdentifier()
     {
+        if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+        {
+            return "TI_PLAIN_MAP_LARGE";
+        }
         return "TI_PLAIN_MAP_SMALL";
     }
 
@@ -92,6 +96,7 @@ public class MapTypeCode extends ContainerTypeCode
         return st.render();
     }
 
+    @Override
     public String getMaxsize()
     {
         if (m_maxsize == null)
@@ -102,6 +107,7 @@ public class MapTypeCode extends ContainerTypeCode
         return m_maxsize;
     }
 
+    @Override
     public String getEvaluatedMaxsize()
     {
         if (evaluated_maxsize_ == null)

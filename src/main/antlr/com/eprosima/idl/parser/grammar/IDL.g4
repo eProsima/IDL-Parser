@@ -1156,8 +1156,10 @@ annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = 
 @init
 {
     TemplateGroup annotationTemplates = null;
+    String old_scope = ctx.getScope();
+    String name = null;
 }
-    : annotation_header LEFT_BRACE annotation_body[$annotation_header.annotation] RIGHT_BRACE
+    : annotation_header
     {
         if($annotation_header.annotation != null)
         {
@@ -1172,8 +1174,23 @@ annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = 
                 }
             }
 
-            $returnPair = new Pair<AnnotationDeclaration, TemplateGroup>($annotation_header.annotation, annotationTemplates);
+            name = $annotation_header.annotation.getName();
+
+            // Update to a new namespace.
+            if(old_scope.isEmpty())
+                ctx.setScope(name);
+            else
+                ctx.setScope(old_scope + "::" + name);
         }
+    }
+    LEFT_BRACE
+    annotation_body[$annotation_header.annotation]
+    RIGHT_BRACE
+    {
+        // Set the old namespace.
+        ctx.setScope(old_scope);
+        // Create the returned data.
+        $returnPair = new Pair<AnnotationDeclaration, TemplateGroup>($annotation_header.annotation, annotationTemplates);
     }
     ;
 
@@ -1217,7 +1234,7 @@ annotation_inheritance_spec [AnnotationDeclaration annotation]
             }
             else
             {
-                System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + $scoped_name.pair.first() + " not supported. Ignoring...");
+                throw new ParseException($scoped_name.pair.second(), "was not defined previously");
             }
         }
     }
@@ -2213,7 +2230,6 @@ array_declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, Tem
             {
                 arrayTemplates.setAttribute("array", typecode);
                 arrayTemplates.setAttribute("ctx", ctx);
-                arrayTemplates.setAttribute("array_type",tk.getText());
             }
             Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
             Pair<Pair<String, Token>, ContainerTypeCode> pp = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
@@ -2786,7 +2802,7 @@ annotation_appl returns [Annotation annotation = null]
         anndecl = ctx.getAnnotationDeclaration(name);
         if(anndecl == null)
         {
-            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + name + " not supported. Ignoring...");
+            throw new ParseException($scoped_name.pair.second(), "was not defined previously");
         }
         else
         {

@@ -42,9 +42,23 @@ public class StringTypeCode extends TypeCode
         switch (getKind())
         {
             case Kind.KIND_STRING:
-                return "TI_STRING8_SMALL";
+                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+                {
+                    return "TI_STRING8_LARGE";
+                }
+                else
+                {
+                    return "TI_STRING8_SMALL";
+                }
             case Kind.KIND_WSTRING:
-                return "TI_STRING16_SMALL";
+                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+                {
+                    return "TI_STRING16_LARGE";
+                }
+                else
+                {
+                    return "TI_STRING16_SMALL";
+                }
             default:
                 return "TK_None";
         }
@@ -96,6 +110,7 @@ public class StringTypeCode extends TypeCode
         return getIdlTypenameFromStringTemplate().toString();
     }
 
+    @Override
     public String getMaxsize()
     {
         if (m_maxsize == null)
@@ -106,6 +121,7 @@ public class StringTypeCode extends TypeCode
         return m_maxsize;
     }
 
+    @Override
     public String getEvaluatedMaxsize()
     {
         if (evaluated_maxsize_ == null)
