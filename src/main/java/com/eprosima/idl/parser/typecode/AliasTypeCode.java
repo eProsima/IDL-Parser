@@ -178,6 +178,16 @@ public class AliasTypeCode extends ContainerTypeCode
         return m_scope + "::dds_::" + m_name + "_";
     }
 
+    public String getCScopedname()
+    {
+        if(m_scope.isEmpty())
+        {
+            return m_name;
+        }
+
+        return m_scope.replace("::", "_") + "_" + m_name;
+    }
+
     public String getScope()
     {
         return m_scope;
