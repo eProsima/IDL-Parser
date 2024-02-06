@@ -39,7 +39,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     @Override
     public String getTypeIdentifier()
     {
-        if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+        if (!isUnbound() && Integer.parseInt(evaluated_maxsize_) >= 256)
         {
             return "TI_PLAIN_SEQUENCE_LARGE";
         }
@@ -134,6 +134,10 @@ public class SequenceTypeCode extends ContainerTypeCode
         return evaluated_maxsize_;
     }
 
+    /**
+     * This API is to check if this specific collection has a bound set.
+     * It does not check if the complete collection is bounded or not.
+     */
     public boolean isUnbound()
     {
         return null == m_maxsize;
@@ -145,6 +149,10 @@ public class SequenceTypeCode extends ContainerTypeCode
         return false;
     }
 
+    /**
+     * This API is to check if ultimately the collection element is bounded.
+     * In order to check if this specific collection has bounds, please use isUnbound API.
+     */
     @Override
     public boolean isIsBounded()
     {
