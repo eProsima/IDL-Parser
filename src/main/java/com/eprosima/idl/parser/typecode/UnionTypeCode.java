@@ -44,6 +44,7 @@ public class UnionTypeCode extends MemberedTypeCode
         super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = discriminatorTypeCode;
         ++last_index_;
+        ++last_id_;
     }
 
     public void setDiscriminatorType(
@@ -51,6 +52,7 @@ public class UnionTypeCode extends MemberedTypeCode
     {
         m_discriminatorTypeCode = discriminatorTypeCode;
         ++last_index_;
+        ++last_id_;
     }
 
     @Override
