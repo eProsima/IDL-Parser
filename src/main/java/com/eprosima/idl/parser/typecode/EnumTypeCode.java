@@ -74,7 +74,7 @@ public class EnumTypeCode extends MemberedTypeCode
     public String getCTypename()
     {
         ST st = getCTypenameFromStringTemplate();
-        st.add("name", getScopedname());
+        st.add("name", getCScopedname());
         return st.render();
     }
 
