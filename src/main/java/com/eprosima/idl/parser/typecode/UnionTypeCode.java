@@ -14,6 +14,8 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,11 +50,15 @@ public class UnionTypeCode extends MemberedTypeCode
     }
 
     public void setDiscriminatorType(
-            TypeCode discriminatorTypeCode)
+            TypeCode discriminatorTypeCode) throws RuntimeGenerationException
     {
         m_discriminatorTypeCode = discriminatorTypeCode;
         ++last_index_;
         ++last_id_;
+        if(last_id_ != 0)
+        {
+            throw new RuntimeGenerationException("UnionTypeCode::setDiscriminatorType(): Discriminator member_id is not 0.");
+        }
     }
 
     @Override

@@ -27,6 +27,7 @@ grammar IDL;
     import com.eprosima.idl.parser.strategy.DefaultErrorStrategy;
     import com.eprosima.idl.parser.listener.DefaultErrorListener;
     import com.eprosima.idl.parser.exception.ParseException;
+    import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 
     import java.util.Vector;
 }
@@ -1753,7 +1754,15 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
             // TODO Check supported types for discriminator: long, enumeration, etc...
             if (fw_decl)
             {
-                unionTP.setDiscriminatorType(dist_type);
+                try
+                {
+                    unionTP.setDiscriminatorType(dist_type);
+                }
+                catch (RuntimeGenerationException ex)
+                {
+                    System.out.println("ERROR ("+ ex.getMessage()+ ")");
+                    throw new ParseException(_input.LT(1), fw_name + " wrong discriminator member_id");
+                }
             }
             else
             {
