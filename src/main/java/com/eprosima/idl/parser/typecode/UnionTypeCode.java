@@ -22,8 +22,8 @@ import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.ParseException;
-import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.exception.RuntimeGenerationException;
+import com.eprosima.idl.parser.tree.Annotation;
 
 
 
