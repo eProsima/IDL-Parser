@@ -22,6 +22,7 @@ import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 
 
@@ -44,13 +45,19 @@ public class UnionTypeCode extends MemberedTypeCode
         super(Kind.KIND_UNION, scope, name);
         m_discriminatorTypeCode = discriminatorTypeCode;
         ++last_index_;
+        ++last_id_;
     }
 
     public void setDiscriminatorType(
-            TypeCode discriminatorTypeCode)
+            TypeCode discriminatorTypeCode) throws RuntimeGenerationException
     {
         m_discriminatorTypeCode = discriminatorTypeCode;
         ++last_index_;
+        ++last_id_;
+        if(last_id_ != 0)
+        {
+            throw new RuntimeGenerationException("UnionTypeCode::setDiscriminatorType(): Discriminator member_id is not 0.");
+        }
     }
 
     @Override
