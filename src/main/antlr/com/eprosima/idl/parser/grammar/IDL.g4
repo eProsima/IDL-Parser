@@ -1773,7 +1773,7 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
         LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
         {
             // Calculate default label.
-            TemplateUtil.setUnionDefaultLabel(defs, unionTP, ctx.getScopeFile(), line);
+            TemplateUtil.find_and_set_default_discriminator_value(defs, unionTP, ctx.getScopeFile(), line);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
