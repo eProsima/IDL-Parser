@@ -31,8 +31,6 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
             String name)
     {
         super(Kind.KIND_BITSET, scope, name);
-        m_bitfields = new LinkedHashMap<String, Bitfield>();
-        super_type_ = null;
     }
 
     @Override
@@ -89,9 +87,9 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
     {
         ArrayList<Bitfield> result = new ArrayList<Bitfield>();
 
-        if (includeParents && super_type_ != null)
+        if (includeParents && enclosed_super_type_ != null)
         {
-            result.addAll(super_type_.getAllBitfields());
+            result.addAll(enclosed_super_type_.getAllBitfields());
         }
 
         result.addAll(m_bitfields.values());
@@ -123,21 +121,21 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
     {
         if (super_type_ == null && parent instanceof BitsetTypeCode)
         {
-            BitsetTypeCode parent_bitset = (BitsetTypeCode)parent;
-            super_type_ = parent_bitset;
+            enclosed_super_type_ = (BitsetTypeCode)parent;
+            super_type_ = parent;
         }
         else if (super_type_ == null && parent instanceof AliasTypeCode)
         {
             AliasTypeCode alias = (AliasTypeCode)parent;
             if (alias.getContentTypeCode() instanceof BitsetTypeCode)
             {
-                BitsetTypeCode parent_bitset = (BitsetTypeCode)alias.getContentTypeCode();
-                super_type_ = parent_bitset;
+                enclosed_super_type_ = (BitsetTypeCode)alias.getContentTypeCode();
             }
             else
             {
                 throw new ParseException(null, "Given alias does not correspond to a bitset");
             }
+            super_type_ = parent;
         }
         else if (super_type_ != null)
         {
@@ -155,6 +153,12 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
         return super_type_;
     }
 
+    @Override
+    public TypeCode getEnclosedInheritance()
+    {
+        return enclosed_super_type_;
+    }
+
     public int getBitSize()
     {
         int size = 0;
@@ -170,9 +174,9 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
     {
         int size = 0;
 
-        if (super_type_ != null)
+        if (enclosed_super_type_ != null)
         {
-            size += super_type_.getFullBitSize();
+            size += enclosed_super_type_.getFullBitSize();
         }
 
         for (Bitfield bf : m_bitfields.values())
@@ -182,7 +186,8 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
         return size;
     }
 
-    private BitsetTypeCode super_type_ = null;
-    private LinkedHashMap<String, Bitfield> m_bitfields = null;
+    private BitsetTypeCode enclosed_super_type_ = null;
+    private TypeCode super_type_ = null;
+    private LinkedHashMap<String, Bitfield> m_bitfields = new LinkedHashMap<String, Bitfield>();
     private int m_current_base = 0;
 }

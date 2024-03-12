@@ -34,7 +34,6 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             String name)
     {
         super(Kind.KIND_STRUCT, scope, name);
-        super_type_ = null;
     }
 
     @Override
@@ -92,23 +91,26 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             Context ctx,
             TypeCode parent) throws ParseException
     {
+        String name = parent.getClass().getSimpleName();
+        System.out.println("type = " + name);
+
         if (super_type_ == null && parent instanceof StructTypeCode)
         {
-            StructTypeCode parent_struct = (StructTypeCode)parent;
-            super_type_ = parent_struct;
+            enclosed_super_type_ = (StructTypeCode)parent;
+            super_type_ = parent;
         }
         else if (super_type_ == null && parent instanceof AliasTypeCode)
         {
             AliasTypeCode alias = (AliasTypeCode)parent;
             if (alias.getContentTypeCode() instanceof StructTypeCode)
             {
-                StructTypeCode parent_struct = (StructTypeCode)alias.getContentTypeCode();
-                super_type_ = parent_struct;
+                enclosed_super_type_ = (StructTypeCode)alias.getContentTypeCode();
             }
             else
             {
                 throw new ParseException(null, "Given alias does not correspond to a structure");
             }
+            super_type_ = parent;
         }
         else if (super_type_ != null)
         {
@@ -120,9 +122,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         }
 
 
-        last_id_ = super_type_.last_id_;
-        last_index_ = super_type_.last_index_;
-        if (get_extensibility(super_type_.get_extensibility()) != super_type_.get_extensibility())
+        last_id_ = enclosed_super_type_.last_id_;
+        last_index_ = enclosed_super_type_.last_index_;
+        if (get_extensibility(enclosed_super_type_.get_extensibility()) != super_type_.get_extensibility())
         {
             throw new ParseException(null, "Base structure and derived structure must have same " +
                     Annotation.extensibility_enum_str);
@@ -136,6 +138,12 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     }
 
     @Override
+    public TypeCode getEnclosedInheritance()
+    {
+        return enclosed_super_type_;
+    }
+
+    @Override
     public List<Member> getMembers()
     {
         return getMembers(false);
@@ -146,9 +154,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     {
         List<Member> allMembers = new ArrayList<Member>();
 
-        if (includeParents && super_type_ != null)
+        if (includeParents && enclosed_super_type_ != null)
         {
-            allMembers.addAll(super_type_.getAllMembers());
+            allMembers.addAll(enclosed_super_type_.getAllMembers());
         }
 
         allMembers.addAll(super.getMembers());
@@ -168,9 +176,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            if (super_type_ != null)
+            if (enclosed_super_type_ != null)
             {
-                returned_value &= super_type_.isIsPlain();
+                returned_value &= enclosed_super_type_.isIsPlain();
             }
             returned_value &= super.isIsPlain();
             detect_recursive_ = false;
@@ -191,9 +199,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         if (!detect_recursive_)
         {
             detect_recursive_ = true;
-            if (super_type_ != null)
+            if (enclosed_super_type_ != null)
             {
-                returned_value &= super_type_.isIsBounded();
+                returned_value &= enclosed_super_type_.isIsBounded();
             }
             returned_value &= super.isIsBounded();
             detect_recursive_ = false;
@@ -221,7 +229,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     public boolean addMember(
             Member member) throws ParseException
     {
-        if (member.isAnnotationKey() && null != super_type_)
+        if (member.isAnnotationKey() && null != enclosed_super_type_)
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @" + Annotation.key_str + " cannot be used in a derived structure.");
@@ -234,9 +242,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     protected boolean check_unique_member_id(
             Member member)
     {
-        if (null != super_type_)
+        if (null != enclosed_super_type_)
         {
-            for (Member m : super_type_.getAllMembers())
+            for (Member m : enclosed_super_type_.getAllMembers())
             {
                 if (m.get_id() == member.get_id())
                 {
@@ -256,7 +264,8 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return true;
     }
 
-    private StructTypeCode super_type_;
+    private StructTypeCode enclosed_super_type_ = null;
+    private TypeCode super_type_ = null;
 
     protected boolean detect_recursive_ = false;
 }

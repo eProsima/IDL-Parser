@@ -1291,7 +1291,7 @@ bitset_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
     String name = null;
     Vector<TypeCode> vector = null;
     BitsetTypeCode typecode = null;
-    BitsetTypeCode superType = null;
+    TypeCode superType = null;
     TemplateGroup bitsetTemplates = null;
 } :     KW_BITSET
         identifier
@@ -1318,15 +1318,7 @@ bitset_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
         }
         ( COLON scoped_name
             {
-                TypeCode scopedType = ctx.getTypeCode($scoped_name.pair.first());
-                if (scopedType instanceof BitsetTypeCode)
-                {
-                    superType = (BitsetTypeCode)scopedType;
-                }
-                else
-                {
-                    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Bitset only can inherit from other bitsets.");
-                }
+                superType = ctx.getTypeCode($scoped_name.pair.first());
             }
         )?
         LEFT_BRACE bitfield[typecode] RIGHT_BRACE
@@ -1551,14 +1543,7 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
         (COLON scoped_name
             {
                 TypeCode scopedType = ctx.getTypeCode($scoped_name.pair.first());
-                if (scopedType instanceof StructTypeCode)
-                {
-                    structTP.addInheritance(ctx, scopedType);
-                }
-                else
-                {
-                    System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Structs only can inherit from other structs.");
-                }
+                structTP.addInheritance(ctx, scopedType);
             }
         )?
         LEFT_BRACE member_list[structTP] RIGHT_BRACE
