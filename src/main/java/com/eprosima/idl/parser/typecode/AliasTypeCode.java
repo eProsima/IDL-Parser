@@ -304,6 +304,18 @@ public class AliasTypeCode extends ContainerTypeCode
         return null;
     }
 
+    public int getFullBitSize()
+    {
+        int returnedValue = 0;
+
+        if (getContentTypeCode() instanceof BitsetTypeCode)
+        {
+            returnedValue = ((BitsetTypeCode)getContentTypeCode()).getFullBitSize();
+        }
+
+        return returnedValue;
+    }
+
     /*** End of functions that alias has to export because some typecodes have them*/
 
     private String m_name = null;

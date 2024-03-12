@@ -34,4 +34,6 @@ public interface Inherits
      * @return Linked super type.
      */
     public TypeCode getInheritance();
+
+    public TypeCode getEnclosedInheritance();
 }
