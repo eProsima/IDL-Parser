@@ -93,7 +93,6 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             TypeCode parent) throws ParseException
     {
         String name = parent.getClass().getSimpleName();
-        System.out.println("type = " + name);
 
         if (super_type_ == null && parent instanceof StructTypeCode)
         {
@@ -254,9 +253,9 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     public boolean isNonForwardedContent()
     {
         boolean ret_code = true;
-        if (super_type_ != null)
+        if (enclosed_super_type_ != null)
         {
-            ret_code &= super_type_.isNonForwardedContent(); 
+            ret_code &= enclosed_super_type_.isNonForwardedContent();
         }
         return ret_code &= super.isNonForwardedContent();
     }

@@ -260,7 +260,7 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().getInitialValue();
     }
 
-    /*** Functions to know the type in string templates ***/
+    //{{{ Functions to know the type in string templates
     @Override
     public boolean isIsType_d()
     {
@@ -325,9 +325,9 @@ public class AliasTypeCode extends ContainerTypeCode
         return "EK_MINIMAL";
     }
 
-    /*** End of functions to know the type in string templates ***/
+    //}}}
 
-    /*** Functions that alias has to export because some typecodes have them*/
+    //{{{ Functions that alias has to export because some typecodes have them
     public String getMaxsize()
     {
         return super.getContentTypeCode().getMaxsize();
@@ -365,7 +365,7 @@ public class AliasTypeCode extends ContainerTypeCode
                 ": trying accessing dimensions for a non-array type");
     }
 
-    public int getFullBitSize()
+    public int getFullBitSize() // Function for alias when enclosed type is a BitsetTypeCode
     {
         int returnedValue = 0;
 
@@ -377,7 +377,31 @@ public class AliasTypeCode extends ContainerTypeCode
         return returnedValue;
     }
 
-    /*** End of functions that alias has to export because some typecodes have them*/
+    public TypeCode getInheritance() // Function for alias when enclosed type is a StructTypeCode
+    {
+        TypeCode returnedValue = null;
+
+        if (getContentTypeCode() instanceof StructTypeCode)
+        {
+            returnedValue = ((StructTypeCode)getContentTypeCode()).getInheritance();
+        }
+
+        return returnedValue;
+    }
+
+    public List<Member> getMembers() // Function for alias when enclosed type is a StructTypeCode
+    {
+        List<Member> returnedValue = null;
+
+        if (getContentTypeCode() instanceof StructTypeCode)
+        {
+            returnedValue = ((StructTypeCode)getContentTypeCode()).getMembers();
+        }
+
+        return returnedValue;
+    }
+
+    //}}}
 
     private String m_name = null;
 
