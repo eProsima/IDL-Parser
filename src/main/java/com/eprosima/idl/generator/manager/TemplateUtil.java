@@ -35,24 +35,38 @@ public class TemplateUtil
             return type;
     }
 
-    public static void setUnionDefaultLabel(ArrayList<Definition> defs, UnionTypeCode union_type, String scopeFile, int line)
+    /*!
+     * This function tries to find a default discriminator value for the union following the guidelines extracted from
+     * the standard.
+     *
+     * \b 6.14.2 Mapping for Union Types \b
+     * "If there is a default case specified, the union is initialized to this default case.
+     * In case the union has an implicit default member it is initialized to that case.
+     * In all other cases it is initialized to the first discriminant value specified in IDL"
+     */
+    public static void find_and_set_default_discriminator_value(ArrayList<Definition> defs, UnionTypeCode union_type)
     {
-        TypeCode dist_type = union_type.getDiscriminator().getTypecode();
         List<Member> members = union_type.getMembers();
+        TypeCode disc_type = union_type.getDiscriminator().getTypecode();
 
-        if(dist_type != null && union_type.getDefaultMember() != null)
+        if (Kind.KIND_ALIAS == disc_type.getKind())
         {
-            if(dist_type.getKind() == Kind.KIND_OCTET ||
-                    dist_type.getKind() == Kind.KIND_INT8 ||
-                    dist_type.getKind() == Kind.KIND_SHORT ||
-                    dist_type.getKind() == Kind.KIND_LONG ||
-                    dist_type.getKind() == Kind.KIND_LONGLONG ||
-                    dist_type.getKind() == Kind.KIND_UINT8 ||
-                    dist_type.getKind() == Kind.KIND_USHORT ||
-                    dist_type.getKind() == Kind.KIND_ULONG ||
-                    dist_type.getKind() == Kind.KIND_ULONGLONG ||
-                    dist_type.getKind() == Kind.KIND_CHAR ||
-                    dist_type.getKind() == Kind.KIND_WCHAR)
+            disc_type = ((AliasTypeCode)disc_type).getContentTypeCode();
+        }
+
+        if(disc_type != null)
+        {
+            if(disc_type.getKind() == Kind.KIND_OCTET ||
+                    disc_type.getKind() == Kind.KIND_INT8 ||
+                    disc_type.getKind() == Kind.KIND_SHORT ||
+                    disc_type.getKind() == Kind.KIND_LONG ||
+                    disc_type.getKind() == Kind.KIND_LONGLONG ||
+                    disc_type.getKind() == Kind.KIND_UINT8 ||
+                    disc_type.getKind() == Kind.KIND_USHORT ||
+                    disc_type.getKind() == Kind.KIND_ULONG ||
+                    disc_type.getKind() == Kind.KIND_ULONGLONG ||
+                    disc_type.getKind() == Kind.KIND_CHAR ||
+                    disc_type.getKind() == Kind.KIND_WCHAR)
             {
                 long dvalue = -1;
                 boolean found = true;
@@ -79,15 +93,17 @@ public class TemplateUtil
                                 catch(NumberFormatException nfe)
                                 {
                                     // It could be a const
-                                    for (Definition def : defs)
+                                    if (null != defs)
                                     {
-                                        if (def.isIsConstDeclaration())
+                                        for (Definition def : defs)
                                         {
-                                            ConstDeclaration decl = (ConstDeclaration)def;
-                                            if (decl.getName().equals(label))
+                                            if (def.isIsConstDeclaration())
                                             {
-                                                value = Long.decode(decl.getValue());
-                                                //System.out.println("Label " + label + " has value " + value);
+                                                ConstDeclaration decl = (ConstDeclaration)def;
+                                                if (decl.getName().equals(label))
+                                                {
+                                                    value = Long.decode(decl.getValue());
+                                                }
                                             }
                                         }
                                     }
@@ -109,9 +125,9 @@ public class TemplateUtil
                 union_type.setDefaultvalue(Long.toString(dvalue));
                 union_type.setJavaDefaultvalue(Long.toString(dvalue));
             }
-            else if(dist_type.getKind() == Kind.KIND_BOOLEAN)
+            else if(disc_type.getKind() == Kind.KIND_BOOLEAN)
             {
-                if(members.size() == 1 && ((UnionMember)members.get(0)).getLabels().size() == 1)
+                if(1 == members.size() && 1 == ((UnionMember)members.get(0)).getLabels().size())
                 {
                     if(((UnionMember)members.get(0)).getLabels().get(0).equals("true"))
                     {
@@ -125,23 +141,24 @@ public class TemplateUtil
                     }
                     else
                     {
-                        //TODO
-                        //throw new ParseException(((UnionMember)members.get(0)).getLabels().get(0), "is not a valid label for a boolean discriminator.");
                         throw new ParseException(null, "is not a valid label for a boolean discriminator.");
                     }
                 }
+                else if(2 == members.size() && 1 == ((UnionMember)members.get(0)).getLabels().size() &&
+                        1 == ((UnionMember)members.get(1)).getLabels().size())
+                {
+
+                    union_type.setDefaultvalue(((UnionMember)members.get(0)).getLabels().get(0));
+                    union_type.setJavaDefaultvalue(((UnionMember)members.get(0)).getLabels().get(0));
+                }
                 else
                 {
-                    if(members.size() > 2)
-                        throw new ParseException(null, "boolean switch cannot have more than two elements.");
-
-                    union_type.setDefaultvalue("false");
-                    union_type.setJavaDefaultvalue("false");
+                    throw new ParseException(null, "boolean switch is malformed.");
                 }
             }
-            else if(dist_type.getKind() == Kind.KIND_ENUM)
+            else if(disc_type.getKind() == Kind.KIND_ENUM)
             {
-                EnumTypeCode enume = (EnumTypeCode)dist_type;
+                EnumTypeCode enume = (EnumTypeCode)disc_type;
                 List<Member> list = new ArrayList<Member>(members);
                 List<Member> enum_members = new ArrayList<Member>();
                 enum_members.addAll(enume.getMembers());
@@ -170,8 +187,11 @@ public class TemplateUtil
                     union_type.setDefaultvalue(enume.getScopedname() + "::" + enum_members.get(0).getName());
                     union_type.setJavaDefaultvalue(enume.javapackage + enume.getJavaScopedname() + "." + enum_members.get(0).getName());
                 }
-                else
-                    throw new ParseException(null, "All enumeration elements are used in the union");
+                else if (0 < members.size() && 0 < ((UnionMember)members.get(0)).getLabels().size())
+                {
+                    union_type.setDefaultvalue(((UnionMember)members.get(0)).getLabels().get(0));
+                    union_type.setJavaDefaultvalue(((UnionMember)members.get(0)).getLabels().get(0));
+                }
             }
             else
             {
@@ -180,14 +200,13 @@ public class TemplateUtil
         }
     }
 
-    public static String checkUnionLabel(TypeCode dist_type, String label, String scopeFile, int line)
+    public static String checkUnionLabel(TypeCode disc_type, String label)
     {
-        // TODO Faltan tipos: short, unsigneds...
-        if(dist_type != null)
+        if(disc_type != null)
         {
-            if(dist_type.getKind() == Kind.KIND_ENUM)
+            if(disc_type.getKind() == Kind.KIND_ENUM)
             {
-                EnumTypeCode enume = (EnumTypeCode)dist_type;
+                EnumTypeCode enume = (EnumTypeCode)disc_type;
 
                 if(enume.getScope() != null)
                 {
@@ -195,8 +214,6 @@ public class TemplateUtil
                     {
                         if(!label.startsWith(enume.getScope()))
                         {
-                            //TODO
-                            //throw new ParseException(label,  "was not declared previously");
                             throw new ParseException(null,  "was not declared previously");
                         }
                         else
@@ -209,10 +226,23 @@ public class TemplateUtil
                 {
                     if(label.contains("::"))
                     {
-                        //TODO
-                        //throw new ParseException(label, "was not declared previously");
                         throw new ParseException(null, "was not declared previously");
                     }
+                }
+
+                boolean found = false;
+                for(Member member : enume.getMembers())
+                {
+                    if (label.equals(member.getName()))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    throw new ParseException(null, "Invalid enumerator label");
                 }
             }
         }
