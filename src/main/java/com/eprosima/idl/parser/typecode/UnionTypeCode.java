@@ -233,33 +233,6 @@ public class UnionTypeCode extends MemberedTypeCode
         return false;
     }
 
-    // Add member and the default one at the end.
-    public List<Member> getMembersDefaultAtEnd()
-    {
-        int position = 0;
-        List<Member> ret_members = new ArrayList<Member>();
-        Member default_member = null;
-
-        for (Member m : getMembers())
-        {
-            if (position == m_defaultindex)
-            {
-                default_member = m;
-            }
-            else
-            {
-                ret_members.add(m);
-            }
-        }
-
-        if (null != default_member)
-        {
-            ret_members.add(default_member);
-        }
-
-        return ret_members;
-    }
-
     @Override
     public void addAnnotation(
             Context ctx,

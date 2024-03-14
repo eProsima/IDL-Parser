@@ -60,11 +60,6 @@ public class UnionMember extends Member
         return m_default;
     }
 
-    public boolean isPrintable()
-    {
-        return m_default || (null != m_labels && 0 < m_labels.size());
-    }
-
     private List<String> m_internallabels = null;
     private List<String> m_labels = null;
     private List<String> m_javalabels = null;
