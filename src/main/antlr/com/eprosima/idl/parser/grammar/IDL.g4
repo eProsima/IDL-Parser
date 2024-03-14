@@ -1773,7 +1773,7 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
         LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
         {
             // Calculate default label.
-            TemplateUtil.find_and_set_default_discriminator_value(defs, unionTP, ctx.getScopeFile(), line);
+            TemplateUtil.find_and_set_default_discriminator_value(defs, unionTP);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -1862,7 +1862,7 @@ case_stmt [UnionTypeCode unionTP] returns [TemplateGroup tg = null]
 }
     :    ( KW_CASE const_exp
         {
-            labels.add(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator().getTypecode(), $const_exp.literalStr, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
+            labels.add(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator().getTypecode(), $const_exp.literalStr));
         } COLON
         | KW_DEFAULT { defaul = true; } COLON
         )+
