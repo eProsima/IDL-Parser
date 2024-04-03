@@ -122,4 +122,16 @@ public class EnumTypeCode extends MemberedTypeCode
         return "4";
     }
 
+    @Override
+    public boolean isIsBounded()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isIsPlain()
+    {
+        return true;
+    }
+
 }
