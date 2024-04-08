@@ -37,6 +37,10 @@ public class MapTypeCode extends ContainerTypeCode
     @Override
     public String getTypeIdentifier()
     {
+        if (!isUnbound() && Integer.parseInt(evaluated_maxsize_) >= 256)
+        {
+            return "TI_PLAIN_MAP_LARGE";
+        }
         return "TI_PLAIN_MAP_SMALL";
     }
 
@@ -92,16 +96,18 @@ public class MapTypeCode extends ContainerTypeCode
         return st.render();
     }
 
+    @Override
     public String getMaxsize()
     {
         if (m_maxsize == null)
         {
-            return "100";
+            return default_unbounded_max_size;
         }
 
         return m_maxsize;
     }
 
+    @Override
     public String getEvaluatedMaxsize()
     {
         if (evaluated_maxsize_ == null)
@@ -156,12 +162,25 @@ public class MapTypeCode extends ContainerTypeCode
         m_valueDefinition = valueDefinition;
     }
 
+    /**
+     * This API is to check if this specific collection has a bound set.
+     * It does not check if the complete collection is bounded or not.
+     */
+    public boolean isUnbound()
+    {
+        return null == m_maxsize;
+    }
+
     @Override
     public boolean isIsPlain()
     {
         return false;
     }
 
+    /**
+     * This API is to check if ultimately the collection element is bounded.
+     * In order to check if this specific collection has bounds, please use isUnbound API.
+     */
     @Override
     public boolean isIsBounded()
     {

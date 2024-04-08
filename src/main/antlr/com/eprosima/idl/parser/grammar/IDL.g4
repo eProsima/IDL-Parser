@@ -177,27 +177,11 @@ module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnP
         if(moduleObject == null)
         {
             // Create the Module object.
-            moduleObject = new com.eprosima.idl.parser.tree.Module(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, tk);
-            //ctx.addPendingModule(moduleObject);
+            moduleObject = ctx.createModule(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name, tk);
         }
 
-        // Add the module to the context.
-        ctx.addModule(moduleObject);
-
-        if(ctx.isInScopedFile() || ctx.isScopeLimitToAll()) {
-            if(tmanager != null) {
-                moduleTemplates = tmanager.createTemplateGroup("module");
-                moduleTemplates.setAttribute("ctx", ctx);
-                // Set the module object to the TemplateGroup of the module.
-                moduleTemplates.setAttribute("module", moduleObject);
-            }
-        }
-
-        // Update to a new namespace.
-        if(old_scope.isEmpty())
-            ctx.setScope(name);
-        else
-            ctx.setScope(old_scope + "::" + name);
+        // Add the module to the context and update to the new namespace (internally call ctx.setScope)
+        moduleTemplates = ctx.addModule(moduleObject);
     }
     // Each definition is stored in the Module and each TemplateGroup is set as attribute in the TemplateGroup of the module.
     LEFT_BRACE
@@ -1172,8 +1156,10 @@ annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = 
 @init
 {
     TemplateGroup annotationTemplates = null;
+    String old_scope = ctx.getScope();
+    String name = null;
 }
-    : annotation_header LEFT_BRACE annotation_body[$annotation_header.annotation] RIGHT_BRACE
+    : annotation_header
     {
         if($annotation_header.annotation != null)
         {
@@ -1188,8 +1174,23 @@ annotation_def returns [Pair<AnnotationDeclaration, TemplateGroup> returnPair = 
                 }
             }
 
-            $returnPair = new Pair<AnnotationDeclaration, TemplateGroup>($annotation_header.annotation, annotationTemplates);
+            name = $annotation_header.annotation.getName();
+
+            // Update to a new namespace.
+            if(old_scope.isEmpty())
+                ctx.setScope(name);
+            else
+                ctx.setScope(old_scope + "::" + name);
         }
+    }
+    LEFT_BRACE
+    annotation_body[$annotation_header.annotation]
+    RIGHT_BRACE
+    {
+        // Set the old namespace.
+        ctx.setScope(old_scope);
+        // Create the returned data.
+        $returnPair = new Pair<AnnotationDeclaration, TemplateGroup>($annotation_header.annotation, annotationTemplates);
     }
     ;
 
@@ -1233,7 +1234,7 @@ annotation_inheritance_spec [AnnotationDeclaration annotation]
             }
             else
             {
-                System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + $scoped_name.pair.first() + " not supported. Ignoring...");
+                throw new ParseException($scoped_name.pair.second(), "was not defined previously");
             }
         }
     }
@@ -1772,7 +1773,7 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
         LEFT_BRACE switch_body[unionTP] RIGHT_BRACE
         {
             // Calculate default label.
-            TemplateUtil.setUnionDefaultLabel(defs, unionTP, ctx.getScopeFile(), line);
+            TemplateUtil.find_and_set_default_discriminator_value(defs, unionTP);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -1861,7 +1862,7 @@ case_stmt [UnionTypeCode unionTP] returns [TemplateGroup tg = null]
 }
     :    ( KW_CASE const_exp
         {
-            labels.add(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), $const_exp.literalStr, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
+            labels.add(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator().getTypecode(), $const_exp.literalStr));
         } COLON
         | KW_DEFAULT { defaul = true; } COLON
         )+
@@ -2229,7 +2230,6 @@ array_declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, Tem
             {
                 arrayTemplates.setAttribute("array", typecode);
                 arrayTemplates.setAttribute("ctx", ctx);
-                arrayTemplates.setAttribute("array_type",tk.getText());
             }
             Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
             Pair<Pair<String, Token>, ContainerTypeCode> pp = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
@@ -2802,7 +2802,7 @@ annotation_appl returns [Annotation annotation = null]
         anndecl = ctx.getAnnotationDeclaration(name);
         if(anndecl == null)
         {
-            System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Annotation " + name + " not supported. Ignoring...");
+            throw new ParseException($scoped_name.pair.second(), "was not defined previously");
         }
         else
         {
