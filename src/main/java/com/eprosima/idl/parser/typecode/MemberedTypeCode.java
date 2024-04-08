@@ -39,10 +39,39 @@ public abstract class MemberedTypeCode extends TypeCode
         return m_name;
     }
 
+    /*!
+     * @brief Returns the full scoped name of the type, unless the developer uses
+     * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, by removing from the full scoped name the
+     * current `Context` scope.
+     */
     public String getScopedname()
     {
+        String scoped_name = getFullScopedname();
+
+        if (!ctx.is_enabled_custom_property_in_current_group(ctx.using_explicitly_modules_custom_property))
+        {
+            return scoped_name;
+        }
+
+        String current_scope = ctx.getScope();
+
+        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+        {
+            return scoped_name;
+        }
+
+        return scoped_name.replace(current_scope + "::", "");
+    }
+
+    /*!
+     * @brief Return the scoped name of the type.
+     */
+    public String getFullScopedname()
+    {
         if(m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope + "::" + m_name;
     }
@@ -50,7 +79,9 @@ public abstract class MemberedTypeCode extends TypeCode
     public String getROS2Scopedname()
     {
         if(m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope + "::dds_::" + m_name + "_";
     }
@@ -58,7 +89,9 @@ public abstract class MemberedTypeCode extends TypeCode
     public String getCScopedname()
     {
         if(m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope.replace("::", "_") + "_" + m_name;
     }
@@ -66,7 +99,9 @@ public abstract class MemberedTypeCode extends TypeCode
     public String getJavaScopedname()
     {
         if(m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope.replace("::", ".") + "." + m_name;
     }
@@ -74,7 +109,9 @@ public abstract class MemberedTypeCode extends TypeCode
     public String getJniScopedname()
     {
         if(m_scope.isEmpty())
+        {
             return m_name;
+        }
 
         return m_scope.replace("::", "/") + "/" + m_name;
     }
@@ -94,66 +131,40 @@ public abstract class MemberedTypeCode extends TypeCode
         return new ArrayList<Member>(m_members.values());
     }
 
+    public int getMembersSize()
+    {
+        return m_members.size();
+    }
+
     public boolean addMember(
             Member member) throws ParseException
     {
-        // Check annotations.
-        if (member.isAnnotationOptional() && Kind.KIND_STRUCT != getKind())
+        //{{{ Check annotations.
+        if (member.isAnnotationBitBound() && (
+                    Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @optional annotations only supported for structure's members.");
+                    ": @" + Annotation.bit_bound_str +
+                    " annotations only supported for enumeration's members or bitmask's members.");
+        }
+        if (member.isAnnotationDefaultLiteral() && Kind.KIND_ENUM != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.default_literal_str + " annotations only supported for enumeration's members.");
         }
         if (member.isAnnotationExternal() && (
                     Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @external annotations only supported for structure's members or union's members.");
+                    ": @" + Annotation.external_str +
+                    " annotations only supported for structure's members or union's members.");
         }
-        if (member.isAnnotationMustUnderstand() && Kind.KIND_STRUCT != getKind())
+        if (member.isAnnotationHashid() && (
+                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @must_understand annotations only supported for structure's members.");
-        }
-        if (member.isAnnotationNonSerialized() && Kind.KIND_STRUCT != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @non_serialized annotations only supported for structure's members.");
-        }
-        if (member.isAnnotationKey() && Kind.KIND_STRUCT != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.key_str + " annotations only supported for structure's members (Union discriminator still pending implementation).");
-        }
-        if (null != member.getAnnotationBitBound() && (
-                    Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @bit_bound annotations only supported for enumeration's members or bitmask's members.");
-        }
-        if (member.isAnnotationDefaultLiteral() && Kind.KIND_ENUM != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @default_literal annotations only supported for enumeration's members.");
-        }
-        if (null != member.getAnnotationValue() && Kind.KIND_ENUM != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @value annotations only supported for enumeration's members.");
-        }
-        if (null != member.getAnnotationPosition() && Kind.KIND_BITMASK != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @position annotations only supported for bitmask's members.");
-        }
-        if(member.isAnnotationKey() && member.isAnnotationNonSerialized())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.key_str + " and @non_serialized annotations are incompatible.");
-        }
-        if(member.isAnnotationKey() && member.isAnnotationOptional())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.key_str + " and @optional annotations are incompatible.");
+                    ": @" + Annotation.hashid_str +
+                    "annotations only supported for structure's members or union's members.");
         }
         if (member.isAnnotationId() && (
                     Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
@@ -162,18 +173,55 @@ public abstract class MemberedTypeCode extends TypeCode
                     ": @" + Annotation.id_str +
                     " annotations only supported for structure's members or union's members.");
         }
-        if (member.isAnnotationHashid() && (
-                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
+        if (member.isAnnotationKey() && Kind.KIND_STRUCT != getKind())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.hashid_str +
-                     "annotations only supported for structure's members or union's members.");
+                    ": @" + Annotation.key_str +
+                    " annotations only supported for structure's members (Union discriminator still pending implementation).");
+        }
+        if (member.isAnnotationMustUnderstand() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.must_understand_str + " annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationNonSerialized() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.non_serialized_str + " annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationOptional() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.optional_str +" annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationPosition() && Kind.KIND_BITMASK != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.position_str + " annotations only supported for bitmask's members.");
+        }
+        if (member.isAnnotationValue() && Kind.KIND_ENUM != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.value_str + " annotations only supported for enumeration's members.");
+        }
+
+        if(member.isAnnotationKey() && member.isAnnotationNonSerialized())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.key_str + " and @" + Annotation.non_serialized_str +
+                    " annotations are incompatible.");
+        }
+        if(member.isAnnotationKey() && member.isAnnotationOptional())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.key_str + " and @" + Annotation.optional_str + " annotations are incompatible.");
         }
         if (member.isAnnotationId() && member.isAnnotationHashid())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @" + Annotation.id_str + " and @" + Annotation.hashid_str + " annotations cannot be together.");
         }
+        //}}}
 
         if(!m_members.containsKey(member.getName()))
         {
@@ -236,7 +284,7 @@ public abstract class MemberedTypeCode extends TypeCode
         }
         catch (RuntimeGenerationException ex)
         {
-            // Should be never called because was previously called isAnnotationId() or similar.
+            // Should never be called because isAnnotationId() or similar was previously called.
         }
     }
 
@@ -358,6 +406,18 @@ public abstract class MemberedTypeCode extends TypeCode
         }
 
         return ann.getValue();
+    }
+
+    public boolean isNonForwardedContent()
+    {
+        for (Member member : m_members.values())
+        {
+            if (member.getTypecode().isForwarded())
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private String m_name = null;

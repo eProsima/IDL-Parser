@@ -1218,7 +1218,7 @@ case_stmt [UnionTypeCode unionTP]
 }
 	:	( KW_CASE const_exp
 		{
-			labels.add(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator(), $const_exp.literalStr, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
+			labels.add(TemplateUtil.checkUnionLabel(unionTP.getDiscriminator().getTypecode(), $const_exp.literalStr, ctx.getScopeFile(), _input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : 1));
 		} COLON
 		| KW_DEFAULT { defaul = true; } COLON
 		)+

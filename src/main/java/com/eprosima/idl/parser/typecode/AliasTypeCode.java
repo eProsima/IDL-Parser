@@ -14,6 +14,7 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.util.Pair;
 import java.util.List;
 import org.stringtemplate.v4.ST;
@@ -130,9 +131,36 @@ public class AliasTypeCode extends ContainerTypeCode
         return m_name;
     }
 
+    /*!
+     * @brief Returns the full scoped name of the type, unless the developer uses
+     * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, by removing from the full scoped name the
+     * current `Context` scope.
+     */
     public String getScopedname()
     {
-        if (m_scope.isEmpty())
+        String scoped_name = getFullScopedname();
+
+        if (!ctx.is_enabled_custom_property_in_current_group(ctx.using_explicitly_modules_custom_property))
+        {
+            return scoped_name;
+        }
+
+        String current_scope = ctx.getScope();
+
+        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+        {
+            return scoped_name;
+        }
+
+        return scoped_name.replace(current_scope + "::", "");
+    }
+
+    /*!
+     * @brief Return the scoped name of the type.
+     */
+    public String getFullScopedname()
+    {
+        if(m_scope.isEmpty())
         {
             return m_name;
         }
@@ -148,6 +176,16 @@ public class AliasTypeCode extends ContainerTypeCode
         }
 
         return m_scope + "::dds_::" + m_name + "_";
+    }
+
+    public String getCScopedname()
+    {
+        if(m_scope.isEmpty())
+        {
+            return m_name;
+        }
+
+        return m_scope.replace("::", "_") + "_" + m_name;
     }
 
     public String getScope()
@@ -222,7 +260,7 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().getInitialValue();
     }
 
-    /*** Functions to know the type in string templates ***/
+    //{{{ Functions to know the type in string templates
     @Override
     public boolean isIsType_d()
     {
@@ -270,6 +308,12 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().isIsBitmaskType();
     }
 
+    @Override
+    public boolean isIsEnumType()
+    {
+        return super.getContentTypeCode().isIsEnumType();
+    }
+
     public boolean isIsType_10()
     {
         return true;
@@ -281,9 +325,9 @@ public class AliasTypeCode extends ContainerTypeCode
         return "EK_MINIMAL";
     }
 
-    /*** End of functions to know the type in string templates ***/
+    //}}}
 
-    /*** Functions that alias has to export because some typecodes have them*/
+    //{{{ Functions that alias has to export because some typecodes have them
     public String getMaxsize()
     {
         return super.getContentTypeCode().getMaxsize();
@@ -294,17 +338,34 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().getSize();
     }
 
-    public List<String> getDimensions()
+    public String getEvaluatedMaxsize() throws RuntimeGenerationException
+    {
+        return super.getContentTypeCode().getEvaluatedMaxsize();
+    }
+
+    public List<String> getDimensions() throws RuntimeGenerationException
     {
         if (super.getContentTypeCode() instanceof ArrayTypeCode)
         {
             return ((ArrayTypeCode) super.getContentTypeCode()).getDimensions();
         }
 
-        return null;
+        throw new RuntimeGenerationException("Error in alias " + m_name +
+                ": trying accessing dimensions for a non-array type");
     }
 
-    public int getFullBitSize()
+    public List<String> getEvaluatedDimensions() throws RuntimeGenerationException
+    {
+        if (super.getContentTypeCode() instanceof ArrayTypeCode)
+        {
+            return ((ArrayTypeCode) super.getContentTypeCode()).getEvaluatedDimensions();
+        }
+
+        throw new RuntimeGenerationException("Error in alias " + m_name +
+                ": trying accessing dimensions for a non-array type");
+    }
+
+    public int getFullBitSize() // Function for alias when enclosed type is a BitsetTypeCode
     {
         int returnedValue = 0;
 
@@ -316,7 +377,31 @@ public class AliasTypeCode extends ContainerTypeCode
         return returnedValue;
     }
 
-    /*** End of functions that alias has to export because some typecodes have them*/
+    public TypeCode getInheritance() // Function for alias when enclosed type is a StructTypeCode
+    {
+        TypeCode returnedValue = null;
+
+        if (getContentTypeCode() instanceof StructTypeCode)
+        {
+            returnedValue = ((StructTypeCode)getContentTypeCode()).getInheritance();
+        }
+
+        return returnedValue;
+    }
+
+    public List<Member> getMembers() // Function for alias when enclosed type is a StructTypeCode
+    {
+        List<Member> returnedValue = null;
+
+        if (getContentTypeCode() instanceof StructTypeCode)
+        {
+            returnedValue = ((StructTypeCode)getContentTypeCode()).getMembers();
+        }
+
+        return returnedValue;
+    }
+
+    //}}}
 
     private String m_name = null;
 

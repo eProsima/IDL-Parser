@@ -14,36 +14,6 @@
 
 package com.eprosima.idl.context;
 
-import com.eprosima.idl.parser.exception.ParseException;
-import com.eprosima.idl.parser.tree.Annotation;
-import com.eprosima.idl.parser.tree.AnnotationDeclaration;
-import com.eprosima.idl.parser.tree.AnnotationMember;
-import com.eprosima.idl.parser.tree.ConstDeclaration;
-import com.eprosima.idl.parser.tree.Definition;
-import com.eprosima.idl.parser.tree.Interface;
-import com.eprosima.idl.parser.tree.Operation;
-import com.eprosima.idl.parser.tree.Param;
-import com.eprosima.idl.parser.tree.TypeDeclaration;
-import com.eprosima.idl.parser.tree.TreeNode;
-import com.eprosima.idl.parser.typecode.AliasTypeCode;
-import com.eprosima.idl.parser.typecode.AnyTypeCode;
-import com.eprosima.idl.parser.typecode.ArrayTypeCode;
-import com.eprosima.idl.parser.typecode.BitfieldSpec;
-import com.eprosima.idl.parser.typecode.BitsetTypeCode;
-import com.eprosima.idl.parser.typecode.BitmaskTypeCode;
-import com.eprosima.idl.parser.typecode.EnumMember;
-import com.eprosima.idl.parser.typecode.EnumTypeCode;
-import com.eprosima.idl.parser.typecode.Kind;
-import com.eprosima.idl.parser.typecode.MapTypeCode;
-import com.eprosima.idl.parser.typecode.PrimitiveTypeCode;
-import com.eprosima.idl.parser.typecode.SequenceTypeCode;
-import com.eprosima.idl.parser.typecode.SetTypeCode;
-import com.eprosima.idl.parser.typecode.StringTypeCode;
-import com.eprosima.idl.parser.typecode.StructTypeCode;
-import com.eprosima.idl.parser.typecode.TypeCode;
-import com.eprosima.idl.parser.typecode.UnionTypeCode;
-import com.eprosima.idl.util.Pair;
-import com.eprosima.idl.util.Util;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -63,16 +33,60 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import org.antlr.v4.runtime.Token;
+import org.stringtemplate.v4.STGroupFile;
 
-
-
+import com.eprosima.idl.generator.manager.TemplateGroup;
+import com.eprosima.idl.generator.manager.TemplateManager;
+import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.AnnotationDeclaration;
+import com.eprosima.idl.parser.tree.AnnotationMember;
+import com.eprosima.idl.parser.tree.ConstDeclaration;
+import com.eprosima.idl.parser.tree.Definition;
+import com.eprosima.idl.parser.tree.Interface;
+import com.eprosima.idl.parser.tree.Operation;
+import com.eprosima.idl.parser.tree.Param;
+import com.eprosima.idl.parser.tree.TypeDeclaration;
+import com.eprosima.idl.parser.tree.TreeNode;
+import com.eprosima.idl.parser.typecode.AliasTypeCode;
+import com.eprosima.idl.parser.typecode.AnyTypeCode;
+import com.eprosima.idl.parser.typecode.ArrayTypeCode;
+import com.eprosima.idl.parser.typecode.BitfieldSpec;
+import com.eprosima.idl.parser.typecode.BitsetTypeCode;
+import com.eprosima.idl.parser.typecode.Bitmask;
+import com.eprosima.idl.parser.typecode.BitmaskTypeCode;
+import com.eprosima.idl.parser.typecode.EnumMember;
+import com.eprosima.idl.parser.typecode.EnumTypeCode;
+import com.eprosima.idl.parser.typecode.Kind;
+import com.eprosima.idl.parser.typecode.MapTypeCode;
+import com.eprosima.idl.parser.typecode.PrimitiveTypeCode;
+import com.eprosima.idl.parser.typecode.SequenceTypeCode;
+import com.eprosima.idl.parser.typecode.SetTypeCode;
+import com.eprosima.idl.parser.typecode.StringTypeCode;
+import com.eprosima.idl.parser.typecode.StructTypeCode;
+import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.parser.typecode.UnionTypeCode;
+import com.eprosima.idl.util.Pair;
+import com.eprosima.idl.util.Util;
 
 public class Context
 {
+    /*!
+     * Built-in custom property to specify a TemplateGroup is using explicitly modules (in C++ when opening the
+     * namespace "namespace module {")
+     */
+    public static final String using_explicitly_modules_custom_property = "using_explicitly_modules";
+
     public Context(
+            TemplateManager tmanager,
             String file,
-            ArrayList<String> includePaths)
+            ArrayList<String> includePaths,
+            boolean generate_typesc
+            )
     {
+        tmanager_ = tmanager;
+        generate_typesc_ = generate_typesc;
+
         // Detect OS
         m_os = System.getProperty("os.name");
         m_userdir = System.getProperty("user.dir");
@@ -120,7 +134,7 @@ public class Context
         m_scopeFilesStack = new Stack<Pair<String, Integer>>();
         for (int i = 0; i < includePaths.size(); ++i)
         {
-            String include = (String)includePaths.get(i);
+            String include = includePaths.get(i);
             if (startsWith(include, includeFlag))
             {
                 include = include.substring(includeFlag.length());
@@ -172,25 +186,71 @@ public class Context
             }
         }
 
-        // Add here builtin annotations? (IDL 4.2 - 8.3.1 section)
-        AnnotationDeclaration idann = createAnnotationDeclaration(Annotation.id_str, null);
-        idann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_LONG), "-1"));
+        // Load IDL types for stringtemplates
+        TypeCode.ctx = this;
+        TypeCode.idltypesgr = new STGroupFile("com/eprosima/idl/templates/idlTypes.stg", '$', '$');
+        if (generate_typesc)
+        {
+            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/TypesCInterface.stg", '$', '$');
+        }
+        else
+        {
+            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/Types.stg", '$', '$');
+        }
+        TypeCode.ctypesgr = new STGroupFile("com/eprosima/idl/templates/CTypes.stg", '$', '$');
+        TypeCode.javatypesgr = new STGroupFile("com/eprosima/idl/templates/JavaTypes.stg", '$', '$');
 
+        // Builtin annotations (IDL 4.2 - 8.3 section & XTypes 1.3 - 7.3.1.2.1 section)
+
+        //{{{ @ami
+        AnnotationDeclaration amiann = createAnnotationDeclaration(Annotation.ami_str, null);
+        amiann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @autoid
         AnnotationDeclaration autoidann = createAnnotationDeclaration(Annotation.autoid_str, null);
         EnumTypeCode autoidannenum = new EnumTypeCode(autoidann.getScopedname(), Annotation.autoid_enum_str);
         autoidannenum.addMember(new EnumMember(Annotation.autoid_sequential_str));
         autoidannenum.addMember(new EnumMember(Annotation.autoid_hash_str));
         autoidann.addMember(new AnnotationMember(Annotation.value_str, autoidannenum, Annotation.autoid_hash_str));
+        //}}}
 
-        AnnotationDeclaration optionalann = createAnnotationDeclaration("optional", null);
-        optionalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        //{{{ @bit_bound
+        AnnotationDeclaration bit_boundann = createAnnotationDeclaration(Annotation.bit_bound_str, null);
+        bit_boundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), Annotation.null_default_value));
+        //}}}
 
-        AnnotationDeclaration positionann = createAnnotationDeclaration("position", null);
-        positionann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), "-1"));
+        //{{{ @data_representation
+        BitmaskTypeCode data_representation_mask_bitmask = new BitmaskTypeCode(null, Annotation.data_representation_mask_str);
+        Bitmask xcdr1_bitmask = new Bitmask(data_representation_mask_bitmask, Annotation.xcdr1_bitflag_str);
+        xcdr1_bitmask.setPosition(0);
+        data_representation_mask_bitmask.addBitmask(xcdr1_bitmask);
+        Bitmask xml_bitmask = new Bitmask(data_representation_mask_bitmask, Annotation.xml_bitflag_str);
+        xml_bitmask.setPosition(1);
+        data_representation_mask_bitmask.addBitmask(xml_bitmask);
+        Bitmask xcdr2_bitmask = new Bitmask(data_representation_mask_bitmask, Annotation.xcdr2_bitflag_str);
+        xcdr2_bitmask.setPosition(2);
+        data_representation_mask_bitmask.addBitmask(xcdr2_bitmask);
 
-        AnnotationDeclaration valueann = createAnnotationDeclaration(Annotation.value_str, null);
-        valueann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
+        AnnotationDeclaration data_representation_annotation = createAnnotationDeclaration(Annotation.data_representation_str, null);
+        data_representation_annotation.addMember(new AnnotationMember(Annotation.allowed_kinds_str, data_representation_mask_bitmask, Annotation.empty_str));
+        //}}}
 
+        //{{{ @default
+        AnnotationDeclaration defaultann = createAnnotationDeclaration(Annotation.default_str, null);
+        defaultann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
+        //}}}
+
+        //{{{ @default_literal
+        createAnnotationDeclaration(Annotation.default_literal_str, null);
+        //}}}
+
+        //{{{ @default_nested
+        AnnotationDeclaration default_nested_annotation = createAnnotationDeclaration(Annotation.default_nested_str, null);
+        default_nested_annotation.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @extensibility
         AnnotationDeclaration extensibilityann = createAnnotationDeclaration(Annotation.extensibility_str, null);
         EnumTypeCode extensibilityannenum = new EnumTypeCode(extensibilityann.getScopedname(), Annotation.extensibility_enum_str);
         extensibilityannenum.addMember(new EnumMember(Annotation.ex_final_str));
@@ -202,72 +262,126 @@ public class Context
         createAnnotationDeclaration(Annotation.final_str, null);
         createAnnotationDeclaration(Annotation.appendable_str, null);
         createAnnotationDeclaration(Annotation.mutable_str, null);
+        //}}}
 
-        // Create default @Key annotation.
-        AnnotationDeclaration keyann = createAnnotationDeclaration(Annotation.key_str, null);
-        keyann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        //{{{ @external
+        AnnotationDeclaration externalann = createAnnotationDeclaration(Annotation.external_str, null);
+        externalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
 
-        AnnotationDeclaration mustundann = createAnnotationDeclaration("must_understand", null);
-        mustundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
-
-        createAnnotationDeclaration("default_literal", null);
-
-        AnnotationDeclaration rangeann = createAnnotationDeclaration("range", null);
-        rangeann.addMember(new AnnotationMember("min", new AnyTypeCode(), null));
-        //String.valueOf(Integer.MIN_VALUE)));
-        rangeann.addMember(new AnnotationMember("max", new AnyTypeCode(), null));
-        //String.valueOf(Integer.MAX_VALUE)));
-
-        AnnotationDeclaration unitsann = createAnnotationDeclaration("units", null);
-        unitsann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_STRING), ""));
-
-        AnnotationDeclaration defaultann = createAnnotationDeclaration("default", null);
-        defaultann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
-
-        AnnotationDeclaration minann = createAnnotationDeclaration("min", null);
-        minann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
-
-        AnnotationDeclaration maxann = createAnnotationDeclaration("max", null);
-        maxann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
-
-        AnnotationDeclaration bit_boundann = createAnnotationDeclaration("bit_bound", null);
-        bit_boundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), "-1"));
-
-        AnnotationDeclaration externalann = createAnnotationDeclaration("external", null);
-        externalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
-
-        AnnotationDeclaration nestedann = createAnnotationDeclaration("nested", null);
-        nestedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
-
-        AnnotationDeclaration verbatimann = createAnnotationDeclaration("verbatim", null);
-        EnumTypeCode verbatimannenum = new EnumTypeCode(verbatimann.getScopedname(), "verbatimannenum");
-        verbatimannenum.addMember(new EnumMember("BEGIN_FILE"));
-        verbatimannenum.addMember(new EnumMember("BEFORE_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("BEGIN_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("END_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("AFTER_DECLARATION"));
-        verbatimannenum.addMember(new EnumMember("END_FILE"));
-        verbatimann.addMember(new AnnotationMember("language", new PrimitiveTypeCode(Kind.KIND_STRING), "*"));
-        // c, c++, java, idl, * (any), or custom value
-        verbatimann.addMember(new AnnotationMember("placement", verbatimannenum, "BEFORE_DECLARATION"));
-        verbatimann.addMember(new AnnotationMember("text", new PrimitiveTypeCode(Kind.KIND_STRING), ""));
-
-        AnnotationDeclaration serviceann = createAnnotationDeclaration("service", null);
-        serviceann.addMember(new AnnotationMember("platform", new PrimitiveTypeCode(Kind.KIND_STRING), "*"));
-        // CORBA, DDS, * (any), or custom value
-
-        AnnotationDeclaration onewayann = createAnnotationDeclaration("oneway", null);
-        onewayann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
-
-        AnnotationDeclaration amiann = createAnnotationDeclaration("ami", null);
-        amiann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
-
+        //{{{ @hashid
         AnnotationDeclaration hashid_annotation = createAnnotationDeclaration(Annotation.hashid_str, null);
-        hashid_annotation.addMember(new AnnotationMember(Annotation.value_str, new StringTypeCode(Kind.KIND_STRING, null, null), ""));
+        hashid_annotation.addMember(new AnnotationMember(Annotation.value_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.empty_str));
+        //}}}
 
-        // Create default @non_serialized annotation.
-        AnnotationDeclaration non_serializedann = createAnnotationDeclaration("non_serialized", null);
-        non_serializedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), "true"));
+        //{{{ @id
+        AnnotationDeclaration idann = createAnnotationDeclaration(Annotation.id_str, null);
+        idann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_ULONG), Annotation.null_default_value));
+        //}}}
+
+        //{{{ @ignore_literal_names
+        AnnotationDeclaration ignore_literal_names_annotation = createAnnotationDeclaration(Annotation.ignore_literal_names_str, null);
+        ignore_literal_names_annotation.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @key
+        // Create default @key annotation (@Key annotation also supported and registered in parseIDL)
+        AnnotationDeclaration keyann = createAnnotationDeclaration(Annotation.key_str, null);
+        keyann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @max
+        AnnotationDeclaration maxann = createAnnotationDeclaration(Annotation.max_str, null);
+        maxann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
+        //}}}
+
+        //{{{ @min
+        AnnotationDeclaration minann = createAnnotationDeclaration(Annotation.min_str, null);
+        minann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
+        //}}}
+
+        //{{{ @must_understand
+        AnnotationDeclaration mustundann = createAnnotationDeclaration(Annotation.must_understand_str, null);
+        mustundann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @nested
+        AnnotationDeclaration nestedann = createAnnotationDeclaration(Annotation.nested_str, null);
+        nestedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @non_serialized
+        AnnotationDeclaration non_serializedann = createAnnotationDeclaration(Annotation.non_serialized_str, null);
+        non_serializedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @oneway
+        AnnotationDeclaration onewayann = createAnnotationDeclaration(Annotation.oneway_str, null);
+        onewayann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @optional
+        AnnotationDeclaration optionalann = createAnnotationDeclaration(Annotation.optional_str, null);
+        optionalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
+        //{{{ @position
+        AnnotationDeclaration positionann = createAnnotationDeclaration(Annotation.position_str, null);
+        positionann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_USHORT), Annotation.null_default_value));
+        //}}}
+
+        //{{{ @range
+        AnnotationDeclaration rangeann = createAnnotationDeclaration(Annotation.range_str, null);
+        rangeann.addMember(new AnnotationMember(Annotation.min_str, new AnyTypeCode(), null));
+        rangeann.addMember(new AnnotationMember(Annotation.max_str, new AnyTypeCode(), null));
+        //}}}
+
+        //{{{ @service
+        AnnotationDeclaration serviceann = createAnnotationDeclaration(Annotation.service_str, null);
+        serviceann.addMember(new AnnotationMember(Annotation.platform_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
+        // CORBA, DDS, * (any), or custom value
+        //}}}
+
+        //{{{ topic
+        AnnotationDeclaration topic_annotation = createAnnotationDeclaration(Annotation.topic_str, null);
+        topic_annotation.addMember(new AnnotationMember(Annotation.name_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
+        topic_annotation.addMember(new AnnotationMember(Annotation.platform_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
+        //}}}
+
+        //{{{ @try_construct
+        EnumTypeCode try_construct_fail_action_enum = new EnumTypeCode(null, Annotation.try_construct_enum_str);
+        try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_discard_str));
+        try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_use_default_str));
+        try_construct_fail_action_enum.addMember(new EnumMember(Annotation.try_construct_trim_str));
+
+        AnnotationDeclaration try_construct_annotation = createAnnotationDeclaration(Annotation.try_construct_str, null);
+        try_construct_annotation.addMember(new AnnotationMember(Annotation.value_str, try_construct_fail_action_enum, Annotation.try_construct_use_default_str));
+        //}}}
+
+        //{{{ @unit
+        AnnotationDeclaration unitsann = createAnnotationDeclaration(Annotation.unit_str, null);
+        unitsann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
+        //}}}
+
+        //{{{ @value
+        AnnotationDeclaration valueann = createAnnotationDeclaration(Annotation.value_str, null);
+        valueann.addMember(new AnnotationMember(Annotation.value_str, new AnyTypeCode(), null));
+        //}}}
+
+        //{{{ @verbatim
+        AnnotationDeclaration verbatimann = createAnnotationDeclaration(Annotation.verbatim_str, null);
+        EnumTypeCode verbatimannenum = new EnumTypeCode(verbatimann.getScopedname(), Annotation.placement_enum_str);
+        verbatimannenum.addMember(new EnumMember(Annotation.begin_file_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.before_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.begin_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.end_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.after_declaration_str));
+        verbatimannenum.addMember(new EnumMember(Annotation.end_file_str));
+        verbatimann.addMember(new AnnotationMember(Annotation.language_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
+        // c, c++, java, idl, * (any), or custom value
+        verbatimann.addMember(new AnnotationMember(Annotation.placement_str, verbatimannenum, Annotation.before_declaration_str));
+        verbatimann.addMember(new AnnotationMember(Annotation.text_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
+        //}}}
     }
 
     public String getFilename()
@@ -377,13 +491,36 @@ public class Context
      * @brief This function adds a module to the context.
      * This function is used in the parser.
      */
-    public void addModule(
+    public TemplateGroup addModule(
             com.eprosima.idl.parser.tree.Module module)
     {
+        TemplateGroup moduleTemplates = null;
+
         if (!m_modules.containsKey(module.getScopedname()))
         {
             m_modules.put(module.getScopedname(), module);
         }
+
+        if(isInScopedFile() || isScopeLimitToAll()) {
+            if(tmanager_ != null) {
+                moduleTemplates = tmanager_.createTemplateGroup("module");
+                moduleTemplates.setAttribute("ctx", this);
+                // Set the module object to the TemplateGroup of the module.
+                moduleTemplates.setAttribute("module", module);
+            }
+        }
+
+        // Change context scope.
+        if (m_scope.isEmpty())
+        {
+            setScope(module.getName());
+        }
+        else
+        {
+            setScope(m_scope + "::" + module.getName());
+        }
+
+        return moduleTemplates;
     }
 
     public com.eprosima.idl.parser.tree.Module existsModule(
@@ -531,6 +668,16 @@ public class Context
         }
 
         return returnedValue;
+    }
+
+    public com.eprosima.idl.parser.tree.Module createModule(
+            String scope_file,
+            boolean is_in_scope,
+            String scope,
+            String name,
+            Token token)
+    {
+        return new com.eprosima.idl.parser.tree.Module (scope_file, is_in_scope, scope, name, token);
     }
 
     public Operation createOperation(
@@ -690,7 +837,7 @@ public class Context
         TypeCode returnedValue = null;
         TypeDeclaration typedecl = m_types.get(name);
 
-        // Probar si no tiene scope, con el scope actual.
+        // Wether the name doesn't contain scope, test with the current scope.
         if (typedecl == null)
         {
             String scope = m_scope;
@@ -1354,6 +1501,27 @@ public class Context
         return aux_str;
     }
 
+    public boolean isGenerateTypesC()
+    {
+        return generate_typesc_;
+    }
+
+    /*!
+     * @brief Checks a custom property was enables for a TemplateGroup.
+     *
+     * There are built-in custom properties:
+     * - Context.using_explicitly_modules_custom_property: specifies a TemplateGroup is using explicitly modules.
+     */
+    public boolean is_enabled_custom_property_in_current_group(String custom_property)
+    {
+        if (null != tmanager_)
+        {
+            return tmanager_.is_enabled_custom_property_in_current_group(custom_property);
+        }
+
+        return false;
+    }
+
     // OS
     String m_os = null;
     String m_userdir = null;
@@ -1404,4 +1572,8 @@ public class Context
     private HashSet<String> m_keywords = null;
 
     private boolean m_ignore_case = true;
+
+    private boolean generate_typesc_ = false;
+
+    protected TemplateManager tmanager_ = null;
 }

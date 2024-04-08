@@ -14,10 +14,6 @@
 
 package com.eprosima.idl.generator.manager;
 
-import com.eprosima.idl.generator.manager.TemplateGroup;
-import com.eprosima.idl.parser.typecode.TypeCode;
-import com.eprosima.idl.context.Context;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -31,51 +27,38 @@ import org.stringtemplate.v4.misc.STMessage;
 
 public class TemplateManager
 {
-    private Map<String, STGroup> m_groups = new HashMap<String, STGroup>();
+    private Map<String, TemplateSTGroup> m_groups = new HashMap<String, TemplateSTGroup>();
 
     private boolean st_error_ = false;
 
-    public TemplateManager(String stackTemplateNames, Context ctx, boolean generate_typesc)
+    private TemplateSTGroup current_template_stgroup_ = null;
+
+    public TemplateSTGroup addGroup(String groupname)
     {
-        // Load IDL types for stringtemplates
-        TypeCode.idltypesgr = new STGroupFile("com/eprosima/idl/templates/idlTypes.stg", '$', '$');
-        if (generate_typesc)
-        {
-            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/TypesCInterface.stg", '$', '$');
-        }
-        else
-        {
-            TypeCode.cpptypesgr = new STGroupFile("com/eprosima/idl/templates/Types.stg", '$', '$');
-        }
-        TypeCode.ctypesgr = new STGroupFile("com/eprosima/idl/templates/CTypes.stg", '$', '$');
-        TypeCode.javatypesgr = new STGroupFile("com/eprosima/idl/templates/JavaTypes.stg", '$', '$');
-        TypeCode.ctx = ctx;
+        TemplateSTGroup group = new TemplateSTGroup(groupname);
+        m_groups.put(groupname, group);
+        return group;
     }
 
-    public void addGroup(String groupname)
+    public TemplateSTGroup addGroupFromString(String groupname, String text)
     {
-        STGroup group = new STGroupFile(groupname, '$', '$');
+        TemplateSTGroup group = new TemplateSTGroup(groupname, text);
         m_groups.put(groupname, group);
-    }
-
-    public void addGroupFromString(String groupname, String text)
-    {
-        STGroup group = new STGroupString(groupname, text, '$', '$');
-        m_groups.put(groupname, group);
+        return group;
     }
 
     public TemplateGroup createTemplateGroup(String templatename)
     {
         TemplateGroup tg = new TemplateGroup(this);
-        Set<Entry<String, STGroup>> set = m_groups.entrySet();
-        Iterator<Entry<String, STGroup>> it = set.iterator();
+        Set<Entry<String, TemplateSTGroup>> set = m_groups.entrySet();
+        Iterator<Entry<String, TemplateSTGroup>> it = set.iterator();
 
         while(it.hasNext())
         {
-            Map.Entry<String, STGroup> m = it.next();
+            Map.Entry<String, TemplateSTGroup> m = it.next();
 
             // Obtain instance
-            ST template = m.getValue().getInstanceOf(templatename);
+            TemplateST template = new TemplateST(m.getValue(), templatename);
             tg.addTemplate(m.getKey(), template);
         }
 
@@ -96,5 +79,20 @@ public class TemplateManager
     public boolean get_st_error()
     {
         return st_error_;
+    }
+
+    public void set_current_template_stgroup(TemplateSTGroup template_stgroup)
+    {
+        current_template_stgroup_ = template_stgroup;
+    }
+
+    public boolean is_enabled_custom_property_in_current_group(String custom_property)
+    {
+        if (null != current_template_stgroup_)
+        {
+            return current_template_stgroup_.is_enabled_custom_property(custom_property);
+        }
+
+        return false;
     }
 }

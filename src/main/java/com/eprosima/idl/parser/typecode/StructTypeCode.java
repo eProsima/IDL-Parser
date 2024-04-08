@@ -22,6 +22,7 @@ import org.stringtemplate.v4.ST;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Inherits;
 
@@ -92,7 +93,6 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             TypeCode parent) throws ParseException
     {
         String name = parent.getClass().getSimpleName();
-        System.out.println("type = " + name);
 
         if (super_type_ == null && parent instanceof StructTypeCode)
         {
@@ -161,6 +161,17 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
 
         allMembers.addAll(super.getMembers());
         return allMembers;
+    }
+
+    public Member getFirstMember() throws RuntimeGenerationException
+    {
+        List<Member> members = getMembers();
+        if (members.size() == 0)
+        {
+            throw new RuntimeGenerationException("Error in structure " + super.getName() +
+                    ": trying accesing first member of an empty structure");
+        }
+        return members.get(0);
     }
 
     public List<Member> getAllMembers() // Alias for getMembers(true) for stg
@@ -236,6 +247,17 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         }
         calculate_member_id_(member);
         return super.addMember(member);
+    }
+
+    @Override
+    public boolean isNonForwardedContent()
+    {
+        boolean ret_code = true;
+        if (enclosed_super_type_ != null)
+        {
+            ret_code &= enclosed_super_type_.isNonForwardedContent();
+        }
+        return ret_code &= super.isNonForwardedContent();
     }
 
     @Override

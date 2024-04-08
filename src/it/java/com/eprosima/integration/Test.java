@@ -46,14 +46,18 @@ public class Test
             String generatorName,
             String inputPath,
             String exampleArch,
-            String cdr_version,
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -cdr " + cdr_version + " -replace -example" + " " + exampleArch + (testFlag ? " -test" : "");
+        String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test -default-container-prealloc-size 50" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
+
+        if (idl.equals("external") || idl.equals("declarations"))
+        {
+            flags = flags + " -no-typeobjectsupport";
+        }
 
         String command = program + flags + output + idlPath;
 
@@ -63,14 +67,18 @@ public class Test
     public boolean generate(
             String generatorName,
             String inputPath,
-            String cdr_version,
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -cdr " + cdr_version + " -replace -example" + (testFlag ? " -test" : "");
+        String flags = " -replace -example" + (testFlag ? " -test -default-container-prealloc-size 50" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
+
+        if (idl.equals("external") || idl.equals("declarations"))
+        {
+            flags = flags + " -no-typeobjectsupport";
+        }
 
         String command = program + flags + output + idlPath;
         return Command.execute(command, null, errorOutputOnly, true);
