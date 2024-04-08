@@ -35,6 +35,11 @@ public class UnionMember extends Member
         return m_labels;
     }
 
+    public int getLabelsSize()
+    {
+        return m_labels.size();
+    }
+
     public void setLabels(List<String> labels)
     {
         m_labels = labels;
@@ -53,11 +58,6 @@ public class UnionMember extends Member
     public boolean isDefault()
     {
         return m_default;
-    }
-
-    public boolean isPrintable()
-    {
-        return m_default || (null != m_labels && 0 < m_labels.size());
     }
 
     private List<String> m_internallabels = null;
