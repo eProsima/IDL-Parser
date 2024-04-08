@@ -67,21 +67,47 @@ public class MemberAppliedAnnotations implements Notebook
         return m_annotations.values();
     }
 
-    public boolean isAnnotationOptional()
+    //{{{ Auxiliary function to check which built-in annotation is the instance.
+
+    public boolean isAnnotationBitBound()
     {
-        Annotation ann = m_annotations.get(Annotation.optional_str);
-        if (ann != null)
+        return m_annotations.get(Annotation.bit_bound_str) != null;
+    }
+
+    public Short getAnnotationBitBoundValue() throws RuntimeGenerationException
+    {
+        try
         {
-            try
+            if (isAnnotationBitBound())
             {
-                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
-            }
-            catch (RuntimeGenerationException ex)
-            {
-                // Should not be called as @optional annotation only has one parameter
+                return Short.parseShort(m_annotations.get(Annotation.bit_bound_str).getValue());
             }
         }
-        return false;
+        catch (RuntimeGenerationException ex)
+        {
+            // Should never be called because isAnnotationBitBound() was previously called.
+        }
+        return 0;
+    }
+
+    public boolean isAnnotationDefault()
+    {
+        return m_annotations.get(Annotation.default_str) != null;
+    }
+
+    public String getAnnotationDefaultValue() throws RuntimeGenerationException
+    {
+        Annotation ann = m_annotations.get(Annotation.default_str);
+        if (ann != null)
+        {
+            return ann.getValue();
+        }
+        throw new RuntimeGenerationException("Error getting @default annotation value: annotation not found");
+    }
+
+    public boolean isAnnotationDefaultLiteral()
+    {
+        return m_annotations.get(Annotation.default_literal_str) != null;
     }
 
     public boolean isAnnotationExternal()
@@ -96,6 +122,37 @@ public class MemberAppliedAnnotations implements Notebook
             catch (RuntimeGenerationException ex)
             {
                 // Should not be called as @external annotation has only one parameter
+            }
+        }
+        return false;
+    }
+
+    public boolean isAnnotationHashid()
+    {
+        return m_annotations.get(Annotation.hashid_str) != null;
+    }
+
+    public boolean isAnnotationId()
+    {
+        return m_annotations.get(Annotation.id_str) != null;
+    }
+
+    public boolean isAnnotationKey()
+    {
+        Annotation ann = m_annotations.get(Annotation.key_str);
+        if (ann == null)
+        {
+            ann = m_annotations.get(Annotation.eprosima_key_str); // Try old way
+        }
+        if (ann != null)
+        {
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @key annotation has only one parameter
             }
         }
         return false;
@@ -135,13 +192,9 @@ public class MemberAppliedAnnotations implements Notebook
         return false;
     }
 
-    public boolean isAnnotationKey()
+    public boolean isAnnotationOptional()
     {
-        Annotation ann = m_annotations.get(Annotation.key_str);
-        if (ann == null)
-        {
-            ann = m_annotations.get(Annotation.eprosima_key_str); // Try old way
-        }
+        Annotation ann = m_annotations.get(Annotation.optional_str);
         if (ann != null)
         {
             try
@@ -150,57 +203,10 @@ public class MemberAppliedAnnotations implements Notebook
             }
             catch (RuntimeGenerationException ex)
             {
-                // Should not be called as @key annotation has only one parameter
+                // Should not be called as @optional annotation only has one parameter
             }
         }
         return false;
-    }
-
-    public boolean isAnnotationBitBound()
-    {
-        return m_annotations.get(Annotation.bit_bound_str) != null;
-    }
-
-    public Short getAnnotationBitBoundValue() throws RuntimeGenerationException
-    {
-        try
-        {
-            if (isAnnotationBitBound())
-            {
-                return Short.parseShort(m_annotations.get(Annotation.bit_bound_str).getValue());
-            }
-        }
-        catch (RuntimeGenerationException ex)
-        {
-            // Should never be called because isAnnotationBitBound() was previously called.
-        }
-        return 0;
-    }
-
-    public boolean isAnnotationDefaultLiteral()
-    {
-        return m_annotations.get(Annotation.default_literal_str) != null;
-    }
-
-    public boolean isAnnotationValue()
-    {
-        return m_annotations.get(Annotation.value_str) != null;
-    }
-
-    public String getAnnotationValueValue()
-    {
-        try
-        {
-            if (isAnnotationValue())
-            {
-                return m_annotations.get(Annotation.value_str).getValue();
-            }
-        }
-        catch (RuntimeGenerationException ex)
-        {
-            // Should never be called because isAnnotationValue() was previously called.
-        }
-        return "";
     }
 
     public boolean isAnnotationPosition()
@@ -224,21 +230,7 @@ public class MemberAppliedAnnotations implements Notebook
         return 0;
     }
 
-    public boolean isAnnotationDefault()
-    {
-        return m_annotations.get(Annotation.default_str) != null;
-    }
-
-    public String getAnnotationDefaultValue() throws RuntimeGenerationException
-    {
-        Annotation ann = m_annotations.get(Annotation.default_str);
-        if (ann != null)
-        {
-            return ann.getValue();
-        }
-        throw new RuntimeGenerationException("Error getting @default annotation value: annotation not found");
-    }
-
+    //{{{ @try_construct
     public boolean isAnnotationTryConstruct()
     {
         return m_annotations.containsKey(Annotation.try_construct_str);
@@ -297,16 +289,29 @@ public class MemberAppliedAnnotations implements Notebook
         calculate_try_construct();
         return TryConstructFailAction.TRIM == try_construct_;
     }
+    //}}}
 
-    public boolean isAnnotationId()
+    public boolean isAnnotationValue()
     {
-        return m_annotations.get(Annotation.id_str) != null;
+        return m_annotations.get(Annotation.value_str) != null;
     }
 
-    public boolean isAnnotationHashid()
+    public String getAnnotationValueValue()
     {
-        return m_annotations.get(Annotation.hashid_str) != null;
+        try
+        {
+            if (isAnnotationValue())
+            {
+                return m_annotations.get(Annotation.value_str).getValue();
+            }
+        }
+        catch (RuntimeGenerationException ex)
+        {
+            // Should never be called because isAnnotationValue() was previously called.
+        }
+        return "";
     }
+    //}}}
 
     private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();
 

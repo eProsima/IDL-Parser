@@ -139,33 +139,7 @@ public abstract class MemberedTypeCode extends TypeCode
     public boolean addMember(
             Member member) throws ParseException
     {
-        // Check annotations.
-        if (member.isAnnotationOptional() && Kind.KIND_STRUCT != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.optional_str +" annotations only supported for structure's members.");
-        }
-        if (member.isAnnotationExternal() && (
-                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.external_str + " annotations only supported for structure's members or union's members.");
-        }
-        if (member.isAnnotationMustUnderstand() && Kind.KIND_STRUCT != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @must_understand annotations only supported for structure's members.");
-        }
-        if (member.isAnnotationNonSerialized() && Kind.KIND_STRUCT != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @non_serialized annotations only supported for structure's members.");
-        }
-        if (member.isAnnotationKey() && Kind.KIND_STRUCT != getKind())
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.key_str + " annotations only supported for structure's members (Union discriminator still pending implementation).");
-        }
+        //{{{ Check annotations.
         if (member.isAnnotationBitBound() && (
                     Kind.KIND_ENUM != getKind() && Kind.KIND_BITMASK != getKind()))
         {
@@ -177,16 +151,57 @@ public abstract class MemberedTypeCode extends TypeCode
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @default_literal annotations only supported for enumeration's members.");
         }
-        if (member.isAnnotationValue() && Kind.KIND_ENUM != getKind())
+        if (member.isAnnotationExternal() && (
+                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
         {
             throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @value annotations only supported for enumeration's members.");
+                    ": @" + Annotation.external_str + " annotations only supported for structure's members or union's members.");
+        }
+        if (member.isAnnotationHashid() && (
+                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.hashid_str +
+                    "annotations only supported for structure's members or union's members.");
+        }
+        if (member.isAnnotationId() && (
+                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.id_str +
+                    " annotations only supported for structure's members or union's members.");
+        }
+        if (member.isAnnotationKey() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.key_str + " annotations only supported for structure's members (Union discriminator still pending implementation).");
+        }
+        if (member.isAnnotationMustUnderstand() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @must_understand annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationNonSerialized() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @non_serialized annotations only supported for structure's members.");
+        }
+        if (member.isAnnotationOptional() && Kind.KIND_STRUCT != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.optional_str +" annotations only supported for structure's members.");
         }
         if (member.isAnnotationPosition() && Kind.KIND_BITMASK != getKind())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @position annotations only supported for bitmask's members.");
         }
+        if (member.isAnnotationValue() && Kind.KIND_ENUM != getKind())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @value annotations only supported for enumeration's members.");
+        }
+
         if(member.isAnnotationKey() && member.isAnnotationNonSerialized())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
@@ -197,25 +212,12 @@ public abstract class MemberedTypeCode extends TypeCode
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @" + Annotation.key_str + " and @" + Annotation.optional_str + " annotations are incompatible.");
         }
-        if (member.isAnnotationId() && (
-                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.id_str +
-                    " annotations only supported for structure's members or union's members.");
-        }
-        if (member.isAnnotationHashid() && (
-                    Kind.KIND_STRUCT != getKind() && Kind.KIND_UNION != getKind()))
-        {
-            throw new ParseException(null, "Error in member " + member.getName() +
-                    ": @" + Annotation.hashid_str +
-                    "annotations only supported for structure's members or union's members.");
-        }
         if (member.isAnnotationId() && member.isAnnotationHashid())
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @" + Annotation.id_str + " and @" + Annotation.hashid_str + " annotations cannot be together.");
         }
+        //}}}
 
         if(!m_members.containsKey(member.getName()))
         {

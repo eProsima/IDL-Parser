@@ -29,18 +29,33 @@ public class Annotation
     public static final String empty_str = "";
     public static final String any_str = "*";
 
+    public static final String ami_str = "ami";
+
+    //{{{ @autoid
     public static final String autoid_str = "autoid";
     public static final String autoid_enum_str = "AutoidKind";
     public static final String autoid_sequential_str = "SEQUENTIAL";
     public static final String autoid_sequential_value_str = "0";
     public static final String autoid_hash_str = "HASH";
     public static final String autoid_hash_value_str = "1";
+    //}}}
 
-    public static final String hashid_str = "hashid";
-    public static final String id_str = "id";
-    public static final String key_str = "key";
-    public static final String eprosima_key_str = "Key";
+    public static final String bit_bound_str = "bit_bound";
 
+    //{{{ @data_representation
+    public static final String data_representation_mask_str = "DataRepresentationMask";
+    public static final String xcdr1_bitflag_str = "XCDR1";
+    public static final String xml_bitflag_str = "XML";
+    public static final String xcdr2_bitflag_str = "XCDR2";
+    public static final String data_representation_str = "data_representation";
+    public static final String allowed_kinds_str = "allowed_kinds";
+    //}}}
+
+    public static final String default_str = "default";
+    public static final String default_literal_str = "default_literal";
+    public static final String default_nested_str = "default_nested";
+
+    //{{{ @extensibility
     public static final String extensibility_str = "extensibility";
     public static final String extensibility_enum_str = "ExtensibilityKind";
     public static final String final_str = "final";
@@ -52,24 +67,50 @@ public class Annotation
     public static final String ex_appendable_val = "1";
     public static final String ex_mutable_str = "MUTABLE";
     public static final String ex_mutable_val = "2";
+    //}}}
 
-    public static final String value_str = "value";
-
-    public static final String optional_str = "optional";
     public static final String external_str = "external";
-    public static final String position_str = "position";
-    public static final String must_understand_str = "must_understand";
-    public static final String default_literal_str = "default_literal";
-    public static final String default_str = "default";
-    public static final String range_str = "range";
-    public static final String min_str = "min";
-    public static final String max_str = "max";
-    public static final String unit_str = "unit";
-    public static final String bit_bound_str = "bit_bound";
-    public static final String nested_str = "nested";
-    public static final String default_nested_str = "default_nested";
+    public static final String hashid_str = "hashid";
+    public static final String id_str = "id";
     public static final String ignore_literal_names_str = "ignore_literal_names";
 
+    ///{{{ @key
+    public static final String key_str = "key";
+    public static final String eprosima_key_str = "Key";
+    //}}}
+
+    public static final String max_str = "max";
+    public static final String min_str = "min";
+    public static final String must_understand_str = "must_understand";
+    public static final String nested_str = "nested";
+    public static final String non_serialized_str = "non_serialized";
+    public static final String oneway_str = "oneway";
+    public static final String optional_str = "optional";
+    public static final String position_str = "position";
+    public static final String range_str = "range";
+
+    //{{{ @service
+    public static final String service_str = "service";
+    public static final String platform_str = "platform";
+    //}}}
+
+    //{{{ @topic
+    public static final String topic_str = "topic";
+    public static final String name_str = "name";
+    //}}}
+
+    //{{{ @try_construct
+    public static final String try_construct_str = "try_construct";
+    public static final String try_construct_enum_str = "TryConstructFailAction";
+    public static final String try_construct_discard_str = "DISCARD";
+    public static final String try_construct_use_default_str = "USE_DEFAULT";
+    public static final String try_construct_trim_str = "TRIM";
+    //}}}
+
+    public static final String unit_str = "unit";
+    public static final String value_str = "value";
+
+    //{{{ @verbatim
     public static final String verbatim_str = "verbatim";
     public static final String placement_enum_str = "PlacementKind";
     public static final String begin_file_str = "BEGIN_FILE";
@@ -81,27 +122,7 @@ public class Annotation
     public static final String language_str = "language";
     public static final String placement_str = "placement";
     public static final String text_str = "text";
-
-    public static final String service_str = "service";
-    public static final String platform_str = "platform";
-    public static final String oneway_str = "oneway";
-    public static final String ami_str = "ami";
-
-    public static final String non_serialized_str = "non_serialized";
-    public static final String data_representation_mask_str = "DataRepresentationMask";
-    public static final String xcdr1_bitflag_str = "XCDR1";
-    public static final String xml_bitflag_str = "XML";
-    public static final String xcdr2_bitflag_str = "XCDR2";
-    public static final String data_representation_str = "data_representation";
-    public static final String allowed_kinds_str = "allowed_kinds";
-    public static final String topic_str = "topic";
-    public static final String name_str = "name";
-
-    public static final String try_construct_str = "try_construct";
-    public static final String try_construct_enum_str = "TryConstructFailAction";
-    public static final String try_construct_discard_str = "DISCARD";
-    public static final String try_construct_use_default_str = "USE_DEFAULT";
-    public static final String try_construct_trim_str = "TRIM";
+    //}}}
 
     public Annotation(AnnotationDeclaration declaration)
     {
@@ -259,38 +280,38 @@ public class Annotation
 
     public boolean isIsBuiltin()
     {
-        if (getName().equals(Annotation.id_str) ||
+        if (getName().equals(Annotation.ami_str) ||
+            getName().equals(Annotation.appendable_str) ||
             getName().equals(Annotation.autoid_str) ||
+            getName().equals(Annotation.bit_bound_str) ||
+            getName().equals(Annotation.data_representation_str) ||
+            getName().equals(Annotation.default_str) ||
+            getName().equals(Annotation.default_literal_str) ||
+            getName().equals(Annotation.default_nested_str) ||
+            getName().equals(Annotation.eprosima_key_str) ||
+            getName().equals(Annotation.extensibility_str) ||
+            getName().equals(Annotation.external_str) ||
+            getName().equals(Annotation.final_str) ||
+            getName().equals(Annotation.hashid_str) ||
+            getName().equals(Annotation.id_str) ||
+            getName().equals(Annotation.ignore_literal_names_str) ||
+            getName().equals(Annotation.key_str) ||
+            getName().equals(Annotation.max_str) ||
+            getName().equals(Annotation.min_str) ||
+            getName().equals(Annotation.must_understand_str) ||
+            getName().equals(Annotation.mutable_str) ||
+            getName().equals(Annotation.nested_str) ||
+            getName().equals(Annotation.non_serialized_str) ||
+            getName().equals(Annotation.oneway_str) ||
             getName().equals(Annotation.optional_str) ||
             getName().equals(Annotation.position_str) ||
-            getName().equals(Annotation.value_str) ||
-            getName().equals(Annotation.extensibility_str) ||
-            getName().equals(Annotation.final_str) ||
-            getName().equals(Annotation.appendable_str) ||
-            getName().equals(Annotation.mutable_str) ||
-            getName().equals(Annotation.key_str) ||
-            getName().equals(Annotation.eprosima_key_str) ||
-            getName().equals(Annotation.must_understand_str) ||
-            getName().equals(Annotation.default_literal_str) ||
-            getName().equals(Annotation.default_str) ||
             getName().equals(Annotation.range_str) ||
-            getName().equals(Annotation.min_str) ||
-            getName().equals(Annotation.max_str) ||
-            getName().equals(Annotation.unit_str) ||
-            getName().equals(Annotation.bit_bound_str) ||
-            getName().equals(Annotation.external_str) ||
-            getName().equals(Annotation.nested_str) ||
-            getName().equals(Annotation.verbatim_str) ||
             getName().equals(Annotation.service_str) ||
-            getName().equals(Annotation.oneway_str) ||
-            getName().equals(Annotation.ami_str) ||
-            getName().equals(Annotation.hashid_str) ||
-            getName().equals(Annotation.default_nested_str) ||
-            getName().equals(Annotation.ignore_literal_names_str) ||
+            getName().equals(Annotation.topic_str) ||
             getName().equals(Annotation.try_construct_str) ||
-            getName().equals(Annotation.non_serialized_str) ||
-            getName().equals(Annotation.data_representation_str) ||
-            getName().equals(Annotation.topic_str))
+            getName().equals(Annotation.unit_str) ||
+            getName().equals(Annotation.value_str) ||
+            getName().equals(Annotation.verbatim_str))
         {
             return true;
         }
