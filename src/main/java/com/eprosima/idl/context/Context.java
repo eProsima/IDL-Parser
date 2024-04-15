@@ -982,6 +982,8 @@ public class Context
                                     includeFile.substring(0, includeFile.length() - 4).replace('.', '_');
                                     // Change back to "." for relative paths.
                                     dependency_to_add = dependency_to_add.replaceAll("__/", "../");
+                                    // Substitute "\\" with File separator.
+                                    dependency_to_add = dependency_to_add.replace('\\', '/');
 
                                     m_directIncludeDependencies.add(dependency_to_add);
                                 }
