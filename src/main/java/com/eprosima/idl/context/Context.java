@@ -45,6 +45,7 @@ import com.eprosima.idl.util.Pair;
 import com.eprosima.idl.util.Util;
 import java.io.File;
 import java.io.StringReader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -112,7 +113,7 @@ public class Context
 
         // The scope file has to be initialized because could occur the preprocessor
         // is not called (using -ppDisable).
-        m_scopeFile = m_file;
+        m_scopeFile = Paths.get(m_file).normalize().toString();
 
         m_includePaths = new ArrayList<String>();
         m_dependencies = new LinkedHashSet<String>();
@@ -139,12 +140,7 @@ public class Context
             {
                 include = include.substring(m_directoryFile.length());
             }
-            // Add last separator (can be empty by now...)
-            if (!include.isEmpty() && include.charAt(include.length() - 1) != java.io.File.separatorChar)
-            {
-                include += java.io.File.separator;
-            }
-            m_includePaths.add(include);
+            m_includePaths.add(Paths.get(include).normalize().toString() + java.io.File.separator);
         }
 
         // Reorder include paths;
@@ -855,7 +851,7 @@ public class Context
 
             // Read filename
             scanner.next();
-            String file = scanner.next();
+            String file = Paths.get(scanner.next()).normalize().toString();
 
             // Read flags.
             boolean systemFile = false, enteringFile = false, exitingFile = false;
@@ -952,7 +948,7 @@ public class Context
                                     }
 
                                     m_directIncludeDependencies.add(includeFile.substring(0,
-                                            includeFile.length() - 4).replace('.', '_'));
+                                            includeFile.length() - 4).replace('.', '_').replace('\\', '/'));
                                 }
                             }
                             else
