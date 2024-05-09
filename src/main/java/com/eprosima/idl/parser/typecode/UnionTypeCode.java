@@ -143,6 +143,36 @@ public class UnionTypeCode extends MemberedTypeCode
         return null;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to check if a generated language binding union (cpp, java) related to this
+     * union object should have the default case generated.
+     * @code
+       $union.members :{ member |
+       $member.labels:{ label |case $label$:}; separator="\n"$
+       $if(member.default)$default:$endif$
+           // Do something
+           break;
+       }; separator="\n"$
+       $if(union.needDefaultCase)$
+       default:
+           break;
+       $endif$
+     * @endcode
+     * @return @e false if the union contains a member declared as default member or the union discriminator type is
+     * @b boolean and the @e true and @e false case labels were defined. In other case, @e true is returned.
+     */
+    public boolean getNeedDefaultCase()
+    {
+        if (m_defaultindex == -1 &&
+                !(Kind.KIND_BOOLEAN == discriminator_.getTypecode().getKind() && 2 == getMembers().size()))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public String getCppTypename()
     {
