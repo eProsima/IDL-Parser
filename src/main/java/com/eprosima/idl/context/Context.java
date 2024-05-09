@@ -16,6 +16,7 @@ package com.eprosima.idl.context;
 
 import java.io.File;
 import java.io.StringReader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -126,7 +127,7 @@ public class Context
 
         // The scope file has to be initialized because could occur the preprocessor
         // is not called (using -ppDisable).
-        m_scopeFile = m_file;
+        m_scopeFile = Paths.get(m_file).normalize().toString();
 
         m_includePaths = new ArrayList<String>();
         m_dependencies = new LinkedHashSet<String>();
@@ -153,12 +154,7 @@ public class Context
             {
                 include = include.substring(m_directoryFile.length());
             }
-            // Add last separator (can be empty by now...)
-            if (!include.isEmpty() && include.charAt(include.length() - 1) != java.io.File.separatorChar)
-            {
-                include += java.io.File.separator;
-            }
-            m_includePaths.add(include);
+            m_includePaths.add(Paths.get(include).normalize().toString() + java.io.File.separator);
         }
 
         // Reorder include paths;
@@ -1033,7 +1029,7 @@ public class Context
 
             // Read filename
             scanner.next();
-            String file = scanner.next();
+            String file = Paths.get(scanner.next()).normalize().toString();
 
             // Read flags.
             boolean systemFile = false, enteringFile = false, exitingFile = false;
@@ -1133,6 +1129,8 @@ public class Context
                                     includeFile.substring(0, includeFile.length() - 4).replace('.', '_');
                                     // Change back to "." for relative paths.
                                     dependency_to_add = dependency_to_add.replaceAll("__/", "../");
+                                    // Substitute "\\" with File separator.
+                                    dependency_to_add = dependency_to_add.replace('\\', '/');
 
                                     m_directIncludeDependencies.add(dependency_to_add);
                                 }
