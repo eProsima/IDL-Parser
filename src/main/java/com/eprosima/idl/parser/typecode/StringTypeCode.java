@@ -56,7 +56,7 @@ public class StringTypeCode extends TypeCode
      * @ingroup api_for_stg
      * @brief This function can be used to retrieve the TypeIdentifier's kind.
      * @return @e TI_STRING8_SMALL or TI_STRING16_SMALL if string is unbound or smaller than 256.
-     * Otherwise @e TI_STRING8_LARGE or TI_STRING16_LARGEis returned.
+     * Otherwise @e TI_STRING8_LARGE or TI_STRING16_LARGE is returned.
      */
     @Override
     public String getTypeIdentifier()
