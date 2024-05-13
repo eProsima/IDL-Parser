@@ -92,10 +92,34 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
             result.addAll(enclosed_super_type_.getAllBitfields());
         }
 
-        result.addAll(m_bitfields.values());
+        int last_position = 0;
+
+        if (0 < result.size())
+        {
+            Bitfield last_field = result.get(result.size() - 1);
+            last_position = last_field.getBasePosition() + last_field.getSpec().getBitSize();
+        }
+
+        for(Bitfield bitfield : m_bitfields.values())
+        {
+            Bitfield new_bitfield = new Bitfield((BitsetTypeCode)bitfield.getTypecode(), bitfield.getSpec(), bitfield.getName());
+            new_bitfield.setBasePosition(last_position);
+            last_position += new_bitfield.getSpec().getBitSize();
+            result.add(new_bitfield);
+        }
+
         return result;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function calls internally @code getBitfields(true), returning all bitfields including the inherited ones.
+     * @return A list of all bitfields.
+     *
+     * @warning Position of bitfields of the derived bitset are updated as the bitset was plain.
+     * This decision was made to help generating code for TypeObject, because DDS X-Types 1.3 doesn's specify a way to
+     * represent bitset inheritance in TypeObject.
+     */
     public List<Bitfield> getAllBitfields() // Alias for getBitfields(true) for stg
     {
         return getBitfields(true);
