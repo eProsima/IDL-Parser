@@ -36,13 +36,35 @@ public class StringTypeCode extends TypeCode
         return true;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to check if TypeIdentifier's kind is the small one or the large one.
+     * @return @e false if string is unbound or smaller than 256.
+     * Otherwise @e true is returned.
+     */
+    public boolean getIsTypeIdentifierKindLarge()
+    {
+        if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to retrieve the TypeIdentifier's kind.
+     * @return @e TI_STRING8_SMALL or TI_STRING16_SMALL if string is unbound or smaller than 256.
+     * Otherwise @e TI_STRING8_LARGE or TI_STRING16_LARGE is returned.
+     */
     @Override
     public String getTypeIdentifier()
     {
         switch (getKind())
         {
             case Kind.KIND_STRING:
-                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+                if (getIsTypeIdentifierKindLarge())
                 {
                     return "TI_STRING8_LARGE";
                 }
@@ -51,7 +73,7 @@ public class StringTypeCode extends TypeCode
                     return "TI_STRING8_SMALL";
                 }
             case Kind.KIND_WSTRING:
-                if (isIsBounded() && Integer.parseInt(evaluated_maxsize_) >= 256)
+                if (getIsTypeIdentifierKindLarge())
                 {
                     return "TI_STRING16_LARGE";
                 }

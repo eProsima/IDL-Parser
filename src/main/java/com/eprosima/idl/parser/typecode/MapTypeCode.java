@@ -34,10 +34,33 @@ public class MapTypeCode extends ContainerTypeCode
         return true;
     }
 
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to check if TypeIdentifier's kind is the small one or the large one.
+     * @return @e false if map is unbound or smaller than 256.
+     * Otherwise @e true is returned.
+     */
+    public boolean getIsTypeIdentifierKindLarge()
+    {
+        if (!isUnbound() && Integer.parseInt(evaluated_maxsize_) >= 256)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to retrieve the TypeIdentifier's kind.
+     * @return @e TI_PLAIN_MAP_SMALL if map is unbound or smaller than 256.
+     * Otherwise @e TI_PLAIN_MAP_LARGE is returned.
+     */
     @Override
     public String getTypeIdentifier()
     {
-        if (!isUnbound() && Integer.parseInt(evaluated_maxsize_) >= 256)
+        if (getIsTypeIdentifierKindLarge())
         {
             return "TI_PLAIN_MAP_LARGE";
         }

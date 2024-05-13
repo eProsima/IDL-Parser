@@ -33,18 +33,39 @@ public class ArrayTypeCode extends ContainerTypeCode
         return true;
     }
 
-    @Override
-    public String getTypeIdentifier()
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to check if TypeIdentifier's kind is the small one or the large one.
+     * @return @e false if all dimensions of the array are smaller than 256.
+     * Otherwise @e true is returned.
+     */
+    public boolean getIsTypeIdentifierKindLarge()
     {
-        String type_id = "TI_PLAIN_ARRAY_SMALL";
         for (int count = 0; count < evaluated_dimensions_.size(); ++count)
         {
             if (Integer.parseInt(evaluated_dimensions_.get(count)) >= 256)
             {
-                return "TI_PLAIN_ARRAY_LARGE";
+                return true;
             }
         }
-        return type_id;
+
+        return false;
+    }
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to retrieve the TypeIdentifier's kind.
+     * @return @e TI_PLAIN_ARRAY_SMALL if all dimensions of the array are smaller than 256.
+     * Otherwise @e TI_PLAIN_ARRAY_LARGE is returned.
+     */
+    @Override
+    public String getTypeIdentifier()
+    {
+        if (getIsTypeIdentifierKindLarge())
+        {
+            return "TI_PLAIN_ARRAY_LARGE";
+        }
+        return "TI_PLAIN_ARRAY_SMALL";
     }
 
     @Override
