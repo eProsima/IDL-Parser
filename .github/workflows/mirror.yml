@@ -20,5 +20,5 @@ jobs:
       uses: eProsima/eProsima-CI/external/mirror-branch-action@v0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        source: '3.x'
+        source: '3.0.x'
         dest: ${{ matrix.dest_branch }}
