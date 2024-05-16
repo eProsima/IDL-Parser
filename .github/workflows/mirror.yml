@@ -3,11 +3,8 @@ on:
   push:
     branches:
       - 'master'
-      - '3.0.x'
-      - '1.7.x'
 jobs:
   mirror_job:
-    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Mirror master branch to API & ABI compatible minor version branches
     strategy:
@@ -23,38 +20,4 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         source: 'master'
-        dest: ${{ matrix.dest_branch }}
-  mirror_job_3_x:
-    if: github.ref == 'refs/heads/3.0.x'
-    runs-on: ubuntu-latest
-    name: Mirror 3.0.x branch to compatible version branches
-    strategy:
-      fail-fast: false
-      matrix:
-        dest_branch:
-          - '3.x'
-    steps:
-    - name: Mirror action step
-      id: mirror
-      uses: eProsima/eProsima-CI/external/mirror-branch-action@v0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        source: '3.x'
-        dest: ${{ matrix.dest_branch }}
-  mirror_job_1_x:
-    if: github.ref == 'refs/heads/1.7.x'
-    runs-on: ubuntu-latest
-    name: Mirror 1.7.x branch to compatible version branches
-    strategy:
-      fail-fast: false
-      matrix:
-        dest_branch:
-          - '1.x'
-    steps:
-    - name: Mirror action step
-      id: mirror
-      uses: eProsima/eProsima-CI/external/mirror-branch-action@v0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        source: '1.x'
         dest: ${{ matrix.dest_branch }}
