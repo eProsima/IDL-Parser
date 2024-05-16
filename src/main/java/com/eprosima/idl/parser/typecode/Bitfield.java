@@ -45,14 +45,55 @@ public class Bitfield extends Member
         return m_spec;
     }
 
-    @Override
-    public String getName()
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function check if the bitfield was defined by name.
+     * @return true if the bitfield was defined by name in the IDL file. false otherwise.
+     */
+    public boolean getIsDefined()
     {
-        if (super.getName().isEmpty())
+        return !getName().isEmpty();
+    }
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns a string containing the mask in hexadecimal which can be used to make bitwise AND
+     * operation over the bitfield.
+     * @return The bit mask in hexadecimal.
+     */
+    public String getBitmask()
+    {
+        String mask = "";
+        int mod = m_spec.getBitSize() / 4;
+        int rest = m_spec.getBitSize() % 4;
+
+        while (0 != mod)
         {
-            return null;
+            mask += "F";
+            --mod;
         }
-        return super.getName();
+
+        switch(rest)
+        {
+            case 1:
+            mask = "1" + mask;
+            break;
+            case 2:
+            mask = "3" + mask;
+            break;
+            case 3:
+            mask = "7" + mask;
+            break;
+            default:
+            break;
+        }
+
+        if (mask.isEmpty())
+        {
+            mask = "0";
+        }
+
+        return "0x" + mask;
     }
 
     @Override

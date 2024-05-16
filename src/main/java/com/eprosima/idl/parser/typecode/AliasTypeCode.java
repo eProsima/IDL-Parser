@@ -365,18 +365,6 @@ public class AliasTypeCode extends ContainerTypeCode
                 ": trying accessing dimensions for a non-array type");
     }
 
-    public int getFullBitSize() // Function for alias when enclosed type is a BitsetTypeCode
-    {
-        int returnedValue = 0;
-
-        if (getContentTypeCode() instanceof BitsetTypeCode)
-        {
-            returnedValue = ((BitsetTypeCode)getContentTypeCode()).getFullBitSize();
-        }
-
-        return returnedValue;
-    }
-
     public TypeCode getInheritance() // Function for alias when enclosed type is a StructTypeCode
     {
         TypeCode returnedValue = null;

@@ -1320,12 +1320,15 @@ bitset_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
         ( COLON scoped_name
             {
                 superType = ctx.getTypeCode($scoped_name.pair.first());
+                if (superType != null)
+                {
+                    typecode.addInheritance(ctx, superType);
+                }
+
             }
         )?
         LEFT_BRACE bitfield[typecode] RIGHT_BRACE
         {
-            if (superType != null) typecode.addInheritance(ctx, superType);
-
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
                 if(tmanager != null) {
@@ -1357,9 +1360,6 @@ bitfield [BitsetTypeCode owner]
                             bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
 
                             $owner.addBitfield(bitfield);
-
-                            if(!$owner.addMember(bitfield))
-                                throw new ParseException($simple_declarators.ret.get(count).first().second(), " was defined previously");
                         }
                     }
                 }
@@ -1376,9 +1376,6 @@ bitfield [BitsetTypeCode owner]
                         bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, "");
 
                         $owner.addBitfield(bitfield);
-
-                        if(!$owner.addMember(bitfield))
-                            System.out.println("Empty space failed to be inserted.");
                     }
                 }
             )

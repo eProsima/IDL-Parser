@@ -333,7 +333,7 @@ public class TestIDLParser {
 
     public void parseBitset(BitsetTypeCode bitset) {
         System.out.println("Start Bitset: " + bitset.getName());
-        for (Bitfield field : bitset.getBitfields(true)) {
+        for (Bitfield field : bitset.getBitfields()) {
             parseBitfield(field);
         }
         System.out.println("End Bitset: \n");
