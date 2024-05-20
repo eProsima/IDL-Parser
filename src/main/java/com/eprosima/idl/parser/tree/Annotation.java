@@ -323,6 +323,11 @@ public class Annotation
         return m_members.size();
     }
 
+    public AnnotationDeclaration getAnnotationDeclaration()
+    {
+        return m_declaration;
+    }
+
     private HashMap<String, AnnotationMember> m_members = null;
     private AnnotationDeclaration m_declaration = null;
 }
