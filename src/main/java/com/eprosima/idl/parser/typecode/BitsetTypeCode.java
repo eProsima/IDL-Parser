@@ -77,28 +77,34 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
         return st.render();
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns all bitfields including the inherited ones.
+     * @return A list of all bitfields.
+     */
     public List<Bitfield> getBitfields()
     {
-        return getBitfields(false);
-    }
-
-    public List<Bitfield> getBitfields(
-            boolean includeParents)
-    {
         ArrayList<Bitfield> result = new ArrayList<Bitfield>();
-
-        if (includeParents && enclosed_super_type_ != null)
-        {
-            result.addAll(enclosed_super_type_.getAllBitfields());
-        }
-
         result.addAll(m_bitfields.values());
         return result;
     }
 
-    public List<Bitfield> getAllBitfields() // Alias for getBitfields(true) for stg
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns all bitfields including the inherited ones which were defined by name.
+     * @return A list of all bitfields defined by name.
+     */
+    public List<Bitfield> getDefinedBitfields()
     {
-        return getBitfields(true);
+        ArrayList<Bitfield> result = new ArrayList<Bitfield>();
+        for (Bitfield bitfield : m_bitfields.values())
+        {
+            if (bitfield.getIsDefined())
+            {
+                result.add(bitfield);
+            }
+        }
+        return result;
     }
 
     public boolean addBitfield(
@@ -106,19 +112,41 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
     {
         if (null == bitfield.getName())
         {
-            m_current_base += bitfield.getSpec().getBitSize();
-            return true;
+            bitfield.setName("");
         }
-        if (!m_bitfields.containsKey(bitfield.getName()) )
+
+        String key = bitfield.getName();
+
+        if (key.isEmpty())
         {
-            m_bitfields.put(bitfield.getName(), bitfield);
+            ++annonymous_index_;
+            key = "_annonymous_" + Integer.toString(annonymous_index_);
+        }
+
+        if (!m_bitfields.containsKey(key))
+        {
+            m_bitfields.put(key, bitfield);
             bitfield.setBasePosition(m_current_base);
             m_current_base += bitfield.getSpec().getBitSize();
+
+            if (bitfield.getIsDefined())
+            {
+                addMember(bitfield);
+            }
+
             return true;
         }
         return false;
     }
 
+    /*!
+     * @ingroup api_for_g4
+     * @brief This function adds the inherited Bitset to this Bitset instance.
+     * Internally add the member from inherited Bitset to this instance, making a plain bitset as defined in IDL to
+     * C++11 2021.
+     * @param ctx Parser context.
+     * @param parent Inherited Bitset
+     */
     @Override
     public void addInheritance(
             Context ctx,
@@ -150,6 +178,23 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
         {
             throw new ParseException(null, "Inheritance must correspond to the name of a previously defined bitset");
         }
+
+        //{{{ Add members of inherited Bitset.
+        if (null != enclosed_super_type_)
+        {
+            enclosed_super_type_.m_bitfields.forEach((key, bitfield) ->
+            {
+                Bitfield new_bitfield = new Bitfield(this, bitfield.getSpec(), bitfield.getName());
+                m_bitfields.put(key, bitfield);
+                m_current_base += bitfield.getSpec().getBitSize();
+
+                if (bitfield.getIsDefined())
+                {
+                    addMember(bitfield);
+                }
+            });
+        }
+        //}}}
     }
 
     @Override
@@ -169,18 +214,7 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
         return m_current_base;
     }
 
-    public int getFullBitSize()
-    {
-        int size = 0;
-
-        if (enclosed_super_type_ != null)
-        {
-            size += enclosed_super_type_.getFullBitSize();
-        }
-
-        return m_current_base + size;
-    }
-
+    private int annonymous_index_ = 0;
     private BitsetTypeCode enclosed_super_type_ = null;
     private TypeCode super_type_ = null;
     private LinkedHashMap<String, Bitfield> m_bitfields = new LinkedHashMap<String, Bitfield>();
