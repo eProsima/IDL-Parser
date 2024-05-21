@@ -91,7 +91,7 @@ public class BitsetTypeCode extends MemberedTypeCode implements Inherits
 
     /*!
      * @ingroup api_for_stg
-     * @brief This function returns all bitfields including the inherited ones which was defined by name.
+     * @brief This function returns all bitfields including the inherited ones which were defined by name.
      * @return A list of all bitfields defined by name.
      */
     public List<Bitfield> getDefinedBitfields()
