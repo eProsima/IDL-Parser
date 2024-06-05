@@ -113,12 +113,6 @@ public class Context
             m_file = m_file.substring(m_directoryFile.length());
          */
 
-        m_definitions = new ArrayList<Definition>();
-        m_modules = new HashMap<String, com.eprosima.idl.parser.tree.Module>();
-        m_interfaces = new HashMap<String, Interface>();
-        m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
-        m_types = new HashMap<String, TypeDeclaration>();
-        m_annotations = new HashMap<String, AnnotationDeclaration>();
         m_keywords = new HashSet<String>();
         fillKeywords();
 
@@ -793,6 +787,11 @@ public class Context
     {
         BitfieldSpec object = new BitfieldSpec(m_scope, size, type);
         return object;
+    }
+
+    public Collection<com.eprosima.idl.parser.tree.Exception> getExceptions()
+    {
+        return m_exceptions.values();
     }
 
     public Collection<TypeDeclaration> getTypes()
@@ -1538,17 +1537,17 @@ public class Context
     final String includeFlag = "-I";
 
     //! Store all global definitions.
-    private ArrayList<Definition> m_definitions;
+    private ArrayList<Definition> m_definitions = new ArrayList<Definition>();
     //! Map that contains all modules that were found processing the IDL file (after preprocessing):
-    private HashMap<String, com.eprosima.idl.parser.tree.Module> m_modules = null;
+    private HashMap<String, com.eprosima.idl.parser.tree.Module> m_modules = new HashMap<String, com.eprosima.idl.parser.tree.Module>();
     //! Map that contains all interfaces that were found processing the IDL file (after preprocessing):
-    private HashMap<String, Interface> m_interfaces = null;
+    private HashMap<String, Interface> m_interfaces = new HashMap<String, Interface>();
     //! Map that contains all global exceptions that were found processing the IDL file (after preprocessing).
-    private HashMap<String, com.eprosima.idl.parser.tree.Exception> m_exceptions = null;
+    private HashMap<String, com.eprosima.idl.parser.tree.Exception> m_exceptions = new HashMap<String, com.eprosima.idl.parser.tree.Exception>();
     //! Map that contains all types that were found processing the IDL file (after preprocessing).
-    protected HashMap<String, TypeDeclaration> m_types = null;
+    private HashMap<String, TypeDeclaration> m_types = new HashMap<String, TypeDeclaration>();
     //! Map that contains all annotations that where found processing the IDL file.
-    private HashMap<String, AnnotationDeclaration> m_annotations = null;
+    private HashMap<String, AnnotationDeclaration> m_annotations = new HashMap<String, AnnotationDeclaration>();
 
     private ArrayList<String> m_includePaths = null;
     //! Set that contains the library dependencies that were found because there was a line of the preprocessor.
