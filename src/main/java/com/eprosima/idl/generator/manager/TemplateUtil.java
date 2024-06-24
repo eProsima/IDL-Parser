@@ -69,12 +69,33 @@ public class TemplateUtil
                     disc_type.getKind() == Kind.KIND_WCHAR)
             {
                 long dvalue = -1;
+
+                switch (disc_type.getKind())
+                {
+                    case Kind.KIND_OCTET:
+                    case Kind.KIND_INT8:
+                    case Kind.KIND_UINT8:
+                    case Kind.KIND_CHAR:
+                        dvalue = Byte.MAX_VALUE;
+                        break;
+                    case Kind.KIND_SHORT:
+                    case Kind.KIND_USHORT:
+                    case Kind.KIND_WCHAR:
+                        dvalue = Short.MAX_VALUE;
+                        break;
+                    case Kind.KIND_LONG:
+                    case Kind.KIND_ULONG:
+                        dvalue = Integer.MAX_VALUE;
+                        break;
+                    default:
+                        dvalue = Long.MAX_VALUE;
+                }
+
                 boolean found = true;
                 List<Member> list = new ArrayList<Member>(members);
 
                 do
                 {
-                    ++dvalue;
                     found = false;
 
                     for(Member member : list)
@@ -117,7 +138,11 @@ public class TemplateUtil
                             }
                         }
 
-                        if(found) break;
+                        if(found)
+                        {
+                            --dvalue;
+                            break;
+                        }
                     }
                 }
                 while(found);
