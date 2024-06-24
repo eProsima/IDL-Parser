@@ -1694,6 +1694,7 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
     UnionTypeCode unionTP = null;
     TemplateGroup unionTemplates = null;
     Boolean fw_decl = false;
+    ArrayList<Annotation> discriminator_annotations = new ArrayList<Annotation>();
 }
     :   KW_UNION
         identifier
@@ -1732,7 +1733,7 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
                 }
             }
         }
-        KW_SWITCH LEFT_BRACKET switch_type_spec { dist_type=$switch_type_spec.typecode; } RIGHT_BRACKET
+        KW_SWITCH LEFT_BRACKET (annotation_appl { discriminator_annotations.add($annotation_appl.annotation); })? switch_type_spec { dist_type=$switch_type_spec.typecode; } RIGHT_BRACKET
         {
             // TODO Check supported types for discriminator: long, enumeration, etc...
             if (fw_decl)
@@ -1752,6 +1753,12 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
                 unionTP = ctx.createUnionTypeCode(ctx.getScope(), name, dist_type);
             }
             unionTP.setDefined();
+
+            // Set discriminator annotations.
+            for(Annotation annotation : discriminator_annotations)
+            {
+                unionTP.getDiscriminator().addAnnotation(ctx, annotation);
+            }
 
             // Apply annotations to the TypeCode
             if (null != annotations)
