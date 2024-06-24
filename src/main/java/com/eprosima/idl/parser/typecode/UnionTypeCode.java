@@ -123,6 +123,8 @@ public class UnionTypeCode extends MemberedTypeCode
             javalabels = internal_labels;
         }
 
+        // Checks the discriminator has the @default annotation. In that case checks the union's member has a label with
+        // the @default annotation value and if they matches store the union's member index.
         try
         {
             if (discriminator_.isAnnotationDefault())
@@ -163,6 +165,12 @@ public class UnionTypeCode extends MemberedTypeCode
         return 0;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the union's member which contains a label that matches with discriminator's
+     * @default annotation. If no one then return \b null.
+     * @return The union's member that passes the conditions or \b null value.
+     */
     public Member getDefaultAnnotatedMember() throws RuntimeGenerationException
     {
         if (m_defaultannotated_index != -1)
@@ -261,6 +269,12 @@ public class UnionTypeCode extends MemberedTypeCode
         m_javaDefaultValue = value;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the discriminator's @default annotation value as string. If annotation was not
+     * defined, returns \b null.
+     * @return The discriminator's @default annotation value or \b null if annotation was not defined
+     */
     public String getDefaultAnnotatedValue()
     {
         try
@@ -339,6 +353,10 @@ public class UnionTypeCode extends MemberedTypeCode
 
     private int m_defaultindex = -1;
 
+    /*!
+     * Stores the index of the union's member which contains a label that matches with the discriminator's @default
+     * annotation.
+     */
     private int m_defaultannotated_index = -1;
 
     private String m_defaultValue = null;

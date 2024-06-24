@@ -70,6 +70,8 @@ public class TemplateUtil
             {
                 long dvalue = -1;
 
+                // For primitive types, if default case was not defined, we will find a not used value starting for
+                // the maximum value of the primitive type for the default implicit value.
                 switch (disc_type.getKind())
                 {
                     case Kind.KIND_OCTET:
@@ -140,6 +142,7 @@ public class TemplateUtil
 
                         if(found)
                         {
+                            // Possible default implicit value used. Changing to test the former value.
                             --dvalue;
                             break;
                         }
