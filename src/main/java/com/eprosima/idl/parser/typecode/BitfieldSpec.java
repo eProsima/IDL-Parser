@@ -26,7 +26,7 @@ public class BitfieldSpec
         }
         else if (size <= 8)
         {
-            return Kind.KIND_OCTET;
+            return Kind.KIND_UINT8;
         }
         else if (size <= 16)
         {
