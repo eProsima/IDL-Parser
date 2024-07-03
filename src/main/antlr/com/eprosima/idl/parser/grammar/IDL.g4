@@ -2320,7 +2320,8 @@ op_decl [Vector<Annotation> annotations] returns [Pair<Operation, TemplateGroup>
         Vector<Pair<String, Token>> exceptions = null;
 }
     :   ( op_attribute { tkoneway=$op_attribute.token; } )?
-        op_type_spec { retType=$op_type_spec.returnPair.first(); template=$op_type_spec.returnPair.second();}
+        op_type_spec { if(null != $op_type_spec.returnPair) {retType=$op_type_spec.returnPair.first();
+            template=$op_type_spec.returnPair.second();}}
         {
             tk = _input.LT(1);
             name += tk.getText();
