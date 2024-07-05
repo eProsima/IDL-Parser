@@ -123,8 +123,8 @@ public class UnionTypeCode extends MemberedTypeCode
             javalabels = internal_labels;
         }
 
-        // Checks the discriminator has the @default annotation. In that case checks the union's member has a label with
-        // the @default annotation value and if they matches store the union's member index.
+        // Checks the discriminator has the @default annotation. In that case check the union's member has a label with
+        // the @default annotation value and if they match store the union's member index.
         try
         {
             if (discriminator_.isAnnotationDefault())
@@ -141,6 +141,7 @@ public class UnionTypeCode extends MemberedTypeCode
                         }
                         else
                         {
+                            // Default value matches with more than one member.
                             return -2;
                         }
                     }
@@ -179,7 +180,7 @@ public class UnionTypeCode extends MemberedTypeCode
         }
         else if (discriminator_.isAnnotationDefault())
         {
-            throw new RuntimeGenerationException("UnionTypeCode::getDefaultAnnotatedMember(): Discriminator has a default value but that value not found in label cases");
+            throw new RuntimeGenerationException("UnionTypeCode::getDefaultAnnotatedMember(): Discriminator has a default value but that value was not found in label cases");
         }
 
         return null;
