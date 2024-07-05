@@ -68,7 +68,8 @@ public class TemplateUtil
                     disc_type.getKind() == Kind.KIND_CHAR ||
                     disc_type.getKind() == Kind.KIND_WCHAR)
             {
-                long dvalue = -1;
+                long default_discriminator_value = -1;
+                long minimum_valid_value = -1;
 
                 // For primitive types, if the default case was not defined, use the highest unused value as the
                 // implicit default value.
@@ -78,19 +79,23 @@ public class TemplateUtil
                     case Kind.KIND_INT8:
                     case Kind.KIND_UINT8:
                     case Kind.KIND_CHAR:
-                        dvalue = Byte.MAX_VALUE;
+                        default_discriminator_value = Byte.MAX_VALUE;
+                        minimum_valid_value = Byte.MIN_VALUE;
                         break;
                     case Kind.KIND_SHORT:
                     case Kind.KIND_USHORT:
                     case Kind.KIND_WCHAR:
-                        dvalue = Short.MAX_VALUE;
+                        default_discriminator_value = Short.MAX_VALUE;
+                        minimum_valid_value = Short.MIN_VALUE;
                         break;
                     case Kind.KIND_LONG:
                     case Kind.KIND_ULONG:
-                        dvalue = Integer.MAX_VALUE;
+                        default_discriminator_value = Integer.MAX_VALUE;
+                        minimum_valid_value = Integer.MIN_VALUE;
                         break;
                     default:
-                        dvalue = Long.MAX_VALUE;
+                        default_discriminator_value = Long.MAX_VALUE;
+                        minimum_valid_value = Long.MIN_VALUE;
                 }
 
                 boolean found = true;
@@ -132,7 +137,7 @@ public class TemplateUtil
                                     }
                                 }
 
-                                if(dvalue == value)
+                                if(default_discriminator_value == value)
                                 {
                                     found = true;
                                     break;
@@ -143,15 +148,21 @@ public class TemplateUtil
                         if(found)
                         {
                             // Possible default implicit value used. Try with the next lower value.
-                            --dvalue;
+                            --default_discriminator_value;
                             break;
                         }
                     }
                 }
-                while(found);
+                while(found && default_discriminator_value >= minimum_valid_value);
 
-                union_type.setDefaultvalue(Long.toString(dvalue));
-                union_type.setJavaDefaultvalue(Long.toString(dvalue));
+                if (found)
+                {
+                    // All values were used. Using value 0 as default implicit value.
+                    default_discriminator_value = 0;
+                }
+
+                union_type.setDefaultvalue(Long.toString(default_discriminator_value));
+                union_type.setJavaDefaultvalue(Long.toString(default_discriminator_value));
             }
             else if(disc_type.getKind() == Kind.KIND_BOOLEAN)
             {
