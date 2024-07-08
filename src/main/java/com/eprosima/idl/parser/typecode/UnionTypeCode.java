@@ -101,10 +101,12 @@ public class UnionTypeCode extends MemberedTypeCode
         List<String> labels = null;
         List<String> javalabels = null;
 
-        if (Kind.KIND_ENUM == discriminator_.getTypecode().getKind() ||
-                Kind.KIND_BITMASK == discriminator_.getTypecode().getKind())
+        TypeCode discriminator_typecode = discriminator_.getTypecode();
+
+        if (Kind.KIND_ENUM == discriminator_typecode.getKind() ||
+                Kind.KIND_BITMASK == discriminator_typecode.getKind())
         {
-            MemberedTypeCode enum_type = (MemberedTypeCode)discriminator_.getTypecode();
+            MemberedTypeCode enum_type = (MemberedTypeCode)discriminator_typecode;
             labels = new ArrayList<String>();
             javalabels = new ArrayList<String>();
 
@@ -121,6 +123,37 @@ public class UnionTypeCode extends MemberedTypeCode
             javalabels = internal_labels;
         }
 
+        // Checks the discriminator has the @default annotation. In that case check the union's member has a label with
+        // the @default annotation value and if they match store the union's member index.
+        try
+        {
+            if (discriminator_.isAnnotationDefault())
+            {
+                String default_value = discriminator_.getAnnotationDefaultValue();
+
+                for (String label : labels)
+                {
+                    if (label.equals(default_value))
+                    {
+                        if (m_defaultannotated_index == -1)
+                        {
+                            m_defaultannotated_index = getMembers().size();
+                        }
+                        else
+                        {
+                            // Default value matches with more than one member.
+                            return -2;
+                        }
+                    }
+                }
+            }
+        }
+        catch(RuntimeGenerationException ex)
+        {
+            // Never enter here because we check previously using isAnnotationDefault().
+        }
+
+
         member.setLabels(labels);
         member.setJavaLabels(javalabels);
 
@@ -131,6 +164,26 @@ public class UnionTypeCode extends MemberedTypeCode
         }
 
         return 0;
+    }
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the union's member which contains a label that matches with discriminator's
+     * @default annotation. If no one then return \b null.
+     * @return The union's member that passes the conditions or \b null value.
+     */
+    public Member getDefaultAnnotatedMember() throws RuntimeGenerationException
+    {
+        if (m_defaultannotated_index != -1)
+        {
+            return getMembers().get(m_defaultannotated_index);
+        }
+        else if (discriminator_.isAnnotationDefault())
+        {
+            throw new RuntimeGenerationException("UnionTypeCode::getDefaultAnnotatedMember(): Discriminator has a default value but that value was not found in label cases");
+        }
+
+        return null;
     }
 
     public Member getDefaultMember()
@@ -217,6 +270,29 @@ public class UnionTypeCode extends MemberedTypeCode
         m_javaDefaultValue = value;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the discriminator's @default annotation value as string. If annotation was not
+     * defined, returns \b null.
+     * @return The discriminator's @default annotation value or \b null if annotation was not defined
+     */
+    public String getDefaultAnnotatedValue()
+    {
+        try
+        {
+            if (discriminator_.isAnnotationDefault())
+            {
+                return discriminator_.getAnnotationDefaultValue();
+            }
+        }
+        catch(RuntimeGenerationException ex)
+        {
+            // Never enter here because we check previously using isAnnotationDefault().
+        }
+
+        return null;
+    }
+
     // Used in stringtemplates
     public String getDefaultvalue()
     {
@@ -277,6 +353,12 @@ public class UnionTypeCode extends MemberedTypeCode
     private UnionMember discriminator_ = null;
 
     private int m_defaultindex = -1;
+
+    /*!
+     * Stores the index of the union's member which contains a label that matches with the discriminator's @default
+     * annotation.
+     */
+    private int m_defaultannotated_index = -1;
 
     private String m_defaultValue = null;
 
