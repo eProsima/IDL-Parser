@@ -536,7 +536,13 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
     {
         if(typecode != null)
         {
-            constDecl = new ConstDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), constName, typecode, constValue, tk);
+            constDecl = new ConstDeclaration(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), constName,
+                    typecode, constValue,
+                    typecode.isPrimitive()
+                    && !typecode.isIsEnumType()
+                    && !typecode.isIsCharType()
+                    && !typecode.isIsWCharType()
+                    ? ctx.evaluate_literal(constValue) : constValue, tk);
 
             if(constTemplates != null)
             {

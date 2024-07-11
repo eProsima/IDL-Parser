@@ -1469,13 +1469,15 @@ public class Context
             {
                 ConstDeclaration const_decl = (ConstDeclaration)definition;
 
-                if (const_decl.getTypeCode().isPrimitive() || const_decl.getTypeCode().isIsStringType() || const_decl.getTypeCode().isIsWStringType())
+                if ((const_decl.getTypeCode().isPrimitive() && !const_decl.getTypeCode().isIsEnumType())
+                || const_decl.getTypeCode().isIsStringType()
+                || const_decl.getTypeCode().isIsWStringType())
                 {
-                    const_str = const_str + ";" + const_decl.getFormatedScopedname() + "=" + const_decl.getValue();
+                    const_str = const_str + ";" + const_decl.getFormatedScopedname() + "=" + const_decl.getEvaluatedValue();
 
                     if (const_decl.getScope() == getScope())
                     {
-                        const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getValue();
+                        const_str = const_str + ";" + const_decl.getName() + "=" + const_decl.getEvaluatedValue();
                     }
                 }
             }
@@ -1492,7 +1494,7 @@ public class Context
         }
         catch (ScriptException se)
         {
-            throw new ParseException(null, "Error evaluating array dimension: " + aux_str);
+            throw new ParseException(null, "Error evaluating expression: " + aux_str);
         }
 
         return aux_str;
