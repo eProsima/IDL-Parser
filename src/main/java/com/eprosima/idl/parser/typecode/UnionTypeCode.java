@@ -178,10 +178,6 @@ public class UnionTypeCode extends MemberedTypeCode
         {
             return getMembers().get(m_defaultannotated_index);
         }
-        else if (discriminator_.isAnnotationDefault())
-        {
-            throw new RuntimeGenerationException("UnionTypeCode::getDefaultAnnotatedMember(): Discriminator has a default value but that value was not found in label cases");
-        }
 
         return null;
     }
