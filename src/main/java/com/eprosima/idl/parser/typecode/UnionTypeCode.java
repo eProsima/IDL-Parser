@@ -172,7 +172,7 @@ public class UnionTypeCode extends MemberedTypeCode
      * @default annotation. If no one then return \b null.
      * @return The union's member that passes the conditions or \b null value.
      */
-    public Member getDefaultAnnotatedMember() throws RuntimeGenerationException
+    public Member getDefaultAnnotatedMember()
     {
         if (m_defaultannotated_index != -1)
         {
