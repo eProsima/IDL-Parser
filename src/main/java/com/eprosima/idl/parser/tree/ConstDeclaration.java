@@ -35,7 +35,7 @@ public class ConstDeclaration extends DefinitionContainer implements Definition,
 
         m_typecode = typecode;
         m_value = value;
-        evaluated_value_ =evaluated_value;
+        evaluated_value_ = evaluated_value;
         // Set as parent to the Typecode.
         m_typecode.setParent(this);
     }
