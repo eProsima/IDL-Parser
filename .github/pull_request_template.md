@@ -21,7 +21,7 @@
     In case of bug fixes, please provide the list of supported branches where this fix should be also merged.
     Please uncomment following line, adjusting the corresponding target branches for the backport.
 -->
-<!-- @Mergifyio backport 3.0.x 1.7.x 1.6.x 1.3.x -->
+<!-- @Mergifyio backport 3.0.x 1.5.x 1.2.x -->
 
 <!-- If an issue is already opened, please uncomment next line with the corresponding issue number. -->
 <!-- Fixes #(issue) -->
@@ -48,5 +48,3 @@
 - [ ] The PR has a milestone assigned.
 - [ ] The title and description correctly express the PR's purpose.
 - [ ] Check contributor checklist is correct.
-- [ ] Check CI results: changes do not issue any warning.
-- [ ] Check CI results: failing tests are unrelated with the changes.
