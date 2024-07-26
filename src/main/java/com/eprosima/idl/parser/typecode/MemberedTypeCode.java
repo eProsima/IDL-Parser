@@ -16,6 +16,8 @@ package com.eprosima.idl.parser.typecode;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.function.Function;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -126,9 +128,37 @@ public abstract class MemberedTypeCode extends TypeCode
         return !m_scope.isEmpty();
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to return all members ordered by index (insertion).
+     * @return List of all members ordered by index.
+     */
     public List<Member> getMembers()
     {
         return new ArrayList<Member>(m_members.values());
+    }
+
+    private class ComparatorById implements Comparator<Member>
+    {
+        @Override
+        public int compare(
+            Member m1,
+            Member m2)
+        {
+            return m1.get_id() - m2.get_id();
+        }
+    }
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function can be used to return all members ordered by MemberId.
+     * @return List of all members ordered by MemberId.
+     */
+    public List<Member> getMembersById()
+    {
+        ArrayList<Member> ret_list = new ArrayList<Member>(m_members.values());
+        Collections.sort(ret_list, new ComparatorById());
+        return ret_list;
     }
 
     public int getMembersSize()
