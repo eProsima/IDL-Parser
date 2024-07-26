@@ -21,12 +21,21 @@ import org.antlr.v4.runtime.Token;
 
 public class ConstDeclaration extends DefinitionContainer implements Definition, Export
 {
-    public ConstDeclaration(String scopeFile, boolean isInScope, String scope, String name, TypeCode typecode, String value, Token token)
+    public ConstDeclaration(
+        String scopeFile,
+        boolean isInScope,
+        String scope,
+        String name,
+        TypeCode typecode, 
+        String value,
+        String evaluated_value,
+        Token token)
     {
         super(scopeFile, isInScope, scope, name, token);
 
         m_typecode = typecode;
         m_value = value;
+        evaluated_value_ = evaluated_value;
         // Set as parent to the Typecode.
         m_typecode.setParent(this);
     }
@@ -34,6 +43,11 @@ public class ConstDeclaration extends DefinitionContainer implements Definition,
     public TypeCode getTypeCode()
     {
         return m_typecode;
+    }
+
+    public String getEvaluatedValue()
+    {
+        return evaluated_value_;
     }
 
     public String getValue()
@@ -99,6 +113,7 @@ public class ConstDeclaration extends DefinitionContainer implements Definition,
         return false;
     }
 
+    private String evaluated_value_ = null;
     private TypeCode m_typecode = null;
     private String m_value = null;
     private Object m_parent = null;
