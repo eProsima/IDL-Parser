@@ -25,6 +25,7 @@ import java.util.List;
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.typecode.StructTypeCode;
 
 public abstract class MemberedTypeCode extends TypeCode
 {
@@ -245,6 +246,11 @@ public abstract class MemberedTypeCode extends TypeCode
         {
             throw new ParseException(null, "Error in member " + member.getName() +
                     ": @" + Annotation.key_str + " and @" + Annotation.optional_str + " annotations are incompatible.");
+        }
+        if (member.isAnnotationKey() && this instanceof StructTypeCode && null != ((StructTypeCode)this).getInheritance())
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": @" + Annotation.key_str + " cannot be used in a derived type.");
         }
         if (member.isAnnotationId() && member.isAnnotationHashid())
         {
