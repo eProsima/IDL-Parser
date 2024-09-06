@@ -188,6 +188,12 @@ public class UnionTypeCode extends MemberedTypeCode
         {
             return getMembers().get(m_defaultindex);
         }
+        else if((Kind.KIND_BOOLEAN == discriminator_.getTypecode().getKind() && 2 == getMembers().size()) ||
+                (Kind.KIND_ENUM == discriminator_.getTypecode().getKind() &&
+                 ((EnumTypeCode)discriminator_.getTypecode()).getMembers().size() == getTotallabels().size()))
+        {
+            return getMembers().get(0);
+        }
 
         return null;
     }
