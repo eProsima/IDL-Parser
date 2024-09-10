@@ -509,18 +509,6 @@ public abstract class TypeCode implements Notebook
         return ExtensibilityKind.MUTABLE == extensibility_;
     }
 
-    public boolean isAnnotationExtensibilityNotApplied()
-    {
-        if (!m_annotations.containsKey(Annotation.final_str) &&
-                !m_annotations.containsKey(Annotation.appendable_str) &&
-                !m_annotations.containsKey(Annotation.mutable_str) &&
-                !m_annotations.containsKey(Annotation.extensibility_str))
-        {
-            return true;
-        }
-        return false;
-    }
-
     public boolean isAnnotationNested()
     {
         Annotation ann = m_annotations.get(Annotation.nested_str);
