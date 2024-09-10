@@ -182,11 +182,30 @@ public class UnionTypeCode extends MemberedTypeCode
         return null;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the union's default member (when there is no implicit default).
+     * A member is selected as the default one according to one of these cases:
+     * - It is under the `default:` case label.
+     * - It is under the case label of the default discriminator.
+     * - All possible values of the discriminator's type are covered so the first member should be considered the default.
+     *
+     * @return The union's default member.
+     */
     public Member getDefaultMember()
     {
+        // Union's default member is explicitly selected (either under the `default:` case label or under the default discriminator value case label).
         if (m_defaultindex != -1)
         {
             return getMembers().get(m_defaultindex);
+        }
+        // All possible values of a Boolean discriminator or Enumeration discriminator are covered.
+        else if((Kind.KIND_BOOLEAN == discriminator_.getTypecode().getKind() && 2 == getTotallabels().size()) ||
+                (Kind.KIND_ENUM == discriminator_.getTypecode().getKind() &&
+                 ((EnumTypeCode)discriminator_.getTypecode()).getMembers().size() == getTotallabels().size()))
+        {
+            // First member is selected ad the default one.
+            return getMembers().get(0);
         }
 
         return null;
