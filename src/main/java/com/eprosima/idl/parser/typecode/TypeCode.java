@@ -365,6 +365,10 @@ public abstract class TypeCode implements Notebook
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getCppTypenameForTypeId()
     {
+        if (Kind.KIND_OCTET == m_kind)
+        {
+            return "byte";
+        }
         String s = getCppTypename();
         return s.equals("long double") ? "longdouble" : s;
     }
