@@ -401,23 +401,24 @@ public class Context
         m_scope = scope;
     }
 
-    public String getRelativeDir(String dependant_idl_dir)
+    public String getRelativeDir()
     {
-        String relative_dir = Util.getIDLFileDirectoryOnly(m_file);
-
-        if(null != relative_dir)
+        String idl_dir = Util.getIDLFileDirectoryOnly(m_file);
+        String relative_dir = idl_dir;
+        int longest_size = 0;
+        if(null != idl_dir)
         {
-            File rel_dir = new File(relative_dir);
-
-            if (rel_dir.isAbsolute())
+            for (String includePath : m_includePaths)
             {
-                if (null != dependant_idl_dir && relative_dir.startsWith(dependant_idl_dir))
+                if (m_file.startsWith(includePath))
                 {
-                    relative_dir = relative_dir.substring(dependant_idl_dir.length());
-                }
-                else
-                {
-                    relative_dir = "";
+                    // To get the relative path find the longest common path
+                    // between any includePath and the IDL file directory.
+                    if (longest_size < includePath.length())
+                    {
+                        longest_size = includePath.length();
+                        relative_dir = idl_dir.substring(includePath.length());
+                    }
                 }
             }
         }
@@ -425,7 +426,6 @@ public class Context
         {
             relative_dir = "";
         }
-
         return relative_dir;
     }
 
