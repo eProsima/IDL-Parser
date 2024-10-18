@@ -98,7 +98,12 @@ public class TemplateGroup
                     StringWriter out = new StringWriter();
                     STWriter wr = new AutoIndentWriter(out);
                     template.get_st().write(wr, error_listener_);
-                    m.getValue().get_st().add(attribute, out.toString());
+                    String out_string = out.toString();
+
+                    if (!out_string.isBlank())
+                    {
+                        m.getValue().get_st().add(attribute, out.toString());
+                    }
 
                     // Unset the current TemplateSTGroup in TemplateManager.
                     manager_.set_current_template_stgroup(null);
