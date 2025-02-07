@@ -259,6 +259,11 @@ public class Context
         externalann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
         //}}}
 
+        //{{{ @feed
+        AnnotationDeclaration feedann = createAnnotationDeclaration(Annotation.feed_str, null);
+        feedann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
+        //}}}
+
         //{{{ @hashid
         AnnotationDeclaration hashid_annotation = createAnnotationDeclaration(Annotation.hashid_str, null);
         hashid_annotation.addMember(new AnnotationMember(Annotation.value_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.empty_str));

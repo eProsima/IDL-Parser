@@ -70,6 +70,7 @@ public class Annotation
     //}}}
 
     public static final String external_str = "external";
+    public static final String feed_str = "feed";
     public static final String hashid_str = "hashid";
     public static final String id_str = "id";
     public static final String ignore_literal_names_str = "ignore_literal_names";
