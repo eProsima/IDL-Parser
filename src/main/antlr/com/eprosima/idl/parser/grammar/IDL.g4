@@ -2449,6 +2449,20 @@ param_decl_list [Operation operation, TemplateGroup tpl]
 
 param_decl returns [Pair<Param, TemplateGroup> returnPair = null]
 @init{
+    ArrayList<Annotation> annotations = new ArrayList<Annotation>();
+}
+    : (annotation_appl { annotations.add($annotation_appl.annotation); })* param_def
+    {
+        $returnPair=$param_def.returnPair;
+        for (Annotation ann : annotations)
+        {
+            $returnPair.first().addAnnotation(ctx, ann);
+        }
+    }
+    ;
+
+param_def returns [Pair<Param, TemplateGroup> returnPair = null]
+@init{
         TemplateGroup paramTemplate = null;
         TemplateGroup template = null;
         if(tmanager != null) {
