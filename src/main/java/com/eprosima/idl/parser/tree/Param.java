@@ -15,8 +15,12 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.context.Context;
 
-public class Param
+import java.util.Map;
+import java.util.HashMap;
+
+public class Param implements Notebook
 {
     public enum Kind
     {
@@ -72,6 +76,7 @@ public class Param
         m_name = name;
         m_typecode = typecode;
         m_kind = kind;
+        m_annotations = new HashMap<String, Annotation>();
     }
 
     public Param(String name, Definition definition, Kind kind)
@@ -79,6 +84,7 @@ public class Param
         m_name = name;
         m_definition = definition;
         m_kind = kind;
+        m_annotations = new HashMap<String, Annotation>();
     }
 
     public String getName()
@@ -106,9 +112,26 @@ public class Param
         return m_parent;
     }
 
+    @Override
+    public void addAnnotation(Context ctx, Annotation annotation)
+    {
+        if(annotation != null)
+        {
+            m_annotations.put(annotation.getName(), annotation);
+        }
+    }
+
+    @Override
+    public Map<String, Annotation> getAnnotations()
+    {
+        return m_annotations;
+    }
+
     private Kind m_kind = Kind.IN_PARAM;
     private String m_name = null;
     private TypeCode m_typecode = null;
     private Definition m_definition = null;
     private Object m_parent = null;
+    //! Map that stores the annotations of the parameter.
+    private HashMap<String, Annotation> m_annotations = null;
 }
