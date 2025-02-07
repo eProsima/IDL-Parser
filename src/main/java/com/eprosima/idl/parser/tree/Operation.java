@@ -15,6 +15,7 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.typecode.TypeCode;
 import com.eprosima.idl.parser.tree.Param;
 
@@ -153,6 +154,32 @@ public class Operation extends TreeNode implements Export
     {
         m_unresolvedExceptions.add(ename);
     }
+    
+    //{{{ Auxiliary functions to check built-in annotations that apply to this item.
+
+    /**
+     * Return whether the operation has been annotated as feed
+     *
+     * @return true when the operation has been annotated as feed, false otherwise.
+     */
+    public boolean isAnnotationFeed()
+    {
+        Annotation ann = getAnnotations().get(Annotation.feed_str);
+        if (ann != null)
+        {
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @feed annotation has only one parameter
+            }
+        }
+        return false;
+    }
+
+    //}}}
 
     @Override
     public boolean resolve(Context ctx)
