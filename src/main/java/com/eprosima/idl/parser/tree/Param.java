@@ -76,7 +76,6 @@ public class Param implements Notebook
         m_name = name;
         m_typecode = typecode;
         m_kind = kind;
-        m_annotations = new HashMap<String, Annotation>();
     }
 
     public Param(String name, Definition definition, Kind kind)
@@ -84,7 +83,6 @@ public class Param implements Notebook
         m_name = name;
         m_definition = definition;
         m_kind = kind;
-        m_annotations = new HashMap<String, Annotation>();
     }
 
     public String getName()
@@ -133,5 +131,5 @@ public class Param implements Notebook
     private Definition m_definition = null;
     private Object m_parent = null;
     //! Map that stores the annotations of the parameter.
-    private HashMap<String, Annotation> m_annotations = null;
+    private HashMap<String, Annotation> m_annotations = new HashMap<String, Annotation>();
 }
