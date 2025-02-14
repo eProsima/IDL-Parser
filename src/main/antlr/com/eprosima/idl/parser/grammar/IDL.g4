@@ -2263,6 +2263,7 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
     String name = null;
     com.eprosima.idl.parser.tree.Exception exceptionObject = null;
     TemplateGroup exTemplates = null;
+    StructTypeCode structTP = null;
     Token tk = null;
 }
     :   KW_EXCEPTION
@@ -2277,7 +2278,26 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
                 throw new ParseException(null, "Illegal identifier: " + error);
             }
             name = ctx.removeEscapeCharacter($identifier.id);
+
+            // Find typecode in the global map.
+            String fw_name = name;
+            if (ctx.getScope() != null && !ctx.getScope().isEmpty())
+            {
+                fw_name = ctx.getScope() + "::" + name;
+            }
+
+            TypeCode typecode = ctx.getTypeCode(fw_name);
+            if(typecode != null)
+            {
+                System.out.println("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Identifier already used.");
+            }
+            else
+            {
+                structTP = ctx.createStructTypeCode(name);
+            }
+            structTP.setDefined();
         }
+        LEFT_BRACE member_list[structTP] RIGHT_BRACE
         {
             // Create the Exception object.
             exceptionObject = ctx.createException(name, tk);
@@ -2289,6 +2309,11 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
                     exTemplates.setAttribute("ctx", ctx);
                     // Set the the exception object to the TemplateGroup of the module.
                     exTemplates.setAttribute("exception", exceptionObject);
+                    exTemplates.setAttribute("struct", structTP);
+                    if($member_list.tg != null)
+                    {
+                        exTemplates.setAttribute("member_list", $member_list.tg);
+                    }
                 }
             }
             // Its a dependency.
@@ -2296,9 +2321,6 @@ except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>
             {
                 ctx.addIncludeDependency(ctx.getScopeFile());
             }
-        }
-        LEFT_BRACE opt_member_list[exceptionObject] RIGHT_BRACE
-        {
             // Create the returned data.
             $returnPair = new Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>(exceptionObject, exTemplates);
         }
