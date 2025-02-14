@@ -1597,7 +1597,7 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
         }
     ;
 
-member_list [StructTypeCode structTP] returns [TemplateGroup tg = null]
+member_list [MemberedTypeCode structTP] returns [TemplateGroup tg = null]
     :   (
             member_def
             {
