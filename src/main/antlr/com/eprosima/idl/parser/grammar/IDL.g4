@@ -124,7 +124,6 @@ definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
             }
         }  // Type Declaration
     |   const_decl[null] SEMICOLON { cdtg=$const_decl.returnPair; if(cdtg!=null){ vector.add(cdtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, cdtg.second());}} // Const Declaration
-    |   except_decl SEMICOLON { etg=$except_decl.returnPair; if(etg!=null){ vector.add(etg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, etg.second());}} // Exception.
     |   interface_or_forward_decl[annotations] SEMICOLON { itg=$interface_or_forward_decl.itg; if(itg!=null){ vector.add(itg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());}} // Interface
     |   module SEMICOLON { mtg=$module.returnPair; if(mtg!=null){ vector.add(mtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, mtg.second());}} // Module
     |   value SEMICOLON
@@ -383,7 +382,6 @@ export [Vector<Annotation> annotations] returns [Pair<Vector<Export>, TemplateGr
 }
     :   type_decl[annotations, null] SEMICOLON { tetg=$type_decl.returnPair; if(tetg!=null){ for(TypeDeclaration tydl : tetg.first()) vector.add(tydl); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, tetg.second());} }  // Type Declaration
     |   const_decl[null] SEMICOLON { cetg=$const_decl.returnPair; if(cetg!=null){ vector.add(cetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, cetg.second());}} // Const Declaration
-    |   except_decl SEMICOLON { eetg=$except_decl.returnPair; if(eetg!=null){ vector.add(eetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, eetg.second());}}  // Exception
     |   attr_decl SEMICOLON
     { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Attribute declarations are not supported. Ignoring..."); }
     |   op_decl[annotations] SEMICOLON { oetg=$op_decl.returnPair; if(oetg!=null){ vector.add(oetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, oetg.second());}}  // Operation
@@ -760,6 +758,7 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     String fw_name = null;
 }
     :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator[null, annotations] { ttg=$type_declarator.returnPair; }
+    |   exception_type[annotations] { ttg=$exception_type.returnPair; }
     |   struct_type[annotations] { ttg=$struct_type.returnPair; fw_name = $struct_type.fw_name; }
     |   union_type[annotations, defs] { ttg=$union_type.returnPair; fw_name = $union_type.fw_name; }
     |   enum_type[annotations] { ttg=$enum_type.returnPair; }
@@ -1482,6 +1481,53 @@ bit_values [BitmaskTypeCode owner]
     ;
 
 struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
+    :   KW_STRUCT
+        struct_or_exception_type[annotations, false]
+        {
+            $returnPair = $struct_or_exception_type.returnPair;
+            $fw_name = $struct_or_exception_type.fw_name;
+        }
+    |
+        KW_STRUCT
+        identifier
+        {
+            String name = null;
+            Vector<TypeCode> vector = null;
+            StructTypeCode structTP = null;
+            TemplateGroup structTemplates = null;
+
+            // Forward declaration
+            name = $identifier.id;
+            structTP = ctx.createStructTypeCode(name);
+
+            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+            {
+                if(tmanager != null) {
+                    structTemplates = tmanager.createTemplateGroup("fwd_decl");
+                    structTemplates.setAttribute("ctx", ctx);
+                    structTemplates.setAttribute("type", structTP);
+                }
+            }
+
+            // Return the returned data.
+            vector = new Vector<TypeCode>();
+            structTP.setForwarded(true);
+            vector.add(structTP);
+            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
+            $fw_name = null;
+        }
+    ;
+
+exception_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
+    :   KW_EXCEPTION
+        struct_or_exception_type[annotations, true]
+        {
+            $returnPair = $struct_or_exception_type.returnPair;
+            $fw_name = $struct_or_exception_type.fw_name;
+        }
+    ;
+
+struct_or_exception_type[Vector<Annotation> annotations, Boolean is_exception] returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null, String fw_name = null]
 @init{
     String name = null;
     Vector<TypeCode> vector = null;
@@ -1490,8 +1536,7 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
     TemplateGroup structTemplates = null;
     Boolean fw_declaration = false;
 }
-    :   KW_STRUCT
-        identifier
+    :   identifier
         {
             String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
@@ -1555,7 +1600,14 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
                 if(tmanager != null) {
-                    structTemplates = tmanager.createTemplateGroup("struct_type");
+                    if (is_exception)
+                    {
+                        structTemplates = tmanager.createTemplateGroup("exception");
+                    }
+                    else
+                    {
+                        structTemplates = tmanager.createTemplateGroup("struct_type");
+                    }
                     structTemplates.setAttribute("ctx", ctx);
                     structTemplates.setAttribute("struct", structTP);
                     if($member_list.tg != null)
@@ -1570,30 +1622,6 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
             vector.add(structTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
             $fw_name = (fw_declaration) ? name : null;
-        }
-    |
-        KW_STRUCT
-        identifier
-        {
-            // Forward declaration
-            name=$identifier.id;
-            structTP = ctx.createStructTypeCode(name);
-
-            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-            {
-                if(tmanager != null) {
-                    structTemplates = tmanager.createTemplateGroup("fwd_decl");
-                    structTemplates.setAttribute("ctx", ctx);
-                    structTemplates.setAttribute("type", structTP);
-                }
-            }
-
-            // Return the returned data.
-            vector = new Vector<TypeCode>();
-            structTP.setForwarded(true);
-            vector.add(structTP);
-            $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
-            $fw_name = null;
         }
     ;
 
@@ -2256,84 +2284,6 @@ fixed_array_size returns [String literalStr = null]
 attr_decl returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, TypeCode>> ret = null, Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Definition>> retDef = null]
     :   readonly_attr_spec
     |   attr_spec { $ret=$attr_spec.ret; $retDef=$attr_spec.retDef; }
-    ;
-
-except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup> returnPair = null]
-@init {
-    String name = null;
-    com.eprosima.idl.parser.tree.Exception exceptionObject = null;
-    TemplateGroup exTemplates = null;
-    StructTypeCode structTP = null;
-    Token tk = null;
-}
-    :   KW_EXCEPTION
-        {
-            tk = _input.LT(1);
-        }
-        identifier
-        {
-            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
-            if (error != null)
-            {
-                throw new ParseException(null, "Illegal identifier: " + error);
-            }
-            name = ctx.removeEscapeCharacter($identifier.id);
-
-            // Find typecode in the global map.
-            String fw_name = name;
-            if (ctx.getScope() != null && !ctx.getScope().isEmpty())
-            {
-                fw_name = ctx.getScope() + "::" + name;
-            }
-
-            TypeCode typecode = ctx.getTypeCode(fw_name);
-            if(typecode != null)
-            {
-                System.out.println("ERROR (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Identifier already used.");
-            }
-            else
-            {
-                structTP = ctx.createStructTypeCode(name);
-            }
-            structTP.setDefined();
-        }
-        LEFT_BRACE member_list[structTP] RIGHT_BRACE
-        {
-            // Create the Exception object.
-            exceptionObject = ctx.createException(name, tk);
-
-            if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
-            {
-                if(tmanager != null) {
-                    exTemplates = tmanager.createTemplateGroup("exception");
-                    exTemplates.setAttribute("ctx", ctx);
-                    // Set the the exception object to the TemplateGroup of the module.
-                    exTemplates.setAttribute("exception", exceptionObject);
-                    exTemplates.setAttribute("struct", structTP);
-                    if($member_list.tg != null)
-                    {
-                        exTemplates.setAttribute("member_list", $member_list.tg);
-                    }
-                }
-            }
-            // Its a dependency.
-            else
-            {
-                ctx.addIncludeDependency(ctx.getScopeFile());
-            }
-            // Create the returned data.
-            $returnPair = new Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup>(exceptionObject, exTemplates);
-        }
-    ;
-
-opt_member_list [com.eprosima.idl.parser.tree.Exception exceptionObject]
-    :  (
-          member
-          {
-              for(int count = 0; count < $member.ret.size(); ++count)
-                  $exceptionObject.addMember($member.ret.get(count).second());
-          }
-       )*
     ;
 
  /*!
