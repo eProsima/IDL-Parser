@@ -602,14 +602,13 @@ public class Context
         return ret;
     }
 
-    public com.eprosima.idl.parser.tree.Exception createException(
+    public void createException(
             String name,
-            Token token)
+            StructTypeCode typecode)
     {
         com.eprosima.idl.parser.tree.Exception exceptionObject = new com.eprosima.idl.parser.tree.Exception(m_scopeFile,
-                        isInScopedFile(), m_scope, name, token);
+                        isInScopedFile(), m_scope, name, null);
         addException(exceptionObject);
-        return exceptionObject;
     }
 
     /*!

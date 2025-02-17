@@ -1575,7 +1575,13 @@ struct_or_exception_type[Vector<Annotation> annotations, Boolean is_exception] r
             {
                 structTP = ctx.createStructTypeCode(name);
             }
+            structTP.setIsException(is_exception);
             structTP.setDefined();
+
+            if (is_exception)
+            {
+                ctx.createException(name, structTP);
+            }
 
             // Apply annotations to the TypeCode
             if (null != annotations)

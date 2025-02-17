@@ -92,6 +92,11 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             Context ctx,
             TypeCode parent) throws ParseException
     {
+        if (is_exception_)
+        {
+            throw new ParseException(null, "Inheritance is not allowed for exceptions");
+        }
+
         String name = parent.getClass().getSimpleName();
 
         if (super_type_ == null && parent instanceof StructTypeCode)
@@ -121,6 +126,10 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
             throw new ParseException(null, "Inheritance must correspond to the name of a previously defined structure");
         }
 
+        if (enclosed_super_type_.isIsException())
+        {
+            throw new ParseException(null, "Cannot inherit from an exception");
+        }
 
         last_id_ = enclosed_super_type_.last_id_;
         last_index_ = enclosed_super_type_.last_index_;
@@ -182,7 +191,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public boolean isIsPlain()
     {
-        boolean returned_value = true;
+        boolean returned_value = !is_exception_;
 
         if (!detect_recursive_)
         {
@@ -205,7 +214,7 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
     @Override
     public boolean isIsBounded()
     {
-        boolean returned_value = true;
+        boolean returned_value = !is_exception_;
 
         if (!detect_recursive_)
         {
@@ -286,8 +295,20 @@ public class StructTypeCode extends MemberedTypeCode implements Inherits
         return true;
     }
 
+    public boolean isIsException()
+    {
+        return is_exception_;
+    }
+
+    public void setIsException(
+            boolean is_exception)
+    {
+        is_exception_ = is_exception;
+    }
+
     private StructTypeCode enclosed_super_type_ = null;
     private TypeCode super_type_ = null;
+    private boolean is_exception_ = false;
 
     protected boolean detect_recursive_ = false;
 }
