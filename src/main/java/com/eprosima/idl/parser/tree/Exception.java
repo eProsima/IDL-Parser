@@ -90,6 +90,7 @@ public class Exception extends TreeNode implements Export, Definition
     public int addMember(Member member)
     {
         m_members.add(member);
+        member.set_index(m_members.size() - 1);
         return m_members.size() - 1;
     }
 
