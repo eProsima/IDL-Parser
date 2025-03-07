@@ -77,7 +77,7 @@ public class TestIDLParser {
         }
 
         TemplateManager tmanager = new TemplateManager();
-        Context context = new Context(tmanager, idlFileName, m_includePaths, false);
+        Context context = new Context(tmanager, idlFileName, m_includePaths, false, true);
 
         try {
 

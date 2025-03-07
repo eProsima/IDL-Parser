@@ -82,11 +82,13 @@ public class Context
             TemplateManager tmanager,
             String file,
             ArrayList<String> includePaths,
-            boolean generate_typesc
+            boolean generate_typesc,
+            boolean flat_output_dir
             )
     {
         tmanager_ = tmanager;
         generate_typesc_ = generate_typesc;
+        flat_output_dir_ = flat_output_dir;
 
         // Detect OS
         m_os = System.getProperty("os.name");
@@ -95,23 +97,6 @@ public class Context
         m_filename = Util.getIDLFileNameOnly(file).replace('.', '_').replace('-', '_');
         m_directoryFile = Util.getIDLFileDirectoryOnly(file);
         m_file = file;
-
-        // Remove absolute directory where the application was executed
-        if (startsWith(m_file, m_userdir))
-        {
-            m_file = m_file.substring(m_userdir.length());
-
-            // Remove possible separator
-            if (startsWith(m_file, java.io.File.separator))
-            {
-                m_file = m_file.substring(1);
-            }
-        }
-        /*
-           // Remove relative directory if is equal that where the processed IDL is.
-           if(m_directoryFile != null && startsWith(m_file, m_directoryFile))
-            m_file = m_file.substring(m_directoryFile.length());
-         */
 
         m_keywords = new HashSet<String>();
         fillKeywords();
@@ -134,20 +119,7 @@ public class Context
             {
                 include = include.substring(includeFlag.length());
             }
-            if (startsWith(include, m_userdir))
-            {
-                include = include.substring(m_userdir.length());
 
-                // Remove possible separator
-                if (startsWith(include, java.io.File.separator))
-                {
-                    include = include.substring(1);
-                }
-            }
-            if (m_directoryFile != null && startsWith(include, m_directoryFile))
-            {
-                include = include.substring(m_directoryFile.length());
-            }
             m_includePaths.add(Paths.get(include).normalize().toString() + java.io.File.separator);
         }
 
@@ -175,6 +147,8 @@ public class Context
                 ++pointer;
             }
         }
+
+        m_relativeDirectory = getRelativeDir();
 
         // Load IDL types for stringtemplates
         TypeCode.ctx = this;
@@ -379,6 +353,11 @@ public class Context
         return m_filename;
     }
 
+    public String getRelativeDirectory()
+    {
+        return m_relativeDirectory;
+    }
+
     public void setFilename(
             String filename)
     {
@@ -401,23 +380,23 @@ public class Context
         m_scope = scope;
     }
 
-    public String getRelativeDir(String dependant_idl_dir)
+    public String getRelativeDir()
     {
-        String relative_dir = Util.getIDLFileDirectoryOnly(m_file);
-
-        if(null != relative_dir)
+        String relative_dir = m_directoryFile;
+        int longest_size = 0;
+        if(null != m_directoryFile)
         {
-            File rel_dir = new File(relative_dir);
-
-            if (rel_dir.isAbsolute())
+            for (String includePath : m_includePaths)
             {
-                if (null != dependant_idl_dir && relative_dir.startsWith(dependant_idl_dir))
+                if (m_file.startsWith(includePath))
                 {
-                    relative_dir = relative_dir.substring(dependant_idl_dir.length());
-                }
-                else
-                {
-                    relative_dir = "";
+                    // To get the relative path find the longest common path
+                    // between any includePath and the IDL file directory.
+                    if (longest_size < includePath.length())
+                    {
+                        longest_size = includePath.length();
+                        relative_dir = m_directoryFile.substring(includePath.length());
+                    }
                 }
             }
         }
@@ -1109,11 +1088,6 @@ public class Context
                                 if (file.equals(m_file))
                                 {
                                     String includeFile = m_scopeFile;
-                                    // Remove relative directory if is equal that where the processed IDL is.
-                                    if (m_directoryFile != null && startsWith(includeFile, m_directoryFile))
-                                    {
-                                        includeFile = includeFile.substring(m_directoryFile.length());
-                                    }
                                     // Remove relative directory if is equal to a include path.
                                     for (int i = 0; i < m_includePaths.size(); ++i)
                                     {
@@ -1130,6 +1104,11 @@ public class Context
                                     dependency_to_add = dependency_to_add.replaceAll("__/", "../");
                                     // Substitute "\\" with File separator.
                                     dependency_to_add = dependency_to_add.replace('\\', '/');
+
+                                    if (flat_output_dir_)
+                                    {
+                                        dependency_to_add = dependency_to_add.substring(dependency_to_add.lastIndexOf("/") + 1);
+                                    }
 
                                     m_directIncludeDependencies.add(dependency_to_add);
                                 }
@@ -1505,6 +1484,11 @@ public class Context
         return generate_typesc_;
     }
 
+    public boolean isGenerateFlatOutputDir()
+    {
+        return flat_output_dir_;
+    }
+
     /*!
      * @brief Checks a custom property was enables for a TemplateGroup.
      *
@@ -1526,6 +1510,7 @@ public class Context
     String m_userdir = null;
 
     private String m_filename = "";
+    private String m_relativeDirectory = "";
     private String m_file = "";
     private String m_directoryFile = "";
 
@@ -1573,6 +1558,8 @@ public class Context
     private boolean m_ignore_case = true;
 
     private boolean generate_typesc_ = false;
+
+    private boolean flat_output_dir_ = false;
 
     protected TemplateManager tmanager_ = null;
 }
