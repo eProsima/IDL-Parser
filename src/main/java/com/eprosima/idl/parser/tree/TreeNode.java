@@ -134,6 +134,13 @@ public class TreeNode implements Notebook
         return m_annotations;
     }
 
+    /**
+     * @brief This function checks if the node is annotated as nested.
+     *
+     * It is designed so it can be used in the templates with `$if(node.annotatedAsNested)$`
+     *
+     * @return true if the node is annotated as nested, false otherwise.
+     */
     public boolean isAnnotatedAsNested()
     {
         Annotation ann = m_annotations.get(Annotation.nested_str);
