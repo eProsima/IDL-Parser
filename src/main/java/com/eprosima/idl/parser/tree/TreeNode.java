@@ -15,6 +15,7 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -131,6 +132,23 @@ public class TreeNode implements Notebook
     public Map<String, Annotation> getAnnotations()
     {
         return m_annotations;
+    }
+
+    public boolean isAnnotatedAsNested()
+    {
+        Annotation ann = m_annotations.get(Annotation.nested_str);
+        if (ann != null)
+        {
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @nested annotation has only one parameter
+            }
+        }
+        return false;
     }
 
     public Token getToken()
