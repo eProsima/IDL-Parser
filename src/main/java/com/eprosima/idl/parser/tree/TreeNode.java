@@ -135,6 +135,7 @@ public class TreeNode implements Notebook
     }
 
     /**
+     * @ingroup api_for_stg
      * @brief This function checks if the node is annotated as nested.
      *
      * It is designed so it can be used in the templates with `$if(node.annotatedAsNested)$`
