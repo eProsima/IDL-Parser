@@ -23,7 +23,9 @@ import org.stringtemplate.v4.STGroup;
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Notebook;
+import com.eprosima.idl.parser.tree.TypeDeclaration;
 
 
 public abstract class TypeCode implements Notebook
@@ -415,6 +417,25 @@ public abstract class TypeCode implements Notebook
             Object parent)
     {
         m_parent = parent;
+    }
+
+    /**
+     * @ingroup api_for_stg
+     * @brief This function returns true if the typecode is declared inside an interface.
+     * @return true if the typecode is declared inside an interface.
+     */
+    public boolean isDeclaredInsideInterface()
+    {
+        if (m_parent instanceof TypeDeclaration)
+        {
+            TypeDeclaration type_decl = (TypeDeclaration)m_parent;
+            if (type_decl.getParent() instanceof Interface)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
