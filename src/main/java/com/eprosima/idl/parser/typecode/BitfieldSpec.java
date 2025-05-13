@@ -65,6 +65,11 @@ public class BitfieldSpec
         return !m_scope.isEmpty();
     }
 
+    public String getNamespace()
+    {
+        return "";
+    }
+
     public String getCppTypename()
     {
         return m_type.getCppTypename();

@@ -199,6 +199,12 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getNamespace()
+    {
+        return generate_namespace(m_scope);
+    }
+
+    @Override
     public String getCppTypename()
     {
         ST st = getCppTypenameFromStringTemplate();

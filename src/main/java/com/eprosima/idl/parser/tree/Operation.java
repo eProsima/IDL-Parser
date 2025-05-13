@@ -198,6 +198,12 @@ public class Operation extends TreeNode implements Export
         return false;
     }
 
+    @Override
+    protected boolean isDeclaredInsideInterface()
+    {
+        return true;
+    }
+
     private Object m_parent = null;
     private boolean m_isOneway = false;
     private ArrayList<Param> m_params;

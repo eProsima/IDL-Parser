@@ -94,6 +94,35 @@ public class TreeNode implements Notebook
         return m_scope;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the namespace where the type would be declared.
+     * @return Namespace where the type would be declared.
+     */
+    public String getNamespace()
+    {
+        String namespace = m_scope;
+        // Remove last scope when declared inside an Interface
+        if (isDeclaredInsideInterface())
+        {
+            int last_index = m_scope.lastIndexOf("::");
+            if (last_index == -1)
+            {
+                namespace = "";
+            }
+            else
+            {
+                namespace = m_scope.substring(0, last_index);
+            }
+        }
+        return namespace;
+    }
+
+    protected boolean isDeclaredInsideInterface()
+    {
+        return false;
+    }
+
     /*
      * @brief This function returns the scoped name of the interface but
      * changing "::" by "_".

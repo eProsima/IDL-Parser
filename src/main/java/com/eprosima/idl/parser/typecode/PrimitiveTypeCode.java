@@ -25,6 +25,12 @@ public class PrimitiveTypeCode extends TypeCode
     }
 
     @Override
+    public String getNamespace()
+    {
+        return "";
+    }
+
+    @Override
     public String getCppTypename()
     {
         return getCppTypenameFromStringTemplate().render();

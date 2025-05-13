@@ -76,6 +76,32 @@ public abstract class TypeCode implements Notebook
         return m_kind == Kind.KIND_NULL;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the namespace where the type would be declared.
+     * @return Namespace where the type would be declared.
+     */
+    public abstract String getNamespace();
+
+    protected String generate_namespace(String scope)
+    {
+        String namespace = scope;
+        // Remove last scope when declared inside an Interface
+        if (isDeclaredInsideInterface())
+        {
+            int last_index = scope.lastIndexOf("::");
+            if (last_index == -1)
+            {
+                namespace = "";
+            }
+            else
+            {
+                namespace = scope.substring(0, last_index);
+            }
+        }
+        return namespace;
+    }
+
     /*|
      * @brief This function returns the typename with the scope that is obtained using the cpptypesgr string template.
      * @return The IDL typename.
