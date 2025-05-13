@@ -5,7 +5,7 @@ Please, refer to the [master branch](https://github.com/eProsima/IDL-Parser/blob
 *eProsima IDL parser* maintains several releases with different support cycles.
 **All of them are attached to different *eProsima Fast DDS-Gen* releases.**
 
-## *eProsima Fast DDS-Gen* and *IDL parser* version compatibility
+## *eProsima Fast DDS-Gen* and *IDL parser* supported version compatibility
 
 |Fast DDS-Gen Version|IDL parser Version|IDL parser Version branch|IDL parser Latest Release|
 |--------------------|------------------|-------------------------|-------------------------|
@@ -13,6 +13,8 @@ Please, refer to the [master branch](https://github.com/eProsima/IDL-Parser/blob
 |3.3|3.0|[3.0.x](https://github.com/eProsima/IDL-Parser/tree/3.0.x)|[v3.0.1](https://github.com/eProsima/IDL-Parser/releases/tag/v3.0.1)|
 |2.5|1.5|[1.5.x](https://github.com/eProsima/IDL-Parser/tree/1.5.x)|[v1.5.0](https://github.com/eProsima/IDL-Parser/releases/tag/v1.5.0)|
 |2.1|1.2|[1.2.x](https://github.com/eProsima/IDL-Parser/tree/1.2.x)|[v1.2.0](https://github.com/eProsima/IDL-Parser/releases/tag/v1.2.0)|
+
+## *eProsima Fast DDS-Gen* and *IDL parser* previously supported version compatibility
 
 |Fast DDS-Gen Version|IDL parser Version|IDL parser Version branch|IDL parser Latest Release|Release Date|EOL Date|
 |--------------------|------------------|-------------------------|-------------------------|------------|--------|
