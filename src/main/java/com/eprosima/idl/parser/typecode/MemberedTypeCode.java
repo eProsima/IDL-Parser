@@ -129,6 +129,12 @@ public abstract class MemberedTypeCode extends TypeCode
         return !m_scope.isEmpty();
     }
 
+    @Override
+    public String getNamespace()
+    {
+        return generate_namespace(m_scope);
+    }
+
     /*!
      * @ingroup api_for_stg
      * @brief This function can be used to return all members ordered by index (insertion).

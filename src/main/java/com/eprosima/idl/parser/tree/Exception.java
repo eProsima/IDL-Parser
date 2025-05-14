@@ -100,6 +100,12 @@ public class Exception extends TreeNode implements Export, Definition
         return true;
     }
 
+    @Override
+    protected boolean isDeclaredInsideInterface()
+    {
+        return m_parent instanceof Interface;
+    }
+
     private Object m_parent = null;
     private List<Member> m_members = null;
 }

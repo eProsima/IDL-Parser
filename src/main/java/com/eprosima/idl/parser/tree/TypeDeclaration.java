@@ -97,6 +97,23 @@ public class TypeDeclaration extends TreeNode implements Definition, Export
         return true;
     }
 
+    @Override
+    public boolean isAnnotatedAsNested()
+    {
+        if (getParent() instanceof Interface)
+        {
+            return true;
+        }
+
+        return super.isAnnotatedAsNested();
+    }
+
+    @Override
+    protected boolean isDeclaredInsideInterface()
+    {
+        return m_parent instanceof Interface;
+    }
+
     private TypeCode m_typecode = null;
     private Object m_parent = null;
 }

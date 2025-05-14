@@ -26,6 +26,12 @@ public abstract class ContainerTypeCode extends TypeCode
     }
 
     @Override
+    public String getNamespace()
+    {
+        return "";
+    }
+
+    @Override
     public abstract String getCppTypename();
 
     @Override

@@ -15,6 +15,7 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -93,6 +94,35 @@ public class TreeNode implements Notebook
         return m_scope;
     }
 
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the namespace where the type would be declared.
+     * @return Namespace where the type would be declared.
+     */
+    public String getNamespace()
+    {
+        String namespace = m_scope;
+        // Remove last scope when declared inside an Interface
+        if (isDeclaredInsideInterface())
+        {
+            int last_index = m_scope.lastIndexOf("::");
+            if (last_index == -1)
+            {
+                namespace = "";
+            }
+            else
+            {
+                namespace = m_scope.substring(0, last_index);
+            }
+        }
+        return namespace;
+    }
+
+    protected boolean isDeclaredInsideInterface()
+    {
+        return false;
+    }
+
     /*
      * @brief This function returns the scoped name of the interface but
      * changing "::" by "_".
@@ -131,6 +161,31 @@ public class TreeNode implements Notebook
     public Map<String, Annotation> getAnnotations()
     {
         return m_annotations;
+    }
+
+    /**
+     * @ingroup api_for_stg
+     * @brief This function checks if the node is annotated as nested.
+     *
+     * It is designed so it can be used in the templates with `$if(node.annotatedAsNested)$`
+     *
+     * @return true if the node is annotated as nested, false otherwise.
+     */
+    public boolean isAnnotatedAsNested()
+    {
+        Annotation ann = m_annotations.get(Annotation.nested_str);
+        if (ann != null)
+        {
+            try
+            {
+                return ann.getValue().toUpperCase().equals(Annotation.capitalized_true_str);
+            }
+            catch (RuntimeGenerationException ex)
+            {
+                // Should not be called as @nested annotation has only one parameter
+            }
+        }
+        return false;
     }
 
     public Token getToken()

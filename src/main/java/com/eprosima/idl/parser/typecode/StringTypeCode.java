@@ -105,6 +105,12 @@ public class StringTypeCode extends TypeCode
     }
 
     @Override
+    public String getNamespace()
+    {
+        return "";
+    }
+
+    @Override
     public String getCppTypename()
     {
         ST st = getCppTypenameFromStringTemplate();

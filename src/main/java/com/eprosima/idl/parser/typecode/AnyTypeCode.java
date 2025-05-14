@@ -26,6 +26,12 @@ public class AnyTypeCode extends TypeCode
     }
 
     @Override
+    public String getNamespace()
+    {
+        return null;
+    }
+
+    @Override
     public String getCppTypename()
     {
         return null;

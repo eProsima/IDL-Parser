@@ -23,7 +23,9 @@ import org.stringtemplate.v4.STGroup;
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 import com.eprosima.idl.parser.tree.Annotation;
+import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Notebook;
+import com.eprosima.idl.parser.tree.TypeDeclaration;
 
 
 public abstract class TypeCode implements Notebook
@@ -72,6 +74,32 @@ public abstract class TypeCode implements Notebook
     public boolean isIsAnyTypeCode()
     {
         return m_kind == Kind.KIND_NULL;
+    }
+
+    /*!
+     * @ingroup api_for_stg
+     * @brief This function returns the namespace where the type would be declared.
+     * @return Namespace where the type would be declared.
+     */
+    public abstract String getNamespace();
+
+    protected String generate_namespace(String scope)
+    {
+        String namespace = scope;
+        // Remove last scope when declared inside an Interface
+        if (isDeclaredInsideInterface())
+        {
+            int last_index = scope.lastIndexOf("::");
+            if (last_index == -1)
+            {
+                namespace = "";
+            }
+            else
+            {
+                namespace = scope.substring(0, last_index);
+            }
+        }
+        return namespace;
     }
 
     /*|
@@ -415,6 +443,25 @@ public abstract class TypeCode implements Notebook
             Object parent)
     {
         m_parent = parent;
+    }
+
+    /**
+     * @ingroup api_for_stg
+     * @brief This function returns true if the typecode is declared inside an interface.
+     * @return true if the typecode is declared inside an interface.
+     */
+    public boolean isDeclaredInsideInterface()
+    {
+        if (m_parent instanceof TypeDeclaration)
+        {
+            TypeDeclaration type_decl = (TypeDeclaration)m_parent;
+            if (type_decl.getParent() instanceof Interface)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
