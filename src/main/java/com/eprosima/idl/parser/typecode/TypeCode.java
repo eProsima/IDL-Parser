@@ -26,6 +26,7 @@ import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Notebook;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
+import com.eprosima.idl.parser.tree.Exception;
 
 
 public abstract class TypeCode implements Notebook
@@ -456,6 +457,14 @@ public abstract class TypeCode implements Notebook
         {
             TypeDeclaration type_decl = (TypeDeclaration)m_parent;
             if (type_decl.getParent() instanceof Interface)
+            {
+                return true;
+            }
+        }
+        else if (m_parent instanceof Exception)
+        {
+            Exception ex = (Exception)m_parent;
+            if (ex.getParent() instanceof Interface)
             {
                 return true;
             }
