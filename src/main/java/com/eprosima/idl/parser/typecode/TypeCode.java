@@ -473,6 +473,35 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    protected String interface_prefix()
+    {
+        Interface interf = null;
+
+        if (m_parent instanceof TypeDeclaration)
+        {
+            TypeDeclaration type_decl = (TypeDeclaration)m_parent;
+            if (type_decl.getParent() instanceof Interface)
+            {
+                interf = (Interface)type_decl.getParent();
+            }
+        }
+        else if (m_parent instanceof Exception)
+        {
+            Exception ex = (Exception)m_parent;
+            if (ex.getParent() instanceof Interface)
+            {
+                interf = (Interface)ex.getParent();
+            }
+        }
+
+        if (interf == null)
+        {
+            return "";
+        }
+
+        return interf.getName() + "__";
+    }
+
     @Override
     public void addAnnotation(
             Context ctx,

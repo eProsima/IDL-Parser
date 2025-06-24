@@ -131,6 +131,16 @@ public class AliasTypeCode extends ContainerTypeCode
         return m_name;
     }
 
+    /**
+     * @ingroup api_for_stg
+     * @brief This function returns the name to use in the type object registration methods.
+     * @return A string with the name to use in the type object registration methods.
+     */
+    public String getNameForTypeObjectRegistration()
+    {
+        return interface_prefix() + getName();
+    }
+
     /*!
      * @brief Returns the full scoped name of the type, unless the developer uses
      * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, by removing from the full scoped name the
