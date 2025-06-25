@@ -118,6 +118,31 @@ public class TreeNode implements Notebook
         return namespace;
     }
 
+    /**
+     * @ingroup api_for_stg
+     * @brief This function returns the name to use in the type object registration methods.
+     * @return A string with the name to use in the type object registration methods.
+     */
+    public String getNameForTypeObjectRegistration()
+    {
+        return interfacePrefix() + getName();
+    }
+
+    protected String interfacePrefix()
+    {
+        // Get last scope when inside an interface
+        if (isDeclaredInsideInterface())
+        {
+            String[] scopes = m_scope.split("::");
+            if (scopes.length > 0)
+            {
+                return scopes[scopes.length - 1] + "__";
+            }
+        }
+
+        return "";
+    }
+
     protected boolean isDeclaredInsideInterface()
     {
         return false;

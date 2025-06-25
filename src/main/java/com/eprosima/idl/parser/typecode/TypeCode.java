@@ -26,6 +26,7 @@ import com.eprosima.idl.parser.tree.Annotation;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.Notebook;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
+import com.eprosima.idl.parser.tree.Exception;
 
 
 public abstract class TypeCode implements Notebook
@@ -460,8 +461,45 @@ public abstract class TypeCode implements Notebook
                 return true;
             }
         }
+        else if (m_parent instanceof Exception)
+        {
+            Exception ex = (Exception)m_parent;
+            if (ex.getParent() instanceof Interface)
+            {
+                return true;
+            }
+        }
 
         return false;
+    }
+
+    protected String interfacePrefix()
+    {
+        Interface interf = null;
+
+        if (m_parent instanceof TypeDeclaration)
+        {
+            TypeDeclaration type_decl = (TypeDeclaration)m_parent;
+            if (type_decl.getParent() instanceof Interface)
+            {
+                interf = (Interface)type_decl.getParent();
+            }
+        }
+        else if (m_parent instanceof Exception)
+        {
+            Exception ex = (Exception)m_parent;
+            if (ex.getParent() instanceof Interface)
+            {
+                interf = (Interface)ex.getParent();
+            }
+        }
+
+        if (interf == null)
+        {
+            return "";
+        }
+
+        return interf.getName() + "__";
     }
 
     @Override
