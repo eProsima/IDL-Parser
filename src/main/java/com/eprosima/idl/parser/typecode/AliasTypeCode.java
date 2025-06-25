@@ -138,7 +138,7 @@ public class AliasTypeCode extends ContainerTypeCode
      */
     public String getNameForTypeObjectRegistration()
     {
-        return interface_prefix() + getName();
+        return interfacePrefix() + getName();
     }
 
     /*!

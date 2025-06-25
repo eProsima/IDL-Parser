@@ -125,10 +125,10 @@ public class TreeNode implements Notebook
      */
     public String getNameForTypeObjectRegistration()
     {
-        return interface_prefix() + getName();
+        return interfacePrefix() + getName();
     }
 
-    protected String interface_prefix()
+    protected String interfacePrefix()
     {
         // Get last scope when inside an interface
         if (isDeclaredInsideInterface())

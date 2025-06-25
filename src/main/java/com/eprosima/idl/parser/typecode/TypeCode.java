@@ -473,7 +473,7 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
-    protected String interface_prefix()
+    protected String interfacePrefix()
     {
         Interface interf = null;
 

@@ -49,7 +49,7 @@ public abstract class MemberedTypeCode extends TypeCode
      */
     public String getNameForTypeObjectRegistration()
     {
-        return interface_prefix() + getName();
+        return interfacePrefix() + getName();
     }
 
     /*!
