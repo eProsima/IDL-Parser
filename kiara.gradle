@@ -27,8 +27,8 @@ apply plugin: 'project-report'
 
 //general properties
 jar {
-    baseName = 'kiaraparser'
-    version =  '0.1.0'
+    archiveBaseName = 'kiaraparser'
+    archiveVersion =  '0.1.0'
 }
 
 description = """"""
