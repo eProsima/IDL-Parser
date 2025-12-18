@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    antlr('org.antlr:antlr4:4.13.0')
+    antlr('org.antlr:antlr4:4.13.2')
     implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version:'15.4'
 }
 
@@ -62,7 +62,7 @@ version = "4.2.0"
 
 //general properties
 jar {
-    duplicatesStrategy 'exclude'
+    duplicatesStrategy = 'exclude'
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     archiveBaseName = 'idlparser'
     manifest {
@@ -71,7 +71,7 @@ jar {
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
-   classifier = 'sources'
+   archiveClassifier = 'sources'
    from sourceSets.main.allJava
 }
 
@@ -91,7 +91,7 @@ publishing {
          from components.java
 
          artifact sourceJar {
-            classifier 'sources'
+            archiveClassifier = 'sources'
          }
       }
    }
