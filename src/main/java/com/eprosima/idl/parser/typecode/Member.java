@@ -69,7 +69,7 @@ public class Member extends MemberAppliedAnnotations
 
     public boolean isIsPlain()
     {
-        if (m_typecode != null && !isAnnotationOptional())
+        if (m_typecode != null && !isAnnotationOptional() && !isAnnotationExternal())
         {
             return m_typecode.isIsPlain();
         }
