@@ -208,7 +208,11 @@ public class Member implements Notebook
 
     public boolean isIsPlain()
     {
+<<<<<<< HEAD
         if (m_typecode != null)
+=======
+        if (m_typecode != null && !isAnnotationOptional() && !isAnnotationExternal())
+>>>>>>> aedde6d (Consider external members as not plain (#185))
         {
             return m_typecode.isIsPlain();
         }
