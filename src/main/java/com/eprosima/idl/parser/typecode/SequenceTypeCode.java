@@ -96,6 +96,7 @@ public class SequenceTypeCode extends ContainerTypeCode
     {
         ST st = getCppTypenameFromStringTemplate();
         st.add("ctx", ctx);
+        st.add("sequence_type_code", this);
         st.add("type", getContentTypeCode().getCppTypename());
         String contenttype = getContentTypeCode().getCppTypename().replaceAll("::", "_");
         if (getContentTypeCode() instanceof StringTypeCode)
