@@ -396,6 +396,11 @@ public abstract class TypeCode implements Notebook
         return m_kind == Kind.KIND_UNION;
     }
 
+    public boolean isIsBufferType()
+    {
+        return false;
+    }
+
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getCppTypenameForTypeId()
     {
