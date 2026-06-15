@@ -193,10 +193,7 @@ public class TestIDLParser {
                     {
                         System.out.print(", ");
                     }
-                    try {
-                        System.out.print(member.getName() + " = " + member.getValue());
-                    } catch (Exception e) {
-                    }
+                    System.out.print(member.getName() + " = " + member.getValue());
                     first = false;
                 }
                 if (new_line) System.out.println(")");

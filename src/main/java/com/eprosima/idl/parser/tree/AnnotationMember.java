@@ -53,17 +53,46 @@ public class AnnotationMember
         return m_typecode;
     }
 
-    public String getValue() throws RuntimeGenerationException
+    public String getNumericValue()
+    {
+        String value = getValue();
+
+        if (m_typecode.isIsEnumType())
+        {
+            EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
+            int idx = 0;
+            for (Member m : enumTC.getMembers())
+            {
+                String m_str = enumTC.getScopedname() + "::" + m.getName();
+                if (m_str.equals(value))
+                {
+                    return Integer.toString(idx);
+                }
+                idx++;
+            }
+        }
+
+        return value;
+    }
+
+    public String getValue()
     {
         if (m_typecode.isIsEnumType())
         {
             EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
             String literal_value = "";
             String value = m_value;
+
+            if (null == value)
+            {
+                value = "";
+            }
+
             if (value.startsWith("\"") && value.endsWith("\""))
             {
-                value =  value.substring(1, m_value.length() - 1);
+                value =  value.substring(1, value.length() - 1);
             }
+
             for (Member m : enumTC.getMembers())
             {
                 if (m.getName().equals(value))
@@ -74,14 +103,18 @@ public class AnnotationMember
                 {
                     literal_value = m.getName();
                 }
+                else if (value.isEmpty())
+                {
+                    value = m.getName();
+                }
             }
 
-            System.out.println(m_value + " is not a valid label for " + m_name);
-            if (literal_value.isEmpty())
+            if (!literal_value.isEmpty())
             {
-                throw new RuntimeGenerationException(m_value + " is not a valid label for " + m_name);
+                return enumTC.getScopedname() + "::" + literal_value;
             }
-            return enumTC.getScopedname() + "::" + literal_value;
+
+            return enumTC.getScopedname() + "::" + value;
         }
         else if (m_typecode.isIsStringType() || m_typecode.isIsWStringType())
         {
@@ -106,7 +139,13 @@ public class AnnotationMember
                 if (m_value.startsWith("0x")) {
                     // If it's hexadecimal, parse it using parseInt with radix 16
                     return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
-                } else {
+                }
+                else if (m_value.startsWith("0"))
+                {
+                    return Integer.toString(Integer.parseInt(m_value.substring(1), 8));
+                }
+                else
+                {
                     return m_value;
                 }
             }
@@ -124,9 +163,15 @@ public class AnnotationMember
                 EnumTypeCode enumTC = (EnumTypeCode)typecode;
                 String literal_value = "";
                 String value = m_value;
+
+                if (null == value)
+                {
+                    value = "";
+                }
+
                 if (value.startsWith("\"") && value.endsWith("\""))
                 {
-                    value =  value.substring(1, m_value.length() - 1);
+                    value =  value.substring(1, value.length() - 1);
                 }
                 for (Member m : enumTC.getMembers())
                 {
@@ -138,21 +183,26 @@ public class AnnotationMember
                     {
                         literal_value = m.getName();
                     }
+                    else if (value.isEmpty())
+                    {
+                        value = m.getName();
+                    }
                 }
 
-                if (literal_value.isEmpty())
+                if (!literal_value.isEmpty())
                 {
-                    throw new RuntimeGenerationException(m_value + " is not a valid label for " + m_name);
+                    return enumTC.getScopedname() + "::" + literal_value;
                 }
-                return enumTC.getScopedname() + "::" + literal_value;
+
+                return enumTC.getScopedname() + "::" + value;
             }
             else if (typecode.isIsStringType() || typecode.isIsWStringType())
             {
                 if (m_value != null)
                 {
-                    if (m_value.startsWith("\"") && m_value.endsWith("\""))
+                    if (!m_value.startsWith("\"") && !m_value.endsWith("\""))
                     {
-                        return m_value.substring(1, m_value.length() - 1);
+                        return "\"" + m_value + "\"";
                     }
                 }
                 if (typecode.isIsWStringType())
@@ -169,7 +219,13 @@ public class AnnotationMember
                     if (m_value.startsWith("0x")) {
                         // If it's hexadecimal, parse it using parseInt with radix 16
                         return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
-                    } else {
+                    }
+                    else if (m_value.startsWith("0"))
+                    {
+                        return Integer.toString(Integer.parseInt(m_value.substring(1), 8));
+                    }
+                    else
+                    {
                         return m_value;
                     }
                 }

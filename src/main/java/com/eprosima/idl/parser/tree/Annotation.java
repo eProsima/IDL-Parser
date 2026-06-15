@@ -244,7 +244,7 @@ public class Annotation
         return ((AnnotationMember)m_members.values().toArray()[0]).getValueFromAny(typecode);
     }
 
-    public String getValue(String attribute) throws RuntimeGenerationException
+    public String getValue(String attribute)
     {
         return m_members.get(attribute).getValue();
     }
