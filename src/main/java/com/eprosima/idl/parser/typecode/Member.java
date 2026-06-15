@@ -143,11 +143,6 @@ public class Member extends MemberAppliedAnnotations
         return ann.getValue();
     }
 
-    public boolean isAnnotationHashid()
-    {
-        return null != getAnnotations().get(Annotation.hashid_str);
-    }
-
     public String getAnnotationHashidValue() throws RuntimeGenerationException
     {
         Annotation ann = getAnnotations().get(Annotation.hashid_str);
@@ -158,6 +153,17 @@ public class Member extends MemberAppliedAnnotations
         }
 
         return ann.getValue();
+    }
+
+    public String getAnnotationDefaultValue() throws RuntimeGenerationException
+    {
+        Annotation ann = getAnnotations().get(Annotation.default_str);
+        if (ann != null)
+        {
+            return ann.getValueFromAny(m_typecode);
+        }
+        throw new RuntimeGenerationException("Error getting @" + Annotation.default_str +
+                " annotation value: annotation not found");
     }
 
     private String m_name = null;

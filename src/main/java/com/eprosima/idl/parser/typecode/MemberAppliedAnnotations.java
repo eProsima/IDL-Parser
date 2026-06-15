@@ -95,17 +95,6 @@ public class MemberAppliedAnnotations implements Notebook
         return m_annotations.get(Annotation.default_str) != null;
     }
 
-    public String getAnnotationDefaultValue() throws RuntimeGenerationException
-    {
-        Annotation ann = m_annotations.get(Annotation.default_str);
-        if (ann != null)
-        {
-            return ann.getValue();
-        }
-        throw new RuntimeGenerationException("Error getting @" + Annotation.default_str +
-                " annotation value: annotation not found");
-    }
-
     public boolean isAnnotationDefaultLiteral()
     {
         return m_annotations.get(Annotation.default_literal_str) != null;

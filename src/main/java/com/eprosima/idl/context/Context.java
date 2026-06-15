@@ -328,14 +328,14 @@ public class Context
 
         //{{{ @service
         AnnotationDeclaration serviceann = createAnnotationDeclaration(Annotation.service_str, null);
-        serviceann.addMember(new AnnotationMember(Annotation.platform_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
+        serviceann.addMember(new AnnotationMember(Annotation.platform_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.any_str));
         // CORBA, DDS, * (any), or custom value
         //}}}
 
         //{{{ topic
         AnnotationDeclaration topic_annotation = createAnnotationDeclaration(Annotation.topic_str, null);
-        topic_annotation.addMember(new AnnotationMember(Annotation.name_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
-        topic_annotation.addMember(new AnnotationMember(Annotation.platform_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
+        topic_annotation.addMember(new AnnotationMember(Annotation.name_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.empty_str));
+        topic_annotation.addMember(new AnnotationMember(Annotation.platform_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.any_str));
         //}}}
 
         //{{{ @try_construct
@@ -350,7 +350,7 @@ public class Context
 
         //{{{ @unit
         AnnotationDeclaration unitsann = createAnnotationDeclaration(Annotation.unit_str, null);
-        unitsann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
+        unitsann.addMember(new AnnotationMember(Annotation.value_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.empty_str));
         //}}}
 
         //{{{ @value
@@ -367,10 +367,10 @@ public class Context
         verbatimannenum.addMember(new EnumMember(Annotation.end_declaration_str));
         verbatimannenum.addMember(new EnumMember(Annotation.after_declaration_str));
         verbatimannenum.addMember(new EnumMember(Annotation.end_file_str));
-        verbatimann.addMember(new AnnotationMember(Annotation.language_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.any_str));
+        verbatimann.addMember(new AnnotationMember(Annotation.language_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.any_str));
         // c, c++, java, idl, * (any), or custom value
         verbatimann.addMember(new AnnotationMember(Annotation.placement_str, verbatimannenum, Annotation.before_declaration_str));
-        verbatimann.addMember(new AnnotationMember(Annotation.text_str, new PrimitiveTypeCode(Kind.KIND_STRING), Annotation.empty_str));
+        verbatimann.addMember(new AnnotationMember(Annotation.text_str, new StringTypeCode(Kind.KIND_STRING, null, null), Annotation.empty_str));
         //}}}
     }
 

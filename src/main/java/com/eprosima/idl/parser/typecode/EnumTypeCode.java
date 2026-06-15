@@ -97,12 +97,17 @@ public class EnumTypeCode extends MemberedTypeCode
     @Override
     public String getInitialValue()
     {
-        if (getMembers().size() > 0)
+        String initial_value = getMembers().size() > 0 ? getScopedname() + "::" + getMembers().get(0).getName() : "";
+        for (Member m : getMembers())
         {
-            return getScopedname() + "::" + getMembers().get(0).getName();
+            if (m.isAnnotationDefaultLiteral())
+            {
+                initial_value = getScopedname() + "::" + m.getName();
+                break;
+            }
         }
 
-        return "";
+        return initial_value;
     }
 
     @Override
@@ -133,7 +138,7 @@ public class EnumTypeCode extends MemberedTypeCode
     {
         return true;
     }
-    
+
     public int getBitBound()
     {
         // TODO: pending @bit_bound annotation application to enum types

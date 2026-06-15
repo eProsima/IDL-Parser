@@ -15,10 +15,13 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.parser.exception.ParseException;
-import com.eprosima.idl.parser.typecode.Member;
+import com.eprosima.idl.parser.typecode.AnyTypeCode;
 import com.eprosima.idl.parser.typecode.EnumMember;
 import com.eprosima.idl.parser.typecode.EnumTypeCode;
+import com.eprosima.idl.parser.typecode.Member;
 import com.eprosima.idl.parser.typecode.TypeCode;
+
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 
 public class AnnotationMember
 {
@@ -50,26 +53,35 @@ public class AnnotationMember
         return m_typecode;
     }
 
-    public String getValue()
+    public String getValue() throws RuntimeGenerationException
     {
         if (m_typecode.isIsEnumType())
         {
             EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
-            int idx = 0;
-            int default_idx = 0;
+            String literal_value = "";
+            String value = m_value;
+            if (value.startsWith("\"") && value.endsWith("\""))
+            {
+                value =  value.substring(1, m_value.length() - 1);
+            }
             for (Member m : enumTC.getMembers())
             {
-                if (m.getName().equals(m_value))
+                if (m.getName().equals(value))
                 {
-                    return Integer.toString(idx);
+                    return enumTC.getScopedname() + "::" + m.getName();
                 }
                 else if (m.isAnnotationDefaultLiteral())
                 {
-                    default_idx = idx;
+                    literal_value = m.getName();
                 }
-                idx++;
             }
-            return Integer.toString(default_idx);
+
+            System.out.println(m_value + " is not a valid label for " + m_name);
+            if (literal_value.isEmpty())
+            {
+                throw new RuntimeGenerationException(m_value + " is not a valid label for " + m_name);
+            }
+            return enumTC.getScopedname() + "::" + literal_value;
         }
         else if (m_typecode.isIsStringType() || m_typecode.isIsWStringType())
         {
@@ -101,6 +113,72 @@ public class AnnotationMember
             return m_typecode.getInitialValue();
         }
         return m_value;
+    }
+
+    public String getValueFromAny(TypeCode typecode) throws RuntimeGenerationException
+    {
+        if (m_typecode instanceof AnyTypeCode)
+        {
+            if (typecode.isIsEnumType())
+            {
+                EnumTypeCode enumTC = (EnumTypeCode)typecode;
+                String literal_value = "";
+                String value = m_value;
+                if (value.startsWith("\"") && value.endsWith("\""))
+                {
+                    value =  value.substring(1, m_value.length() - 1);
+                }
+                for (Member m : enumTC.getMembers())
+                {
+                    if (m.getName().equals(value))
+                    {
+                        return enumTC.getScopedname() + "::" + m.getName();
+                    }
+                    else if (m.isAnnotationDefaultLiteral())
+                    {
+                        literal_value = m.getName();
+                    }
+                }
+
+                if (literal_value.isEmpty())
+                {
+                    throw new RuntimeGenerationException(m_value + " is not a valid label for " + m_name);
+                }
+                return enumTC.getScopedname() + "::" + literal_value;
+            }
+            else if (typecode.isIsStringType() || typecode.isIsWStringType())
+            {
+                if (m_value != null)
+                {
+                    if (m_value.startsWith("\"") && m_value.endsWith("\""))
+                    {
+                        return m_value.substring(1, m_value.length() - 1);
+                    }
+                }
+                if (typecode.isIsWStringType())
+                {
+                    return "L\"\"";
+                }
+                return "";
+            }
+            else if (typecode.isPrimitiveType())
+            {
+                if (m_value != null)
+                {
+                    // Check if the string starts with "0x" to determine if it's hexadecimal
+                    if (m_value.startsWith("0x")) {
+                        // If it's hexadecimal, parse it using parseInt with radix 16
+                        return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
+                    } else {
+                        return m_value;
+                    }
+                }
+                return typecode.getInitialValue();
+            }
+            return m_value;
+        }
+
+        throw new RuntimeGenerationException("Annotation " + m_name + "is not from any type");
     }
 
     public String getEnumStringValue()
