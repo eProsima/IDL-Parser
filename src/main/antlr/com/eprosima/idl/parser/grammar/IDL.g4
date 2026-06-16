@@ -722,6 +722,7 @@ literal returns [Pair<String, Token> pair = null]
     String literalStr = tk.getText();
 }
     :   ( HEX_LITERAL
+    | OCTAL_LITERAL
     | INTEGER_LITERAL
     | STRING_LITERAL { literalStr = ctx.concatStringLiterals(literalStr); }
     | WIDE_STRING_LITERAL { literalStr = ctx.concatStringLiterals(literalStr); }
