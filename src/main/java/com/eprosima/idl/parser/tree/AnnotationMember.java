@@ -140,7 +140,7 @@ public class AnnotationMember
                     // If it's hexadecimal, parse it using parseInt with radix 16
                     return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
                 }
-                else if (m_value.startsWith("0"))
+                else if (m_value.startsWith("0") && m_value.length() > 1)
                 {
                     return Integer.toString(Integer.parseInt(m_value.substring(1), 8));
                 }
@@ -220,7 +220,7 @@ public class AnnotationMember
                         // If it's hexadecimal, parse it using parseInt with radix 16
                         return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
                     }
-                    else if (m_value.startsWith("0"))
+                    else if (m_value.startsWith("0") && m_value.length() > 1)
                     {
                         return Integer.toString(Integer.parseInt(m_value.substring(1), 8));
                     }
