@@ -251,6 +251,7 @@ public class AnnotationMember
                 }
                 String[] value_with_scopes = value.split("::");
                 value = value_with_scopes[value_with_scopes.length - 1];
+
                 if (m.getName().equals(value))
                 {
                     return value;
@@ -259,6 +260,50 @@ public class AnnotationMember
             throw new ParseException(null, m_value + " is not a valid label for " + m_name);
         }
         return m_value;
+    }
+
+    public String getPlacementEnumStringValue()
+    {
+        if (m_name == Annotation.placement_str && m_value != null && m_typecode.isIsEnumType())
+        {
+            EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
+            for (Member m : enumTC.getMembers())
+            {
+                String value = m_value;
+                if (value.startsWith("\"") && value.endsWith("\""))
+                {
+                    value = value.substring(1, value.length() - 1);
+                }
+                String[] value_with_scopes = value.split("::");
+                value = value_with_scopes[value_with_scopes.length - 1];
+
+                if (m.getName().equals(value))
+                {
+                    if (value.equals(Annotation.begin_file_str))
+                    {
+                        return "begin-declaration-file";
+                    }
+                    else if (value.equals(Annotation.before_declaration_str))
+                    {
+                        return "before-declaration";
+                    }
+                    else if (value.equals(Annotation.after_declaration_str))
+                    {
+                        return "after-declaration";
+                    }
+                    else if (value.equals(Annotation.end_declaration_str))
+                    {
+                        return "end-declaration";
+                    }
+                    else if (value.equals(Annotation.end_file_str))
+                    {
+                        return "end-declaration-file";
+                    }
+                }
+            }
+            throw new ParseException(null, m_value + " is not a valid label for " + m_name);
+        }
+        throw new ParseException(null, m_name + "is not Placement annotation member");
     }
 
     public void setValue(String value)
