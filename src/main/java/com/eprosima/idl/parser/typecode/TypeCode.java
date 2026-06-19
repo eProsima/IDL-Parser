@@ -622,8 +622,13 @@ public abstract class TypeCode implements Notebook
         {
             try
             {
-                return (ann.getValue().toUpperCase().equals(Annotation.autoid_hash_value_str) ||
-                        ann.getValue().isEmpty());
+                String value= ann.getValue();;
+                if (value.isEmpty()) {
+                    return true;
+                }
+                String[] value_with_scopes = value.split("::");
+                value = value_with_scopes[value_with_scopes.length - 1];
+                return value.equals(Annotation.autoid_hash_str);
             }
             catch (RuntimeGenerationException ex)
             {
