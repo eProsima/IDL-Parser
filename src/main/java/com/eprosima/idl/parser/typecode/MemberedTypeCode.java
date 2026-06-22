@@ -325,7 +325,7 @@ public abstract class MemberedTypeCode extends TypeCode
                 String value = member.getAnnotationHashidValue();
                 member.set_id(calculate_hash.apply(value.isEmpty() ? member.getName() : value));
             }
-            else if (!isAnnotationAutoid() || getAnnotationAutoidValue().equals(Annotation.autoid_sequential_value_str))
+            else if (!isAnnotationAutoid() || getAnnotationAutoidValue().equals(Annotation.autoid_sequential_str))
             {
                 member.set_id(++last_id_);
             }
@@ -457,7 +457,10 @@ public abstract class MemberedTypeCode extends TypeCode
                     " annotation not found.");
         }
 
-        return ann.getValue();
+        String value= ann.getValue();;
+        String[] value_with_scopes = value.split("::");
+        return value_with_scopes[value_with_scopes.length - 1];
+
     }
 
     public boolean isNonForwardedContent()

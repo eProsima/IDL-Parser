@@ -35,9 +35,7 @@ public class Annotation
     public static final String autoid_str = "autoid";
     public static final String autoid_enum_str = "AutoidKind";
     public static final String autoid_sequential_str = "SEQUENTIAL";
-    public static final String autoid_sequential_value_str = "0";
     public static final String autoid_hash_str = "HASH";
-    public static final String autoid_hash_value_str = "1";
     //}}}
 
     public static final String bit_bound_str = "bit_bound";
@@ -231,6 +229,17 @@ public class Annotation
         }
 
         return ((AnnotationMember)m_members.values().toArray()[0]).getValue();
+    }
+
+    public String getValueFromAny(TypeCode typecode) throws RuntimeGenerationException
+    {
+        if(m_members.size() != 1)
+        {
+            throw new RuntimeGenerationException("Error in annotation " + getName() +
+                    ": accessing value of a multiple parameter exception");
+        }
+
+        return ((AnnotationMember)m_members.values().toArray()[0]).getValueFromAny(typecode);
     }
 
     public String getValue(String attribute)

@@ -15,10 +15,13 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.parser.exception.ParseException;
-import com.eprosima.idl.parser.typecode.Member;
+import com.eprosima.idl.parser.typecode.AnyTypeCode;
 import com.eprosima.idl.parser.typecode.EnumMember;
 import com.eprosima.idl.parser.typecode.EnumTypeCode;
+import com.eprosima.idl.parser.typecode.Member;
 import com.eprosima.idl.parser.typecode.TypeCode;
+
+import com.eprosima.idl.parser.exception.RuntimeGenerationException;
 
 public class AnnotationMember
 {
@@ -50,26 +53,68 @@ public class AnnotationMember
         return m_typecode;
     }
 
+    public String getNumericValue()
+    {
+        String value = getValue();
+
+        if (m_typecode.isIsEnumType())
+        {
+            EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
+            int idx = 0;
+            for (Member m : enumTC.getMembers())
+            {
+                String m_str = enumTC.getScopedname() + "::" + m.getName();
+                if (m_str.equals(value))
+                {
+                    return Integer.toString(idx);
+                }
+                idx++;
+            }
+        }
+
+        return value;
+    }
+
     public String getValue()
     {
         if (m_typecode.isIsEnumType())
         {
             EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
-            int idx = 0;
-            int default_idx = 0;
+            String literal_value = "";
+            String value = m_value;
+
+            if (null == value)
+            {
+                value = "";
+            }
+
+            if (value.startsWith("\"") && value.endsWith("\""))
+            {
+                value =  value.substring(1, value.length() - 1);
+            }
+
             for (Member m : enumTC.getMembers())
             {
-                if (m.getName().equals(m_value))
+                if (m.getName().equals(value))
                 {
-                    return Integer.toString(idx);
+                    return enumTC.getScopedname() + "::" + m.getName();
                 }
                 else if (m.isAnnotationDefaultLiteral())
                 {
-                    default_idx = idx;
+                    literal_value = m.getName();
                 }
-                idx++;
+                else if (value.isEmpty())
+                {
+                    value = m.getName();
+                }
             }
-            return Integer.toString(default_idx);
+
+            if (!literal_value.isEmpty())
+            {
+                return enumTC.getScopedname() + "::" + literal_value;
+            }
+
+            return enumTC.getScopedname() + "::" + value;
         }
         else if (m_typecode.isIsStringType() || m_typecode.isIsWStringType())
         {
@@ -94,13 +139,102 @@ public class AnnotationMember
                 if (m_value.startsWith("0x")) {
                     // If it's hexadecimal, parse it using parseInt with radix 16
                     return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
-                } else {
+                }
+                else if (m_value.startsWith("0") && m_value.length() > 1 && Character.isDigit(m_value.charAt(1)))
+                {
+                    return Integer.toString(Integer.parseInt(m_value.substring(1), 8));
+                }
+                else
+                {
                     return m_value;
                 }
             }
             return m_typecode.getInitialValue();
         }
         return m_value;
+    }
+
+    public String getValueFromAny(TypeCode typecode) throws RuntimeGenerationException
+    {
+        if (m_typecode instanceof AnyTypeCode)
+        {
+            if (typecode.isIsEnumType())
+            {
+                EnumTypeCode enumTC = (EnumTypeCode)typecode;
+                String literal_value = "";
+                String value = m_value;
+
+                if (null == value)
+                {
+                    value = "";
+                }
+
+                if (value.startsWith("\"") && value.endsWith("\""))
+                {
+                    value =  value.substring(1, value.length() - 1);
+                }
+                for (Member m : enumTC.getMembers())
+                {
+                    if (m.getName().equals(value))
+                    {
+                        return enumTC.getScopedname() + "::" + m.getName();
+                    }
+                    else if (m.isAnnotationDefaultLiteral())
+                    {
+                        literal_value = m.getName();
+                    }
+                    else if (value.isEmpty())
+                    {
+                        value = m.getName();
+                    }
+                }
+
+                if (!literal_value.isEmpty())
+                {
+                    return enumTC.getScopedname() + "::" + literal_value;
+                }
+
+                return enumTC.getScopedname() + "::" + value;
+            }
+            else if (typecode.isIsStringType() || typecode.isIsWStringType())
+            {
+                if (m_value != null)
+                {
+                    if (!m_value.startsWith("\"") && !m_value.endsWith("\""))
+                    {
+                        return "\"" + m_value + "\"";
+                    }
+                }
+                if (typecode.isIsWStringType())
+                {
+                    return "L\"\"";
+                }
+                return m_value;
+            }
+            else if (typecode.isPrimitiveType())
+            {
+                if (m_value != null)
+                {
+                    // Check if the string starts with "0x" to determine if it's hexadecimal
+                    if (m_value.startsWith("0x")) {
+                        // If it's hexadecimal, parse it using parseInt with radix 16
+                        return Integer.toString(Integer.parseInt(m_value.substring(2), 16));
+                    }
+                    else if (m_value.startsWith("0") && m_value.length() > 1 && Character.isDigit(m_value.charAt(1)))
+                    {
+                        return Integer.toString(Integer.parseInt(m_value.substring(1), 8));
+                    }
+                    else
+                    {
+                        return m_value;
+                    }
+                }
+                return typecode.getInitialValue();
+            }
+            return m_value;
+        }
+
+        throw new RuntimeGenerationException("Annotation " + m_name + "is not from any type");
     }
 
     public String getEnumStringValue()
@@ -117,6 +251,7 @@ public class AnnotationMember
                 }
                 String[] value_with_scopes = value.split("::");
                 value = value_with_scopes[value_with_scopes.length - 1];
+
                 if (m.getName().equals(value))
                 {
                     return value;
@@ -125,6 +260,50 @@ public class AnnotationMember
             throw new ParseException(null, m_value + " is not a valid label for " + m_name);
         }
         return m_value;
+    }
+
+    public String getPlacementEnumStringValue()
+    {
+        if (m_name == Annotation.placement_str && m_value != null && m_typecode.isIsEnumType())
+        {
+            EnumTypeCode enumTC = (EnumTypeCode)m_typecode;
+            for (Member m : enumTC.getMembers())
+            {
+                String value = m_value;
+                if (value.startsWith("\"") && value.endsWith("\""))
+                {
+                    value = value.substring(1, value.length() - 1);
+                }
+                String[] value_with_scopes = value.split("::");
+                value = value_with_scopes[value_with_scopes.length - 1];
+
+                if (m.getName().equals(value))
+                {
+                    if (value.equals(Annotation.begin_file_str))
+                    {
+                        return "begin-declaration-file";
+                    }
+                    else if (value.equals(Annotation.before_declaration_str))
+                    {
+                        return "before-declaration";
+                    }
+                    else if (value.equals(Annotation.after_declaration_str))
+                    {
+                        return "after-declaration";
+                    }
+                    else if (value.equals(Annotation.end_declaration_str))
+                    {
+                        return "end-declaration";
+                    }
+                    else if (value.equals(Annotation.end_file_str))
+                    {
+                        return "end-declaration-file";
+                    }
+                }
+            }
+            throw new ParseException(null, m_value + " is not a valid label for " + m_name);
+        }
+        throw new ParseException(null, m_name + "is not Placement annotation member");
     }
 
     public void setValue(String value)
