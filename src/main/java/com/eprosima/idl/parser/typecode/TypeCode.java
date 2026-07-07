@@ -86,6 +86,11 @@ public abstract class TypeCode implements Notebook
 
     protected String generate_namespace(String scope)
     {
+        if (scope == null || scope.isEmpty())
+        {
+            return "";
+        }
+
         String namespace = scope;
         // Remove last scope when declared inside an Interface
         if (isDeclaredInsideInterface())
