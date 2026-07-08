@@ -35,7 +35,34 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getScopedname()
     {
+<<<<<<< HEAD
         if(m_scope.isEmpty())
+=======
+        String scoped_name = getFullScopedname();
+
+        if (!ctx.is_enabled_custom_property_in_current_group(ctx.using_explicitly_modules_custom_property))
+        {
+            return scoped_name;
+        }
+
+        String current_scope = ctx.getScope();
+
+        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+        {
+            return scoped_name;
+        }
+
+        return scoped_name.replace(current_scope + "::", "");
+    }
+
+    /*!
+     * @brief Return the scoped name of the type.
+     */
+    public String getFullScopedname()
+    {
+        if((m_scope == null) || m_scope.isEmpty())
+        {
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
             return m_name;
 
         return m_scope + "::" + m_name;
@@ -43,7 +70,12 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getROS2Scopedname()
     {
+<<<<<<< HEAD
         if(m_scope.isEmpty())
+=======
+        if((m_scope == null) || m_scope.isEmpty())
+        {
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
             return m_name;
 
         return m_scope + "::dds_::" + m_name + "_";
@@ -51,7 +83,12 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getCScopedname()
     {
+<<<<<<< HEAD
         if(m_scope.isEmpty())
+=======
+        if((m_scope == null) || m_scope.isEmpty())
+        {
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
             return m_name;
 
         return m_scope.replace("::", "_") + "_" + m_name;
@@ -59,7 +96,12 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getJavaScopedname()
     {
+<<<<<<< HEAD
         if(m_scope.isEmpty())
+=======
+        if((m_scope == null) || m_scope.isEmpty())
+        {
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
             return m_name;
 
         return m_scope.replace("::", ".") + "." + m_name;
@@ -67,7 +109,12 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getJniScopedname()
     {
+<<<<<<< HEAD
         if(m_scope.isEmpty())
+=======
+        if((m_scope == null) || m_scope.isEmpty())
+        {
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
             return m_name;
 
         return m_scope.replace("::", "/") + "/" + m_name;
@@ -80,7 +127,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public boolean getHasScope()
     {
-        return !m_scope.isEmpty();
+        return (m_scope != null) && !m_scope.isEmpty();
     }
 
     public List<Member> getMembers()
