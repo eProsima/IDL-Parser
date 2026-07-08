@@ -97,6 +97,30 @@ public class Annotation
         return ((AnnotationMember)m_members.values().toArray()[0]).getValue();
     }
 
+<<<<<<< HEAD
+=======
+    public String getEnumStringValue() throws RuntimeGenerationException
+    {
+        if(m_members.size() != 1)
+        {
+            throw new RuntimeGenerationException("Error in annotation " + getName() +
+                    ": accessing value of a multiple parameter exception");
+        }
+        return ((AnnotationMember)m_members.values().toArray()[0]).getEnumStringValue();
+    }
+
+    public String getValueFromAny(TypeCode typecode) throws RuntimeGenerationException
+    {
+        if(m_members.size() != 1)
+        {
+            throw new RuntimeGenerationException("Error in annotation " + getName() +
+                    ": accessing value of a multiple parameter exception");
+        }
+
+        return ((AnnotationMember)m_members.values().toArray()[0]).getValueFromAny(typecode);
+    }
+
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
     public String getValue(String attribute)
     {
         return m_members.get(attribute).getValue();

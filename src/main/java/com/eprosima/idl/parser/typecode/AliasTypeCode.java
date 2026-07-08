@@ -132,7 +132,33 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public String getScopedname()
     {
+<<<<<<< HEAD
         if (m_scope.isEmpty())
+=======
+        String scoped_name = getFullScopedname();
+
+        if (!ctx.is_enabled_custom_property_in_current_group(ctx.using_explicitly_modules_custom_property))
+        {
+            return scoped_name;
+        }
+
+        String current_scope = ctx.getScope();
+
+        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
+        {
+            return scoped_name;
+        }
+
+        return scoped_name.replace(current_scope + "::", "");
+    }
+
+    /*!
+     * @brief Return the scoped name of the type.
+     */
+    public String getFullScopedname()
+    {
+        if((m_scope == null) || m_scope.isEmpty())
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
         {
             return m_name;
         }
@@ -142,7 +168,7 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public String getROS2Scopedname()
     {
-        if (m_scope.isEmpty())
+        if ((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -150,6 +176,19 @@ public class AliasTypeCode extends ContainerTypeCode
         return m_scope + "::dds_::" + m_name + "_";
     }
 
+<<<<<<< HEAD
+=======
+    public String getCScopedname()
+    {
+        if((m_scope == null) || m_scope.isEmpty())
+        {
+            return m_name;
+        }
+
+        return m_scope.replace("::", "_") + "_" + m_name;
+    }
+
+>>>>>>> 74ea5e2 (Fix handling of null scope and `try_construct` (#196))
     public String getScope()
     {
         return m_scope;
@@ -157,7 +196,7 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public boolean getHasScope()
     {
-        return !m_scope.isEmpty();
+        return (m_scope != null) && !m_scope.isEmpty();
     }
 
     @Override

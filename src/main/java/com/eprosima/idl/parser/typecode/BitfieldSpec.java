@@ -62,7 +62,7 @@ public class BitfieldSpec
 
     public boolean getHasScope()
     {
-        return !m_scope.isEmpty();
+        return (m_scope != null) && !m_scope.isEmpty();
     }
 
     public String getCppTypename()
