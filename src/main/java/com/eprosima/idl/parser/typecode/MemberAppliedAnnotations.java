@@ -245,10 +245,6 @@ public class MemberAppliedAnnotations implements Notebook
                 {
                     try_construct_ = TryConstructFailAction.TRIM;
                 }
-                else if (annotation_value.isEmpty())
-                {
-                    try_construct_ = TryConstructFailAction.USE_DEFAULT;
-                }
                 else
                 {
                     throw new RuntimeGenerationException("try_construct annotation does not have a recognized value: '" + annotation_value + "'");
