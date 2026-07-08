@@ -232,21 +232,26 @@ public class MemberAppliedAnnotations implements Notebook
         {
             if (isAnnotationTryConstruct())
             {
-                if (m_annotations.get(Annotation.try_construct_str).getValue().equals(Annotation.try_construct_discard_str))
+                String annotation_value = m_annotations.get(Annotation.try_construct_str).getEnumStringValue();
+                if (annotation_value.equals(Annotation.try_construct_discard_str))
                 {
                     try_construct_ = TryConstructFailAction.DISCARD;
                 }
-                else if (m_annotations.get(Annotation.try_construct_str).getValue().equals(Annotation.try_construct_use_default_str))
+                else if (annotation_value.equals(Annotation.try_construct_use_default_str))
                 {
                     try_construct_ = TryConstructFailAction.USE_DEFAULT;
                 }
-                else if (m_annotations.get(Annotation.try_construct_str).getValue().equals(Annotation.try_construct_trim_str))
+                else if (annotation_value.equals(Annotation.try_construct_trim_str))
                 {
                     try_construct_ = TryConstructFailAction.TRIM;
                 }
+                else if (annotation_value.isEmpty())
+                {
+                    try_construct_ = TryConstructFailAction.USE_DEFAULT;
+                }
                 else
                 {
-                    throw new RuntimeGenerationException("try_construct annotation does not have a recognized value");
+                    throw new RuntimeGenerationException("try_construct annotation does not have a recognized value: '" + annotation_value + "'");
                 }
             }
             else
