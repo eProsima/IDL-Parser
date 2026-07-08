@@ -9,8 +9,8 @@ Please, refer to the [master branch](https://github.com/eProsima/IDL-Parser/blob
 
 |Fast DDS-Gen Version|IDL parser Version|IDL parser Version branch|IDL parser Latest Release|
 |--------------------|------------------|-------------------------|-------------------------|
-|4.2|4.2|[4.2.x](https://github.com/eProsima/IDL-Parser/tree/4.2.x)|[v4.2.0](https://github.com/eProsima/IDL-Parser/releases/tag/v4.2.0)|
-|4.1|4.1|[4.1.x](https://github.com/eProsima/IDL-Parser/tree/4.1.x)|[v4.1.0](https://github.com/eProsima/IDL-Parser/releases/tag/v4.1.0)|
+|4.4|4.4|[4.4.x](https://github.com/eProsima/IDL-Parser/tree/4.4.x)||
+|4.3|4.3|[4.3.x](https://github.com/eProsima/IDL-Parser/tree/4.3.x)|[v4.3.0](https://github.com/eProsima/IDL-Parser/releases/tag/v4.3.0)|
 |4.0|4.0|[4.0.x](https://github.com/eProsima/IDL-Parser/tree/4.0.x)|[v4.0.4](https://github.com/eProsima/IDL-Parser/releases/tag/v4.0.4)|
 |3.3|3.0|[3.0.x](https://github.com/eProsima/IDL-Parser/tree/3.0.x)|[v3.0.1](https://github.com/eProsima/IDL-Parser/releases/tag/v3.0.1)|
 |2.1|1.2|[1.2.x](https://github.com/eProsima/IDL-Parser/tree/1.2.x)|[v1.2.0](https://github.com/eProsima/IDL-Parser/releases/tag/v1.2.0)|
@@ -19,6 +19,8 @@ Please, refer to the [master branch](https://github.com/eProsima/IDL-Parser/blob
 
 |Fast DDS-Gen Version|IDL parser Version|IDL parser Version branch|IDL parser Latest Release|Release Date|EOL Date|
 |--------------------|------------------|-------------------------|-------------------------|------------|--------|
+|4.2|4.2|[4.2.x](https://github.com/eProsima/IDL-Parser/tree/4.2.x)|[v4.2.1](https://github.com/eProsima/IDL-Parser/releases/tag/v4.2.1)|October 2025|June 2026|
+|4.1|4.1|[4.1.x](https://github.com/eProsima/IDL-Parser/tree/4.1.x)|[v4.1.0](https://github.com/eProsima/IDL-Parser/releases/tag/v4.1.0)|July 2025|January 2026|
 |3.2|3.0|[3.0.x](https://github.com/eProsima/IDL-Parser/tree/3.0.x)|[v3.0.0](https://github.com/eProsima/IDL-Parser/releases/tag/v3.0.0)|December 2023|July 2024|
 |3.1|2.0|[2.0.x](https://github.com/eProsima/IDL-Parser/tree/2.0.x)|[v2.0.0](https://github.com/eProsima/IDL-Parser/releases/tag/v2.0.0)|November 2023|March 2024|
 |2.5|1.6|[1.6.x](https://github.com/eProsima/IDL-Parser/tree/1.6.x)|[v1.6.0](https://github.com/eProsima/IDL-Parser/releases/tag/v1.6.0)|June 2023|February 2024|
