@@ -160,7 +160,7 @@ public class AliasTypeCode extends ContainerTypeCode
      */
     public String getFullScopedname()
     {
-        if(m_scope.isEmpty())
+        if((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -170,7 +170,7 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public String getROS2Scopedname()
     {
-        if (m_scope.isEmpty())
+        if ((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -180,7 +180,7 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public String getCScopedname()
     {
-        if(m_scope.isEmpty())
+        if((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -195,7 +195,7 @@ public class AliasTypeCode extends ContainerTypeCode
 
     public boolean getHasScope()
     {
-        return !m_scope.isEmpty();
+        return (m_scope != null) && !m_scope.isEmpty();
     }
 
     @Override

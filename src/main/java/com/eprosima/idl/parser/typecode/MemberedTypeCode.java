@@ -71,7 +71,7 @@ public abstract class MemberedTypeCode extends TypeCode
      */
     public String getFullScopedname()
     {
-        if(m_scope.isEmpty())
+        if((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -81,7 +81,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getROS2Scopedname()
     {
-        if(m_scope.isEmpty())
+        if((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -91,7 +91,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getCScopedname()
     {
-        if(m_scope.isEmpty())
+        if((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -101,7 +101,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getJavaScopedname()
     {
-        if(m_scope.isEmpty())
+        if((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -111,7 +111,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public String getJniScopedname()
     {
-        if(m_scope.isEmpty())
+        if((m_scope == null) || m_scope.isEmpty())
         {
             return m_name;
         }
@@ -126,7 +126,7 @@ public abstract class MemberedTypeCode extends TypeCode
 
     public boolean getHasScope()
     {
-        return !m_scope.isEmpty();
+        return (m_scope != null) && !m_scope.isEmpty();
     }
 
     /*!
