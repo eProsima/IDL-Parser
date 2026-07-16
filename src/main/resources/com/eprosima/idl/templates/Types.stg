@@ -58,8 +58,9 @@ type_c(name) ::= <<$name$>>
 
 type_10(name) ::= <<$name$>>
 
-// TODO Para que sirve empty en FastBuffers?
-type_e(ctx, type, contenttype, maxsize, empty) ::= <<std::vector<$type$>$empty$>>
+// Note: empty is never assigned. It is a helper to avoid '>>>' causing a syntax error when parsing the template,
+// and avoid an extra space when it is not needed.
+type_e(ctx, sequence_type_code, type, contenttype, maxsize, empty) ::= <<std::vector<$type$>$empty$>>
 
 type_1a(name, type) ::= <<$name$>>
 

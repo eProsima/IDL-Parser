@@ -330,6 +330,12 @@ public class AliasTypeCode extends ContainerTypeCode
         return super.getContentTypeCode().isIsEnumType();
     }
 
+    @Override
+    public boolean isIsBufferType()
+    {
+        return super.getContentTypeCode().isIsBufferType();
+    }
+
     public boolean isIsType_10()
     {
         return true;

@@ -81,10 +81,22 @@ public class SequenceTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public boolean isIsBufferType()
+    {
+        if (isUnbound())
+        {
+            return getContentTypeCode().isIsByteType() || getContentTypeCode().isIsUint8Type();
+        }
+        
+        return false;
+    }
+
+    @Override
     public String getCppTypename()
     {
         ST st = getCppTypenameFromStringTemplate();
         st.add("ctx", ctx);
+        st.add("sequence_type_code", this);
         st.add("type", getContentTypeCode().getCppTypename());
         String contenttype = getContentTypeCode().getCppTypename().replaceAll("::", "_");
         if (getContentTypeCode() instanceof StringTypeCode)

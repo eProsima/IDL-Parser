@@ -396,6 +396,11 @@ public abstract class TypeCode implements Notebook
         return m_kind == Kind.KIND_UNION;
     }
 
+    public boolean isIsBufferType()
+    {
+        return false;
+    }
+
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getCppTypenameForTypeId()
     {
@@ -538,19 +543,19 @@ public abstract class TypeCode implements Notebook
             {
                 if (m_annotations.containsKey(Annotation.final_str) ||
                         (m_annotations.containsKey(Annotation.extensibility_str) &&
-                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_final_val)))
+                        m_annotations.get(Annotation.extensibility_str).getEnumStringValue().equals(Annotation.ex_final_str)))
                 {
                     extensibility_ = ExtensibilityKind.FINAL;
                 }
                 else if (m_annotations.containsKey(Annotation.appendable_str) ||
                         (m_annotations.containsKey(Annotation.extensibility_str) &&
-                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_appendable_val)))
+                        m_annotations.get(Annotation.extensibility_str).getEnumStringValue().equals(Annotation.ex_appendable_str)))
                 {
                     extensibility_ = ExtensibilityKind.APPENDABLE;
                 }
                 else if (m_annotations.containsKey(Annotation.mutable_str) ||
                         (m_annotations.containsKey(Annotation.extensibility_str) &&
-                        m_annotations.get(Annotation.extensibility_str).getValue().equals(Annotation.ex_mutable_val)))
+                        m_annotations.get(Annotation.extensibility_str).getEnumStringValue().equals(Annotation.ex_mutable_str)))
                 {
                     extensibility_ = ExtensibilityKind.MUTABLE;
                 }
