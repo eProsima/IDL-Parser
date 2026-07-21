@@ -13,7 +13,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.5</version>
+                <version>4.13.2</version>
                 <configuration>
                     <sourceDirectory>src/main/antlr</sourceDirectory>
                     <arguments>
@@ -78,12 +78,12 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.5</version>
+            <version>4.13.2</version>
         </dependency>
         <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>stringtemplate</artifactId>
-            <version>3.2</version>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino-engine</artifactId>
+            <version>1.7.14</version>
         </dependency>
     </dependencies>
     <properties>
