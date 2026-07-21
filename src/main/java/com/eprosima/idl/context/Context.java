@@ -1293,15 +1293,7 @@ public class Context
 
     public static ScriptEngine getJSScriptEngine()
     {
-        if (Double.parseDouble(System.getProperty("java.specification.version")) < 11)
-        {
-            return new ScriptEngineManager().getEngineByName("js");
-        }
-        else
-        {
-            return new org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory()
-                           .getScriptEngine();
-        }
+        return new ScriptEngineManager().getEngineByName("JavaScript");
     }
 
     public String evaluate_literal(
