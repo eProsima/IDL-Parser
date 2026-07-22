@@ -1439,7 +1439,7 @@ public class Context
 
     public static ScriptEngine getJSScriptEngine()
     {
-        return new ScriptEngineManager().getEngineByName("JavaScript");
+        return new ScriptEngineManager().getEngineByName("rhino");
     }
 
     public String evaluate_literal(
