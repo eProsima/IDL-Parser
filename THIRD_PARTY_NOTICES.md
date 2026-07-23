@@ -12,13 +12,13 @@ redistribution requirements of those licenses.
 > Because the build creates a `jar-with-dependencies`, the resolved transitive dependency set
 > should also be reviewed whenever dependency versions or the Maven build configuration change.
 
-## ANTLR 4 (Tool & Runtime) — version 4.13.2
+## ANTLR 4 (Tool & Runtime) — version 4.13.0
 
-- Maven coordinates: `org.antlr:antlr4:4.13.2`, `org.antlr:antlr4-runtime:4.13.2`
+- Maven coordinates: `org.antlr:antlr4:4.13.0`, `org.antlr:antlr4-runtime:4.13.0`
 - Project: ANTLR 4
 - License: BSD 3-Clause License
-- Source: <https://github.com/antlr/antlr4/tree/4.13.2>
-- License file: <https://github.com/antlr/antlr4/blob/4.13.2/LICENSE.txt>
+- Source: <https://github.com/antlr/antlr4/tree/4.13.0>
+- License file: <https://github.com/antlr/antlr4/blob/4.13.0/LICENSE.txt>
 
 ### License text
 
@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## ANTLR 3 Runtime — version 3.5.3
 
-> Pulled in transitively by `org.antlr:antlr4:4.13.2`.
+> Pulled in transitively by `org.antlr:antlr4:4.13.0`.
 
 - Maven coordinates: `org.antlr:antlr-runtime:3.5.3`
 - Project: ANTLR 3
@@ -95,7 +95,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## StringTemplate 4 (ST4) — version 4.3.4
 
-> Pulled in transitively by `org.antlr:antlr4:4.13.2`.
+> Pulled in transitively by `org.antlr:antlr4:4.13.0`.
 
 - Maven coordinates: `org.antlr:ST4:4.3.4`
 - Project: StringTemplate 4
@@ -136,7 +136,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## abego TreeLayout Core — version 1.0.3
 
-> Pulled in transitively by `org.antlr:antlr4:4.13.2`.
+> Pulled in transitively by `org.antlr:antlr4:4.13.0`.
 
 - Maven coordinates: `org.abego.treelayout:org.abego.treelayout.core:1.0.3`
 - Project: abego TreeLayout
@@ -178,7 +178,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ## ICU4J — version 72.1
 
-> Pulled in transitively by `org.antlr:antlr4:4.13.2`.
+> Pulled in transitively by `org.antlr:antlr4:4.13.0`.
 
 - Maven coordinates: `com.ibm.icu:icu4j:72.1`
 - Project: International Component for Unicode for Java (ICU4J)
