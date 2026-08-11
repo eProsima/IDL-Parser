@@ -412,6 +412,17 @@ public abstract class TypeCode implements Notebook
         return s.equals("long double") ? "longdouble" : s;
     }
 
+    public String getCppTypenameForSwig()
+    {
+        return getCppTypename();
+    }
+
+    public String getNoScopedCppTypenameForSwig()
+    {
+        String s = getNoScopedCppTypename();
+        return s.equals("long double") ? "longdouble" : s;
+    }
+
     public String getTypeIdentifier()
     {
         return "TK_None";

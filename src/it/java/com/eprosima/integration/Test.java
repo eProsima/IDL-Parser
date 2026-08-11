@@ -45,11 +45,11 @@ public class Test
     public boolean generate(
             String generatorName,
             String inputPath,
-            String exampleArch,
+            String extra_arg,
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -replace -example" + " " + exampleArch + (testFlag ? " -test -default-container-prealloc-size 50" : "");
+        String flags = " -replace " + extra_arg + (testFlag ? " -test -default-container-prealloc-size 50" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
@@ -70,7 +70,7 @@ public class Test
             boolean testFlag)
     {
         String program = "java -jar " + generatorName + ".jar";
-        String flags = " -replace -example" + (testFlag ? " -test -default-container-prealloc-size 50" : "");
+        String flags = " -replace " + (testFlag ? " -test -default-container-prealloc-size 50" : "");
         String output = " -d " + outputPath;
 
         String idlPath = " " + inputPath + "/" + idl + ".idl";
@@ -92,7 +92,7 @@ public class Test
 
     public boolean compile()
     {
-        return Command.execute("make", outputPath + "/build", errorOutputOnly, true);
+        return Command.execute("make", outputPath + "/build", errorOutputOnly, false);
     }
 
     public boolean run()

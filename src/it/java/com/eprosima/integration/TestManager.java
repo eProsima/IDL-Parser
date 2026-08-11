@@ -36,7 +36,7 @@ public class TestManager
     private String generatorName;
     private String inputPath;
     private String outputPath;
-    private String exampleArch;
+    private String extra_arg;
     private List<String> cMakeArgs;
     private boolean errorOutputOnly;
 
@@ -54,7 +54,7 @@ public class TestManager
         this.generatorName = generatorName;
         this.inputPath = inputPath;
         this.outputPath = outputPath;
-        this.exampleArch = null;
+        this.extra_arg = null;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
     }
@@ -64,7 +64,7 @@ public class TestManager
             String generatorName,
             String inputPath,
             String outputPath,
-            String exampleArch,
+            String extra_arg,
             List<String> list_tests,
             List<String> blacklist_tests)
     {
@@ -74,7 +74,7 @@ public class TestManager
         this.generatorName = generatorName;
         this.inputPath = inputPath;
         this.outputPath = outputPath;
-        this.exampleArch = exampleArch;
+        this.extra_arg = extra_arg;
         this.cMakeArgs = new ArrayList<String>();
         this.errorOutputOnly = true;
     }
@@ -157,11 +157,11 @@ public class TestManager
         {
             printHeader(test.getIDL(), TestLevel.GENERATE);
 
-            if (exampleArch == null)
+            if (extra_arg == null)
             {
                 return printlnStatus(test.generate(generatorName, inputPath, level == TestLevel.RUN));
             } else {
-                return printlnStatus(test.generate(generatorName, inputPath, exampleArch, level == TestLevel.RUN));
+                return printlnStatus(test.generate(generatorName, inputPath, extra_arg, level == TestLevel.RUN));
             }
         }
 

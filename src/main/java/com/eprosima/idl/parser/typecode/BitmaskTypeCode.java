@@ -122,6 +122,18 @@ public class BitmaskTypeCode extends MemberedTypeCode
         return st.render();
     }
 
+    @Override
+    public String getCppTypenameForSwig()
+    {
+        return getCastingType();
+    }
+
+    @Override
+    public String getNoScopedCppTypenameForSwig()
+    {
+        return getCastingType();
+    }
+
     public List<Bitmask> getBitmasks()
     {
         return new ArrayList<Bitmask>(m_bitmasks.values());

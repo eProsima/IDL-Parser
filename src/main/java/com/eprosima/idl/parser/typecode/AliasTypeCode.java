@@ -247,6 +247,18 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getCppTypenameForSwig()
+    {
+        return super.getContentTypeCode().getCppTypenameForSwig();
+    }
+
+    @Override
+    public String getNoScopedCppTypenameForSwig()
+    {
+        return super.getContentTypeCode().getNoScopedCppTypenameForSwig();
+    }
+
+    @Override
     public String getStType()
     {
         return super.getContentTypeCode().getStType();
@@ -387,7 +399,18 @@ public class AliasTypeCode extends ContainerTypeCode
                 ": trying accessing dimensions for a non-array type");
     }
 
-    public TypeCode getInheritance() // Function for alias when enclosed type is a StructTypeCode
+    public List<List<String>> getEvaluatedDimensionsForSwig() throws RuntimeGenerationException
+    {
+        if (super.getContentTypeCode() instanceof ArrayTypeCode)
+        {
+            return ((ArrayTypeCode) super.getContentTypeCode()).getEvaluatedDimensionsForSwig();
+        }
+
+        throw new RuntimeGenerationException("Error in alias " + m_name +
+                ": trying accessing evaluated dimensions for a non-array type");
+    }
+
+    public TypeCode getInheritance() // Function for alias when enclosed type is a StructTypeCodeCode
     {
         TypeCode returnedValue = null;
 
