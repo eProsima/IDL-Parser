@@ -233,7 +233,14 @@ public class ArrayTypeCode extends ContainerTypeCode
             String dimension,
             String evaluated_dimension)
     {
-        m_dimensions.add("(" + dimension + ")"); // To avoid swig error with '*' operator.
+        if (dimension.contains("*"))
+        {
+            m_dimensions.add("(" + dimension + ")"); // To avoid swig error with '*' operator.
+        }
+        else
+        {
+            m_dimensions.add(dimension);
+        }
         evaluated_dimensions_.add(evaluated_dimension);
     }
 
