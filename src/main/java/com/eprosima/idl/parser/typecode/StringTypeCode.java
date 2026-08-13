@@ -139,6 +139,12 @@ public class StringTypeCode extends TypeCode
     }
 
     @Override
+    public String getNoScopedCppTypenameForSwig()
+    {
+        return getNoScopedCppTypename().replaceAll("<", "_").replaceAll(">", "_");
+    }
+
+    @Override
     public String getMaxsize()
     {
         if (m_maxsize == null)

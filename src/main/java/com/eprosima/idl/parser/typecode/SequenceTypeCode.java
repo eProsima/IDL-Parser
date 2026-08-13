@@ -147,6 +147,23 @@ public class SequenceTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getCppTypenameForSwig()
+    {
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("ctx", ctx);
+        st.add("sequence_type_code", this);
+        st.add("type", getContentTypeCode().getCppTypenameForSwig());
+        String contenttype = getContentTypeCode().getCppTypename().replaceAll("::", "_");
+        if (getContentTypeCode() instanceof StringTypeCode)
+        {
+            contenttype = contenttype.replace("*", "_ptr_") + ((StringTypeCode)getContentTypeCode()).getMaxsize();
+        }
+        st.add("contenttype", contenttype);
+        st.add("maxsize", m_maxsize);
+        return st.render();
+    }
+
+    @Override
     public String getMaxsize()
     {
         if (m_maxsize == null)
