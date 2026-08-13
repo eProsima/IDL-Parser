@@ -130,11 +130,11 @@ public class TestManager
         idlFiles.removeAll(Arrays.asList(args));
     }
 
-    public boolean runTests()
+    public boolean runTests(Test.FailIfErrLevel failIfErrLevel)
     {
         for (String idlFile : idlFiles)
         {
-            Test test = new Test(idlFile, outputPath, errorOutputOnly);
+            Test test = new Test(idlFile, outputPath, errorOutputOnly, failIfErrLevel);
             if (!run(test))
             {
                 return false;
