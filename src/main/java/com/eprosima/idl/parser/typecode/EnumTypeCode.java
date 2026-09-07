@@ -14,6 +14,9 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 
@@ -74,6 +77,12 @@ public class EnumTypeCode extends MemberedTypeCode
                         Annotation.value_str + " value '" + member.getAnnotationValueValue() +
                         "' is not an integer.");
             }
+        }
+
+        if (!used_values_.add(next_value_))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": value " + next_value_ + " is already used by another literal.");
         }
 
         member.setValue(next_value_);
@@ -166,5 +175,7 @@ public class EnumTypeCode extends MemberedTypeCode
     }
 
     private int next_value_ = 0;
+
+    private Set<Integer> used_values_ = new HashSet<Integer>();
 
 }
