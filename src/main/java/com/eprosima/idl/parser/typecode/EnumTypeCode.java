@@ -14,6 +14,9 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.tree.Annotation;
+
 import org.stringtemplate.v4.ST;
 
 
@@ -59,6 +62,23 @@ public class EnumTypeCode extends MemberedTypeCode
     public void addMember(
             EnumMember member)
     {
+        if (member.isAnnotationValue())
+        {
+            try
+            {
+                next_value_ = Integer.decode(member.getAnnotationValueValue().trim());
+            }
+            catch (NumberFormatException ex)
+            {
+                throw new ParseException(null, "Error in member " + member.getName() + ": @" +
+                        Annotation.value_str + " value '" + member.getAnnotationValueValue() +
+                        "' is not an integer.");
+            }
+        }
+
+        member.setValue(next_value_);
+        next_value_ = member.getValue() + 1;
+
         addMember((Member)member);
     }
 
@@ -144,5 +164,7 @@ public class EnumTypeCode extends MemberedTypeCode
         // TODO: pending @bit_bound annotation application to enum types
         return 32;
     }
+
+    private int next_value_ = 0;
 
 }
