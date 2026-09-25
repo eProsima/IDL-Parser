@@ -20,4 +20,16 @@ public class EnumMember extends Member
     {
         super(null, name);
     }
+
+    public void setValue(int value)
+    {
+        value_ = value;
+    }
+
+    public int getValue()
+    {
+        return value_;
+    }
+
+    private int value_ = 0;
 }
