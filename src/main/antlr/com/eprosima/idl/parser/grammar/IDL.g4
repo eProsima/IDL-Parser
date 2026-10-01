@@ -35,6 +35,8 @@ grammar IDL;
 @parser::members {
     private TemplateManager tmanager = null;
     private Context ctx = null;
+    //! Greater than zero while parsing the declarators of struct or union members, which live in their own scope.
+    private int member_declarators = 0;
 
     public Context getContext_()
     {
@@ -127,6 +129,8 @@ definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
     |   except_decl SEMICOLON { etg=$except_decl.returnPair; if(etg!=null){ vector.add(etg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, etg.second());}} // Exception.
     |   interface_or_forward_decl[annotations] SEMICOLON { itg=$interface_or_forward_decl.itg; if(itg!=null){ vector.add(itg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());}} // Interface
     |   module SEMICOLON { mtg=$module.returnPair; if(mtg!=null){ vector.add(mtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, mtg.second());}} // Module
+    |   template_module_dcl SEMICOLON // Template module declaration: reported to the context, body skipped.
+    |   template_module_inst SEMICOLON // Template module instantiation: reported to the context.
     |   value SEMICOLON
     |   type_id_decl SEMICOLON
     |   type_prefix_decl SEMICOLON
@@ -195,6 +199,83 @@ module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnP
     }
     ;
 
+
+/*!
+ * @brief This grammar expression catches a template module declaration: module Name<formal parameters> { ... }.
+ * Template modules are not supported: the declaration is reported to the context and its body is skipped without
+ * being analyzed, since it may refer to the formal parameters.
+ */
+template_module_dcl
+@init{
+    Token tk = null;
+}
+    :   KW_MODULE { tk = _input.LT(1); } identifier template_module_parameters template_module_body
+    {
+        ctx.templateModuleDeclaration(ctx.removeEscapeCharacter($identifier.id), tk);
+    }
+    ;
+
+/*!
+ * @brief This grammar expression catches a template module instantiation: module Template<actual parameters> Name.
+ * The instantiation is reported to the context, which decides what to do with it.
+ */
+template_module_inst
+@init{
+    Token tk = null;
+}
+    :   KW_MODULE { tk = _input.LT(1); } scoped_name template_module_parameters identifier
+    {
+        ctx.templateModuleInstantiation($scoped_name.pair.first(), $template_module_parameters.params,
+                ctx.removeEscapeCharacter($identifier.id), tk);
+    }
+    ;
+
+/*!
+ * @brief Angle-bracketed parameter list of a template module, matched without analysis.
+ * @return The parameters as written, split at top-level commas, with whitespace normalized.
+ */
+template_module_parameters returns [List<String> params = new ArrayList<String>()]
+    :   LEFT_ANG_BRACKET template_module_parameter_token* RIGHT_ANG_BRACKET
+    {
+        String inner = $text.substring(1, $text.length() - 1);
+        int depth = 0;
+        StringBuilder current = new StringBuilder();
+        for (char c : inner.toCharArray())
+        {
+            if (c == ',' && depth == 0)
+            {
+                $params.add(current.toString().trim().replaceAll("\\s+", " "));
+                current.setLength(0);
+                continue;
+            }
+            if (c == '<')
+            {
+                ++depth;
+            }
+            else if (c == '>')
+            {
+                --depth;
+            }
+            current.append(c);
+        }
+        if (current.toString().trim().length() > 0)
+        {
+            $params.add(current.toString().trim().replaceAll("\\s+", " "));
+        }
+    }
+    ;
+
+template_module_parameter_token
+    :   LEFT_ANG_BRACKET template_module_parameter_token* RIGHT_ANG_BRACKET
+    |   ~(LEFT_ANG_BRACKET | RIGHT_ANG_BRACKET | SEMICOLON | LEFT_BRACE | RIGHT_BRACE)
+    ;
+
+/*!
+ * @brief Brace-delimited body of a template module declaration, matched without analysis.
+ */
+template_module_body
+    :   LEFT_BRACE ( template_module_body | ~(LEFT_BRACE | RIGHT_BRACE) )* RIGHT_BRACE
+    ;
 
 /*!
  * @brief This grammar expression catches a list of definitions.
@@ -523,7 +604,17 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
     }
     Token tk = null;
 }
-    :   KW_CONST const_type[annotation] { typecode=$const_type.returnPair.first(); template=$const_type.returnPair.second(); tk = _input.LT(1);} identifier
+    :   KW_CONST const_type[annotation]
+        {
+            // The returned pair is null when the constant type is not supported (and has been reported).
+            if ($const_type.returnPair != null)
+            {
+                typecode=$const_type.returnPair.first();
+                template=$const_type.returnPair.second();
+            }
+            tk = _input.LT(1);
+        }
+        identifier
         {
             String error = ctx.checkIdentifier(Definition.Kind.CONST_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
@@ -766,7 +857,12 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     |   enum_type[annotations] { ttg=$enum_type.returnPair; }
     |   bitset_type[annotations] { ttg=$bitset_type.returnPair; }
     |   bitmask_type[annotations] { ttg=$bitmask_type.returnPair; }
-    |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
+    |   KW_NATIVE {tk = _input.LT(1);} simple_declarator
+        {
+            Vector<TypeCode> native_vector = new Vector<TypeCode>();
+            native_vector.add(ctx.createNativeTypeCode(ctx.getScope(), $simple_declarator.ret.first().first()));
+            ttg = new Pair<Vector<TypeCode>, TemplateGroup>(native_vector, null);
+        }
     |   constr_forward_decl )
     {
         if(ttg!=null)
@@ -780,6 +876,8 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
                     name = ((MemberedTypeCode)ttg.first().get(count)).getName();
                 else if(ttg.first().get(count) instanceof AliasTypeCode)
                     name = ((AliasTypeCode)ttg.first().get(count)).getName();
+                else if(ttg.first().get(count) instanceof NativeTypeCode)
+                    name = ((NativeTypeCode)ttg.first().get(count)).getName();
 
                 if (fw_name != null)
                 {
@@ -940,7 +1038,7 @@ template_type_spec returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     |   map_type { $returnPair=new Pair<TypeCode, TemplateGroup>($map_type.returnPair.first(), $map_type.returnPair.second()); }
     |   string_type { $returnPair=$string_type.returnPair; }
     |   wide_string_type { $returnPair=$wide_string_type.returnPair; }
-    |   fixed_pt_type
+    |   fixed_pt_type { $returnPair=new Pair<TypeCode, TemplateGroup>($fixed_pt_type.typecode, null); }
     ;
 
 constr_type_spec returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
@@ -999,7 +1097,10 @@ simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = nu
 }
     :  identifier
         {
-            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            // Members are scoped by their struct or union, so they cannot clash with the enclosing scope.
+            String error = member_declarators > 0
+                ? ctx.checkMemberIdentifier($identifier.id)
+                : ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
             {
                 throw new ParseException(null, "Illegal identifier: " + error);
@@ -1646,7 +1747,7 @@ member returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Member>> r
         }
     }
 }
-    :   type_spec[null] declarators SEMICOLON
+    :   type_spec[null] { ++member_declarators; } declarators { --member_declarators; } SEMICOLON
         {
             if($type_spec.returnPair.first()!=null)
             {
@@ -1917,7 +2018,7 @@ element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<Pair<St
         }
     }
 }
-    :   type_spec[null] declarator
+    :   type_spec[null] { ++member_declarators; } declarator { --member_declarators; }
         {
             if($type_spec.returnPair.first() != null)
             {
@@ -2560,12 +2661,11 @@ param_type_spec returns [Pair<TypeCode, TemplateGroup> returnPair = null, Defini
         }
     ;
 
-fixed_pt_type
-@init{
-    Token tk = _input.LT(1);
-}
-    :   KW_FIXED LEFT_ANG_BRACKET positive_int_const COMA positive_int_const RIGHT_ANG_BRACKET
-    {throw new ParseException(tk, ". Fixed type is not supported");}
+fixed_pt_type returns [TypeCode typecode = null]
+    :   KW_FIXED LEFT_ANG_BRACKET digits=positive_int_const COMA scale=positive_int_const RIGHT_ANG_BRACKET
+    {
+        $typecode = ctx.createFixedTypeCode($digits.literalStr, $scale.literalStr);
+    }
     ;
 
 fixed_pt_const_type

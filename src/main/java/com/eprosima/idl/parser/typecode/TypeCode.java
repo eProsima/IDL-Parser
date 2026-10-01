@@ -401,6 +401,16 @@ public abstract class TypeCode implements Notebook
         return false;
     }
 
+    public boolean isIsFixedType()
+    {
+        return false;
+    }
+
+    public boolean isIsNativeType()
+    {
+        return false;
+    }
+
     // Functions to ease TypeIdentifier and TypeObject generation.
     public String getCppTypenameForTypeId()
     {

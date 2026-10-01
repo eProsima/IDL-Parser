@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -58,8 +59,10 @@ import com.eprosima.idl.parser.typecode.Bitmask;
 import com.eprosima.idl.parser.typecode.BitmaskTypeCode;
 import com.eprosima.idl.parser.typecode.EnumMember;
 import com.eprosima.idl.parser.typecode.EnumTypeCode;
+import com.eprosima.idl.parser.typecode.FixedTypeCode;
 import com.eprosima.idl.parser.typecode.Kind;
 import com.eprosima.idl.parser.typecode.MapTypeCode;
+import com.eprosima.idl.parser.typecode.NativeTypeCode;
 import com.eprosima.idl.parser.typecode.PrimitiveTypeCode;
 import com.eprosima.idl.parser.typecode.SequenceTypeCode;
 import com.eprosima.idl.parser.typecode.SetTypeCode;
@@ -729,10 +732,24 @@ public class Context
         return new EnumTypeCode(scope, name);
     }
 
+    public FixedTypeCode createFixedTypeCode(
+            String digits,
+            String scale)
+    {
+        return new FixedTypeCode(digits, evaluate_literal(digits), scale, evaluate_literal(scale));
+    }
+
     public MapTypeCode createMapTypeCode(
             String maxsize)
     {
         return new MapTypeCode(maxsize, evaluate_literal(maxsize));
+    }
+
+    public NativeTypeCode createNativeTypeCode(
+            String scope,
+            String name)
+    {
+        return new NativeTypeCode(scope, name);
     }
 
     public PrimitiveTypeCode createPrimitiveTypeCode(
@@ -994,6 +1011,48 @@ public class Context
     public ArrayList<String> getIncludeDependencies()
     {
         return new ArrayList<String>(m_includedependency);
+    }
+
+    /*!
+     * @brief Called when a template module declaration (module Name<formal parameters> { ... };) is parsed.
+     * Its body is skipped: template modules are not supported, and a template module is not a type until it is
+     * instantiated. By default a warning is printed.
+     * @param name Name of the template module.
+     * @param token Token where the declaration starts.
+     */
+    public void templateModuleDeclaration(
+            String name,
+            Token token)
+    {
+        System.out.println("WARNING (File " + getScopeFile() + ", Line " + getLineInScopeFile(token) +
+                "): Template module declarations are not supported. Ignoring " + name + "...");
+    }
+
+    /*!
+     * @brief Called when a template module instantiation (module Template<actual parameters> Name;) is parsed.
+     * By default a warning is printed and nothing is instantiated.
+     * @param template_name Scoped name of the instantiated template module, as written.
+     * @param parameters Actual parameters, as written (whitespace normalized).
+     * @param name Name of the module the instantiation declares.
+     * @param token Token where the instantiation starts.
+     */
+    public void templateModuleInstantiation(
+            String template_name,
+            List<String> parameters,
+            String name,
+            Token token)
+    {
+        System.out.println("WARNING (File " + getScopeFile() + ", Line " + getLineInScopeFile(token) +
+                "): Template module instantiations are not supported. Ignoring " + name + "...");
+    }
+
+    /*!
+     * @brief Returns the line of a token relative to the file currently being parsed.
+     */
+    public int getLineInScopeFile(
+            Token token)
+    {
+        return token != null ? token.getLine() - m_currentincludeline : 1;
     }
 
     /*!
@@ -1311,6 +1370,22 @@ public class Context
         return null;
     }
 
+    /*!
+     * @brief Checks the name of a struct or union member. Members live in the scope of their type, so only
+     * keywords are rejected here.
+     * @return An error message, or null if the name is valid.
+     */
+    public String checkMemberIdentifier(
+            String id)
+    {
+        if (checkKeyword(id))
+        {
+            return id + " is a keyword, use escape character if you want to use it as identifier (_" + id + ")";
+        }
+
+        return null;
+    }
+
     public void ignore_case(
             boolean ignore_case)
     {
@@ -1450,7 +1525,8 @@ public class Context
             return null;
         }
 
-        String aux_str = "(" + str.replace("::", "_") + ") | 0";
+        // Fully qualified names (::A::B) are looked up by their scoped name (A_B).
+        String aux_str = "(" + str.replaceAll("(^|[^A-Za-z0-9_])::", "$1").replace("::", "_") + ") | 0";
         String const_str = "";
 
         // Add all constants.
