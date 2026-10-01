@@ -1284,6 +1284,12 @@ public class Context
                     {
                         error = false;
                     }
+                    else if (kind == Definition.Kind.INTERFACE && tn instanceof Interface &&
+                            !((Interface)tn).isDefined())
+                    {
+                        // The definition of a forward declared interface.
+                        error = false;
+                    }
 
                     if (error)
                     {
@@ -1309,13 +1315,19 @@ public class Context
         }
 
         // Check interfaces
-        for (String type : m_interfaces.keySet())
+        for (Map.Entry<String, Interface> entry : m_interfaces.entrySet())
         {
+            String type = entry.getKey();
             if (m_ignore_case
                     ? type.equalsIgnoreCase(scopedname)
                     : type.equals(scopedname)
                     )
             {
+                if (kind == Definition.Kind.INTERFACE && !entry.getValue().isDefined())
+                {
+                    // The definition of a forward declared interface.
+                    continue;
+                }
                 return scopedname + " is already defined (Interface: " + type + ")";
             }
         }

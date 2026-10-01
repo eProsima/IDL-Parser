@@ -17,6 +17,7 @@ package com.eprosima.idl.parser.tree;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.antlr.v4.runtime.Token;
 
@@ -26,7 +27,8 @@ public class Interface extends ExportContainer implements Definition
     {
         super(scopeFile, isInScope, scope, name, tk);
 
-        m_bases = new HashMap<String, Interface>();
+        // Keeps the declaration order: in C++ it decides construction and destruction order.
+        m_bases = new LinkedHashMap<String, Interface>();
     }
 
 
@@ -84,6 +86,19 @@ public class Interface extends ExportContainer implements Definition
             return false;
 
         return true;
+    }
+
+    /*!
+     * @brief Marks the interface as defined: its body has been parsed (it is not only forward declared).
+     */
+    public void setDefined()
+    {
+        m_defined = true;
+    }
+
+    public boolean isDefined()
+    {
+        return m_defined;
     }
 
     public ArrayList<Interface> getBases()
@@ -193,6 +208,7 @@ public class Interface extends ExportContainer implements Definition
 
     //! Contains all interfaces it inherits from.
     private Map<String, Interface> m_bases = null;
+    private boolean m_defined = false;
     //! Contains all operations.
     private ArrayList<Operation> m_operations = null;
     private ArrayList<Operation> m_all_operations = null;
