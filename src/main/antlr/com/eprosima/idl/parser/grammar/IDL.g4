@@ -892,7 +892,8 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
 @init {
     Pair<Vector<TypeCode>, TemplateGroup> ttg = null;
     Vector<TypeDeclaration> vector = null;
-    Token tk = null;
+    // Constructed types are located at their keyword; typedefs and natives at their declarator.
+    Token tk = _input.LT(1);
     String fw_name = null;
 }
     :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator[null, annotations] { ttg=$type_declarator.returnPair; }
