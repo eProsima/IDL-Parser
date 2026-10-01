@@ -780,8 +780,17 @@ shift_expr returns [String literalStr = null]
 }
     :   add_expr { $literalStr = $add_expr.literalStr; }
     (
-        {$literalStr += _input.LT(1).getText();}
-        ( RIGHT_SHIFT | LEFT_SHIFT )
+        // ">>" is lexed as two '>' so that nested templates such as sequence<sequence<long>> parse. As a shift
+        // operator, the two '>' must be adjacent.
+        ( first=RIGHT_ANG_BRACKET second=RIGHT_ANG_BRACKET
+            {
+                if ($second.getStartIndex() != $first.getStopIndex() + 1)
+                {
+                    throw new ParseException($second, ". The right shift operator is written >>, without spaces");
+                }
+                $literalStr += ">>";
+            }
+        | LEFT_SHIFT {$literalStr += "<<";} )
         add_expr
         { aux=$add_expr.literalStr; $literalStr += aux;}
     )*
@@ -3143,7 +3152,6 @@ PERCENT:                '%';
 AT:                        '@';
 
 DOUBLE_COLON:           '::';
-RIGHT_SHIFT:            '>>';
 LEFT_SHIFT:             '<<';
 
 KW_SETRAISES:           'setraises';
