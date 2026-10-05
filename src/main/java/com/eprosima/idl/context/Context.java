@@ -151,7 +151,12 @@ public class Context
             {
                 include = include.substring(m_directoryFile.length());
             }
-            m_includePaths.add(Paths.get(include).normalize().toString() + java.io.File.separator);
+            String normalized = Paths.get(include).normalize().toString() + java.io.File.separator;
+            // Once each: the reordering below would swap two equal paths forever.
+            if (!m_includePaths.contains(normalized))
+            {
+                m_includePaths.add(normalized);
+            }
         }
 
         // Reorder include paths;
