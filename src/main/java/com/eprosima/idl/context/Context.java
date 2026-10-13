@@ -1351,7 +1351,7 @@ public class Context
     /*!
      * @brief Enables non-standard IDL extensions:
      * - Enumeration literals can set their value using `LITERAL = value`.
-     * - Members can use the name of a type defined previously.
+     * - Members can use the name of a type defined previously, except the name of the enclosing type.
      * - Keywords only collide with identifiers written with the exact same case (i.e. `FIXED` is a valid identifier).
      * - The leading underscore is kept when it is followed by a digit (i.e. `_1_EXAMPLE`).
      */

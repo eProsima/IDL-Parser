@@ -281,6 +281,14 @@ public abstract class MemberedTypeCode extends TypeCode
         }
         //}}}
 
+        // In relaxed mode members can be named as a type, but not as the enclosing type: it is not supported by C++.
+        if (ctx.isRelaxedIdl() && member.getName().equals(getName()) &&
+                (Kind.KIND_STRUCT == getKind() || Kind.KIND_UNION == getKind() || Kind.KIND_BITSET == getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": a member cannot have the same name as its enclosing type.");
+        }
+
         if(!m_members.containsKey(member.getName()))
         {
             if (Member.MEMBER_ID_INVALID != member.get_id() && !check_unique_member_id(member))
