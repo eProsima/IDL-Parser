@@ -1185,9 +1185,40 @@ public class Context
     {
         if (id.startsWith("_")) // Escaped identifier?
         {
+            // In relaxed mode the underscore is kept when removing it would leave an identifier starting with a digit
+            // (i.e. `_1_EXAMPLE`).
+            if (m_relaxed_idl && id.length() > 1 && Character.isDigit(id.charAt(1)))
+            {
+                return id;
+            }
+
             id = id.substring(1);
         }
         return id;
+    }
+
+    /*!
+     * @brief Checks the identifier of a member of a struct, union or bitset.
+     *
+     * In relaxed mode, members only have to avoid keywords, so they can use the name of a type defined previously.
+     * Otherwise, the same checks as `checkIdentifier` are applied.
+     * Duplicated member names are checked by the membered type itself.
+     */
+    public String checkMemberIdentifier(
+            String scope,
+            String id)
+    {
+        if (!m_relaxed_idl)
+        {
+            return checkIdentifier(Definition.Kind.TYPE_DECLARATION, scope, id);
+        }
+
+        if (checkKeyword(id))
+        {
+            return id + " is a keyword, use escape character if you want to use it as identifier (_" + id + ")";
+        }
+
+        return null;
     }
 
     public String checkIdentifier(
@@ -1317,6 +1348,24 @@ public class Context
         m_ignore_case = ignore_case;
     }
 
+    /*!
+     * @brief Enables non-standard IDL extensions:
+     * - Enumeration literals can set their value using `LITERAL = value`.
+     * - Members can use the name of a type defined previously.
+     * - Keywords only collide with identifiers written with the exact same case (i.e. `FIXED` is a valid identifier).
+     * - The leading underscore is kept when it is followed by a digit (i.e. `_1_EXAMPLE`).
+     */
+    public void setRelaxedIdl(
+            boolean relaxed_idl)
+    {
+        m_relaxed_idl = relaxed_idl;
+    }
+
+    public boolean isRelaxedIdl()
+    {
+        return m_relaxed_idl;
+    }
+
     protected void fillKeywords()
     {
         m_keywords.add("setraises");
@@ -1397,7 +1446,8 @@ public class Context
 
         for (String keyword : m_keywords)
         {
-            if (m_ignore_case
+            // In relaxed mode keywords only collide when written with the exact same case.
+            if (m_ignore_case && !m_relaxed_idl
                     ? keyword.equalsIgnoreCase(id)
                     : keyword.equals(id)
                     )
@@ -1563,6 +1613,8 @@ public class Context
     private HashSet<String> m_keywords = null;
 
     private boolean m_ignore_case = true;
+
+    private boolean m_relaxed_idl = false;
 
     private boolean generate_typesc_ = false;
 
