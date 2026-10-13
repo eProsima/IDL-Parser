@@ -2262,6 +2262,7 @@ enumerator_list [EnumTypeCode enumTP]
 enumerator [EnumTypeCode enumTP]
 @init{
     String name = null;
+    EnumMember new_field = null;
     ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 }
     :   (annotation_appl { annotations.add($annotation_appl.annotation); })* identifier
@@ -2272,11 +2273,34 @@ enumerator [EnumTypeCode enumTP]
                 throw new ParseException(null, "Illegal identifier: " + error);
             }
             name = ctx.removeEscapeCharacter($identifier.id);
-            EnumMember new_field = new EnumMember(name);
+            new_field = new EnumMember(name);
             for (Annotation ann : annotations)
             {
                 new_field.addAnnotation(ctx, ann);
             }
+        }
+        (
+            // Non-standard extension: `LITERAL = value` as an alternative to `@value(value) LITERAL`.
+            tk=EQUAL const_exp
+            {
+                if (!ctx.isRelaxedIdl())
+                {
+                    throw new ParseException($tk, "Assigning a value to an enumeration literal using '=' is not" +
+                            " standard IDL. Use @" + Annotation.value_str + " annotation instead.");
+                }
+
+                if (new_field.isAnnotationValue())
+                {
+                    throw new ParseException($tk, "Enumeration literal " + name + " already has a value set by @" +
+                            Annotation.value_str + " annotation.");
+                }
+
+                Annotation value_annotation = new Annotation(ctx.getAnnotationDeclaration(Annotation.value_str));
+                value_annotation.addValue($const_exp.literalStr);
+                new_field.addAnnotation(ctx, value_annotation);
+            }
+        )?
+        {
             enumTP.addMember(ctx, new_field);
         }
     ;
