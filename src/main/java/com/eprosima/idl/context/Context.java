@@ -1431,6 +1431,30 @@ public class Context
             return id + " is not a valid identifier: it has to start with a letter after removing the escape character";
         }
 
+        if (m_relaxed_idl)
+        {
+            // Constants are referenced in the generated code by their name as written in the IDL (i.e. array bounds),
+            // so a member named as a visible constant would hide it inside the class scope.
+            String name = removeEscapeCharacter(id);
+            String current_scope = (getScope() == null) ? "" : getScope();
+
+            for (Definition def : m_definitions)
+            {
+                if (def.isIsConstDeclaration())
+                {
+                    ConstDeclaration const_decl = (ConstDeclaration)def;
+                    String const_scope = (const_decl.getScope() == null) ? "" : const_decl.getScope();
+
+                    if (const_decl.getName().equals(name) && (const_scope.isEmpty() ||
+                            current_scope.equals(const_scope) || current_scope.startsWith(const_scope + "::")))
+                    {
+                        return name + " is already defined as a constant (" + const_decl.getScopedname() +
+                               ") visible from this scope";
+                    }
+                }
+            }
+        }
+
         return null;
     }
 
@@ -1444,6 +1468,7 @@ public class Context
      * @brief Enables non-standard IDL extensions:
      * - Enumeration literals can set their value using `LITERAL = value`.
      * - Members can use the name of a type defined previously, except the name of the enclosing type.
+     *   Members still cannot use the name of a visible constant.
      * - Keywords only collide with identifiers written with the exact same case (i.e. `FIXED` is a valid identifier),
      *   except TRUE and FALSE.
      * - The leading underscore is kept when it is followed by a digit (i.e. `_1_EXAMPLE`).
