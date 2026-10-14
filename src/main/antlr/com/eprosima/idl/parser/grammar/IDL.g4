@@ -490,7 +490,7 @@ value_element
     ;
 
 state_member
-    :   ( KW_PUBLIC | KW_PRIVATE ) type_spec[null] declarators SEMICOLON
+    :   ( KW_PUBLIC | KW_PRIVATE ) type_spec[null] declarators[true] SEMICOLON
     ;
 
 init_decl
@@ -502,7 +502,7 @@ init_param_decls
     ;
 
 init_param_decl
-    :   init_param_attribute param_type_spec simple_declarator
+    :   init_param_attribute param_type_spec simple_declarator[false]
     ;
 
 init_param_attribute
@@ -766,7 +766,7 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     |   enum_type[annotations] { ttg=$enum_type.returnPair; }
     |   bitset_type[annotations] { ttg=$bitset_type.returnPair; }
     |   bitmask_type[annotations] { ttg=$bitmask_type.returnPair; }
-    |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
+    |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator[false]
     |   constr_forward_decl )
     {
         if(ttg!=null)
@@ -816,7 +816,7 @@ type_declarator [AnnotationDeclaration annotation, Vector<Annotation> annotation
         }
     }
 }
-    :   type_spec[annotation] declarators
+    :   type_spec[annotation] declarators[false]
     {
        if($type_spec.returnPair.first() != null)
        {
@@ -951,15 +951,15 @@ constr_type_spec returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = nul
     |   bitmask_type[null]
     ;
 
-declarators returns [Vector<Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>> ret = new Vector<Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>>()]
-    :   declarator
+declarators [boolean is_member] returns [Vector<Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>> ret = new Vector<Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>>()]
+    :   declarator[$is_member]
         {
             if($declarator.ret != null)
                 $ret.add($declarator.ret);
             else
                 throw new ParseException(null, "Cannot parse type declarator");
         }
-        ( COMA declarator
+        ( COMA declarator[$is_member]
         {
             if($declarator.ret != null)
                 $ret.add($declarator.ret);
@@ -969,15 +969,15 @@ declarators returns [Vector<Pair<Pair<Pair<String, Token>, ContainerTypeCode>, T
         )*
     ;
 
-simple_declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
-    :   simple_declarator
+simple_declarators [boolean is_member] returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>()]
+    :   simple_declarator[$is_member]
         {
             if($simple_declarator.ret != null)
                 $ret.add($simple_declarator.ret);
             else
                 throw new ParseException(null, "Cannot parse type declarator");
         }
-        ( COMA simple_declarator
+        ( COMA simple_declarator[$is_member]
         {
             if($simple_declarator.ret != null)
                 $ret.add($simple_declarator.ret);
@@ -987,19 +987,21 @@ simple_declarators returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>>
         )*
     ;
 
-declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup> ret = null]
-    :   simple_declarator { $ret=new Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>($simple_declarator.ret, null); }
+declarator [boolean is_member] returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup> ret = null]
+    :   simple_declarator[$is_member] { $ret=new Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>($simple_declarator.ret, null); }
     |   complex_declarator { $ret=$complex_declarator.ret; }
     ;
 
-simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = null]
+simple_declarator [boolean is_member] returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = null]
 @init
 {
     Token tk = _input.LT(1);
 }
     :  identifier
         {
-            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            String error = $is_member ?
+                    ctx.checkMemberIdentifier(ctx.getScope(), $identifier.id) :
+                    ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
             {
                 throw new ParseException(null, "Illegal identifier: " + error);
@@ -1280,7 +1282,7 @@ annotation_member [AnnotationDeclaration annotation] returns [Pair<TypeCode, Tem
     String literalStr = null;
 }
     :
-    const_type[annotation] {$returnPair=$const_type.returnPair;} simple_declarator ( KW_DEFAULT const_exp { literalStr=$const_exp.literalStr; } )? SEMICOLON
+    const_type[annotation] {$returnPair=$const_type.returnPair;} simple_declarator[false] ( KW_DEFAULT const_exp { literalStr=$const_exp.literalStr; } )? SEMICOLON
     {
         if(!$annotation.addMember(new AnnotationMember($simple_declarator.ret.first().first(), $const_type.returnPair.first(), literalStr)))
         {
@@ -1355,7 +1357,7 @@ bitset_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
 bitfield [BitsetTypeCode owner]
     :   (
             (
-                bitfield_spec simple_declarators SEMICOLON
+                bitfield_spec simple_declarators[true] SEMICOLON
                 {
                     if($bitfield_spec.bitfieldType != null)
                     {
@@ -1646,7 +1648,7 @@ member returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Member>> r
         }
     }
 }
-    :   type_spec[null] declarators SEMICOLON
+    :   type_spec[null] declarators[true] SEMICOLON
         {
             if($type_spec.returnPair.first()!=null)
             {
@@ -1917,7 +1919,7 @@ element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<Pair<St
         }
     }
 }
-    :   type_spec[null] declarator
+    :   type_spec[null] declarator[true]
         {
             if($type_spec.returnPair.first() != null)
             {
@@ -2012,6 +2014,7 @@ enumerator_list [EnumTypeCode enumTP]
 enumerator [EnumTypeCode enumTP]
 @init{
     String name = null;
+    EnumMember new_field = null;
     ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 }
     :   (annotation_appl { annotations.add($annotation_appl.annotation); })* identifier
@@ -2022,11 +2025,34 @@ enumerator [EnumTypeCode enumTP]
                 throw new ParseException(null, "Illegal identifier: " + error);
             }
             name = ctx.removeEscapeCharacter($identifier.id);
-            EnumMember new_field = new EnumMember(name);
+            new_field = new EnumMember(name);
             for (Annotation ann : annotations)
             {
                 new_field.addAnnotation(ctx, ann);
             }
+        }
+        (
+            // Non-standard extension: `LITERAL = value` as an alternative to `@value(value) LITERAL`.
+            tk=EQUAL const_exp
+            {
+                if (!ctx.isRelaxedIdl())
+                {
+                    throw new ParseException($tk, "Assigning a value to an enumeration literal using '=' is not" +
+                            " standard IDL. Use @" + Annotation.value_str + " annotation instead.");
+                }
+
+                if (new_field.isAnnotationValue())
+                {
+                    throw new ParseException($tk, "Enumeration literal " + name + " already has a value set by @" +
+                            Annotation.value_str + " annotation.");
+                }
+
+                Annotation value_annotation = new Annotation(ctx.getAnnotationDeclaration(Annotation.value_str));
+                value_annotation.addValue($const_exp.literalStr);
+                new_field.addAnnotation(ctx, value_annotation);
+            }
+        )?
+        {
             enumTP.addMember(new_field);
         }
     ;
@@ -2475,7 +2501,7 @@ param_def returns [Pair<Param, TemplateGroup> returnPair = null]
 }
     :   ('in' | 'out' | 'inout')
         param_type_spec { typecode=$param_type_spec.returnPair.first(); template=$param_type_spec.returnPair.second(); definition=$param_type_spec.def; }
-        simple_declarator
+        simple_declarator[false]
         {
             if(typecode != null)
             {
@@ -2622,8 +2648,8 @@ readonly_attr_spec
     ;
 
 readonly_attr_declarator
-    :   simple_declarator raises_expr
-    |   simple_declarator ( COMA simple_declarator )*
+    :   simple_declarator[false] raises_expr
+    |   simple_declarator[false] ( COMA simple_declarator[false] )*
     ;
 
 attr_spec returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, TypeCode>> ret = new Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, TypeCode>>(), Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Definition>> retDef = new Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Definition>>()]
@@ -2660,9 +2686,9 @@ attr_declarator returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> re
 @init {
     $ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>();
 }
-    :   simple_declarator {$ret.add($simple_declarator.ret);}
+    :   simple_declarator[false] {$ret.add($simple_declarator.ret);}
         ( attr_raises_expr
-        | (COMA simple_declarator {$ret.add($simple_declarator.ret);})*
+        | (COMA simple_declarator[false] {$ret.add($simple_declarator.ret);})*
         )
     ;
 

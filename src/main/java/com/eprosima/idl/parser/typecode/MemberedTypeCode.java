@@ -66,6 +66,12 @@ public abstract class MemberedTypeCode extends TypeCode
             return scoped_name;
         }
 
+        if (ctx.isRelaxedIdl())
+        {
+            // A member can be named as its type, hiding it inside the class scope. Use the fully qualified name.
+            return "::" + scoped_name;
+        }
+
         String current_scope = ctx.getScope();
 
         if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
@@ -274,6 +280,14 @@ public abstract class MemberedTypeCode extends TypeCode
                     ": @" + Annotation.id_str + " and @" + Annotation.hashid_str + " annotations cannot be together.");
         }
         //}}}
+
+        // In relaxed mode members can be named as a type, but not as the enclosing type: it is not supported by C++.
+        if (ctx.isRelaxedIdl() && member.getName().equals(getName()) &&
+                (Kind.KIND_STRUCT == getKind() || Kind.KIND_UNION == getKind() || Kind.KIND_BITSET == getKind()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": a member cannot have the same name as its enclosing type.");
+        }
 
         if(!m_members.containsKey(member.getName()))
         {

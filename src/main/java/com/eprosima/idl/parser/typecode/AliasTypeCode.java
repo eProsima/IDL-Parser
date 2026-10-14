@@ -155,6 +155,12 @@ public class AliasTypeCode extends ContainerTypeCode
             return scoped_name;
         }
 
+        if (ctx.isRelaxedIdl())
+        {
+            // A member can be named as its type, hiding it inside the class scope. Use the fully qualified name.
+            return "::" + scoped_name;
+        }
+
         String current_scope = ctx.getScope();
 
         if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
