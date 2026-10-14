@@ -1200,7 +1200,8 @@ public class Context
     /*!
      * @brief Checks the identifier of a member of a struct, union or bitset.
      *
-     * In relaxed mode, members only have to avoid keywords, so they can use the name of a type defined previously.
+     * In relaxed mode, members only have to avoid keywords and the names of visible constants, so they can use the
+     * name of a type defined previously.
      * Otherwise, the same checks as `checkIdentifier` are applied.
      * Duplicated member names are checked by the membered type itself.
      */
@@ -1216,6 +1217,27 @@ public class Context
         if (checkKeyword(id))
         {
             return id + " is a keyword, use escape character if you want to use it as identifier (_" + id + ")";
+        }
+
+        // Constants are referenced in the generated code by their name as written in the IDL (i.e. array bounds), so a
+        // member named as a visible constant would hide it inside the class scope.
+        String name = removeEscapeCharacter(id);
+        String current_scope = (scope == null) ? "" : scope;
+
+        for (Definition def : m_definitions)
+        {
+            if (def.isIsConstDeclaration())
+            {
+                ConstDeclaration const_decl = (ConstDeclaration)def;
+                String const_scope = (const_decl.getScope() == null) ? "" : const_decl.getScope();
+
+                if (const_decl.getName().equals(name) && (const_scope.isEmpty() ||
+                        current_scope.equals(const_scope) || current_scope.startsWith(const_scope + "::")))
+                {
+                    return name + " is already defined as a constant (" + const_decl.getScopedname() +
+                           ") visible from this scope";
+                }
+            }
         }
 
         return null;
@@ -1352,6 +1374,7 @@ public class Context
      * @brief Enables non-standard IDL extensions:
      * - Enumeration literals can set their value using `LITERAL = value`.
      * - Members can use the name of a type defined previously, except the name of the enclosing type.
+     *   Members still cannot use the name of a visible constant.
      * - Keywords only collide with identifiers written with the exact same case (i.e. `FIXED` is a valid identifier).
      * - The leading underscore is kept when it is followed by a digit (i.e. `_1_EXAMPLE`).
      */
