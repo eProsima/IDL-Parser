@@ -20,17 +20,17 @@ type_6() ::= <<double>>
 
 type_13() ::= <<long double>>
 
-type_1() ::= <<int16_t>>
+type_1() ::= <<std::int16_t>>
 
-type_2() ::= <<int32_t>>
+type_2() ::= <<std::int32_t>>
 
-type_11() ::= <<int64_t>>
+type_11() ::= <<std::int64_t>>
 
-type_3() ::= <<uint16_t>>
+type_3() ::= <<std::uint16_t>>
 
-type_4() ::= <<uint32_t>>
+type_4() ::= <<std::uint32_t>>
 
-type_12() ::= <<uint64_t>>
+type_12() ::= <<std::uint64_t>>
 
 type_8() ::= <<char>>
 
@@ -38,7 +38,7 @@ type_14() ::= <<wchar_t>>
 
 type_7() ::= <<bool>>
 
-type_9() ::= <<uint8_t>>
+type_9() ::= <<std::uint8_t>>
 
 type_d(max_size) ::= <<$if(max_size)$eprosima::fastcdr::fixed_string<$max_size$>$else$std::string$endif$>>
 
@@ -66,6 +66,6 @@ type_1a(name, type) ::= <<$name$>>
 
 type_1b(name) ::= <<$name$>>
 
-type_1d(name) ::= <<int8_t>>
+type_1d(name) ::= <<std::int8_t>>
 
-type_1e(name) ::= <<uint8_t>>
+type_1e(name) ::= <<std::uint8_t>>

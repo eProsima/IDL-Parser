@@ -125,13 +125,13 @@ public class BitmaskTypeCode extends MemberedTypeCode
     @Override
     public String getCppTypenameForSwig()
     {
-        return getCastingType();
+        return getUnqualifiedCastingType();
     }
 
     @Override
     public String getNoScopedCppTypenameForSwig()
     {
-        return getCastingType();
+        return getUnqualifiedCastingType();
     }
 
     public List<Bitmask> getBitmasks()
@@ -204,26 +204,24 @@ public class BitmaskTypeCode extends MemberedTypeCode
 
     public String getBoundType()
     {
-        if (m_bit_bound <= 8)
-        {
-            return " : uint8_t";
-        }
-        else if (m_bit_bound <= 16)
-        {
-            return " : uint16_t";
-        }
-        else if (m_bit_bound <= 32)
-        {
-            return " : uint32_t";
-        }
-        else if (m_bit_bound <= 64)
-        {
-            return " : uint64_t";
-        }
-        return "";
+        String type = getCastingType();
+        return type.isEmpty() ? "" : " : " + type;
     }
 
+    /*!
+     * @brief The fixed-width integer that holds the bitmask, as <cstdint> declares it (std::uint32_t).
+     */
     public String getCastingType()
+    {
+        String type = getUnqualifiedCastingType();
+        return type.isEmpty() ? "" : "std::" + type;
+    }
+
+    /*!
+     * @brief The fixed-width integer that holds the bitmask, without its namespace (uint32_t), for the identifiers
+     * built from it.
+     */
+    private String getUnqualifiedCastingType()
     {
         if (m_bit_bound <= 8)
         {
