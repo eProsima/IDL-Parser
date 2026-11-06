@@ -90,6 +90,16 @@ public class MapTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getCppTypenameForSwig()
+    {
+        ST st = getCppTypenameFromStringTemplate();
+        st.add("key", getKeyTypeCode().getCppTypenameForSwig());
+        st.add("value", getValueTypeCode().getCppTypenameForSwig());
+        st.add("maxsize", m_maxsize);
+        return st.render();
+    }
+
+    @Override
     public String getCTypename()
     {
         ST st = getCTypenameFromStringTemplate();
