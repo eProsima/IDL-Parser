@@ -57,6 +57,12 @@ public class TemplateGroup
     {
         TemplateST template = m_templates.get(groupname);
 
+        // The group may not define this template.
+        if (template == null)
+        {
+            return null;
+        }
+
         //If there is extensiones, add them before return the template.
         if(m_extensionstemplates.containsKey(groupname + "_" + template.get_st().getName()))
         {
