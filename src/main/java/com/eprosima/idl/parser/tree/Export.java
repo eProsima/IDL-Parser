@@ -29,6 +29,11 @@ public interface Export
     public boolean isIsTypeDeclaration();
 
     public boolean isIsConstDeclaration();
+
+    default public boolean isIsAttribute()
+    {
+        return false;
+    }
     
     // TODO Capturar el error en la gramatica y saltarlo.
     public boolean resolve(Context ctx);

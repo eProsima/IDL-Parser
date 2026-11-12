@@ -127,7 +127,19 @@ definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
         }  // Type Declaration
     |   const_decl[null] SEMICOLON { cdtg=$const_decl.returnPair; if(cdtg!=null){ vector.add(cdtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, cdtg.second());}} // Const Declaration
     |   except_decl SEMICOLON { etg=$except_decl.returnPair; if(etg!=null){ vector.add(etg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, etg.second());}} // Exception.
-    |   interface_or_forward_decl[annotations] SEMICOLON { itg=$interface_or_forward_decl.itg; if(itg!=null){ vector.add(itg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());}} // Interface
+    |   interface_or_forward_decl[annotations] SEMICOLON
+        {
+            itg=$interface_or_forward_decl.itg;
+            if(itg!=null)
+            {
+                // A forward declaration only contributes its template: the interface is added by its definition.
+                if(!$interface_or_forward_decl.is_forward)
+                {
+                    vector.add(itg.first());
+                }
+                $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());
+            }
+        } // Interface
     |   module SEMICOLON { mtg=$module.returnPair; if(mtg!=null){ vector.add(mtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, mtg.second());}} // Module
     |   template_module_dcl SEMICOLON // Template module declaration: reported to the context, body skipped.
     |   template_module_inst SEMICOLON // Template module instantiation: reported to the context.
@@ -232,35 +244,47 @@ template_module_inst
 
 /*!
  * @brief Angle-bracketed parameter list of a template module, matched without analysis.
- * @return The parameters as written, split at top-level commas, with whitespace normalized.
+ * @return The parameters as written, split at top-level commas, with whitespace and comments normalized to a space.
  */
 template_module_parameters returns [List<String> params = new ArrayList<String>()]
-    :   LEFT_ANG_BRACKET template_module_parameter_token* RIGHT_ANG_BRACKET
+    :   open=LEFT_ANG_BRACKET template_module_parameter_token* close=RIGHT_ANG_BRACKET
     {
-        String inner = $text.substring(1, $text.length() - 1);
+        // Built from the visible tokens, so that comments are left out and only angle bracket tokens nest.
         int depth = 0;
+        Token previous = null;
         StringBuilder current = new StringBuilder();
-        for (char c : inner.toCharArray())
+        for (int index = $open.getTokenIndex() + 1; index < $close.getTokenIndex(); ++index)
         {
-            if (c == ',' && depth == 0)
+            Token token = _input.get(index);
+            if (token.getChannel() != Token.DEFAULT_CHANNEL)
             {
-                $params.add(current.toString().trim().replaceAll("\\s+", " "));
-                current.setLength(0);
                 continue;
             }
-            if (c == '<')
+            if (token.getType() == COMA && depth == 0)
+            {
+                $params.add(current.toString());
+                current.setLength(0);
+                previous = null;
+                continue;
+            }
+            if (token.getType() == LEFT_ANG_BRACKET)
             {
                 ++depth;
             }
-            else if (c == '>')
+            else if (token.getType() == RIGHT_ANG_BRACKET)
             {
                 --depth;
             }
-            current.append(c);
+            if (previous != null && token.getStartIndex() != previous.getStopIndex() + 1)
+            {
+                current.append(' ');
+            }
+            current.append(token.getText());
+            previous = token;
         }
-        if (current.toString().trim().length() > 0)
+        if (current.length() > 0)
         {
-            $params.add(current.toString().trim().replaceAll("\\s+", " "));
+            $params.add(current.toString());
         }
     }
     ;
@@ -319,9 +343,9 @@ definition_list [DefinitionContainer dc] returns [TemplateGroup dlTemplates]
  * @brief This grammar expression catches currently a interface declaration.
  * @return This grammar expression returns the interface object and its template group.
  */
-interface_or_forward_decl [Vector<Annotation> annotations] returns [Pair<Interface, TemplateGroup> itg = null]
+interface_or_forward_decl [Vector<Annotation> annotations] returns [Pair<Interface, TemplateGroup> itg = null, boolean is_forward = false]
     :   interface_decl[annotations] {$itg = $interface_decl.returnPair;}
-    |   forward_decl {$itg = $forward_decl.itg;}
+    |   forward_decl {$itg = $forward_decl.itg; $is_forward = true;}
     ;
 
 interface_decl [Vector<Annotation> annotations] returns [Pair<Interface, TemplateGroup> returnPair = null]
@@ -904,20 +928,27 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     |   bitmask_type[annotations] { ttg=$bitmask_type.returnPair; }
     |   KW_NATIVE {tk = _input.LT(1);} simple_declarator
         {
-            Vector<TypeCode> native_vector = new Vector<TypeCode>();
-            NativeTypeCode native_type = ctx.createNativeTypeCode(ctx.getScope(), $simple_declarator.ret.first().first());
-            native_vector.add(native_type);
-
-            // Native declarations are only generated by template sets that define a "native_decl" template.
-            TemplateGroup nativeTemplates = null;
-            if ((ctx.isInScopedFile() || ctx.isScopeLimitToAll()) && tmanager != null &&
-                    tmanager.isTemplateDefined("native_decl"))
+            // Native declarations are only supported by template sets that define a "native_decl" template.
+            // Otherwise they are not registered, so that generators never see a native type.
+            if (tmanager != null && tmanager.isTemplateDefined("native_decl"))
             {
-                nativeTemplates = tmanager.createTemplateGroup("native_decl");
-                nativeTemplates.setAttribute("ctx", ctx);
-                nativeTemplates.setAttribute("native", native_type);
+                Vector<TypeCode> native_vector = new Vector<TypeCode>();
+                NativeTypeCode native_type = ctx.createNativeTypeCode(ctx.getScope(), $simple_declarator.ret.first().first());
+                native_vector.add(native_type);
+
+                TemplateGroup nativeTemplates = null;
+                if (ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+                {
+                    nativeTemplates = tmanager.createTemplateGroup("native_decl");
+                    nativeTemplates.setAttribute("ctx", ctx);
+                    nativeTemplates.setAttribute("native", native_type);
+                }
+                ttg = new Pair<Vector<TypeCode>, TemplateGroup>(native_vector, nativeTemplates);
             }
-            ttg = new Pair<Vector<TypeCode>, TemplateGroup>(native_vector, nativeTemplates);
+            else
+            {
+                System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (tk != null ? tk.getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring...");
+            }
         }
     |   constr_forward_decl )
     {
@@ -2718,9 +2749,29 @@ param_type_spec returns [Pair<TypeCode, TemplateGroup> returnPair = null, Defini
     ;
 
 fixed_pt_type returns [TypeCode typecode = null]
+@init{
+    Token tk = _input.LT(1);
+}
     :   KW_FIXED LEFT_ANG_BRACKET digits=positive_int_const COMA scale=positive_int_const RIGHT_ANG_BRACKET
     {
-        $typecode = ctx.createFixedTypeCode($digits.literalStr, $scale.literalStr);
+        FixedTypeCode fixed = ctx.createFixedTypeCode($digits.literalStr, $scale.literalStr);
+
+        // A fixed-point type has up to 31 significant digits, and a scale between 0 and its digits.
+        int digits_value = -1, scale_value = -1;
+        try
+        {
+            digits_value = Integer.parseInt(fixed.getEvaluatedDigits());
+            scale_value = Integer.parseInt(fixed.getEvaluatedScale());
+        }
+        catch (NumberFormatException e)
+        {
+        }
+        if (digits_value < 1 || digits_value > 31 || scale_value < 0 || scale_value > digits_value)
+        {
+            throw new ParseException(tk, ". Fixed type must have between 1 and 31 digits, and a scale between 0 and its digits");
+        }
+
+        $typecode = fixed;
     }
     ;
 
@@ -2778,14 +2829,20 @@ readonly_attr_spec returns [Vector<Attribute> attributes = new Vector<Attribute>
         {
             for (Pair<String, Token> name : $readonly_attr_declarator.names)
             {
-                $attributes.add(new Attribute(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(), name.first(),
-                        $param_type_spec.returnPair.first(), $param_type_spec.def, true, name.second()));
+                Attribute attribute = new Attribute(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(),
+                        name.first(), $param_type_spec.returnPair.first(), $param_type_spec.def, true, name.second());
+                for (Pair<String, Token> exception : $readonly_attr_declarator.raises)
+                {
+                    attribute.addGetRaises(exception.first());
+                }
+                $attributes.add(attribute);
             }
         }
     ;
 
-readonly_attr_declarator returns [Vector<Pair<String, Token>> names = new Vector<Pair<String, Token>>()]
-    :   simple_declarator { $names.add($simple_declarator.ret.first()); } raises_expr
+readonly_attr_declarator returns [Vector<Pair<String, Token>> names = new Vector<Pair<String, Token>>(),
+        Vector<Pair<String, Token>> raises = new Vector<Pair<String, Token>>()]
+    :   simple_declarator { $names.add($simple_declarator.ret.first()); } raises_expr { if ($raises_expr.exlist != null) $raises = $raises_expr.exlist; }
     |   simple_declarator { $names.add($simple_declarator.ret.first()); }
         ( COMA simple_declarator { $names.add($simple_declarator.ret.first()); } )*
     ;
@@ -2796,38 +2853,51 @@ attr_spec returns [Vector<Attribute> attributes = new Vector<Attribute>()]
             for (Pair<Pair<String, Token>, ContainerTypeCode> declarator : $attr_declarator.ret)
             {
                 // attr_declarator always is a simple declarator. Not a complex (array).
-                $attributes.add(new Attribute(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(),
+                Attribute attribute = new Attribute(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(),
                         declarator.first().first(), $param_type_spec.returnPair.first(), $param_type_spec.def, false,
-                        declarator.first().second()));
+                        declarator.first().second());
+                for (Pair<String, Token> exception : $attr_declarator.getraises)
+                {
+                    attribute.addGetRaises(exception.first());
+                }
+                for (Pair<String, Token> exception : $attr_declarator.setraises)
+                {
+                    attribute.addSetRaises(exception.first());
+                }
+                $attributes.add(attribute);
             }
         }
     ;
 
-attr_declarator returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret]
+attr_declarator returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret,
+        Vector<Pair<String, Token>> getraises = new Vector<Pair<String, Token>>(),
+        Vector<Pair<String, Token>> setraises = new Vector<Pair<String, Token>>()]
 @init {
     $ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>();
 }
     :   simple_declarator {$ret.add($simple_declarator.ret);}
-        ( attr_raises_expr
+        ( attr_raises_expr { $getraises = $attr_raises_expr.getraises; $setraises = $attr_raises_expr.setraises; }
         | (COMA simple_declarator {$ret.add($simple_declarator.ret);})*
         )
     ;
 
-attr_raises_expr
-    :   get_excep_expr ( set_excep_expr )?
-    |   set_excep_expr
+attr_raises_expr returns [Vector<Pair<String, Token>> getraises = new Vector<Pair<String, Token>>(),
+        Vector<Pair<String, Token>> setraises = new Vector<Pair<String, Token>>()]
+    :   get_excep_expr { $getraises = $get_excep_expr.exlist; }
+        ( set_excep_expr { $setraises = $set_excep_expr.exlist; } )?
+    |   set_excep_expr { $setraises = $set_excep_expr.exlist; }
     ;
 
-get_excep_expr
-    :   KW_GETRAISES exception_list
+get_excep_expr returns [Vector<Pair<String, Token>> exlist = new Vector<Pair<String, Token>>()]
+    :   KW_GETRAISES exception_list { $exlist = $exception_list.exlist; }
     ;
 
-set_excep_expr
-    :   KW_SETRAISES exception_list
+set_excep_expr returns [Vector<Pair<String, Token>> exlist = new Vector<Pair<String, Token>>()]
+    :   KW_SETRAISES exception_list { $exlist = $exception_list.exlist; }
     ;
 
-exception_list
-    :   LEFT_BRACKET scoped_name ( COMA scoped_name )* RIGHT_BRACKET
+exception_list returns [Vector<Pair<String, Token>> exlist = new Vector<Pair<String, Token>>()]
+    :   LEFT_BRACKET scoped_name_list { $exlist = $scoped_name_list.retlist; } RIGHT_BRACKET
     ;
 
 // Component Stuff

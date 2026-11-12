@@ -17,6 +17,8 @@ package com.eprosima.idl.parser.tree;
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.typecode.TypeCode;
 
+import java.util.ArrayList;
+
 import org.antlr.v4.runtime.Token;
 
 /*!
@@ -63,6 +65,38 @@ public class Attribute extends TreeNode implements Export
         return m_readonly;
     }
 
+    /*!
+     * @brief Adds an exception of the getraises clause (raises, for a readonly attribute). It is resolved by resolve().
+     */
+    public void addGetRaises(String ename)
+    {
+        m_unresolvedGetRaises.add(ename);
+    }
+
+    /*!
+     * @brief Adds an exception of the setraises clause. It is resolved by resolve().
+     */
+    public void addSetRaises(String ename)
+    {
+        m_unresolvedSetRaises.add(ename);
+    }
+
+    /*!
+     * @brief Returns the exceptions that reading the attribute may raise.
+     */
+    public ArrayList<com.eprosima.idl.parser.tree.Exception> getGetRaises()
+    {
+        return m_getRaises;
+    }
+
+    /*!
+     * @brief Returns the exceptions that writing the attribute may raise.
+     */
+    public ArrayList<com.eprosima.idl.parser.tree.Exception> getSetRaises()
+    {
+        return m_setRaises;
+    }
+
     @Override
     public void setParent(Object obj)
     {
@@ -73,6 +107,12 @@ public class Attribute extends TreeNode implements Export
     public Object getParent()
     {
         return m_parent;
+    }
+
+    @Override
+    public boolean isIsAttribute()
+    {
+        return true;
     }
 
     @Override
@@ -102,11 +142,54 @@ public class Attribute extends TreeNode implements Export
     @Override
     public boolean resolve(Context ctx)
     {
-        return true;
+        boolean ret = resolveRaises(ctx, m_unresolvedGetRaises, m_getRaises);
+        return resolveRaises(ctx, m_unresolvedSetRaises, m_setRaises) && ret;
+    }
+
+    /*!
+     * @brief Looks up the exceptions of a raises clause among the declared ones and those of the parent interface.
+     */
+    private boolean resolveRaises(
+            Context ctx,
+            ArrayList<String> names,
+            ArrayList<com.eprosima.idl.parser.tree.Exception> exceptions)
+    {
+        boolean ret = true;
+
+        for (String name : names)
+        {
+            // Exceptions are stored by their scoped name, without the leading "::" of a fully qualified name.
+            com.eprosima.idl.parser.tree.Exception exception = ctx.getException(
+                name.startsWith("::") ? name.substring(2) : name);
+
+            if (exception == null && m_parent instanceof Interface)
+            {
+                exception = ((Interface)m_parent).getException(ctx.getScope(), name);
+            }
+
+            if (exception != null)
+            {
+                exceptions.add(exception);
+            }
+            else
+            {
+                System.out.println("ERROR: The definition of exception " + name + " was not found");
+                ret = false;
+            }
+        }
+
+        names.clear();
+        return ret;
     }
 
     private TypeCode m_typecode = null;
     private Definition m_definition = null;
     private boolean m_readonly = false;
+    private ArrayList<String> m_unresolvedGetRaises = new ArrayList<String>();
+    private ArrayList<String> m_unresolvedSetRaises = new ArrayList<String>();
+    private ArrayList<com.eprosima.idl.parser.tree.Exception> m_getRaises =
+            new ArrayList<com.eprosima.idl.parser.tree.Exception>();
+    private ArrayList<com.eprosima.idl.parser.tree.Exception> m_setRaises =
+            new ArrayList<com.eprosima.idl.parser.tree.Exception>();
     private Object m_parent = null;
 }
