@@ -67,15 +67,22 @@ public class EnumTypeCode extends MemberedTypeCode
     {
         if (member.isAnnotationValue())
         {
+            String annotation_value = member.getAnnotationValueValue();
+            annotation_value = null == annotation_value ? "" : annotation_value.trim();
+            String error_prefix = "Error in member " + member.getName() + ": @" + Annotation.value_str;
+
+            if (annotation_value.isEmpty())
+            {
+                throw new ParseException(null, error_prefix + " requires a value.");
+            }
+
             try
             {
-                next_value_ = Integer.decode(member.getAnnotationValueValue().trim());
+                next_value_ = Integer.decode(annotation_value);
             }
             catch (NumberFormatException ex)
             {
-                throw new ParseException(null, "Error in member " + member.getName() + ": @" +
-                        Annotation.value_str + " value '" + member.getAnnotationValueValue() +
-                        "' is not an integer.");
+                throw new ParseException(null, error_prefix + " value '" + annotation_value + "' is not an integer.");
             }
         }
 
