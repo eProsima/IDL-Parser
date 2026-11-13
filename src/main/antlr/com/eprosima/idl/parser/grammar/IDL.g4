@@ -35,6 +35,8 @@ grammar IDL;
 @parser::members {
     private TemplateManager tmanager = null;
     private Context ctx = null;
+    //! Greater than zero while parsing the declarators of struct or union members, which live in their own scope.
+    private int member_declarators = 0;
 
     public Context getContext_()
     {
@@ -125,8 +127,22 @@ definition [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
         }  // Type Declaration
     |   const_decl[null] SEMICOLON { cdtg=$const_decl.returnPair; if(cdtg!=null){ vector.add(cdtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, cdtg.second());}} // Const Declaration
     |   except_decl SEMICOLON { etg=$except_decl.returnPair; if(etg!=null){ vector.add(etg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, etg.second());}} // Exception.
-    |   interface_or_forward_decl[annotations] SEMICOLON { itg=$interface_or_forward_decl.itg; if(itg!=null){ vector.add(itg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());}} // Interface
+    |   interface_or_forward_decl[annotations] SEMICOLON
+        {
+            itg=$interface_or_forward_decl.itg;
+            if(itg!=null)
+            {
+                // A forward declaration only contributes its template: the interface is added by its definition.
+                if(!$interface_or_forward_decl.is_forward)
+                {
+                    vector.add(itg.first());
+                }
+                $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, itg.second());
+            }
+        } // Interface
     |   module SEMICOLON { mtg=$module.returnPair; if(mtg!=null){ vector.add(mtg.first()); $dtg = new Pair<Vector<Definition>, TemplateGroup>(vector, mtg.second());}} // Module
+    |   template_module_dcl SEMICOLON // Template module declaration: reported to the context, body skipped.
+    |   template_module_inst SEMICOLON // Template module instantiation: reported to the context.
     |   value SEMICOLON
     |   type_id_decl SEMICOLON
     |   type_prefix_decl SEMICOLON
@@ -197,6 +213,95 @@ module returns [Pair<com.eprosima.idl.parser.tree.Module, TemplateGroup> returnP
 
 
 /*!
+ * @brief This grammar expression catches a template module declaration: module Name<formal parameters> { ... }.
+ * Template modules are not supported: the declaration is reported to the context and its body is skipped without
+ * being analyzed, since it may refer to the formal parameters.
+ */
+template_module_dcl
+@init{
+    Token tk = null;
+}
+    :   KW_MODULE { tk = _input.LT(1); } identifier template_module_parameters template_module_body
+    {
+        ctx.templateModuleDeclaration(ctx.removeEscapeCharacter($identifier.id), tk);
+    }
+    ;
+
+/*!
+ * @brief This grammar expression catches a template module instantiation: module Template<actual parameters> Name.
+ * The instantiation is reported to the context, which decides what to do with it.
+ */
+template_module_inst
+@init{
+    Token tk = null;
+}
+    :   KW_MODULE { tk = _input.LT(1); } scoped_name template_module_parameters identifier
+    {
+        ctx.templateModuleInstantiation($scoped_name.pair.first(), $template_module_parameters.params,
+                ctx.removeEscapeCharacter($identifier.id), tk);
+    }
+    ;
+
+/*!
+ * @brief Angle-bracketed parameter list of a template module, matched without analysis.
+ * @return The parameters as written, split at top-level commas, with whitespace and comments normalized to a space.
+ */
+template_module_parameters returns [List<String> params = new ArrayList<String>()]
+    :   open=LEFT_ANG_BRACKET template_module_parameter_token* close=RIGHT_ANG_BRACKET
+    {
+        // Built from the visible tokens, so that comments are left out and only angle bracket tokens nest.
+        int depth = 0;
+        Token previous = null;
+        StringBuilder current = new StringBuilder();
+        for (int index = $open.getTokenIndex() + 1; index < $close.getTokenIndex(); ++index)
+        {
+            Token token = _input.get(index);
+            if (token.getChannel() != Token.DEFAULT_CHANNEL)
+            {
+                continue;
+            }
+            if (token.getType() == COMA && depth == 0)
+            {
+                $params.add(current.toString());
+                current.setLength(0);
+                previous = null;
+                continue;
+            }
+            if (token.getType() == LEFT_ANG_BRACKET)
+            {
+                ++depth;
+            }
+            else if (token.getType() == RIGHT_ANG_BRACKET)
+            {
+                --depth;
+            }
+            if (previous != null && token.getStartIndex() != previous.getStopIndex() + 1)
+            {
+                current.append(' ');
+            }
+            current.append(token.getText());
+            previous = token;
+        }
+        if (current.length() > 0)
+        {
+            $params.add(current.toString());
+        }
+    }
+    ;
+
+template_module_parameter_token
+    :   LEFT_ANG_BRACKET template_module_parameter_token* RIGHT_ANG_BRACKET
+    |   ~(LEFT_ANG_BRACKET | RIGHT_ANG_BRACKET | SEMICOLON | LEFT_BRACE | RIGHT_BRACE)
+    ;
+
+/*!
+ * @brief Brace-delimited body of a template module declaration, matched without analysis.
+ */
+template_module_body
+    :   LEFT_BRACE ( template_module_body | ~(LEFT_BRACE | RIGHT_BRACE) )* RIGHT_BRACE
+    ;
+
+/*!
  * @brief This grammar expression catches a list of definitions.
  * @param dc An object that inherits from DefinitionContainer. This object could store all definitions.
  * @return This grammar expression returns the template group with all template groups of definitions.
@@ -238,9 +343,9 @@ definition_list [DefinitionContainer dc] returns [TemplateGroup dlTemplates]
  * @brief This grammar expression catches currently a interface declaration.
  * @return This grammar expression returns the interface object and its template group.
  */
-interface_or_forward_decl [Vector<Annotation> annotations] returns [Pair<Interface, TemplateGroup> itg = null]
+interface_or_forward_decl [Vector<Annotation> annotations] returns [Pair<Interface, TemplateGroup> itg = null, boolean is_forward = false]
     :   interface_decl[annotations] {$itg = $interface_decl.returnPair;}
-    |   forward_decl
+    |   forward_decl {$itg = $forward_decl.itg; $is_forward = true;}
     ;
 
 interface_decl [Vector<Annotation> annotations] returns [Pair<Interface, TemplateGroup> returnPair = null]
@@ -295,6 +400,7 @@ interface_decl [Vector<Annotation> annotations] returns [Pair<Interface, Templat
         ( interface_inheritance_spec[interfaceObject] )?
         LEFT_BRACE interface_body[interfaceObject]{ tg=$interface_body.elTemplates; if(interfaceTemplates!=null && tg!=null)interfaceTemplates.setAttribute("export_list", tg);} RIGHT_BRACE )
         {
+           interfaceObject.setDefined();
            // Set the old namespace.
            ctx.setScope(old_scope);
            // Create the returned data.
@@ -302,7 +408,7 @@ interface_decl [Vector<Annotation> annotations] returns [Pair<Interface, Templat
         }
     ;
 
-forward_decl
+forward_decl returns [Pair<Interface, TemplateGroup> itg = null]
 @init {
     Token tk = null;
     TemplateGroup interfaceTemplates = null;
@@ -325,6 +431,19 @@ forward_decl
                     // Set the the interface object to the TemplateGroup of the module.
                     interfaceTemplates.setAttribute("interface", interfaceObject);
                 }
+            }
+
+            // Forward declarations are only generated by template sets that define an "interface_fwd_decl" template.
+            if (tmanager != null && tmanager.isTemplateDefined("interface_fwd_decl"))
+            {
+                TemplateGroup forwardTemplates = null;
+                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+                {
+                    forwardTemplates = tmanager.createTemplateGroup("interface_fwd_decl");
+                    forwardTemplates.setAttribute("ctx", ctx);
+                    forwardTemplates.setAttribute("interface", interfaceObject);
+                }
+                $itg = new Pair<Interface, TemplateGroup>(interfaceObject, forwardTemplates);
             }
         }
     ;
@@ -385,7 +504,28 @@ export [Vector<Annotation> annotations] returns [Pair<Vector<Export>, TemplateGr
     |   const_decl[null] SEMICOLON { cetg=$const_decl.returnPair; if(cetg!=null){ vector.add(cetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, cetg.second());}} // Const Declaration
     |   except_decl SEMICOLON { eetg=$except_decl.returnPair; if(eetg!=null){ vector.add(eetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, eetg.second());}}  // Exception
     |   attr_decl SEMICOLON
-    { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Attribute declarations are not supported. Ignoring..."); }
+        {
+            // Attributes are only generated by template sets that define an "attribute" template.
+            if (tmanager != null && tmanager.isTemplateDefined("attribute"))
+            {
+                TemplateGroup attributeTemplates = null;
+                if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+                {
+                    attributeTemplates = tmanager.createTemplateGroup("attribute");
+                    attributeTemplates.setAttribute("ctx", ctx);
+                    attributeTemplates.setAttribute("attributes", $attr_decl.attributes);
+                }
+                for (Attribute attribute : $attr_decl.attributes)
+                {
+                    vector.add(attribute);
+                }
+                $etg = new Pair<Vector<Export>, TemplateGroup>(vector, attributeTemplates);
+            }
+            else
+            {
+                System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Attribute declarations are not supported. Ignoring...");
+            }
+        }
     |   op_decl[annotations] SEMICOLON { oetg=$op_decl.returnPair; if(oetg!=null){ vector.add(oetg.first()); $etg = new Pair<Vector<Export>, TemplateGroup>(vector, oetg.second());}}  // Operation
     |   type_id_decl SEMICOLON
     |   type_prefix_decl SEMICOLON
@@ -523,7 +663,17 @@ const_decl [AnnotationDeclaration annotation] returns [Pair<ConstDeclaration, Te
     }
     Token tk = null;
 }
-    :   KW_CONST const_type[annotation] { typecode=$const_type.returnPair.first(); template=$const_type.returnPair.second(); tk = _input.LT(1);} identifier
+    :   KW_CONST const_type[annotation]
+        {
+            // The returned pair is null when the constant type is not supported (and has been reported).
+            if ($const_type.returnPair != null)
+            {
+                typecode=$const_type.returnPair.first();
+                template=$const_type.returnPair.second();
+            }
+            tk = _input.LT(1);
+        }
+        identifier
         {
             String error = ctx.checkIdentifier(Definition.Kind.CONST_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
@@ -654,8 +804,17 @@ shift_expr returns [String literalStr = null]
 }
     :   add_expr { $literalStr = $add_expr.literalStr; }
     (
-        {$literalStr += _input.LT(1).getText();}
-        ( RIGHT_SHIFT | LEFT_SHIFT )
+        // ">>" is lexed as two '>' so that nested templates such as sequence<sequence<long>> parse. As a shift
+        // operator, the two '>' must be adjacent.
+        ( first=RIGHT_ANG_BRACKET second=RIGHT_ANG_BRACKET
+            {
+                if ($second.getStartIndex() != $first.getStopIndex() + 1)
+                {
+                    throw new ParseException($second, ". The right shift operator is written >>, without spaces");
+                }
+                $literalStr += ">>";
+            }
+        | LEFT_SHIFT {$literalStr += "<<";} )
         add_expr
         { aux=$add_expr.literalStr; $literalStr += aux;}
     )*
@@ -757,7 +916,8 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
 @init {
     Pair<Vector<TypeCode>, TemplateGroup> ttg = null;
     Vector<TypeDeclaration> vector = null;
-    Token tk = null;
+    // Constructed types are located at their keyword; typedefs and natives at their declarator.
+    Token tk = _input.LT(1);
     String fw_name = null;
 }
     :   ( KW_TYPEDEF {tk = _input.LT(1);} type_declarator[null, annotations] { ttg=$type_declarator.returnPair; }
@@ -766,7 +926,30 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
     |   enum_type[annotations] { ttg=$enum_type.returnPair; }
     |   bitset_type[annotations] { ttg=$bitset_type.returnPair; }
     |   bitmask_type[annotations] { ttg=$bitmask_type.returnPair; }
-    |   KW_NATIVE { System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (_input.LT(1) != null ? _input.LT(1).getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring..."); } simple_declarator
+    |   KW_NATIVE {tk = _input.LT(1);} simple_declarator
+        {
+            // Native declarations are only supported by template sets that define a "native_decl" template.
+            // Otherwise they are not registered, so that generators never see a native type.
+            if (tmanager != null && tmanager.isTemplateDefined("native_decl"))
+            {
+                Vector<TypeCode> native_vector = new Vector<TypeCode>();
+                NativeTypeCode native_type = ctx.createNativeTypeCode(ctx.getScope(), $simple_declarator.ret.first().first());
+                native_vector.add(native_type);
+
+                TemplateGroup nativeTemplates = null;
+                if (ctx.isInScopedFile() || ctx.isScopeLimitToAll())
+                {
+                    nativeTemplates = tmanager.createTemplateGroup("native_decl");
+                    nativeTemplates.setAttribute("ctx", ctx);
+                    nativeTemplates.setAttribute("native", native_type);
+                }
+                ttg = new Pair<Vector<TypeCode>, TemplateGroup>(native_vector, nativeTemplates);
+            }
+            else
+            {
+                System.out.println("WARNING (File " + ctx.getFilename() + ", Line " + (tk != null ? tk.getLine() - ctx.getCurrentIncludeLine() : "1") + "): Native declarations are not supported. Ignoring...");
+            }
+        }
     |   constr_forward_decl )
     {
         if(ttg!=null)
@@ -780,6 +963,8 @@ type_decl [Vector<Annotation> annotations, ArrayList<Definition> defs] returns [
                     name = ((MemberedTypeCode)ttg.first().get(count)).getName();
                 else if(ttg.first().get(count) instanceof AliasTypeCode)
                     name = ((AliasTypeCode)ttg.first().get(count)).getName();
+                else if(ttg.first().get(count) instanceof NativeTypeCode)
+                    name = ((NativeTypeCode)ttg.first().get(count)).getName();
 
                 if (fw_name != null)
                 {
@@ -940,7 +1125,7 @@ template_type_spec returns [Pair<TypeCode, TemplateGroup> returnPair = null]
     |   map_type { $returnPair=new Pair<TypeCode, TemplateGroup>($map_type.returnPair.first(), $map_type.returnPair.second()); }
     |   string_type { $returnPair=$string_type.returnPair; }
     |   wide_string_type { $returnPair=$wide_string_type.returnPair; }
-    |   fixed_pt_type
+    |   fixed_pt_type { $returnPair=new Pair<TypeCode, TemplateGroup>($fixed_pt_type.typecode, null); }
     ;
 
 constr_type_spec returns [Pair<Vector<TypeCode>, TemplateGroup> returnPair = null]
@@ -999,7 +1184,10 @@ simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = nu
 }
     :  identifier
         {
-            String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+            // Members are scoped by their struct or union, so they cannot clash with the enclosing scope.
+            String error = member_declarators > 0
+                ? ctx.checkMemberIdentifier($identifier.id)
+                : ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
             {
                 throw new ParseException(null, "Illegal identifier: " + error);
@@ -1646,7 +1834,7 @@ member returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Member>> r
         }
     }
 }
-    :   type_spec[null] declarators SEMICOLON
+    :   type_spec[null] { ++member_declarators; } declarators { --member_declarators; } SEMICOLON
         {
             if($type_spec.returnPair.first()!=null)
             {
@@ -1917,7 +2105,7 @@ element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<Pair<St
         }
     }
 }
-    :   type_spec[null] declarator
+    :   type_spec[null] { ++member_declarators; } declarator { --member_declarators; }
         {
             if($type_spec.returnPair.first() != null)
             {
@@ -2254,9 +2442,9 @@ fixed_array_size returns [String literalStr = null]
         RIGHT_SQUARE_BRACKET
     ;
 
-attr_decl returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, TypeCode>> ret = null, Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Definition>> retDef = null]
-    :   readonly_attr_spec
-    |   attr_spec { $ret=$attr_spec.ret; $retDef=$attr_spec.retDef; }
+attr_decl returns [Vector<Attribute> attributes = null]
+    :   readonly_attr_spec { $attributes=$readonly_attr_spec.attributes; }
+    |   attr_spec { $attributes=$attr_spec.attributes; }
     ;
 
 except_decl returns [Pair<com.eprosima.idl.parser.tree.Exception, TemplateGroup> returnPair = null]
@@ -2560,12 +2748,31 @@ param_type_spec returns [Pair<TypeCode, TemplateGroup> returnPair = null, Defini
         }
     ;
 
-fixed_pt_type
+fixed_pt_type returns [TypeCode typecode = null]
 @init{
     Token tk = _input.LT(1);
 }
-    :   KW_FIXED LEFT_ANG_BRACKET positive_int_const COMA positive_int_const RIGHT_ANG_BRACKET
-    {throw new ParseException(tk, ". Fixed type is not supported");}
+    :   KW_FIXED LEFT_ANG_BRACKET digits=positive_int_const COMA scale=positive_int_const RIGHT_ANG_BRACKET
+    {
+        FixedTypeCode fixed = ctx.createFixedTypeCode($digits.literalStr, $scale.literalStr);
+
+        // A fixed-point type has up to 31 significant digits, and a scale between 0 and its digits.
+        int digits_value = -1, scale_value = -1;
+        try
+        {
+            digits_value = Integer.parseInt(fixed.getEvaluatedDigits());
+            scale_value = Integer.parseInt(fixed.getEvaluatedScale());
+        }
+        catch (NumberFormatException e)
+        {
+        }
+        if (digits_value < 1 || digits_value > 31 || scale_value < 0 || scale_value > digits_value)
+        {
+            throw new ParseException(tk, ". Fixed type must have between 1 and 31 digits, and a scale between 0 and its digits");
+        }
+
+        $typecode = fixed;
+    }
     ;
 
 fixed_pt_const_type
@@ -2617,70 +2824,80 @@ type_prefix_decl
         scoped_name STRING_LITERAL
     ;
 
-readonly_attr_spec
+readonly_attr_spec returns [Vector<Attribute> attributes = new Vector<Attribute>()]
     :   KW_READONLY KW_ATTRIBUTE param_type_spec readonly_attr_declarator
-    ;
-
-readonly_attr_declarator
-    :   simple_declarator raises_expr
-    |   simple_declarator ( COMA simple_declarator )*
-    ;
-
-attr_spec returns [Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, TypeCode>> ret = new Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, TypeCode>>(), Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Definition>> retDef = new Vector<Pair<Pair<Pair<String, Token>, TemplateGroup>, Definition>>()]
-@init {
-    TypeCode typecode = null;
-    Definition definition = null;
-}
-    :   KW_ATTRIBUTE param_type_spec { typecode=$param_type_spec.returnPair.first(); definition=$param_type_spec.def; } attr_declarator
         {
-           if(typecode != null)
-           {
-               for(int count = 0; count < $attr_declarator.ret.size(); ++count)
-               {
-                   // attr_declarator always is a simple declarator. Not a complex (array):
-                   // Simple declaration
-                   Pair<Pair<String, Token>, TemplateGroup> pair = new Pair<Pair<String, Token>, TemplateGroup>($attr_declarator.ret.get(count).first(), $param_type_spec.returnPair.second());
-                   $ret.add(new Pair<Pair<Pair<String, Token>, TemplateGroup>, TypeCode>(pair, typecode));
-               }
-           }
-           else if(definition != null)
-           {
-               for(int count = 0; count < $attr_declarator.ret.size(); ++count)
-               {
-                   // attr_declarator always is a simple declarator. Not a complex (array):
-                   // Simple declaration
-                   Pair<Pair<String, Token>, TemplateGroup> pair = new Pair<Pair<String, Token>, TemplateGroup>($attr_declarator.ret.get(count).first(), $param_type_spec.returnPair.second());
-                   $retDef.add(new Pair<Pair<Pair<String, Token>, TemplateGroup>, Definition>(pair, definition));
-               }
-           }
+            for (Pair<String, Token> name : $readonly_attr_declarator.names)
+            {
+                Attribute attribute = new Attribute(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(),
+                        name.first(), $param_type_spec.returnPair.first(), $param_type_spec.def, true, name.second());
+                for (Pair<String, Token> exception : $readonly_attr_declarator.raises)
+                {
+                    attribute.addGetRaises(exception.first());
+                }
+                $attributes.add(attribute);
+            }
         }
     ;
 
-attr_declarator returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret]
+readonly_attr_declarator returns [Vector<Pair<String, Token>> names = new Vector<Pair<String, Token>>(),
+        Vector<Pair<String, Token>> raises = new Vector<Pair<String, Token>>()]
+    :   simple_declarator { $names.add($simple_declarator.ret.first()); } raises_expr { if ($raises_expr.exlist != null) $raises = $raises_expr.exlist; }
+    |   simple_declarator { $names.add($simple_declarator.ret.first()); }
+        ( COMA simple_declarator { $names.add($simple_declarator.ret.first()); } )*
+    ;
+
+attr_spec returns [Vector<Attribute> attributes = new Vector<Attribute>()]
+    :   KW_ATTRIBUTE param_type_spec attr_declarator
+        {
+            for (Pair<Pair<String, Token>, ContainerTypeCode> declarator : $attr_declarator.ret)
+            {
+                // attr_declarator always is a simple declarator. Not a complex (array).
+                Attribute attribute = new Attribute(ctx.getScopeFile(), ctx.isInScopedFile(), ctx.getScope(),
+                        declarator.first().first(), $param_type_spec.returnPair.first(), $param_type_spec.def, false,
+                        declarator.first().second());
+                for (Pair<String, Token> exception : $attr_declarator.getraises)
+                {
+                    attribute.addGetRaises(exception.first());
+                }
+                for (Pair<String, Token> exception : $attr_declarator.setraises)
+                {
+                    attribute.addSetRaises(exception.first());
+                }
+                $attributes.add(attribute);
+            }
+        }
+    ;
+
+attr_declarator returns [Vector<Pair<Pair<String, Token>, ContainerTypeCode>> ret,
+        Vector<Pair<String, Token>> getraises = new Vector<Pair<String, Token>>(),
+        Vector<Pair<String, Token>> setraises = new Vector<Pair<String, Token>>()]
 @init {
     $ret = new Vector<Pair<Pair<String, Token>, ContainerTypeCode>>();
 }
     :   simple_declarator {$ret.add($simple_declarator.ret);}
-        ( attr_raises_expr
+        ( attr_raises_expr { $getraises = $attr_raises_expr.getraises; $setraises = $attr_raises_expr.setraises; }
         | (COMA simple_declarator {$ret.add($simple_declarator.ret);})*
         )
     ;
 
-attr_raises_expr
-    :   get_excep_expr ( set_excep_expr )?
-    |   set_excep_expr
+attr_raises_expr returns [Vector<Pair<String, Token>> getraises = new Vector<Pair<String, Token>>(),
+        Vector<Pair<String, Token>> setraises = new Vector<Pair<String, Token>>()]
+    :   get_excep_expr { $getraises = $get_excep_expr.exlist; }
+        ( set_excep_expr { $setraises = $set_excep_expr.exlist; } )?
+    |   set_excep_expr { $setraises = $set_excep_expr.exlist; }
     ;
 
-get_excep_expr
-    :   KW_GETRAISES exception_list
+get_excep_expr returns [Vector<Pair<String, Token>> exlist = new Vector<Pair<String, Token>>()]
+    :   KW_GETRAISES exception_list { $exlist = $exception_list.exlist; }
     ;
 
-set_excep_expr
-    :   KW_SETRAISES exception_list
+set_excep_expr returns [Vector<Pair<String, Token>> exlist = new Vector<Pair<String, Token>>()]
+    :   KW_SETRAISES exception_list { $exlist = $exception_list.exlist; }
     ;
 
-exception_list
-    :   LEFT_BRACKET scoped_name ( COMA scoped_name )* RIGHT_BRACKET
+exception_list returns [Vector<Pair<String, Token>> exlist = new Vector<Pair<String, Token>>()]
+    :   LEFT_BRACKET scoped_name_list { $exlist = $scoped_name_list.retlist; } RIGHT_BRACKET
     ;
 
 // Component Stuff
@@ -3006,7 +3223,6 @@ PERCENT:                '%';
 AT:                        '@';
 
 DOUBLE_COLON:           '::';
-RIGHT_SHIFT:            '>>';
 LEFT_SHIFT:             '<<';
 
 KW_SETRAISES:           'setraises';

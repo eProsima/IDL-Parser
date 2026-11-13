@@ -57,6 +57,12 @@ public class TemplateManager
         {
             Map.Entry<String, TemplateSTGroup> m = it.next();
 
+            // Groups that do not define the template do not take part in it.
+            if (!m.getValue().get_stgroup().isDefined(templatename))
+            {
+                continue;
+            }
+
             // Obtain instance
             TemplateST template = new TemplateST(m.getValue(), templatename);
             tg.addTemplate(m.getKey(), template);
@@ -65,6 +71,22 @@ public class TemplateManager
         return tg;
     }
 
+
+    /*!
+     * @brief Returns whether any loaded template group defines a template.
+     */
+    public boolean isTemplateDefined(String templatename)
+    {
+        for (TemplateSTGroup group : m_groups.values())
+        {
+            if (group.get_stgroup().isDefined(templatename))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public STGroup createStringTemplateGroup(String templateGroupName)
     {

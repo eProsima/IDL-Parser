@@ -48,4 +48,6 @@ public class Kind
     public static final int KIND_BITFIELD = 0x0000001C;
     public static final int KIND_INT8 = 0x0000001D;
     public static final int KIND_UINT8 = 0x0000001E;
+    public static final int KIND_FIXED = 0x0000001F;
+    public static final int KIND_NATIVE = 0x00000020;
 }

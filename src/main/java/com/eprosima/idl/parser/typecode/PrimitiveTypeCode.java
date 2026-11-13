@@ -36,6 +36,34 @@ public class PrimitiveTypeCode extends TypeCode
         return getCppTypenameFromStringTemplate().render();
     }
 
+    /*
+     * The identifiers built from the C++ type name (anonymous types in the TypeObjectRegistry, Swig templates) take it
+     * without the namespace of the fixed-width integers: uint32_t, not std::uint32_t.
+     */
+
+    @Override
+    public String getFormatedCppTypename()
+    {
+        return getNoScopedCppTypename();
+    }
+
+    @Override
+    public String getCppTypenameForTypeId()
+    {
+        if (Kind.KIND_OCTET == getKind())
+        {
+            return "byte";
+        }
+        String s = getNoScopedCppTypename();
+        return s.equals("long double") ? "longdouble" : s;
+    }
+
+    @Override
+    public String getCppTypenameForSwig()
+    {
+        return getNoScopedCppTypename();
+    }
+
     @Override
     public String getCTypename()
     {
