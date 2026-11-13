@@ -9,6 +9,7 @@ Please, refer to the [master branch](https://github.com/eProsima/IDL-Parser/blob
 
 |Fast DDS-Gen Version|IDL parser Version|IDL parser Version branch|IDL parser Latest Release|
 |--------------------|------------------|-------------------------|-------------------------|
+|4.5|4.5|[4.5.x](https://github.com/eProsima/IDL-Parser/tree/4.5.x)||
 |4.4|4.4|[4.4.x](https://github.com/eProsima/IDL-Parser/tree/4.4.x)||
 |4.3|4.3|[4.3.x](https://github.com/eProsima/IDL-Parser/tree/4.3.x)|[v4.3.0](https://github.com/eProsima/IDL-Parser/releases/tag/v4.3.0)|
 |4.0|4.0|[4.0.x](https://github.com/eProsima/IDL-Parser/tree/4.0.x)|[v4.0.4](https://github.com/eProsima/IDL-Parser/releases/tag/v4.0.4)|
