@@ -1769,8 +1769,26 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
         identifier
         {
             // Forward declaration
-            name=$identifier.id;
-            structTP = ctx.createStructTypeCode(name);
+            name = ctx.removeEscapeCharacter($identifier.id);
+            String fw_name = (ctx.getScope() != null && !ctx.getScope().isEmpty()) ? ctx.getScope() + "::" + name : name;
+            TypeDeclaration previous = ctx.getTypeDeclaration(fw_name);
+
+            // A structure can be forward declared several times, also after its definition.
+            if (previous != null && previous.getTypeCode() instanceof StructTypeCode)
+            {
+                fw_declaration = true;
+                structTP = (StructTypeCode)previous.getTypeCode();
+            }
+            else
+            {
+                String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+                if (error != null)
+                {
+                    throw new ParseException(null, "Illegal identifier: " + error);
+                }
+                structTP = ctx.createStructTypeCode(name);
+                structTP.setForwarded(true);
+            }
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -1783,10 +1801,9 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
 
             // Return the returned data.
             vector = new Vector<TypeCode>();
-            structTP.setForwarded(true);
             vector.add(structTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
-            $fw_name = null;
+            $fw_name = (fw_declaration) ? name : null;
         }
     ;
 
@@ -2002,9 +2019,28 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
         KW_UNION
         identifier
         {
-            name=$identifier.id;
-            // TODO Check supported types for discriminator: long, enumeration, etc...
-            unionTP = ctx.createUnionTypeCode(ctx.getScope(), name);
+            // Forward declaration
+            name = ctx.removeEscapeCharacter($identifier.id);
+            String fw_name = (ctx.getScope() != null && !ctx.getScope().isEmpty()) ? ctx.getScope() + "::" + name : name;
+            TypeDeclaration previous = ctx.getTypeDeclaration(fw_name);
+
+            // A union can be forward declared several times, also after its definition.
+            if (previous != null && previous.getTypeCode() instanceof UnionTypeCode)
+            {
+                fw_decl = true;
+                unionTP = (UnionTypeCode)previous.getTypeCode();
+            }
+            else
+            {
+                String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+                if (error != null)
+                {
+                    throw new ParseException(null, "Illegal identifier: " + error);
+                }
+                // TODO Check supported types for discriminator: long, enumeration, etc...
+                unionTP = ctx.createUnionTypeCode(ctx.getScope(), name);
+                unionTP.setForwarded(true);
+            }
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -2017,10 +2053,9 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
 
             // Return the returned data.
             vector = new Vector<TypeCode>();
-            unionTP.setForwarded(true);
             vector.add(unionTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
-            $fw_name = null;
+            $fw_name = (fw_decl) ? name : null;
 
         }
     ;
