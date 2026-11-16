@@ -1264,6 +1264,11 @@ public class Context
             return id + " is a keyword, use escape character if you want to use it as identifier (_" + id + ")";
         }
 
+        if (!checkEscapedIdentifier(id))
+        {
+            return id + " is not a valid identifier: it has to start with a letter after removing the escape character";
+        }
+
         String scopedname = (scope == null || scope.isEmpty()) ? id : scope + "::" + id;
 
         // Check definitions
@@ -1392,12 +1397,32 @@ public class Context
      * keywords are rejected here.
      * @return An error message, or null if the name is valid.
      */
+    /*!
+     * @brief Checks an escaped identifier still starts with a letter once its escape character is removed
+     * (IDL 4.2 sections 7.2.3 and 7.2.3.2), i.e. `_1abc` and `__abc` are not valid identifiers.
+     */
+    private boolean checkEscapedIdentifier(
+            String id)
+    {
+        if (!id.startsWith("_"))
+        {
+            return true;
+        }
+
+        return 1 < id.length() && Character.isLetter(id.charAt(1));
+    }
+
     public String checkMemberIdentifier(
             String id)
     {
         if (checkKeyword(id))
         {
             return id + " is a keyword, use escape character if you want to use it as identifier (_" + id + ")";
+        }
+
+        if (!checkEscapedIdentifier(id))
+        {
+            return id + " is not a valid identifier: it has to start with a letter after removing the escape character";
         }
 
         return null;
@@ -1480,6 +1505,17 @@ public class Context
         m_keywords.add("bitset");
         m_keywords.add("bitmask");
         m_keywords.add("annotation");
+        m_keywords.add("int8");
+        m_keywords.add("uint8");
+        m_keywords.add("int16");
+        m_keywords.add("uint16");
+        m_keywords.add("int32");
+        m_keywords.add("uint32");
+        m_keywords.add("int64");
+        m_keywords.add("uint64");
+        m_keywords.add("TRUE");
+        m_keywords.add("FALSE");
+        m_keywords.add("typename");
     }
 
     protected boolean checkKeyword(
