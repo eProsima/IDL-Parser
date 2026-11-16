@@ -88,7 +88,10 @@ public class EnumTypeCode extends MemberedTypeCode
         member.setValue(next_value_);
         next_value_ = member.getValue() + 1;
 
-        addMember((Member)member);
+        if (!addMember((Member)member))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() + ": it was defined previously.");
+        }
     }
 
     @Override

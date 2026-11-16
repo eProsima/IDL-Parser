@@ -1554,7 +1554,11 @@ bitfield [BitsetTypeCode owner]
                             // Only simple declaration
                             bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
 
-                            $owner.addBitfield(bitfield);
+                            if (!$owner.addBitfield(bitfield))
+                            {
+                                throw new ParseException($simple_declarators.ret.get(count).first().second(),
+                                        $simple_declarators.ret.get(count).first().first() + " was defined previously");
+                            }
                         }
                     }
                 }
