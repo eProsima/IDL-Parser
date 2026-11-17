@@ -17,6 +17,7 @@ package com.eprosima.idl.parser.typecode;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 
@@ -65,6 +66,13 @@ public class EnumTypeCode extends MemberedTypeCode
     public void addMember(
             EnumMember member)
     {
+        addMember(null, member);
+    }
+
+    public void addMember(
+            Context ctx,
+            EnumMember member)
+    {
         if (member.isAnnotationValue())
         {
             String annotation_value = member.getAnnotationValueValue();
@@ -78,9 +86,9 @@ public class EnumTypeCode extends MemberedTypeCode
 
             try
             {
-                next_value_ = Integer.decode(annotation_value);
+                next_value_ = Integer.decode(null == ctx ? annotation_value : ctx.evaluate_expression(annotation_value));
             }
-            catch (NumberFormatException ex)
+            catch (NumberFormatException | ParseException ex)
             {
                 throw new ParseException(null, error_prefix + " value '" + annotation_value + "' is not an integer.");
             }
