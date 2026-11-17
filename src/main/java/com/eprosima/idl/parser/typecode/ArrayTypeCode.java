@@ -114,6 +114,39 @@ public class ArrayTypeCode extends ContainerTypeCode
     }
 
     @Override
+    public String getCppTypenameForSwig()
+    {
+        ST first = null, second = null, fin = null;
+        String prevf = null, prevs = null;
+
+        for (int count = 0; count < evaluated_dimensions_.size(); ++count)
+        {
+            first = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_first");
+            second = cpptypesgr.getInstanceOf("type_" + Integer.toHexString(Kind.KIND_ARRAY) + "_second");
+            second.add("size", evaluated_dimensions_.get(count));
+
+            if (prevf != null)
+            {
+                first.add("prev", prevf);
+            }
+            if (prevs != null)
+            {
+                second.add("prev", prevs);
+            }
+
+            prevf = first.render();
+            prevs = second.render();
+        }
+
+        fin = getCppTypenameFromStringTemplate();
+        fin.add("firs", prevf);
+        fin.add("secon", prevs);
+        fin.add("type", getContentTypeCode().getCppTypenameForSwig());
+
+        return fin.render();
+    }
+
+    @Override
     public String getCTypename()
     {
         ST first = null, second = null, fin = null;
@@ -200,7 +233,14 @@ public class ArrayTypeCode extends ContainerTypeCode
             String dimension,
             String evaluated_dimension)
     {
-        m_dimensions.add(dimension);
+        if (dimension.contains("*"))
+        {
+            m_dimensions.add("(" + dimension + ")"); // To avoid swig error with '*' operator.
+        }
+        else
+        {
+            m_dimensions.add(dimension);
+        }
         evaluated_dimensions_.add(evaluated_dimension);
     }
 
@@ -212,6 +252,25 @@ public class ArrayTypeCode extends ContainerTypeCode
     public List<String> getEvaluatedDimensions()
     {
         return evaluated_dimensions_;
+    }
+
+
+    public List<List<String>> getEvaluatedDimensionsForSwig()
+    {
+        List<List<String>> result = new ArrayList<>();
+        if (evaluated_dimensions_ == null || evaluated_dimensions_.isEmpty())
+        {
+            return result;
+        }
+
+        int n = evaluated_dimensions_.size();
+        for (int i = n - 1; i >= 0; --i)
+        {
+            // copy the sublist from i..n-1 so we don't return views backed by the original list
+            result.add(new ArrayList<>(evaluated_dimensions_.subList(i, n)));
+        }
+
+        return result;
     }
 
     public int getEvaluatedDimensionsSize()
