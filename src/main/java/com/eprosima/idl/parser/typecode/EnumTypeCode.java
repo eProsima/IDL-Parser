@@ -86,11 +86,12 @@ public class EnumTypeCode extends MemberedTypeCode
 
             try
             {
-                next_value_ = Integer.decode(null == ctx ? annotation_value : ctx.evaluate_expression(annotation_value));
+                next_value_ = Integer.decode(null == ctx ? annotation_value : ctx.evaluate_literal(annotation_value));
             }
             catch (NumberFormatException | ParseException ex)
             {
-                throw new ParseException(null, error_prefix + " value '" + annotation_value + "' is not an integer.");
+                throw new ParseException(null, "Error in member " + member.getName() + ": cannot evaluate '@" +
+                        Annotation.value_str + "(" + annotation_value + ")'.");
             }
         }
 

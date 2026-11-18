@@ -1450,18 +1450,7 @@ public class Context
             return null;
         }
 
-        return evaluate_expression("(" + str + ") | 0");
-    }
-
-    public String evaluate_expression(
-            String str)
-    {
-        if (null == str)
-        {
-            return null;
-        }
-
-        String aux_str = str.replace("::", "_");
+        String aux_str = "(" + str.replace("::", "_") + ") | 0";
         String const_str = "";
 
         // Add all constants.
