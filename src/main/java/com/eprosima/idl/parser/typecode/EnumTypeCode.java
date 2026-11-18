@@ -14,6 +14,13 @@
 
 package com.eprosima.idl.parser.typecode;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.ParseException;
+import com.eprosima.idl.parser.tree.Annotation;
+
 import org.stringtemplate.v4.ST;
 
 
@@ -59,6 +66,44 @@ public class EnumTypeCode extends MemberedTypeCode
     public void addMember(
             EnumMember member)
     {
+        addMember(null, member);
+    }
+
+    public void addMember(
+            Context ctx,
+            EnumMember member)
+    {
+        if (member.isAnnotationValue())
+        {
+            String annotation_value = member.getAnnotationValueValue();
+            annotation_value = null == annotation_value ? "" : annotation_value.trim();
+            String error_prefix = "Error in member " + member.getName() + ": @" + Annotation.value_str;
+
+            if (annotation_value.isEmpty())
+            {
+                throw new ParseException(null, error_prefix + " requires a value.");
+            }
+
+            try
+            {
+                next_value_ = Integer.decode(null == ctx ? annotation_value : ctx.evaluate_literal(annotation_value));
+            }
+            catch (NumberFormatException | ParseException ex)
+            {
+                throw new ParseException(null, "Error in member " + member.getName() + ": cannot evaluate '@" +
+                        Annotation.value_str + "(" + annotation_value + ")'.");
+            }
+        }
+
+        if (!used_values_.add(next_value_))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": value " + next_value_ + " is already used by another literal.");
+        }
+
+        member.setValue(next_value_);
+        next_value_ = member.getValue() + 1;
+
         addMember((Member)member);
     }
 
@@ -144,5 +189,9 @@ public class EnumTypeCode extends MemberedTypeCode
         // TODO: pending @bit_bound annotation application to enum types
         return 32;
     }
+
+    private int next_value_ = 0;
+
+    private Set<Integer> used_values_ = new HashSet<Integer>();
 
 }
