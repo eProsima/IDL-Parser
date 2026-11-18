@@ -17,6 +17,7 @@ package com.eprosima.idl.parser.typecode;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.eprosima.idl.context.Context;
 import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.tree.Annotation;
 
@@ -65,17 +66,32 @@ public class EnumTypeCode extends MemberedTypeCode
     public void addMember(
             EnumMember member)
     {
+        addMember(null, member);
+    }
+
+    public void addMember(
+            Context ctx,
+            EnumMember member)
+    {
         if (member.isAnnotationValue())
         {
+            String annotation_value = member.getAnnotationValueValue();
+            annotation_value = null == annotation_value ? "" : annotation_value.trim();
+            String error_prefix = "Error in member " + member.getName() + ": @" + Annotation.value_str;
+
+            if (annotation_value.isEmpty())
+            {
+                throw new ParseException(null, error_prefix + " requires a value.");
+            }
+
             try
             {
-                next_value_ = Integer.decode(member.getAnnotationValueValue().trim());
+                next_value_ = Integer.decode(null == ctx ? annotation_value : ctx.evaluate_literal(annotation_value));
             }
-            catch (NumberFormatException ex)
+            catch (NumberFormatException | ParseException ex)
             {
-                throw new ParseException(null, "Error in member " + member.getName() + ": @" +
-                        Annotation.value_str + " value '" + member.getAnnotationValueValue() +
-                        "' is not an integer.");
+                throw new ParseException(null, "Error in member " + member.getName() + ": cannot evaluate '@" +
+                        Annotation.value_str + "(" + annotation_value + ")'.");
             }
         }
 
