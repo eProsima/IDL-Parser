@@ -2215,7 +2215,7 @@ enumerator [EnumTypeCode enumTP]
             {
                 new_field.addAnnotation(ctx, ann);
             }
-            enumTP.addMember(new_field);
+            enumTP.addMember(ctx, new_field);
         }
     ;
 
