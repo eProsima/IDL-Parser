@@ -88,6 +88,17 @@ specification [Context context, TemplateManager templatemanager, TemplateGroup m
         }
     )+
     {
+        // A forward declared structure or union has to be defined in the same specification.
+        for (TypeDeclaration typedeclaration : ctx.getTypes())
+        {
+            TypeCode typecode = typedeclaration.getTypeCode();
+            if ((typecode instanceof StructTypeCode || typecode instanceof UnionTypeCode) && !typecode.isDefined())
+            {
+                throw new ParseException(typedeclaration.getToken(),
+                        typedeclaration.getScopedname() + " was forward declared but never defined");
+            }
+        }
+
         if(getNumberOfSyntaxErrors() == 0)
         {
             $spec = new Specification();
@@ -420,7 +431,7 @@ forward_decl returns [Pair<Interface, TemplateGroup> itg = null]
         identifier
         {
             // Create the Interface object.
-            Interface interfaceObject = ctx.createInterface($identifier.id, tk);
+            Interface interfaceObject = ctx.createInterface(ctx.removeEscapeCharacter($identifier.id), tk);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -581,11 +592,11 @@ scoped_name returns [Pair<String, Token> pair = null]
     Token tk = _input.LT(1);
 }
 :   ( {literalStr += _input.LT(1).getText();} DOUBLE_COLON )?
-      {literalStr += _input.LT(1).getText();} (ID /* identifier */ | KW_OBJECT )
+      {literalStr += ctx.removeEscapeCharacter(_input.LT(1).getText());} (ID /* identifier */ | KW_OBJECT )
     (
         /* An escaped KW may be part of the scoped_name */
         {literalStr += _input.LT(1).getText();} DOUBLE_COLON
-            (identifier { literalStr+=$identifier.id; } | KW_OBJECT { literalStr+="Object"; } )
+            (identifier { literalStr+=ctx.removeEscapeCharacter($identifier.id); } | KW_OBJECT { literalStr+="Object"; } )
     )*
     {$pair = new Pair<String, Token>(literalStr, tk);}
     ;
@@ -1190,7 +1201,8 @@ simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = nu
                 : ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
             {
-                throw new ParseException(null, "Illegal identifier: " + error);
+                // Report the error but keep the declarator, as the rules using it expect a result.
+                notifyErrorListeners(tk, "Illegal identifier: " + error, null);
             }
             String name = ctx.removeEscapeCharacter($identifier.id);
             Pair<String, Token> p = new Pair<String, Token>(name, tk);
@@ -1554,7 +1566,11 @@ bitfield [BitsetTypeCode owner]
                             // Only simple declaration
                             bitfield = new Bitfield($owner, $bitfield_spec.bitfieldType, $simple_declarators.ret.get(count).first().first());
 
-                            $owner.addBitfield(bitfield);
+                            if (!$owner.addBitfield(bitfield))
+                            {
+                                throw new ParseException($simple_declarators.ret.get(count).first().second(),
+                                        $simple_declarators.ret.get(count).first().first() + " was defined previously");
+                            }
                         }
                     }
                 }
@@ -1648,7 +1664,12 @@ bit_values [BitmaskTypeCode owner]
 }   :
         (annotation_appl { annots.add($annotation_appl.annotation); })* identifier
         {
-            Bitmask bitmask_f = new Bitmask(owner, $identifier.id);
+            String error_f = ctx.checkMemberIdentifier($identifier.id);
+            if (error_f != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error_f);
+            }
+            Bitmask bitmask_f = new Bitmask(owner, ctx.removeEscapeCharacter($identifier.id));
             for (Annotation ann : annots)
             {
                 bitmask_f.addAnnotation(ctx, ann);
@@ -1659,7 +1680,12 @@ bit_values [BitmaskTypeCode owner]
         (
             COMA (annotation_appl { annots.add($annotation_appl.annotation); })* identifier
             {
-                Bitmask bitmask_o = new Bitmask(owner, $identifier.id);
+                String error_o = ctx.checkMemberIdentifier($identifier.id);
+                if (error_o != null)
+                {
+                    throw new ParseException(null, "Illegal identifier: " + error_o);
+                }
+                Bitmask bitmask_o = new Bitmask(owner, ctx.removeEscapeCharacter($identifier.id));
                 for (Annotation ann : annots)
                 {
                     bitmask_o.addAnnotation(ctx, ann);
@@ -1765,8 +1791,26 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
         identifier
         {
             // Forward declaration
-            name=$identifier.id;
-            structTP = ctx.createStructTypeCode(name);
+            name = ctx.removeEscapeCharacter($identifier.id);
+            String fw_name = (ctx.getScope() != null && !ctx.getScope().isEmpty()) ? ctx.getScope() + "::" + name : name;
+            TypeDeclaration previous = ctx.getTypeDeclaration(fw_name);
+
+            // A structure can be forward declared several times, also after its definition.
+            if (previous != null && previous.getTypeCode() instanceof StructTypeCode)
+            {
+                fw_declaration = true;
+                structTP = (StructTypeCode)previous.getTypeCode();
+            }
+            else
+            {
+                String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+                if (error != null)
+                {
+                    throw new ParseException(null, "Illegal identifier: " + error);
+                }
+                structTP = ctx.createStructTypeCode(name);
+                structTP.setForwarded(true);
+            }
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -1779,10 +1823,9 @@ struct_type[Vector<Annotation> annotations] returns [Pair<Vector<TypeCode>, Temp
 
             // Return the returned data.
             vector = new Vector<TypeCode>();
-            structTP.setForwarded(true);
             vector.add(structTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, structTemplates);
-            $fw_name = null;
+            $fw_name = (fw_declaration) ? name : null;
         }
     ;
 
@@ -1998,9 +2041,28 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
         KW_UNION
         identifier
         {
-            name=$identifier.id;
-            // TODO Check supported types for discriminator: long, enumeration, etc...
-            unionTP = ctx.createUnionTypeCode(ctx.getScope(), name);
+            // Forward declaration
+            name = ctx.removeEscapeCharacter($identifier.id);
+            String fw_name = (ctx.getScope() != null && !ctx.getScope().isEmpty()) ? ctx.getScope() + "::" + name : name;
+            TypeDeclaration previous = ctx.getTypeDeclaration(fw_name);
+
+            // A union can be forward declared several times, also after its definition.
+            if (previous != null && previous.getTypeCode() instanceof UnionTypeCode)
+            {
+                fw_decl = true;
+                unionTP = (UnionTypeCode)previous.getTypeCode();
+            }
+            else
+            {
+                String error = ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
+                if (error != null)
+                {
+                    throw new ParseException(null, "Illegal identifier: " + error);
+                }
+                // TODO Check supported types for discriminator: long, enumeration, etc...
+                unionTP = ctx.createUnionTypeCode(ctx.getScope(), name);
+                unionTP.setForwarded(true);
+            }
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -2013,10 +2075,9 @@ union_type [Vector<Annotation> annotations, ArrayList<Definition> defs] returns 
 
             // Return the returned data.
             vector = new Vector<TypeCode>();
-            unionTP.setForwarded(true);
             vector.add(unionTP);
             $returnPair = new Pair<Vector<TypeCode>, TemplateGroup>(vector, unionTemplates);
-            $fw_name = null;
+            $fw_name = (fw_decl) ? name : null;
 
         }
     ;
@@ -2107,7 +2168,8 @@ element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<Pair<St
 }
     :   type_spec[null] { ++member_declarators; } declarator { --member_declarators; }
         {
-            if($type_spec.returnPair.first() != null)
+            // The declarator is null when the parser recovered from a syntax error in it.
+            if($type_spec.returnPair.first() != null && $declarator.ret != null)
             {
                 if(elementTemplates != null)
                 {
@@ -2425,12 +2487,20 @@ array_declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, Tem
             }
         )+
         {
+            // Members are scoped by their struct or union, so they cannot clash with the enclosing scope.
+            String error = member_declarators > 0
+                ? ctx.checkMemberIdentifier(tk.getText())
+                : ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), tk.getText());
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
             if(arrayTemplates != null)
             {
                 arrayTemplates.setAttribute("array", typecode);
                 arrayTemplates.setAttribute("ctx", ctx);
             }
-            Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
+            Pair<String, Token> p = new Pair<String, Token>(ctx.removeEscapeCharacter(tk.getText()), tk);
             Pair<Pair<String, Token>, ContainerTypeCode> pp = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
             $pair = new Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>(pp, arrayTemplates);
         }

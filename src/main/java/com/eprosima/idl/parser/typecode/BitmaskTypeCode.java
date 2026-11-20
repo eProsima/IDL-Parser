@@ -167,15 +167,14 @@ public class BitmaskTypeCode extends MemberedTypeCode
             Bitmask bitmask,
             int position)
     {
-        if (m_value_bitmasks.containsKey(position))
-        {
-            return false;                                         // Position already taken
-
-        }
         if (m_bitmasks.containsKey(bitmask.getName()))
         {
-            return false;                                           // Already exists
-
+            throw new ParseException(null, "Error in member " + bitmask.getName() + ": it was defined previously.");
+        }
+        if (m_value_bitmasks.containsKey(position))
+        {
+            throw new ParseException(null, "Error in member " + bitmask.getName() + ": position " + position +
+                    " is already used by " + m_value_bitmasks.get(position).getName() + ".");
         }
         bitmask.setPosition(position);
         m_value_bitmasks.put(position, bitmask);
