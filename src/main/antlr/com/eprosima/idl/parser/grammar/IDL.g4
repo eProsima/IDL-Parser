@@ -1201,7 +1201,8 @@ simple_declarator returns [Pair<Pair<String, Token>, ContainerTypeCode> ret = nu
                 : ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), $identifier.id);
             if (error != null)
             {
-                throw new ParseException(null, "Illegal identifier: " + error);
+                // Report the error but keep the declarator, as the rules using it expect a result.
+                notifyErrorListeners(tk, "Illegal identifier: " + error, null);
             }
             String name = ctx.removeEscapeCharacter($identifier.id);
             Pair<String, Token> p = new Pair<String, Token>(name, tk);
@@ -2167,7 +2168,8 @@ element_spec [List<String> labels, boolean isDefault] returns [Pair<Pair<Pair<St
 }
     :   type_spec[null] { ++member_declarators; } declarator { --member_declarators; }
         {
-            if($type_spec.returnPair.first() != null)
+            // The declarator is null when the parser recovered from a syntax error in it.
+            if($type_spec.returnPair.first() != null && $declarator.ret != null)
             {
                 if(elementTemplates != null)
                 {
