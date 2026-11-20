@@ -88,6 +88,17 @@ specification [Context context, TemplateManager templatemanager, TemplateGroup m
         }
     )+
     {
+        // A forward declared structure or union has to be defined in the same specification.
+        for (TypeDeclaration typedeclaration : ctx.getTypes())
+        {
+            TypeCode typecode = typedeclaration.getTypeCode();
+            if ((typecode instanceof StructTypeCode || typecode instanceof UnionTypeCode) && !typecode.isDefined())
+            {
+                throw new ParseException(typedeclaration.getToken(),
+                        typedeclaration.getScopedname() + " was forward declared but never defined");
+            }
+        }
+
         if(getNumberOfSyntaxErrors() == 0)
         {
             $spec = new Specification();
@@ -420,7 +431,7 @@ forward_decl returns [Pair<Interface, TemplateGroup> itg = null]
         identifier
         {
             // Create the Interface object.
-            Interface interfaceObject = ctx.createInterface($identifier.id, tk);
+            Interface interfaceObject = ctx.createInterface(ctx.removeEscapeCharacter($identifier.id), tk);
 
             if(ctx.isInScopedFile() || ctx.isScopeLimitToAll())
             {
@@ -581,11 +592,11 @@ scoped_name returns [Pair<String, Token> pair = null]
     Token tk = _input.LT(1);
 }
 :   ( {literalStr += _input.LT(1).getText();} DOUBLE_COLON )?
-      {literalStr += _input.LT(1).getText();} (ID /* identifier */ | KW_OBJECT )
+      {literalStr += ctx.removeEscapeCharacter(_input.LT(1).getText());} (ID /* identifier */ | KW_OBJECT )
     (
         /* An escaped KW may be part of the scoped_name */
         {literalStr += _input.LT(1).getText();} DOUBLE_COLON
-            (identifier { literalStr+=$identifier.id; } | KW_OBJECT { literalStr+="Object"; } )
+            (identifier { literalStr+=ctx.removeEscapeCharacter($identifier.id); } | KW_OBJECT { literalStr+="Object"; } )
     )*
     {$pair = new Pair<String, Token>(literalStr, tk);}
     ;
@@ -1652,7 +1663,12 @@ bit_values [BitmaskTypeCode owner]
 }   :
         (annotation_appl { annots.add($annotation_appl.annotation); })* identifier
         {
-            Bitmask bitmask_f = new Bitmask(owner, $identifier.id);
+            String error_f = ctx.checkMemberIdentifier($identifier.id);
+            if (error_f != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error_f);
+            }
+            Bitmask bitmask_f = new Bitmask(owner, ctx.removeEscapeCharacter($identifier.id));
             for (Annotation ann : annots)
             {
                 bitmask_f.addAnnotation(ctx, ann);
@@ -1663,7 +1679,12 @@ bit_values [BitmaskTypeCode owner]
         (
             COMA (annotation_appl { annots.add($annotation_appl.annotation); })* identifier
             {
-                Bitmask bitmask_o = new Bitmask(owner, $identifier.id);
+                String error_o = ctx.checkMemberIdentifier($identifier.id);
+                if (error_o != null)
+                {
+                    throw new ParseException(null, "Illegal identifier: " + error_o);
+                }
+                Bitmask bitmask_o = new Bitmask(owner, ctx.removeEscapeCharacter($identifier.id));
                 for (Annotation ann : annots)
                 {
                     bitmask_o.addAnnotation(ctx, ann);
@@ -2464,12 +2485,20 @@ array_declarator returns [Pair<Pair<Pair<String, Token>, ContainerTypeCode>, Tem
             }
         )+
         {
+            // Members are scoped by their struct or union, so they cannot clash with the enclosing scope.
+            String error = member_declarators > 0
+                ? ctx.checkMemberIdentifier(tk.getText())
+                : ctx.checkIdentifier(Definition.Kind.TYPE_DECLARATION, ctx.getScope(), tk.getText());
+            if (error != null)
+            {
+                throw new ParseException(null, "Illegal identifier: " + error);
+            }
             if(arrayTemplates != null)
             {
                 arrayTemplates.setAttribute("array", typecode);
                 arrayTemplates.setAttribute("ctx", ctx);
             }
-            Pair<String, Token> p = new Pair<String, Token>(tk.getText(), tk);
+            Pair<String, Token> p = new Pair<String, Token>(ctx.removeEscapeCharacter(tk.getText()), tk);
             Pair<Pair<String, Token>, ContainerTypeCode> pp = new Pair<Pair<String, Token>, ContainerTypeCode>(p, typecode);
             $pair = new Pair<Pair<Pair<String, Token>, ContainerTypeCode>, TemplateGroup>(pp, arrayTemplates);
         }

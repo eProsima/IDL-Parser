@@ -1269,6 +1269,8 @@ public class Context
             return id + " is not a valid identifier: it has to start with a letter after removing the escape character";
         }
 
+        // Escaped and non escaped identifiers denote the same name.
+        id = removeEscapeCharacter(id);
         String scopedname = (scope == null || scope.isEmpty()) ? id : scope + "::" + id;
 
         // Check definitions
@@ -1384,19 +1386,9 @@ public class Context
             }
         }
 
-        if (id.startsWith("_")) // Escaped identifier?
-        {
-            id = id.substring(1);
-        }
-
         return null;
     }
 
-    /*!
-     * @brief Checks the name of a struct or union member. Members live in the scope of their type, so only
-     * keywords are rejected here.
-     * @return An error message, or null if the name is valid.
-     */
     /*!
      * @brief Checks an escaped identifier still starts with a letter once its escape character is removed
      * (IDL 4.2 sections 7.2.3 and 7.2.3.2), i.e. `_1abc` and `__abc` are not valid identifiers.
@@ -1412,6 +1404,11 @@ public class Context
         return 1 < id.length() && Character.isLetter(id.charAt(1));
     }
 
+    /*!
+     * @brief Checks the name of a struct or union member. Members live in the scope of their type, so only
+     * keywords are rejected here.
+     * @return An error message, or null if the name is valid.
+     */
     public String checkMemberIdentifier(
             String id)
     {
