@@ -15,6 +15,7 @@
 package com.eprosima.idl.parser.tree;
 
 import com.eprosima.idl.context.Context;
+import com.eprosima.idl.parser.exception.ParseException;
 import com.eprosima.idl.parser.typecode.Member;
 
 import java.util.ArrayList;
@@ -89,6 +90,21 @@ public class Exception extends TreeNode implements Export, Definition
 
     public int addMember(Member member)
     {
+        // A member cannot be named as its enclosing type (IDL 4.2 section 7.5.2). It is not supported by C++ either.
+        if (member.getName().equals(getName()))
+        {
+            throw new ParseException(null, "Error in member " + member.getName() +
+                    ": a member cannot have the same name as its enclosing type.");
+        }
+
+        for (Member existing : m_members)
+        {
+            if (existing.getName().equals(member.getName()))
+            {
+                throw new ParseException(null, "Error in member " + member.getName() + ": it was defined previously.");
+            }
+        }
+
         m_members.add(member);
         member.set_index(m_members.size() - 1);
         return m_members.size() - 1;
