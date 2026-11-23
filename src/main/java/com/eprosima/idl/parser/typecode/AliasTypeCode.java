@@ -142,9 +142,9 @@ public class AliasTypeCode extends ContainerTypeCode
     }
 
     /*!
-     * @brief Returns the full scoped name of the type, unless the developer uses
-     * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, by removing from the full scoped name the
-     * current `Context` scope.
+     * @brief Returns the full scoped name of the type. If the developer uses
+     * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, the name is fully qualified from the global
+     * scope, because a member can be named as its type, hiding the type inside the class scope (i.e. `T T;`).
      */
     public String getScopedname()
     {
@@ -155,20 +155,7 @@ public class AliasTypeCode extends ContainerTypeCode
             return scoped_name;
         }
 
-        if (ctx.isRelaxedIdl())
-        {
-            // A member can be named as its type, hiding it inside the class scope. Use the fully qualified name.
-            return "::" + scoped_name;
-        }
-
-        String current_scope = ctx.getScope();
-
-        if(current_scope.isEmpty() || !scoped_name.startsWith(current_scope + "::"))
-        {
-            return scoped_name;
-        }
-
-        return scoped_name.replace(current_scope + "::", "");
+        return "::" + scoped_name;
     }
 
     /*!
