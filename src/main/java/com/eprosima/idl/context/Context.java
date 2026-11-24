@@ -1249,6 +1249,13 @@ public class Context
     {
         if (id.startsWith("_")) // Escaped identifier?
         {
+            // In relaxed mode the underscore is kept when removing it would leave an identifier starting with a digit
+            // (i.e. `_1_EXAMPLE`).
+            if (m_relaxed_idl && id.length() > 1 && Character.isDigit(id.charAt(1)))
+            {
+                return id;
+            }
+
             id = id.substring(1);
         }
         return id;
@@ -1392,6 +1399,7 @@ public class Context
     /*!
      * @brief Checks an escaped identifier still starts with a letter once its escape character is removed
      * (IDL 4.2 sections 7.2.3 and 7.2.3.2), i.e. `_1abc` and `__abc` are not valid identifiers.
+     * In relaxed mode a digit is also allowed, as the underscore is kept (i.e. `_1_EXAMPLE`).
      */
     private boolean checkEscapedIdentifier(
             String id)
@@ -1401,7 +1409,8 @@ public class Context
             return true;
         }
 
-        return 1 < id.length() && Character.isLetter(id.charAt(1));
+        return 1 < id.length() &&
+               (Character.isLetter(id.charAt(1)) || (m_relaxed_idl && Character.isDigit(id.charAt(1))));
     }
 
     /*!
@@ -1422,6 +1431,30 @@ public class Context
             return id + " is not a valid identifier: it has to start with a letter after removing the escape character";
         }
 
+        if (m_relaxed_idl)
+        {
+            // Constants are referenced in the generated code by their name as written in the IDL (i.e. array bounds),
+            // so a member named as a visible constant would hide it inside the class scope.
+            String name = removeEscapeCharacter(id);
+            String current_scope = (getScope() == null) ? "" : getScope();
+
+            for (Definition def : m_definitions)
+            {
+                if (def.isIsConstDeclaration())
+                {
+                    ConstDeclaration const_decl = (ConstDeclaration)def;
+                    String const_scope = (const_decl.getScope() == null) ? "" : const_decl.getScope();
+
+                    if (const_decl.getName().equals(name) && (const_scope.isEmpty() ||
+                            current_scope.equals(const_scope) || current_scope.startsWith(const_scope + "::")))
+                    {
+                        return name + " is already defined as a constant (" + const_decl.getScopedname() +
+                               ") visible from this scope";
+                    }
+                }
+            }
+        }
+
         return null;
     }
 
@@ -1429,6 +1462,26 @@ public class Context
             boolean ignore_case)
     {
         m_ignore_case = ignore_case;
+    }
+
+    /*!
+     * @brief Enables non-standard IDL extensions:
+     * - Enumeration literals can set their value using `LITERAL = value`.
+     * - Members can use the name of a type defined previously, except the name of the enclosing type.
+     *   Members still cannot use the name of a visible constant.
+     * - Keywords only collide with identifiers written with the exact same case (i.e. `FIXED` is a valid identifier),
+     *   except TRUE and FALSE.
+     * - The leading underscore is kept when it is followed by a digit (i.e. `_1_EXAMPLE`).
+     */
+    public void setRelaxedIdl(
+            boolean relaxed_idl)
+    {
+        m_relaxed_idl = relaxed_idl;
+    }
+
+    public boolean isRelaxedIdl()
+    {
+        return m_relaxed_idl;
     }
 
     protected void fillKeywords()
@@ -1522,7 +1575,10 @@ public class Context
 
         for (String keyword : m_keywords)
         {
-            if (m_ignore_case
+            // In relaxed mode keywords only collide when written with the exact same case, except TRUE and FALSE
+            // because `true` and `false` are C++ keywords.
+            boolean relaxed_case = m_relaxed_idl && !keyword.equals("TRUE") && !keyword.equals("FALSE");
+            if (m_ignore_case && !relaxed_case
                     ? keyword.equalsIgnoreCase(id)
                     : keyword.equals(id)
                     )
@@ -1689,6 +1745,8 @@ public class Context
     private HashSet<String> m_keywords = null;
 
     private boolean m_ignore_case = true;
+
+    private boolean m_relaxed_idl = false;
 
     private boolean generate_typesc_ = false;
 
