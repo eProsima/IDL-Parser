@@ -14,6 +14,8 @@
 
 package com.eprosima.idl.generator.manager;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -32,6 +34,58 @@ public class TemplateManager
     private boolean st_error_ = false;
 
     private TemplateSTGroup current_template_stgroup_ = null;
+
+    /*!
+     * Names declared inside the class being rendered (members, accessors, operations...), for each nested render.
+     * Inside that class they hide any type with the same name.
+     */
+    private Deque<HidingNames> hiding_names_stack_ = new ArrayDeque<HidingNames>();
+
+    /*!
+     * @brief Names declared inside the class of a type being rendered.
+     */
+    public static class HidingNames
+    {
+        /*!
+         * @param full_scoped_name Full scoped name of the type whose class is being rendered.
+         * @param name Name of the type whose class is being rendered (its injected class name).
+         * @param declared_names Names declared inside the class (members, accessors, operations...).
+         */
+        public HidingNames(
+                String full_scoped_name,
+                String name,
+                Set<String> declared_names)
+        {
+            full_scoped_name_ = full_scoped_name;
+            name_ = name;
+            declared_names_ = declared_names;
+        }
+
+        /*!
+         * @brief Returns whether a type referenced as `first_identifier[::...]` inside the class would be resolved to
+         * a declaration of the class instead of the type.
+         * @param first_identifier First identifier of the name used to reference the type.
+         * @param full_scoped_name Full scoped name of the referenced type.
+         */
+        public boolean hides(
+                String first_identifier,
+                String full_scoped_name)
+        {
+            if (declared_names_.contains(first_identifier))
+            {
+                return true;
+            }
+
+            // The injected class name only hides other types (i.e. `::S` inside `m::S`).
+            return first_identifier.equals(name_) && !full_scoped_name.equals(full_scoped_name_);
+        }
+
+        private String full_scoped_name_;
+
+        private String name_;
+
+        private Set<String> declared_names_;
+    }
 
     public TemplateSTGroup addGroup(String groupname)
     {
@@ -116,5 +170,31 @@ public class TemplateManager
         }
 
         return false;
+    }
+
+    /*!
+     * @brief Starts rendering the class of a type. Until `pop_hiding_names()`, the names declared inside it hide
+     * types with the same name.
+     */
+    public void push_hiding_names(HidingNames hiding_names)
+    {
+        hiding_names_stack_.push(hiding_names);
+    }
+
+    public void pop_hiding_names()
+    {
+        hiding_names_stack_.pop();
+    }
+
+    /*!
+     * @brief Returns whether a type referenced as `first_identifier[::...]` would be hidden by a declaration of the
+     * class being rendered.
+     */
+    public boolean is_hidden_in_current_class(
+            String first_identifier,
+            String full_scoped_name)
+    {
+        HidingNames current = hiding_names_stack_.peek();
+        return null != current && current.hides(first_identifier, full_scoped_name);
     }
 }

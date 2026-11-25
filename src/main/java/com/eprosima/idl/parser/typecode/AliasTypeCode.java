@@ -143,8 +143,9 @@ public class AliasTypeCode extends ContainerTypeCode
 
     /*!
      * @brief Returns the full scoped name of the type. If the developer uses
-     * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, the name is fully qualified from the global
-     * scope, because a member can be named as its type, hiding the type inside the class scope (i.e. `T T;`).
+     * `TemplateSTGroup.enable_custom_proeprty("using_explicitly_modules")`, the name is relative to the current
+     * `Context` scope, and only qualified from the global scope when a declaration of the class being rendered hides
+     * it (i.e. `T T;`). See Context::get_scoped_name_from_current_scope().
      */
     public String getScopedname()
     {
@@ -155,7 +156,7 @@ public class AliasTypeCode extends ContainerTypeCode
             return scoped_name;
         }
 
-        return "::" + scoped_name;
+        return ctx.get_scoped_name_from_current_scope(scoped_name, isDeclaredInsideInterface());
     }
 
     /*!

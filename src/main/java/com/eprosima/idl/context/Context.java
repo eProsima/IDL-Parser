@@ -1695,6 +1695,48 @@ public class Context
         return false;
     }
 
+    /*!
+     * @brief Returns the name used to reference a type from the code being rendered by a TemplateGroup using
+     * Context.using_explicitly_modules_custom_property.
+     *
+     * The name is relative to the current `Context` scope (the module being generated). It is only qualified from the
+     * global scope when:
+     * - that name would be hidden inside the class being rendered, i.e. by a member named as the type (`T T;`) or as
+     *   its first enclosing module.
+     * - the type is declared inside an interface. Generators that cannot resolve nested types (i.e. SWIG) have to
+     *   reference it with the same spelling as the header.
+     *
+     * @param full_scoped_name Full scoped name of the referenced type, without leading `::`.
+     * @param declared_inside_interface Whether the referenced type is declared inside an interface.
+     */
+    public String get_scoped_name_from_current_scope(
+            String full_scoped_name,
+            boolean declared_inside_interface)
+    {
+        if (declared_inside_interface)
+        {
+            return "::" + full_scoped_name;
+        }
+
+        String scoped_name = full_scoped_name;
+        String current_scope = getScope();
+
+        if (null != current_scope && !current_scope.isEmpty() && full_scoped_name.startsWith(current_scope + "::"))
+        {
+            scoped_name = full_scoped_name.substring(current_scope.length() + 2);
+        }
+
+        int separator = scoped_name.indexOf("::");
+        String first_identifier = (separator < 0) ? scoped_name : scoped_name.substring(0, separator);
+
+        if (null != tmanager_ && tmanager_.is_hidden_in_current_class(first_identifier, full_scoped_name))
+        {
+            return "::" + full_scoped_name;
+        }
+
+        return scoped_name;
+    }
+
     // OS
     String m_os = null;
     String m_userdir = null;
