@@ -14,6 +14,8 @@
 
 package com.eprosima.idl.generator.manager;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -32,6 +34,58 @@ public class TemplateManager
     private boolean st_error_ = false;
 
     private TemplateSTGroup current_template_stgroup_ = null;
+
+    /*!
+     * Names declared inside the class being rendered (members, accessors, operations...), for each nested render.
+     * Inside that class they hide types with the same name.
+     */
+    private Deque<HidingNames> hiding_names_stack_ = new ArrayDeque<HidingNames>();
+
+    /*!
+     * @brief Names declared inside the class of a type being rendered.
+     */
+    public static class HidingNames
+    {
+        /*!
+         * @param class_names Names of the class and its bases (their injected class names), mapped to their full
+         * scoped names.
+         * @param member_names Names of the functions declared inside the class or its bases (member accessors,
+         * operations...).
+         */
+        public HidingNames(
+                Map<String, String> class_names,
+                Set<String> member_names)
+        {
+            class_names_ = class_names;
+            member_names_ = member_names;
+        }
+
+        /*!
+         * @brief Returns whether a name starting with `first_identifier` used inside the class would be resolved to
+         * a declaration of the class instead of the intended one.
+         * @param first_identifier First identifier of the name.
+         * @param first_scoped_name Full scoped name of the declaration that `first_identifier` has to be resolved to.
+         * @param whole_name Whether `first_identifier` is the whole name. Functions are ignored when looking up the
+         * name before a `::`, so members only hide whole names.
+         */
+        public boolean hides(
+                String first_identifier,
+                String first_scoped_name,
+                boolean whole_name)
+        {
+            if (whole_name && member_names_.contains(first_identifier))
+            {
+                return true;
+            }
+
+            String class_scoped_name = class_names_.get(first_identifier);
+            return null != class_scoped_name && !class_scoped_name.equals(first_scoped_name);
+        }
+
+        private Map<String, String> class_names_;
+
+        private Set<String> member_names_;
+    }
 
     public TemplateSTGroup addGroup(String groupname)
     {
@@ -116,5 +170,32 @@ public class TemplateManager
         }
 
         return false;
+    }
+
+    /*!
+     * @brief Starts rendering the class of a type. Until `pop_hiding_names()`, the names declared inside it hide
+     * types with the same name.
+     */
+    public void push_hiding_names(HidingNames hiding_names)
+    {
+        hiding_names_stack_.push(hiding_names);
+    }
+
+    public void pop_hiding_names()
+    {
+        hiding_names_stack_.pop();
+    }
+
+    /*!
+     * @brief Returns whether a name starting with `first_identifier` would be resolved to a declaration of the class
+     * being rendered instead of the intended one. See HidingNames::hides().
+     */
+    public boolean is_hidden_in_current_class(
+            String first_identifier,
+            String first_scoped_name,
+            boolean whole_name)
+    {
+        HidingNames current = hiding_names_stack_.peek();
+        return null != current && current.hides(first_identifier, first_scoped_name, whole_name);
     }
 }
