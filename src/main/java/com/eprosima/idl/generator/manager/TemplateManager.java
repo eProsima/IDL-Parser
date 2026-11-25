@@ -37,7 +37,7 @@ public class TemplateManager
 
     /*!
      * Names declared inside the class being rendered (members, accessors, operations...), for each nested render.
-     * Inside that class they hide any type with the same name.
+     * Inside that class they hide types with the same name.
      */
     private Deque<HidingNames> hiding_names_stack_ = new ArrayDeque<HidingNames>();
 
@@ -47,44 +47,44 @@ public class TemplateManager
     public static class HidingNames
     {
         /*!
-         * @param full_scoped_name Full scoped name of the type whose class is being rendered.
-         * @param name Name of the type whose class is being rendered (its injected class name).
-         * @param declared_names Names declared inside the class (members, accessors, operations...).
+         * @param class_names Names of the class and its bases (their injected class names), mapped to their full
+         * scoped names.
+         * @param member_names Names of the functions declared inside the class or its bases (member accessors,
+         * operations...).
          */
         public HidingNames(
-                String full_scoped_name,
-                String name,
-                Set<String> declared_names)
+                Map<String, String> class_names,
+                Set<String> member_names)
         {
-            full_scoped_name_ = full_scoped_name;
-            name_ = name;
-            declared_names_ = declared_names;
+            class_names_ = class_names;
+            member_names_ = member_names;
         }
 
         /*!
-         * @brief Returns whether a type referenced as `first_identifier[::...]` inside the class would be resolved to
-         * a declaration of the class instead of the type.
-         * @param first_identifier First identifier of the name used to reference the type.
-         * @param full_scoped_name Full scoped name of the referenced type.
+         * @brief Returns whether a name starting with `first_identifier` used inside the class would be resolved to
+         * a declaration of the class instead of the intended one.
+         * @param first_identifier First identifier of the name.
+         * @param first_scoped_name Full scoped name of the declaration that `first_identifier` has to be resolved to.
+         * @param whole_name Whether `first_identifier` is the whole name. Functions are ignored when looking up the
+         * name before a `::`, so members only hide whole names.
          */
         public boolean hides(
                 String first_identifier,
-                String full_scoped_name)
+                String first_scoped_name,
+                boolean whole_name)
         {
-            if (declared_names_.contains(first_identifier))
+            if (whole_name && member_names_.contains(first_identifier))
             {
                 return true;
             }
 
-            // The injected class name only hides other types (i.e. `::S` inside `m::S`).
-            return first_identifier.equals(name_) && !full_scoped_name.equals(full_scoped_name_);
+            String class_scoped_name = class_names_.get(first_identifier);
+            return null != class_scoped_name && !class_scoped_name.equals(first_scoped_name);
         }
 
-        private String full_scoped_name_;
+        private Map<String, String> class_names_;
 
-        private String name_;
-
-        private Set<String> declared_names_;
+        private Set<String> member_names_;
     }
 
     public TemplateSTGroup addGroup(String groupname)
@@ -187,14 +187,15 @@ public class TemplateManager
     }
 
     /*!
-     * @brief Returns whether a type referenced as `first_identifier[::...]` would be hidden by a declaration of the
-     * class being rendered.
+     * @brief Returns whether a name starting with `first_identifier` would be resolved to a declaration of the class
+     * being rendered instead of the intended one. See HidingNames::hides().
      */
     public boolean is_hidden_in_current_class(
             String first_identifier,
-            String full_scoped_name)
+            String first_scoped_name,
+            boolean whole_name)
     {
         HidingNames current = hiding_names_stack_.peek();
-        return null != current && current.hides(first_identifier, full_scoped_name);
+        return null != current && current.hides(first_identifier, first_scoped_name, whole_name);
     }
 }

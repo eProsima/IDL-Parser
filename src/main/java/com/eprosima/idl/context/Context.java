@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.StringReader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1699,12 +1700,17 @@ public class Context
      * @brief Returns the name used to reference a type from the code being rendered by a TemplateGroup using
      * Context.using_explicitly_modules_custom_property.
      *
-     * The name is relative to the current `Context` scope (the module being generated). It is only qualified from the
-     * global scope when:
-     * - that name would be hidden inside the class being rendered, i.e. by a member named as the type (`T T;`) or as
-     *   its first enclosing module.
-     * - the type is declared inside an interface. Generators that cannot resolve nested types (i.e. SWIG) have to
-     *   reference it with the same spelling as the header.
+     * The name is relative to the current `Context` scope (the module being generated). When its first identifier
+     * would be found as another declaration, enclosing modules are added one at a time (`y::T`, then `x::y::T`), and
+     * only when none of these names works it is qualified from the global scope (`::x::y::T`). The first identifier is
+     * found as another declaration when:
+     * - the class being rendered declares a member, operation or attribute with that name, and the name is a single
+     *   identifier. Functions are ignored when looking up the name before a `::`.
+     * - the name of the class being rendered, or of one of its bases, is that identifier, and it is another type.
+     * - a module or type with that name is declared in a scope between the current one and the one of the type.
+     *
+     * Types declared inside an interface are always qualified from the global scope. Generators that cannot resolve
+     * nested types (i.e. SWIG) have to reference them with the same spelling as the header.
      *
      * @param full_scoped_name Full scoped name of the referenced type, without leading `::`.
      * @param declared_inside_interface Whether the referenced type is declared inside an interface.
@@ -1718,23 +1724,86 @@ public class Context
             return "::" + full_scoped_name;
         }
 
-        String scoped_name = full_scoped_name;
-        String current_scope = getScope();
+        String[] identifiers = full_scoped_name.split("::");
+        String current_scope = (null == getScope()) ? "" : getScope();
+        int first = 0;
 
-        if (null != current_scope && !current_scope.isEmpty() && full_scoped_name.startsWith(current_scope + "::"))
+        if (!current_scope.isEmpty() && full_scoped_name.startsWith(current_scope + "::"))
         {
-            scoped_name = full_scoped_name.substring(current_scope.length() + 2);
+            first = current_scope.split("::").length;
         }
 
-        int separator = scoped_name.indexOf("::");
-        String first_identifier = (separator < 0) ? scoped_name : scoped_name.substring(0, separator);
-
-        if (null != tmanager_ && tmanager_.is_hidden_in_current_class(first_identifier, full_scoped_name))
+        // Add enclosing modules one at a time.
+        for (int i = first; i >= 0; --i)
         {
-            return "::" + full_scoped_name;
+            if (is_resolved_from_current_scope(identifiers, i, current_scope))
+            {
+                return String.join("::", Arrays.copyOfRange(identifiers, i, identifiers.length));
+            }
         }
 
-        return scoped_name;
+        // Shorter names, if the type shares some enclosing modules with the current scope.
+        for (int i = first + 1; i < identifiers.length; ++i)
+        {
+            if (is_resolved_from_current_scope(identifiers, i, current_scope))
+            {
+                return String.join("::", Arrays.copyOfRange(identifiers, i, identifiers.length));
+            }
+        }
+
+        return "::" + full_scoped_name;
+    }
+
+    /*!
+     * @brief Returns whether the name formed by `identifiers[first...]`, used inside the class being rendered in the
+     * current scope, is resolved to the type whose full scoped name is formed by `identifiers`.
+     */
+    private boolean is_resolved_from_current_scope(
+            String[] identifiers,
+            int first,
+            String current_scope)
+    {
+        String first_identifier = identifiers[first];
+        String first_scope = String.join("::", Arrays.copyOfRange(identifiers, 0, first));
+        String first_scoped_name = first_scope.isEmpty() ? first_identifier : first_scope + "::" + first_identifier;
+
+        if (null != tmanager_ && tmanager_.is_hidden_in_current_class(first_identifier, first_scoped_name,
+                first == identifiers.length - 1))
+        {
+            return false;
+        }
+
+        // Look up the first identifier from the current scope to the global one.
+        String scope = current_scope;
+
+        while (true)
+        {
+            if (scope.equals(first_scope))
+            {
+                return true;
+            }
+
+            if (is_module_or_type_declared(scope.isEmpty() ? first_identifier : scope + "::" + first_identifier))
+            {
+                return false;
+            }
+
+            if (scope.isEmpty())
+            {
+                // The scope of the first identifier does not enclose the current scope.
+                return false;
+            }
+
+            int separator = scope.lastIndexOf("::");
+            scope = (separator < 0) ? "" : scope.substring(0, separator);
+        }
+    }
+
+    private boolean is_module_or_type_declared(
+            String scoped_name)
+    {
+        return m_modules.containsKey(scoped_name) || m_types.containsKey(scoped_name) ||
+               m_interfaces.containsKey(scoped_name) || m_exceptions.containsKey(scoped_name);
     }
 
     // OS
